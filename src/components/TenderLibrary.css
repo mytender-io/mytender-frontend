@@ -1,3 +1,15 @@
+.tenderlibrary-card-body-content {
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    overflow-y: auto;
+}
+
+.tender-library-title {
+    font-size: 26px;
+    font-weight: 800;
+}
+
 .tender-library-table {
     width: 100%;
     table-layout: fixed;

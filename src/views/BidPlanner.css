@@ -1,0 +1,29 @@
+.library-toggle-bar {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.library-toggle-bar:hover {
+    background-color: #e9ecef;
+}
+
+.library-toggle-bar svg {
+    margin-right: 10px;
+}
+
+.library-section {
+    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+}
+
+.library-section.collapsed {
+    max-height: 0;
+}

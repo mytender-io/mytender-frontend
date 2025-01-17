@@ -12,6 +12,8 @@ import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 import TenderAnalysis from "../components/TenderAnalysis.tsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faChevronUp, faMaximize, faMinimize } from "@fortawesome/free-solid-svg-icons";
 
 const BidPlanner = () => {
   const getAuth = useAuthUser();
@@ -29,6 +31,12 @@ const BidPlanner = () => {
   const [existingBidNames, setExistingBidNames] = useState([]);
   const [organizationUsers, setOrganizationUsers] = useState([]);
   const [currentUserEmail, setCurrentUserEmail] = useState("");
+
+  const [isLibraryVisible, setIsLibraryVisible] = useState(false);
+
+  const toggleLibrary = () => {
+    setIsLibraryVisible(!isLibraryVisible);
+  };
 
   const currentUserPermission = contributors[auth.email] || "viewer";
   const canUserEdit =
@@ -170,13 +178,29 @@ const BidPlanner = () => {
             initialBidName={initialBidName}
           />
           <div>
-            <Row className="mt-4">
-              <Col md={12}>
-                <TenderLibrary key={object_id} object_id={object_id} />
-              </Col>
-            </Row>
-            <div className="mt-4">
-              <TenderAnalysis canUserEdit={canUserEdit} />
+            <div className="library-toggle-bar" onClick={toggleLibrary}>
+              <FontAwesomeIcon
+                icon={faMaximize}
+              />
+              <span>View Company Library Documents</span>
+            </div>
+
+            <div
+              className={`library-section ${!isLibraryVisible ? "collapsed" : ""}`}
+            >
+              <Row className="mt-4">
+                <Col md={12}>
+                  <TenderLibrary key={object_id} object_id={object_id} />
+                </Col>
+              </Row>
+            </div>
+
+            <div>
+              <Row>
+                <Col md={12}>
+                  <TenderAnalysis canUserEdit={canUserEdit} />
+                </Col>
+              </Row>
             </div>
           </div>
         </div>

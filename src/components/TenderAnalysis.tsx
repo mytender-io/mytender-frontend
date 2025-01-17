@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Row, Col, Spinner } from "react-bootstrap";
 import "./TenderAnalysis.css";
 import axios from "axios";
@@ -101,6 +101,20 @@ const TenderAnalysis = ({ canUserEdit }) => {
     }));
   };
 
+  useEffect(() => {
+    setTabContent({
+      0: tender_summary || "",
+      1: evaluation_criteria || "",
+      2: derive_insights || "",
+      3: differentiation_opportunities || ""
+    });
+  }, [
+    tender_summary,
+    evaluation_criteria,
+    derive_insights,
+    differentiation_opportunities
+  ]);
+
   const handleActionClick = async (action, prompt) => {
     if (!canUserEdit) {
       displayAlert("You only have permission to view this bid.", "danger");
@@ -187,29 +201,30 @@ const TenderAnalysis = ({ canUserEdit }) => {
           </button>
         ))}
       </div>
-      <div className="tabs-container">
-        {tabs.map((tab, index) => (
-          <div
-            key={index}
-            className={`tab ${currentTabIndex === index ? "active" : ""}`}
-            onClick={() => setCurrentTabIndex(index)}
-          >
-            <span className="tab-content">
-              <span className="tab-name">{tab}</span>
-            </span>
-          </div>
-        ))}
-      </div>
-      <div className="proposal-container">
-       
-            <textarea
-              className="tender-insights-textarea"
-              value={tabContent[currentTabIndex]}
-              onChange={handleTextChange}
-              placeholder={getPlaceholderText(currentTabIndex)}
-              disabled={!canUserEdit}/>
-         
-     
+      <div>
+        <div className="tabs-container">
+          {tabs.map((tab, index) => (
+            <div
+              key={index}
+              className={`tab ${currentTabIndex === index ? "active" : ""}`}
+              onClick={() => setCurrentTabIndex(index)}
+            >
+              <span className="tab-content">
+                <span className="tab-name">{tab}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="proposal-container">
+          <textarea
+            className="tender-insights-textarea"
+            value={tabContent[currentTabIndex]}
+            onChange={handleTextChange}
+            placeholder={getPlaceholderText(currentTabIndex)}
+            disabled={!canUserEdit}
+          />
+        </div>
       </div>
     </div>
   );

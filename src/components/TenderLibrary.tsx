@@ -306,17 +306,7 @@ const TenderLibrary = ({ object_id }) => {
           ×
         </button>
       </Modal.Header>
-      <Modal.Body className="px-4 py-4">
-        <UploadPDF
-          bid_id={object_id}
-          get_collections={get_collections}
-          onClose={onClose}
-          apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
-          descriptionText="Documents uploaded to the Tender Library will be used as context by
-    our AI to generate compliance requirements and opportunity
-    information for the Tender."
-        />
-      </Modal.Body>
+      <Modal.Body className="px-4 py-4"></Modal.Body>
     </Modal>
   );
 
@@ -385,26 +375,16 @@ const TenderLibrary = ({ object_id }) => {
         <Col md={12}>
           <Card className="mb-2 p-2">
             <Card.Body className="tenderlibrary-card-body-content">
-              <div className="library-card-content-wrapper">
-                <div className="header-row mt-2" id="tender-library">
-                  <div className="lib-title">Tender Upload</div>
-                  <div>
-                    {/* <InterrogateTenderModal bid_id={object_id} /> */}
-                    <Button
-                      aria-controls="simple-menu"
-                      aria-haspopup="true"
-                      onClick={() => handleMenuItemClick("pdf")}
-                      className="upload-button"
-                      style={{ marginLeft: "5px" }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faPlus}
-                        style={{ marginRight: "8px" }}
-                      />
-                      Upload Document
-                    </Button>
-                  </div>
+              <div>
+                <div className="header-row " id="tender-library">
+                  <div className="tender-library-title">Tender Upload</div>
                 </div>
+                <UploadPDF
+                  bid_id={object_id}
+                  get_collections={fetchDocuments}
+                  apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
+                  descriptionText="Upload documents and attatchments that are part of the tender"
+                />
                 <div style={{ width: "100%", marginTop: "30px" }}>
                   <table className="tender-library-table">
                     <thead>
