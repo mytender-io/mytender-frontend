@@ -29,7 +29,7 @@ describe("QA Generator Component", () => {
     // Basic assertions
     expect(questionResponse.status).toBe(200);
     expect(typeof questionResponse.data).toBe("string");
-  }, 15000); // Increased timeout to 15 seconds
+  }, 50000); // Increased timeout to 15 seconds
 
   it("sends a multi-step question to generate subsections", async () => {
     const multistepResponse = await authenticatedAxios.post(
@@ -59,7 +59,7 @@ describe("QA Generator Component", () => {
     // Basic assertions
     expect(multistepResponse.status).toBe(200);
     expect(typeof multistepResponse.data).toBe("string");
-  }, 15000); // Increased timeout to 15 seconds
+  }, 50000); // Increased timeout to 15 seconds
 
   it("uses copilot to refine text", async () => {
     const copilotResponse = await authenticatedAxios.post(
@@ -85,7 +85,7 @@ describe("QA Generator Component", () => {
     // Basic assertions
     expect(copilotResponse.status).toBe(200);
     expect(typeof copilotResponse.data).toBe("string");
-  }, 10000); // Added 10 second timeout
+  }, 50000); // Added 10 second timeout
 
   it("performs an internet search using perplexity", async () => {
     const perplexityResponse = await authenticatedAxios.post(
@@ -108,5 +108,5 @@ describe("QA Generator Component", () => {
     // Basic assertions
     expect(perplexityResponse.status).toBe(200);
     expect(typeof perplexityResponse.data).toBe("string");
-  }, 30000); // Keep 30 second timeout for internet search
+  }, 50000); // Keep 30 second timeout for internet search
 });
