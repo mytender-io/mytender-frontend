@@ -1246,15 +1246,14 @@ const QAGenerator = () => {
 
     let newContentState = contentState;
 
-    // Pattern to match [Extracted...] sections
-    const pattern = /\[(?=.*Extracted).*?\]/g;
+    // Updated pattern to be more flexible with endings and handle line breaks
+    const pattern = /\s*Extracted from:.*?(?:\[.*?\](?:,\s*)?)+[.\n]?/g;
 
     blockMap.forEach((block) => {
       const text = block.getText();
       const key = block.getKey();
 
       let match;
-      let lastIndex = 0;
       const ranges = [];
 
       // Find all matches in the current block
