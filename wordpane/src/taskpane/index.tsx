@@ -1,30 +1,27 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import App from "./components/App";
 import { FluentProvider, webLightTheme } from "@fluentui/react-components";
 
-/* global document, Office, module, require */
+/* global document, Office, module, require, HTMLElement */
 
 const title = "Mytender.io Task Pane Add-in";
-const container: HTMLElement | null = document.getElementById("container");
+
+const rootElement: HTMLElement | null = document.getElementById("container");
+const root = rootElement ? createRoot(rootElement) : undefined;
 
 /* Render application after Office initializes */
 Office.onReady(() => {
-  if (container) {
-    ReactDOM.render(
-      <FluentProvider theme={webLightTheme}>
-        <App title={title} />
-      </FluentProvider>,
-      container
-    );
-  }
+  root?.render(
+    <FluentProvider theme={webLightTheme}>
+      <App title={title} />
+    </FluentProvider>
+  );
 });
 
 if ((module as any).hot) {
   (module as any).hot.accept("./components/App", () => {
     const NextApp = require("./components/App").default;
-    if (container) {
-      ReactDOM.render(<NextApp />, container);
-    }
+    root?.render(NextApp);
   });
 }

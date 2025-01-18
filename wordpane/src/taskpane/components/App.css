@@ -1,12 +1,12 @@
 @font-face {
-  font-family: "ClashDisplay";
-  src: url("../resources/fonts/ClashDisplay-Variable.ttf") format("ttf");
+  font-family: "Manrope";
+  src: url("../resources/fonts/Manrope-VariableFont_wght.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
 :root {
-  --font-family: "ClashDisplay", sans-serif;
+  --font-family: "Manrope";
 }
 
 #root {
@@ -38,6 +38,7 @@ body {
   font-family: var(--font-family) !important;
   height: 100%;
 }
+
 /* Ensure all text elements use the font */
 
 h1,
@@ -55,6 +56,7 @@ textarea,
 select {
   font-family: var(--font-family) !important;
 }
+
 /* Adjust other styles as needed */
 
 .dropdowns-container {
@@ -79,6 +81,7 @@ select {
     /* Reduced from 0.7 */
   }
 }
+
 /* You may need to adjust other specific component styles */
 .container,
 #container {
@@ -94,4 +97,8 @@ select {
   height: 125vh;
   max-height: 125vh;
   overflow-y: hidden;
+}
+
+.wmde-markdown {
+    font-size: 14px;
 }
