@@ -1,16 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import { IButtonStatus, IMessage, IShortcutType } from "../../../types";
-import { Button, Grid, Typography } from "@mui/material";
+import { Button, Grid, IconButton, Typography } from "@mui/material";
 import {
   NorthWest as NorthWestIcon,
   PublishedWithChanges as PublishedWithChangesIcon,
   Replay as ReplayIcon,
+  ContentCopy as ContentCopyIcon,
 } from "@mui/icons-material";
 import Creator from "./Creator";
 
 import "./MessageBox.css";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import "@uiw/react-markdown-preview/markdown.css";
+import CopyButton from "./CopyButton";
 
 interface MessageBoxProps {
   messages: IMessage[];
@@ -24,6 +26,11 @@ const shortcuts: {
   title: string;
   icon: JSX.Element;
 }[] = [
+  {
+    type: "copy",
+    title: "",
+    icon: <ContentCopyIcon fontSize="small" />,
+  },
   {
     type: "insert",
     title: "Insert",
@@ -125,18 +132,31 @@ const MessageBox = ({ messages, showShortcuts, handleClickShortcut, shortcutVisi
               <Grid container spacing={1} className="shortcuts">
                 {shortcuts.map((shortcut, idx) => {
                   if (shortcutVisible === undefined || shortcutVisible(message, shortcut.type) !== "hidden") {
+                    const isDisabled = shortcutVisible && shortcutVisible(message, shortcut.type) === "disabled";
                     return (
                       <Grid item key={idx}>
-                        <Button
-                          onClick={() => onClickShortcut(shortcut.type, message)}
-                          variant="outlined"
-                          color="inherit"
-                          startIcon={shortcut.icon}
-                          size="small"
-                          disabled={shortcutVisible && shortcutVisible(message, shortcut.type) === "disabled"}
-                        >
-                          {shortcut.title}
-                        </Button>
+                        {shortcut.type === "copy" ? (
+                          <CopyButton
+                            onClick={() => onClickShortcut(shortcut.type, message)}
+                            color="inherit"
+                            size="small"
+                            disabled={isDisabled}
+                            className="icon-button"
+                          >
+                            {shortcut.icon}
+                          </CopyButton>
+                        ) : (
+                          <Button
+                            onClick={() => onClickShortcut(shortcut.type, message)}
+                            variant="outlined"
+                            color="inherit"
+                            size="small"
+                            startIcon={shortcut.icon}
+                            disabled={isDisabled}
+                          >
+                            {shortcut.title}
+                          </Button>
+                        )}
                       </Grid>
                     );
                   } else {

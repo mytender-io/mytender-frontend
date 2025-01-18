@@ -6,7 +6,7 @@
 }
 
 .creator > span[class^="MuiTypography-root"] {
-  font-size: 15px;
+  font-size: 13px;
   line-height: normal;
 }
 
@@ -18,8 +18,8 @@
 .creator > svg {
   min-width: 28px;
   min-height: 30px;
-  width: 28px;
-  height: 30px;
+  width: 22px;
+  height: 25px;
 }
 
 div.MuiGrid-root.shortcuts {
@@ -36,4 +36,9 @@ div.MuiGrid-root.shortcuts {
 .message-body__content_text ul {
   padding-left: 5px !important;
   padding-right: 5px !important;
+}
+
+button.MuiButtonBase-root.icon-button {
+  border: solid #c2c2c2 1px;
+  border-radius: 4px;
 }

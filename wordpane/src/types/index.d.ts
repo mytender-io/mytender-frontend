@@ -38,7 +38,7 @@ export type IPromptType =
   | "Graph"
   | "Custom Prompt";
 
-export type IShortcutType = "insert" | "replace" | "refine";
+export type IShortcutType = "insert" | "replace" | "refine" | "copy";
 
 export type IButtonStatus = "hidden" | "disabled" | "enabled";
 
