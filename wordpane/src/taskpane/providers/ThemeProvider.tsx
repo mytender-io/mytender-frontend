@@ -38,6 +38,31 @@ const ThemeProvider = ({ children }) => {
               borderColor: "#C2C2C2",
             },
           },
+          sizeSmall: {
+            fontSize: "12px",
+          },
+          sizeMedium: {
+            fontSize: "15px",
+            padding: "3px 8px",
+          },
+        },
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          sizeSmall: {
+            fontSize: "12px",
+          },
+          sizeMedium: {
+            fontSize: "15px",
+            padding: "3px 10px",
+          },
+        },
+      },
+      MuiSvgIcon: {
+        styleOverrides: {
+          root: {
+            fontSize: "17px",
+          },
         },
       },
     },

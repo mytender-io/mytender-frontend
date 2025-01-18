@@ -102,7 +102,7 @@ module.exports = async (env, options) => {
       new HtmlWebpackPlugin({
         filename: "commands.html",
         template: "./src/commands/commands.html",
-        chunks: ["commands"],
+        chunks: ["polyfill", "commands"],
       }),
       new webpack.ProvidePlugin({
         Promise: ["es6-promise", "Promise"],

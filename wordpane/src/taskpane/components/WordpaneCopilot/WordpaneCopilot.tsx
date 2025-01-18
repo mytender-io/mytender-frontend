@@ -155,6 +155,17 @@ const WordpaneCopilot = () => {
       insertToWord(message, "End");
     } else if (action === "replace") {
       insertToWord(message, "Replace");
+    } else if (action === "copy") {
+      const copyToClipboard = (textToCopy: string) => {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = textToCopy;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        input.remove();
+      };
+      copyToClipboard(message.value);
     }
 
     setCustomPromptMenuVisible(false);
@@ -487,6 +498,7 @@ const WordpaneCopilot = () => {
   };
 
   const shortcutVisible = (message: IMessage, type: IShortcutType): IButtonStatus => {
+    if (message.type === "text" && type === "copy" && message.createdBy == "bot") return "enabled";
     if (message.type === "text" && type === "replace") return "enabled";
     if (message.type === "image" && type === "insert") return "enabled";
     if (type === "refine" && currentRefine?.message?.id === message.id) return "disabled";
@@ -525,7 +537,7 @@ const WordpaneCopilot = () => {
             value="library-chat"
             onClick={() => isLoading || setSelectedTab("library-chat")}
           />
-          <Tab label="Internet Research" value="internet-search" />
+          <Tab label="Internet AI" value="internet-search" />
         </Tabs>
         <SignoutFab />
       </Box>
@@ -635,7 +647,7 @@ const WordpaneCopilot = () => {
             onKeyDown={handleKeyDown}
             disabled={isLoading}
             className={"chat-input" + (isCustomPrompt ? " custom-prompt" : "")}
-            rows={4}
+            rows={3}
             ref={textInputRef}
           />
           <Button

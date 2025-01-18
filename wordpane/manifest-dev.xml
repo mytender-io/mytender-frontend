@@ -17,6 +17,7 @@
   </Hosts>
   <DefaultSettings>
     <SourceLocation DefaultValue="https://word-dev.mytender.io/taskpane.html"/>
+    <RequestedWidth>500</RequestedWidth>
   </DefaultSettings>
   <Permissions>ReadWriteDocument</Permissions>
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
