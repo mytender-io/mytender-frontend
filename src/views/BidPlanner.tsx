@@ -182,7 +182,7 @@ const BidPlanner = () => {
               <FontAwesomeIcon
                 icon={faMaximize}
               />
-              <span>View Company Library Documents</span>
+              <span>View Tender Library Documents</span>
             </div>
 
             <div

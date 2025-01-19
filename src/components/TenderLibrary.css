@@ -5,6 +5,13 @@
     overflow-y: auto;
 }
 
+.card-custom-shadow {
+    box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.1), /* Right shadow */
+    -2px 0 5px -2px rgba(0, 0, 0, 0.1), /* Left shadow */
+    0 2px 5px -2px rgba(0, 0, 0, 0.1);
+    /* Bottom shadow */
+}
+
 .tender-library-title {
     font-size: 26px;
     font-weight: 800;
