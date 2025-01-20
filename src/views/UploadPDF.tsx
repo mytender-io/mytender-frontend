@@ -357,19 +357,21 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
 
       {renderSelectedFiles()}
 
-      <div style={{ marginTop: "20px", textAlign: "right" }}>
-        <Button
-          onClick={handleUpload}
-          disabled={isUploading || selectedFiles.length === 0}
-          className="upload-button"
-        >
-          {isUploading
-            ? "Uploading..."
-            : `Upload ${selectedFiles.length} File${
-                selectedFiles.length !== 1 ? "s" : ""
-              }`}
-        </Button>
-      </div>
+      {selectedFiles.length > 0 && (
+        <div style={{ marginTop: "20px", textAlign: "right" }}>
+          <Button
+            onClick={handleUpload}
+            disabled={isUploading}
+            className="upload-button"
+          >
+            {isUploading
+              ? "Uploading..."
+              : `Upload ${selectedFiles.length} File${
+                  selectedFiles.length !== 1 ? "s" : ""
+                }`}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
