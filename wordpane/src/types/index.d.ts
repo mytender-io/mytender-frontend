@@ -17,6 +17,7 @@ export type IMessageRequest =
       messages: IMessage[];
       isRefine: false;
       isCustomPrompt: boolean;
+      tenderBid?: ITenderBid;
     }
   | {
       type: "text" | "image";
@@ -27,6 +28,7 @@ export type IMessageRequest =
       isRefine: true;
       isCustomPrompt: boolean;
       refineInstruction: string;
+      tenderBid?: ITenderBid;
     };
 
 export type IPromptType =
@@ -42,4 +44,14 @@ export type IShortcutType = "insert" | "replace" | "refine" | "copy";
 
 export type IButtonStatus = "hidden" | "disabled" | "enabled";
 
-export type IChatTypes = "library-chat" | "internet-search";
+export type IChatTypes = "library-chat" | "internet-search" | "tender-search";
+
+export interface ITenderBid {
+  _id: string;
+  bid_manager: string;
+  bid_qualification_result: string;
+  bid_title: string;
+  client_name: string;
+  compliance_requirements: string;
+  contract_information: string;
+}

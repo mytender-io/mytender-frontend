@@ -101,5 +101,10 @@ select {
 }
 
 .wmde-markdown {
-    font-size: 14px;
+  font-size: 14px;
+}
+
+.MuiAutocomplete-listbox > .MuiAutocomplete-option {
+  min-height: 30px !important;
+  height: 30px;
 }

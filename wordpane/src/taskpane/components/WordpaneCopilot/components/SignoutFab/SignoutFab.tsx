@@ -6,8 +6,11 @@ import { ArrowBackIosNew as ArrowBackIosIcon, ArrowForwardIos as ArrowForwardIos
 const SignoutFab = () => {
   const signout = useSignOut();
   const [isOpen, setIsOpen] = useState(false);
+  const [lastArrowClick, setLastArrowClick] = useState<number>(0);
 
   const toggleOpen: MouseEventHandler<HTMLButtonElement> = (e) => {
+    const now = Date.now();
+    setLastArrowClick(now);
     e.preventDefault();
     setIsOpen(!isOpen);
   };
@@ -18,6 +21,7 @@ const SignoutFab = () => {
   };
 
   const outSideClickHandler = (e: MouseEvent) => {
+    if (Date.now() - lastArrowClick < 100) return;
     setIsOpen(false);
   };
 
@@ -31,7 +35,7 @@ const SignoutFab = () => {
     return () => {
       document.removeEventListener("click", outSideClickHandler);
     };
-  });
+  }, [isOpen]);
 
   return (
     <>

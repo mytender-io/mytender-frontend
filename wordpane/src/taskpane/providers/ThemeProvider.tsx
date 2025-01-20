@@ -65,6 +65,24 @@ const ThemeProvider = ({ children }) => {
           },
         },
       },
+      MuiTab: {
+        styleOverrides: {
+          root: {
+            paddingLeft: "3px",
+            paddingRight: "3px",
+            minWidth: "60px",
+          },
+        },
+      },
+      MuiAutocomplete: {
+        styleOverrides: {
+          listbox: {
+            "& > MuiAutocomplete-option": {
+              minHeight: "20px",
+            },
+          },
+        },
+      },
     },
   });
 

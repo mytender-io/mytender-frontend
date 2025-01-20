@@ -1,4 +1,4 @@
-import { IMessage, IMessageRequest, IPromptType } from "../../../types";
+import { IChatTypes, IMessage, IMessageRequest, IPromptType } from "../../../types";
 import { v4 } from "uuid";
 import { getBase64FromBlob } from "../../helper/file";
 import { apiURL } from "../../helper/urls";
@@ -85,7 +85,7 @@ export const askLibraryChatQuestion = async (token: string, request: IMessageReq
           : request.instructionText,
         extra_instructions: normalizeChatHistory(request.messages),
         datasets: ["default"],
-        bid_id: "sharedState.object_id",
+        bid_id: request?.tenderBid?._id || "sharedState.object_id",
       },
       {
         headers: {
@@ -234,7 +234,7 @@ export const getCopilotMode = (action: IPromptType | "default", prompt: string):
   }
 };
 
-export const getDefaultMessage = (type: "library-chat" | "internet-search", useCache: boolean = false): IMessage[] => {
+export const getDefaultMessage = (type: IChatTypes, useCache: boolean = false): IMessage[] => {
   const version = localStorage.getItem("version");
   if (version !== LOCAL_STORAGE_CACHE_VERSION) {
     return [];

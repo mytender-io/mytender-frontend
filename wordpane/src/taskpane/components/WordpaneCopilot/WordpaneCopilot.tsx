@@ -4,7 +4,15 @@ import { useAuthUser } from "react-auth-kit";
 import "./WordpaneCopilot.css";
 import "draft-js/dist/Draft.css";
 import useSelectedText from "../../hooks/useSelectedText";
-import { IMessage, IPromptType, IShortcutType, IButtonStatus, IChatTypes, IMessageRequest } from "../../../types";
+import {
+  IMessage,
+  IPromptType,
+  IShortcutType,
+  IButtonStatus,
+  IChatTypes,
+  IMessageRequest,
+  ITenderBid,
+} from "../../../types";
 import { Box, Button, Grid, MenuItem, MenuList, Paper, Tab, Tabs } from "@mui/material";
 import MessageBox from "../MessageBox";
 import { customPrompts } from "./constants";
@@ -24,6 +32,7 @@ import Welcome from "./Welcome";
 import useShowWelcome from "../../hooks/useShowWelcome";
 import posthog from "posthog-js";
 import SignoutFab from "./components/SignoutFab/SignoutFab";
+import TenderSearchMessageBox from "../MessageBox/TenderSearchMessageBox";
 
 const WordpaneCopilot = () => {
   const getAuth = useAuthUser();
@@ -35,6 +44,9 @@ const WordpaneCopilot = () => {
   const [libraryChatMessages, setLibraryChatMessages] = useState<IMessage[]>(getDefaultMessage("library-chat", true));
   const [internetResearchMessages, setInternetResearchMessages] = useState<IMessage[]>(
     getDefaultMessage("internet-search", true)
+  );
+  const [tenderSearchMessages, setTenderSearchMessages] = useState<IMessage[]>(
+    getDefaultMessage("tender-search", true)
   );
 
   const [showOptions, setShowOptions] = useState(false);
@@ -48,11 +60,13 @@ const WordpaneCopilot = () => {
   const responseBoxRef = useRef(null); // Ref for the response box
 
   const [selectedTab, setSelectedTab] = useState<IChatTypes>("library-chat");
+  const [selectedTenderBid, setSelectedTenderBid] = useState<ITenderBid>();
 
   const { showWelcome, setShowWelcome } = useShowWelcome();
 
   const isLibraryChatTab = useMemo(() => selectedTab === "library-chat", [selectedTab]);
   const isInternetSearchTab = useMemo(() => selectedTab === "internet-search", [selectedTab]);
+  const isTenderSearchTab = useMemo(() => selectedTab === "tender-search", [selectedTab]);
 
   const isLiveChatLoading = useMemo(
     () => isLibraryChatTab && libraryChatMessages.find((item) => item.type === "loading") !== undefined,
@@ -64,9 +78,14 @@ const WordpaneCopilot = () => {
     [isInternetSearchTab, internetResearchMessages]
   );
 
+  const isTenderSearchLoading = useMemo(
+    () => isTenderSearchTab && tenderSearchMessages.find((item) => item.type === "loading") !== undefined,
+    [isTenderSearchTab, tenderSearchMessages]
+  );
+
   const isLoading = useMemo(
-    () => isLiveChatLoading || isInternetSearchLoading,
-    [isLiveChatLoading, isInternetSearchLoading]
+    () => isLiveChatLoading || isInternetSearchLoading || isTenderSearchLoading,
+    [isLiveChatLoading, isInternetSearchLoading, isTenderSearchLoading]
   );
 
   const [isCustomPrompt, setIsCustomPrompt] = useState(false);
@@ -100,6 +119,9 @@ const WordpaneCopilot = () => {
         break;
       case "internet-search":
         setInternetResearchMessages(getDefaultMessage("internet-search"));
+        break;
+      case "tender-search":
+        setTenderSearchMessages(getDefaultMessage("tender-search"));
         break;
       default:
         break;
@@ -330,6 +352,16 @@ const WordpaneCopilot = () => {
     setCacheVersion();
   }, [libraryChatMessages]);
 
+  useEffect(() => {
+    localStorage.setItem(
+      "tender-search",
+      JSON.stringify(
+        tenderSearchMessages.map((message) => ({ ...message, request: { ...message.request, messages: [] } }))
+      )
+    );
+    setCacheVersion();
+  }, [tenderSearchMessages]);
+
   const handleClickSubmitButton = () => {
     setShowWelcome(false);
     posthog.capture("word_addin_submit_clicked", {
@@ -361,6 +393,14 @@ const WordpaneCopilot = () => {
       } else if (currentRefine.tab === "internet-search") {
         const refine = refineResponse(inputValue, currentRefine.message, internetResearchMessages);
         handleInternetSearchMessage({
+          ...currentRefine.message.request,
+          isRefine: true,
+          refineInstruction: inputValue,
+          messages: refine.messages,
+        });
+      } else if (currentRefine.tab === "tender-search") {
+        const refine = refineResponse(inputValue, currentRefine.message, tenderSearchMessages);
+        handleTenderSearchMessage({
           ...currentRefine.message.request,
           isRefine: true,
           refineInstruction: inputValue,
@@ -398,6 +438,17 @@ const WordpaneCopilot = () => {
           isRefine: false,
           isCustomPrompt: false,
           type: "text",
+        });
+      } else if (isTenderSearchTab) {
+        handleTenderSearchMessage({
+          highlightedText: selectedText,
+          instructionText: inputValue,
+          action: "default",
+          messages: tenderSearchMessages,
+          isRefine: false,
+          isCustomPrompt: false,
+          type: "text",
+          tenderBid: selectedTenderBid,
         });
       }
     }
@@ -491,6 +542,30 @@ const WordpaneCopilot = () => {
     }
   };
 
+  const handleTenderSearchMessage = (request: IMessageRequest) => {
+    if (request.instructionText.trim() !== "" && request.tenderBid) {
+      setTenderSearchMessages([
+        ...request.messages,
+        withId({
+          type: "text",
+          createdBy: "user",
+          value: request.instructionText,
+          action: "default",
+          isRefine: request.isRefine,
+          request,
+          tenderBid: request.tenderBid,
+        }),
+        withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false, request }),
+      ]);
+      askLibraryChatQuestion(tokenRef.current, request)
+        .then((message) => {
+          setTenderSearchMessages((messages) => [...messages.slice(0, -1), message]);
+        })
+        .catch(console.log);
+      setInputValue("");
+    }
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleClickSubmitButton();
@@ -532,11 +607,8 @@ const WordpaneCopilot = () => {
           value={selectedTab}
           TabIndicatorProps={{ style: { display: "none" } }}
         >
-          <Tab
-            label="Company Library Chat"
-            value="library-chat"
-            onClick={() => isLoading || setSelectedTab("library-chat")}
-          />
+          <Tab label="Library Chat" value="library-chat" onClick={() => isLoading || setSelectedTab("library-chat")} />
+          <Tab label="Tender Research" value="tender-search" />
           <Tab label="Internet AI" value="internet-search" />
         </Tabs>
         <SignoutFab />
@@ -549,7 +621,7 @@ const WordpaneCopilot = () => {
         ref={responseMessageBoxRef}
       >
         <div className="bid-pilot-container border-box">
-          {showWelcome ? (
+          {showWelcome && !isTenderSearchTab ? (
             <Welcome />
           ) : isInternetSearchTab ? (
             <MessageBox
@@ -558,13 +630,24 @@ const WordpaneCopilot = () => {
               handleClickShortcut={handleClickMessageShortcut}
               shortcutVisible={shortcutVisible}
             />
-          ) : (
+          ) : isLibraryChatTab ? (
             <MessageBox
               messages={libraryChatMessages}
               showShortcuts={true}
               handleClickShortcut={handleClickMessageShortcut}
               shortcutVisible={shortcutVisible}
             />
+          ) : isTenderSearchTab ? (
+            <TenderSearchMessageBox
+              messages={tenderSearchMessages}
+              showShortcuts={true}
+              handleClickShortcut={handleClickMessageShortcut}
+              shortcutVisible={shortcutVisible}
+              setSelectedTenderBid={setSelectedTenderBid}
+              selectedTenderBid={selectedTenderBid}
+            />
+          ) : (
+            "Invalid Tab"
           )}
         </div>
       </Box>
@@ -652,7 +735,7 @@ const WordpaneCopilot = () => {
           />
           <Button
             onClick={handleClickSubmitButton}
-            disabled={isLoading || inputValue.trim() === ""}
+            disabled={isLoading || inputValue.trim() === "" || (isTenderSearchTab && !selectedTenderBid)}
             className="chat-send-button"
             color="primary"
             variant="contained"

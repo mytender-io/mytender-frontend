@@ -42,3 +42,9 @@ button.MuiButtonBase-root.icon-button {
   border: solid #c2c2c2 1px;
   border-radius: 4px;
 }
+
+.tender-search-message-box {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
