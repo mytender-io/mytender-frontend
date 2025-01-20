@@ -35,7 +35,7 @@ import FileContentModal from "../modals/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import LibraryContextMenu from "../modals/LibraryContextMenu.tsx";
 import EllipsisMenu from "../buttons/EllipsisMenu.tsx";
-
+import LibrarySidepane from "../components/LibrarySidepane.tsx";
 
 const NewFolderModal = React.memo(
   ({ show, onHide, onCreateFolder, title, parentFolder }) => {
@@ -169,6 +169,9 @@ const Library = () => {
   const [updateTrigger, setUpdateTrigger] = useState(0);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  // Add this with your other state declarations
+  const [isSidepaneOpen, setIsSidepaneOpen] = useState(true);
 
   const getTopLevelFolders = () => {
     const folders = availableCollections.filter(
@@ -1057,8 +1060,7 @@ const Library = () => {
   return (
     <div className="chatpage">
       <SideBarSmall />
-
-      <div className="lib-container">
+      <div className={`lib-container ${isSidepaneOpen ? "sidepane-open" : ""}`}>
         <div className="scroll-container">
           <h1 className="heavy">Content Library</h1>
 
@@ -1374,6 +1376,10 @@ const Library = () => {
           )}
         </div>
         {/* <LibraryWizard /> */}
+        <LibrarySidepane
+          isOpen={isSidepaneOpen}
+          onToggle={() => setIsSidepaneOpen(!isSidepaneOpen)}
+        />
       </div>
     </div>
   );
