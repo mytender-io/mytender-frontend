@@ -14,7 +14,7 @@ import MarkdownPreview from "@uiw/react-markdown-preview";
 import "@uiw/react-markdown-preview/markdown.css";
 import CopyButton from "./CopyButton";
 
-interface MessageBoxProps {
+export interface MessageBoxProps {
   messages: IMessage[];
   showShortcuts: boolean;
   handleClickShortcut?: (type: IShortcutType, message: IMessage) => void;
