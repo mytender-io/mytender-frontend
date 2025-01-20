@@ -239,8 +239,11 @@ const Bids = () => {
             }
           }
         );
+        // New version
         if (response.data && response.data.status === "success") {
-          fetchBids();
+          setBids((prevBids) =>
+            prevBids.filter((bid) => bid._id !== bidToDelete)
+          );
           handleGAEvent("Bid Tracker", "Delete Bid", "Delete Bid Button");
         } else {
           displayAlert("Failed to delete bid", "error");
@@ -306,16 +309,19 @@ const Bids = () => {
         }
       );
 
-      if (
-        response.data &&
-        (response.data as ApiResponse).status === "success"
-      ) {
+      if (response.data && response.data.status === "success") {
+        // Update local state instead of fetching all bids
+        setBids((prevBids) =>
+          prevBids.map((bid) =>
+            bid._id === bidId ? { ...bid, status: newStatus } : bid
+          )
+        );
+
         handleGAEvent(
           "Bid Tracker",
           "Change Bid Status",
           "Bid Status Dropdown"
         );
-        setTimeout(fetchBids, 500);
       } else {
         displayAlert("Failed to update bid status", "danger");
       }

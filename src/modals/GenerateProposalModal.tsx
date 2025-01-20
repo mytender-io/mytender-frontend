@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { Modal, Button } from "react-bootstrap";
-import SelectFolder from "../components/SelectFolder";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
 import {
+  faCheckCircle,
   faRocket,
-  faSpinner,
-  faWarning
+  faSpinner
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import { LinearProgress, Typography, Box } from "@mui/material";
 import { fetchOutline } from "../utilityfunctions/updateSection";
 import wordpaneImage from "../resources/images/wordpanescreenshot.png";
+import Confetti from "react-confetti";
 import "./GenerateProposalModal.css";
 
 const GenerateProposalModal = ({ bid_id, outline }) => {
@@ -26,6 +26,22 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
   const tokenRef = useRef(auth?.token || "default");
   const [show, setShow] = useState(false);
   const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
+  const [isGenerationComplete, setIsGenerationComplete] = useState(false);
+
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+
+  useEffect(() => {
+    if (currentStep === 2) {
+      setShowConfetti(true);
+      const timer = setTimeout(() => setShowConfetti(false), 5000); // Stop confetti after 5 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep]);
+
   const [loadingMessage, setLoadingMessage] = useState(
     "Analyzing tender requirements..."
   );
@@ -183,9 +199,10 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
 
       window.URL.revokeObjectURL(url);
       document.body.removeChild(link);
-      setProgress(60);
-      handleClose();
+      setProgress(100);
       fetchOutline(bid_id, tokenRef, setSharedState);
+      setIsGenerationComplete(true); // Set completion state
+      setCurrentStep(2); // Move to success step
     } catch (err) {
       console.error("Error generating proposal:", err);
     } finally {
@@ -235,13 +252,13 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
       return (
         <div className="px-2 py-4">
           <div className="px-3">
-            <p>
+            <p className="modal-text">
               This is where the magic happens! The proposal will be generated as
               a Word document that you can then edit and format as needed. You
               can preview the document in the Preview Proposal tab. Make sure
               you download our{" "}
               <a
-                href="https://appsource.microsoft.com/en-us/product/office/WA200007690?src=office&corrid=bd0c24c3-6022-e897-73ad-0dc9bdf3558b&omexanonuid=&referralurl="
+                href="https://appsource.microsoft.com/en-us/product/office/WA200007690"
                 className="text-blue-600 hover:text-blue-800 underline"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -255,7 +272,6 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
               alt="Wordpane Preview"
               className="wordpane-image"
             />
-
             {isGeneratingProposal && (
               <div className="mt-4">
                 <LinearProgressWithLabel
@@ -267,6 +283,45 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
           </div>
         </div>
       );
+    } else if (currentStep === 2) {
+      return (
+        <div className="success-content px-4 py-5 text-center">
+          {showConfetti && (
+            <Confetti
+              width={windowDimensions.width}
+              height={windowDimensions.height}
+              recycle={false}
+              numberOfPieces={200}
+              gravity={0.3}
+            />
+          )}
+          <div className="success-animation mb-4">
+            <div className="success-icon">
+              <FontAwesomeIcon
+                icon={faCheckCircle}
+                size="3x"
+                className="text-success animate-bounce"
+              />
+            </div>
+          </div>
+          <h4 className="success-title mb-4">
+            Fantastic! Your proposal is ready! 🚀
+          </h4>
+          <p className="success-message mb-4">
+            Your proposal has been generated & is ready for editing. Time to
+            review and make it shine! ✨
+          </p>
+          <Button
+            className="upload-button"
+            onClick={() => {
+              handleClose();
+              navigate(`/proposal-preview`);
+            }}
+          >
+            Preview Your Masterpiece
+          </Button>
+        </div>
+      );
     }
   };
 
@@ -276,23 +331,36 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
         <FontAwesomeIcon icon={faRocket} className="pr-2" />
         <span className="modal-title">Generate Proposal</span>
       </button>
-      <Modal show={show} onHide={handleClose} size="lg" centered>
-        <Modal.Header className="px-4 d-flex justify-content-between align-items-center">
-          <Modal.Title>{getHeaderTitle()}</Modal.Title>
-          <button className="close-button ms-auto" onClick={handleClose}>
-            ×
-          </button>
-        </Modal.Header>
-        <Modal.Body className="p-0">{renderStepContent()}</Modal.Body>
-        <Modal.Footer>
-          <Button
-            className="upload-button"
-            onClick={handleNext}
-            disabled={isGeneratingProposal}
-          >
-            {getButtonLabel()}
-          </Button>
-        </Modal.Footer>
+      <Modal
+        show={show}
+        onHide={handleClose}
+        centered
+        dialogClassName={
+          currentStep === 1 ? "custom-modal-width" : "success-modal-width"
+        }
+      >
+        {currentStep === 1 ? (
+          <>
+            <Modal.Header className="px-4 d-flex justify-content-between align-items-center">
+              <Modal.Title>{getHeaderTitle()}</Modal.Title>
+              <button className="close-button ms-auto" onClick={handleClose}>
+                ×
+              </button>
+            </Modal.Header>
+            <Modal.Body className="p-0">{renderStepContent()}</Modal.Body>
+            <Modal.Footer>
+              <Button
+                className="upload-button"
+                onClick={handleNext}
+                disabled={isGeneratingProposal}
+              >
+                {getButtonLabel()}
+              </Button>
+            </Modal.Footer>
+          </>
+        ) : (
+          <Modal.Body className="p-0">{renderStepContent()}</Modal.Body>
+        )}
       </Modal>
     </>
   );
