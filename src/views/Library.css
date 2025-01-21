@@ -5,13 +5,11 @@
     /* Assuming 40px top margin and 30px top padding */
     background-color: white;
     justify-content: center;
-    padding-top: 20px;
+    padding-top: 10px;
     padding-left: 310px;
     padding-right: 20px;
     overflow-x: hidden !important;
     overflow-y: hidden !important;
-    margin: 0;
-    /* Use auto instead of scroll to handle both overflow cases */
 }
 
 .scroll-container {
