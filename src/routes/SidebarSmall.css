@@ -1,7 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap");
-
-/* Add this new style for the header */
-
 .sidebarsmall {
     height: 125vh;
     width: 290px;
@@ -15,7 +12,6 @@
     margin-bottom: 0;
     border: none;
     border-right: #d9d1e0 solid 0.5px;
-    /* Add these new properties */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -23,48 +19,47 @@
 
 .sidebarsmall a {
     justify-content: start;
-    /* Align items horizontally at the start */
-    padding-top: 14px;
-    padding-bottom: 14px;
-    /* Top and bottom padding only */
+    padding-top: 12px;
+    padding-bottom: 12px;
     text-decoration: none;
     color: #535e65;
     display: flex;
     align-items: center;
     padding-left: 10px;
     padding-right: 10px;
-    /* Reduce the distance between each line */
+    border-radius: 8px;
+    margin: 0 8px;
+    transition: all 0.2s ease;
+    /* Changed to all for smooth color transitions */
 }
 
 .sidebarsmall a span {
     font-size: 17px;
-    font-weight: 700 !important;
-    /* Reduce text size */
+    font-weight: 700;
 }
 
 .sidebarsmall a:hover {
     color: #535e65;
-    /* Keep text color #535E65 on hover */
-    background-color: #ffeedf;
-    /* Grey background on hover */
-}
-
-.sidebarsmall a:active {
-    color: #535e65;
-    /* Keep text color #535E65 on hover */
-    background-color: #ffeedf;
-    /* Grey background on hover */
+    background-color: #f0f0f0 !important;
 }
 
 .sidebarsmall a.sidebarsmalllink-active {
-    background-color: #ffeedf;
-    color: #535e65;
+    background-color: transparent;
+    /* Remove background */
+    color: #ff6b3d;
+    /* Orange text color */
+    font-weight: 800;
+    /* Slightly bolder text */
+}
+
+.sidebarsmall a.sidebarsmalllink-active span {
+    font-weight: 800;
+    /* Ensure span is also bold in active state */
 }
 
 .sidebarsmall a svg {
-    margin: 0 20px 0 0;
-    margin-left: 15px;
-    /* Add margin to the right of SVG to create a gap */
+    margin: 0 15px 0 0;
+    margin-left: 5px;
     width: 26px;
     height: 26px;
 }
@@ -84,7 +79,6 @@
     width: 22px;
     margin-right: 7px;
     margin-left: 6px;
-    /* Add space between image and text */
 }
 
 .signout-container {
@@ -116,7 +110,12 @@
     color: black;
 }
 
-.bordered-sidebar-link {
-    border-top: #d9d1e0 solid 2px;
-    border-bottom: #d9d1e0 solid 2px;
+.sidebar-section-header {
+    font-family: "Poppins", sans-serif;
+    color: #8c8c8c;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 16px 24px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
