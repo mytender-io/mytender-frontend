@@ -3,123 +3,120 @@
 /* Add this new style for the header */
 
 .sidebarsmall {
-  height: 125vh;
-  /* Changed from 125vh to 100vh */
-  margin-top: 0px;
-  width: 290px;
-  position: fixed;
-  z-index: 200;
-  top: 0;
-  left: 0;
-  background-color: #f8f9fb;
-  overflow-x: hidden;
-  padding-top: 10px;
-  margin-bottom: 0;
-  border: none;
-  border-right: #d9d1e0 solid 0.5px;
-  /* Add these new properties */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+    height: 125vh;
+    width: 290px;
+    position: fixed;
+    z-index: 200;
+    top: 0;
+    left: 0;
+    background-color: #f8f9fb;
+    overflow-x: hidden;
+    padding-top: 20px;
+    margin-bottom: 0;
+    border: none;
+    border-right: #d9d1e0 solid 0.5px;
+    /* Add these new properties */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .sidebarsmall a {
-  justify-content: start;
-  /* Align items horizontally at the start */
-  padding-top: 14px;
-  padding-bottom: 14px;
-  /* Top and bottom padding only */
-  text-decoration: none;
-  color: #535e65;
-  display: flex;
-  align-items: center;
-  padding-left: 10px;
-  padding-right: 10px;
-  /* Reduce the distance between each line */
+    justify-content: start;
+    /* Align items horizontally at the start */
+    padding-top: 14px;
+    padding-bottom: 14px;
+    /* Top and bottom padding only */
+    text-decoration: none;
+    color: #535e65;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    /* Reduce the distance between each line */
 }
 
 .sidebarsmall a span {
-  font-size: 17px;
-  font-weight: 700 !important;
-  /* Reduce text size */
+    font-size: 17px;
+    font-weight: 700 !important;
+    /* Reduce text size */
 }
 
 .sidebarsmall a:hover {
-  color: #535e65;
-  /* Keep text color #535E65 on hover */
-  background-color: #ffeedf;
-  /* Grey background on hover */
+    color: #535e65;
+    /* Keep text color #535E65 on hover */
+    background-color: #ffeedf;
+    /* Grey background on hover */
 }
 
 .sidebarsmall a:active {
-  color: #535e65;
-  /* Keep text color #535E65 on hover */
-  background-color: #ffeedf;
-  /* Grey background on hover */
+    color: #535e65;
+    /* Keep text color #535E65 on hover */
+    background-color: #ffeedf;
+    /* Grey background on hover */
 }
 
 .sidebarsmall a.sidebarsmalllink-active {
-  background-color: #ffeedf;
-  color: #535e65;
+    background-color: #ffeedf;
+    color: #535e65;
 }
 
 .sidebarsmall a svg {
-  margin: 0 20px 0 0;
-  margin-left: 15px;
-  /* Add margin to the right of SVG to create a gap */
-  width: 26px;
-  height: 26px;
+    margin: 0 20px 0 0;
+    margin-left: 15px;
+    /* Add margin to the right of SVG to create a gap */
+    width: 26px;
+    height: 26px;
 }
 
 .sidebarsmall-image-link {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: #535e65;
-  font-weight: 800;
-  margin-top: 5px;
-  margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #535e65;
+    font-weight: 800;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .sidebarsmall-image-link img {
-  height: 24px;
-  width: 22px;
-  margin-right: 7px;
-  margin-left: 6px;
-  /* Add space between image and text */
+    height: 24px;
+    width: 22px;
+    margin-right: 7px;
+    margin-left: 6px;
+    /* Add space between image and text */
 }
 
 .signout-container {
-  padding-bottom: 10px;
+    padding-bottom: 10px;
 }
 
 .signout-link {
-  margin-top: auto;
+    margin-top: auto;
 }
 
 .sidebar-header {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  margin-bottom: 0px;
-  padding-left: 20px;
-  padding-right: 20px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .sidebar-header img {
-  width: 42px;
-  height: 42px;
-  margin-right: 10px;
+    width: 42px;
+    height: 42px;
+    margin-right: 10px;
 }
 
 .sidebar-header span {
-  font-family: "Poppins", sans-serif;
-  font-size: 25px;
-  font-weight: 700;
-  color: black;
+    font-family: "Poppins", sans-serif;
+    font-size: 25px;
+    font-weight: 700;
+    color: black;
 }
 
 .bordered-sidebar-link {
-  border-top: #d9d1e0 solid 2px;
-  border-bottom: #d9d1e0 solid 2px;
+    border-top: #d9d1e0 solid 2px;
+    border-bottom: #d9d1e0 solid 2px;
 }

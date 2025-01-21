@@ -1,14 +1,13 @@
 .kanban-container {
   display: flex;
   gap: 1rem;
-  height: 100vh;
+  height: 102vh;
   overflow-x: auto;
-  /* Scrollbar customization */
+  margin-top: 20px;
 }
 
 .kanban-container::-webkit-scrollbar {
   height: 12px !important;
-  /* Horizontal scrollbar height */
 }
 
 .kanban-container::-webkit-scrollbar-track {
@@ -40,6 +39,43 @@
   text-overflow: ellipsis;
 }
 
+/* Updated column colors to match status colors */
+
+.kanban-column:nth-child(1) {
+  border-top: 3px solid #d14d1f;
+  /* Planning - matches status-identification */
+  background-color: #ffe4dc20;
+  /* Light version of Planning background */
+}
+
+.kanban-column:nth-child(2) {
+  border-top: 3px solid #2b87af;
+  /* Research - matches status-capture */
+  background-color: #e1f3fb20;
+  /* Light version of Research background */
+}
+
+.kanban-column:nth-child(3) {
+  border-top: 3px solid #2e8b2e;
+  /* First Draft - matches status-first-review */
+  background-color: #e6ffe620;
+  /* Light version of First Draft background */
+}
+
+.kanban-column:nth-child(4) {
+  border-top: 3px solid #8b488b;
+  /* Reviewing - matches status-final-review */
+  background-color: #f8e6f820;
+  /* Light version of Reviewing background */
+}
+
+.kanban-column:nth-child(5) {
+  border-top: 3px solid #2a7f4f;
+  /* Complete - matches status-submitted */
+  background-color: #e0f5e920;
+  /* Light version of Complete background */
+}
+
 .kanban-column-header {
   display: flex;
   justify-content: space-between;
@@ -51,10 +87,31 @@
   flex-shrink: 0;
 }
 
+/* Updated header colors to match status colors */
+
+.kanban-column:nth-child(1) .kanban-column-header h2 {
+  color: #d14d1f;
+}
+
+.kanban-column:nth-child(2) .kanban-column-header h2 {
+  color: #2b87af;
+}
+
+.kanban-column:nth-child(3) .kanban-column-header h2 {
+  color: #2e8b2e;
+}
+
+.kanban-column:nth-child(4) .kanban-column-header h2 {
+  color: #8b488b;
+}
+
+.kanban-column:nth-child(5) .kanban-column-header h2 {
+  color: #2a7f4f;
+}
+
 .kanban-column-header h2 {
   font-size: 1rem;
   font-weight: 600;
-  color: #495057;
   margin: 0;
 }
 
@@ -125,26 +182,4 @@
 
 .bid-detail svg {
   font-size: 0.875rem;
-}
-
-/* Column color coding */
-
-.kanban-column:nth-child(1) {
-  border-top: 3px solid #ffa07a;
-}
-
-.kanban-column:nth-child(2) {
-  border-top: 3px solid #87ceeb;
-}
-
-.kanban-column:nth-child(3) {
-  border-top: 3px solid #98fb98;
-}
-
-.kanban-column:nth-child(4) {
-  border-top: 3px solid #dda0dd;
-}
-
-.kanban-column:nth-child(5) {
-  border-top: 3px solid #3cb371;
 }

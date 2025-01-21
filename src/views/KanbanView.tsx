@@ -10,11 +10,11 @@ interface KanbanViewProps {
 }
 
 const statusColumns = [
-  "Identification",
-  "Capture Planning",
-  "First Review",
-  "Final Review",
-  "Submitted"
+  "Planning",
+  "Research",
+  "First Draft",
+  "Reviewing",
+  "Complete"
 ];
 
 const KanbanView: React.FC<KanbanViewProps> = ({
@@ -36,7 +36,7 @@ const KanbanView: React.FC<KanbanViewProps> = ({
 
   const getBidsForStatus = useCallback(
     (status: string) => {
-      if (status === "Identification") {
+      if (status === "Planning") {
         return bidsRef.current.filter(
           (bid) => bid.status === status || !statusColumns.includes(bid.status)
         );

@@ -3,7 +3,7 @@
 .search-input-container {
     /* Changed from search-container */
     position: relative;
-    max-width: 40rem;
+    max-width: 47rem;
     /* Increased from 50rem */
     width: 100%;
 }
@@ -38,8 +38,4 @@
 
 .search-input:focus {
     outline: none;
-    border-color: #a3a8ad;
-    /* Added for better focus indication */
-    background-color: #f3f4f6;
-    /* Slightly lighter on focus */
 }

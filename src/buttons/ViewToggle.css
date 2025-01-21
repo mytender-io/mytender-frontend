@@ -1,8 +1,38 @@
-.btn-group .btn.view-toggle-btn {
-    font-weight: 700 !important;
-    font-size: 16px !important;
+/* Override Bootstrap's primary color for the active state */
+
+.btn-group .btn.view-toggle-btn.btn-primary {
+    background-color: #ff7f50 !important;
+    /* Coral orange - you can adjust this hex code */
+    border-color: #ff7f50 !important;
+    color: white !important;
 }
 
-.viewtoggle {
+
+/* Add hover state */
+
+.btn-group .btn.view-toggle-btn.btn-primary:hover {
+    background-color: #ff6b3d !important;
+    /* Slightly darker orange for hover */
+    border-color: #ff6b3d !important;
+}
+
+
+/* Keep the light variant styling but with orange border */
+
+.btn-group .btn.view-toggle-btn.btn-light {
+    border-color: #ff7f50 !important;
+    color: #ff7f50 !important;
+}
+
+
+/* Hover state for the inactive button */
+
+.btn-group .btn.view-toggle-btn.btn-light:hover {
+    background-color: #fff5f2 !important;
+    /* Very light orange background on hover */
+}
+
+.btn-group .btn.view-toggle-btn {
     font-weight: 700 !important;
+    font-size: 16px;
 }

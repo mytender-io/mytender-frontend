@@ -397,7 +397,7 @@ const Bids = () => {
       <SideBarSmall />
 
       <div className="lib-container">
-        <div className="padded-container">
+        <div>
           <div className="proposal-header">
             <h1 id="dashboard-title">Tender Dashboard</h1>
             <div style={{ display: "flex" }}>
@@ -413,13 +413,16 @@ const Bids = () => {
             </div>
           </div>
 
-          <div className="mt-3 mb-4 proposal-header">
+          <div
+            className="mt-2"
+            style={{ display: "flex", justifyContent: "space-between" }}
+          >
             <SearchInput value={searchTerm} onChange={setSearchTerm} />
             <ViewToggle value={viewType} onChange={handleViewChange} />
           </div>
           {viewType === "table" ? (
             <div className="table-wrapper">
-              <table className="bids-table mt-1">
+              <table className="bids-table">
                 <thead>
                   <tr>
                     {headers.map((header) => (

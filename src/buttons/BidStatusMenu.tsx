@@ -1,9 +1,22 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { Button } from "react-bootstrap";
-import './BidStatusMenu.css';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faMagnifyingGlass,
+  faClipboardList,
+  faFileCircleCheck,
+  faFileSignature,
+  faFileCircleExclamation
+} from "@fortawesome/free-solid-svg-icons";
+import "./BidStatusMenu.css";
 
-type BidStatus = "Identification" | "Capture Planning" | "First Review" | "Final Review" | "Submitted";
+type BidStatus =
+  | "Planning"
+  | "Research"
+  | "First Draft"
+  | "Reviewing"
+  | "Complete";
 
 const BidStatusMenu = ({
   value,
@@ -14,16 +27,27 @@ const BidStatusMenu = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Validate and normalize the status value
+  // Map old status values to new ones
+  const statusMapping: { [key: string]: BidStatus } = {
+    "Identification": "Planning",
+    "Capture Planning": "Research",
+    "First Review": "First Draft",
+    "Reviewing": "Reviewing",
+    "Submitted": "Complete"
+  };
+
   const normalizeStatus = (status: any): BidStatus => {
     const validStatuses: BidStatus[] = [
-      "Identification",
-      "Capture Planning",
-      "First Review",
-      "Final Review",
-      "Submitted"
+      "Planning",
+      "Research",
+      "First Draft",
+      "Reviewing",
+      "Complete"
     ];
-    return validStatuses.includes(status) ? status : "Identification";
+    if (status in statusMapping) {
+      return statusMapping[status];
+    }
+    return validStatuses.includes(status) ? status : "Planning";
   };
 
   const currentStatus = normalizeStatus(value);
@@ -43,18 +67,35 @@ const BidStatusMenu = ({
 
   const getStatusColor = (status: BidStatus) => {
     switch (status) {
-      case "Identification":
+      case "Planning":
         return "status-identification";
-      case "Capture Planning":
+      case "Research":
         return "status-capture";
-      case "First Review":
+      case "First Draft":
         return "status-first-review";
-      case "Final Review":
+      case "Reviewing":
         return "status-final-review";
-      case "Submitted":
+      case "Complete":
         return "status-submitted";
       default:
         return "status-identification";
+    }
+  };
+
+  const getStatusIcon = (status: BidStatus) => {
+    switch (status) {
+      case "Planning":
+        return faMagnifyingGlass;
+      case "Research":
+        return faClipboardList;
+      case "First Draft":
+        return faFileCircleExclamation;
+      case "Reviewing":
+        return faFileCircleCheck;
+      case "Complete":
+        return faFileSignature;
+      default:
+        return faMagnifyingGlass;
     }
   };
 
@@ -67,6 +108,7 @@ const BidStatusMenu = ({
         aria-haspopup="true"
       >
         {currentStatus}
+        <FontAwesomeIcon icon={getStatusIcon(currentStatus)} className="ms-2" />
       </Button>
       <Menu
         id="bid-status-menu"
@@ -77,41 +119,26 @@ const BidStatusMenu = ({
         PaperProps={{
           elevation: 1,
           style: {
-            width: "160px", // Increased width to accommodate longer status names
+            width: "160px", // Reduced width since names are shorter
             boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
           }
         }}
       >
-        <MenuItem
-          onClick={() => handleSelect("Identification")}
-          className="styled-menu-item"
-        >
-          Identification
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleSelect("Capture Planning")}
-          className="styled-menu-item"
-        >
-          Capture Planning
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleSelect("First Review")}
-          className="styled-menu-item"
-        >
-          First Review
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleSelect("Final Review")}
-          className="styled-menu-item"
-        >
-          Final Review
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleSelect("Submitted")}
-          className="styled-menu-item"
-        >
-          Submitted
-        </MenuItem>
+        {[
+          "Planning",
+          "Research",
+          "First Draft",
+          "Reviewing",
+          "Complete"
+        ].map((status) => (
+          <MenuItem
+            key={status}
+            onClick={() => handleSelect(status as BidStatus)}
+            className="styled-menu-item"
+          >
+            {status}
+          </MenuItem>
+        ))}
       </Menu>
     </div>
   );

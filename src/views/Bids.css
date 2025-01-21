@@ -1,23 +1,9 @@
-.padded-container {
-    /* Adjusted to account for padding-left */
-    /* Assuming 40px top margin and 30px top padding */
-    flex: 1;
-    overflow-y: hidden;
-    overflow-x: hidden;
-    padding: 15px;
-    padding-left: 20px;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    /* Use auto instead of scroll to handle both overflow cases */
-}
-
 .table-wrapper {
     position: relative;
-    max-height: 100vh;
+    max-height: 102vh;
     overflow-x: auto;
     overflow-y: auto;
-    border: 1.5px solid #d9d1e0;
+    margin-top: 20px;
 }
 
 .bids-table {
@@ -46,6 +32,12 @@
     padding: 12px 16px;
     text-align: left;
     border-bottom: 1.5px solid #d9d1e0;
+    border-top: 1.5px solid #d9d1e0;
+}
+
+.bids-table tr:hover {
+    background-color: #f5f5f5;
+    transition: background-color 0.2s ease;
 }
 
 
