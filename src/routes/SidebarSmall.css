@@ -7,7 +7,6 @@
     top: 0;
     left: 0;
     background-color: #f8f9fb;
-    overflow-x: hidden;
     padding-top: 20px;
     margin-bottom: 0;
     border: none;
@@ -15,27 +14,42 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    transition: width 0.3s ease;
+}
+
+.sidebarsmall.collapsed {
+    width: 80px;
 }
 
 .sidebarsmall a {
     justify-content: start;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding: 12px 10px;
     text-decoration: none;
     color: #535e65;
     display: flex;
     align-items: center;
-    padding-left: 10px;
-    padding-right: 10px;
     border-radius: 8px;
     margin: 0 8px;
     transition: all 0.2s ease;
-    /* Changed to all for smooth color transitions */
+    white-space: nowrap;
+}
+
+.sidebarsmall.collapsed a {
+    justify-content: center;
+    padding: 12px 0;
 }
 
 .sidebarsmall a span {
     font-size: 17px;
     font-weight: 700;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.sidebarsmall.collapsed a span {
+    opacity: 0;
+    width: 0;
+    display: none;
 }
 
 .sidebarsmall a:hover {
@@ -45,16 +59,12 @@
 
 .sidebarsmall a.sidebarsmalllink-active {
     background-color: transparent;
-    /* Remove background */
     color: #ff6b3d;
-    /* Orange text color */
     font-weight: 800;
-    /* Slightly bolder text */
 }
 
 .sidebarsmall a.sidebarsmalllink-active span {
     font-weight: 800;
-    /* Ensure span is also bold in active state */
 }
 
 .sidebarsmall a svg {
@@ -62,31 +72,39 @@
     margin-left: 5px;
     width: 26px;
     height: 26px;
+    min-width: 26px;
+    transition: margin 0.3s ease;
 }
 
-.sidebarsmall-image-link {
+.sidebarsmall.collapsed a svg {
+    margin: 0;
+}
+
+.collapse-toggle {
+    position: absolute;
+    top: 62.5vh;
+    right: -15px;
+    width: 32px;
+    height: 32px;
+    background: #f8f9fb;
+    border: 1px solid #d9d1e0;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    text-decoration: none;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 999 !important;
+    transition: all 0.2s ease;
+}
+
+.collapse-toggle:hover {
+    background: #f0f0f0;
+}
+
+.collapse-toggle svg {
+    width: 12px;
+    height: 12px;
     color: #535e65;
-    font-weight: 800;
-    margin-top: 5px;
-    margin-bottom: 5px;
-}
-
-.sidebarsmall-image-link img {
-    height: 24px;
-    width: 22px;
-    margin-right: 7px;
-    margin-left: 6px;
-}
-
-.signout-container {
-    padding-bottom: 10px;
-}
-
-.signout-link {
-    margin-top: auto;
 }
 
 .sidebar-header {
@@ -95,6 +113,12 @@
     margin-bottom: 10px;
     padding-left: 20px;
     padding-right: 20px;
+    overflow: hidden;
+}
+
+.sidebarsmall.collapsed .sidebar-header {
+    justify-content: center;
+    padding: 0 10px;
 }
 
 .sidebar-header img {
@@ -118,4 +142,15 @@
     padding: 16px 24px 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+.signout-container {
+    padding-bottom: 10px;
+}
+
+.bordered-sidebar-link {
+    border-top: #d9d1e0 solid 2px;
+    border-bottom: #d9d1e0 solid 2px;
+    margin: 0 !important;
+    border-radius: 0 !important;
 }

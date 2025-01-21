@@ -3,8 +3,11 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./SidebarSmall.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import sidebarIcon from "../resources/images/mytender.io_badge.png";
+import {
+  faChevronLeft,
+  faChevronRight
+} from "@fortawesome/free-solid-svg-icons";
 
-// Change from 'free-solid-svg-icons' to 'free-regular-svg-icons'
 import {
   faAddressBook as farBookOpen,
   faComments as farComments,
@@ -19,8 +22,8 @@ import {
   faReply,
   faTableColumns
 } from "@fortawesome/free-solid-svg-icons";
+import { Tooltip } from "@mui/material";
 
-// Define interface for lastActiveBid
 interface LastActiveBid {
   _id: string;
   bid_title: string;
@@ -38,6 +41,7 @@ const SideBarSmall = () => {
   const [lastActiveBid, setLastActiveBid] = useState<LastActiveBid | null>(
     null
   );
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const isActive = (path: string): boolean => location.pathname === path;
 
@@ -45,6 +49,11 @@ const SideBarSmall = () => {
     const storedBid = localStorage.getItem("lastActiveBid");
     if (storedBid) {
       setLastActiveBid(JSON.parse(storedBid));
+    }
+
+    const storedCollapsedState = localStorage.getItem("sidebarCollapsed");
+    if (storedCollapsedState) {
+      setIsCollapsed(JSON.parse(storedCollapsedState));
     }
 
     const handleBidUpdate = (event: BidUpdateEvent) => {
@@ -62,6 +71,12 @@ const SideBarSmall = () => {
       );
     };
   }, []);
+
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem("sidebarCollapsed", JSON.stringify(newState));
+  };
 
   const handleDashboardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -84,37 +99,50 @@ const SideBarSmall = () => {
   };
 
   return (
-    <div className="sidebarsmall">
+    <div className={`sidebarsmall ${isCollapsed ? "collapsed" : ""}`}>
       <div>
         <div className="sidebar-header">
-          <img src={sidebarIcon} alt="mytender.io logo" />
-          <span>mytender.io</span>
+          {!isCollapsed && <img src={sidebarIcon} alt="mytender.io logo" />}
+          {!isCollapsed && <span>mytender.io</span>}
         </div>
 
+        <Tooltip
+          title={isCollapsed ? "Expand" : "Collapse"}
+          placement="right"
+          enterDelay={1000} // 1 second delay before showing
+          leaveDelay={0} // No delay when hiding
+        >
+          <button className="collapse-toggle" onClick={toggleCollapse}>
+            <FontAwesomeIcon
+              icon={isCollapsed ? faChevronRight : faChevronLeft}
+            />
+          </button>
+        </Tooltip>
         <Link
           to="#"
           className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor") || isActive("/question-crafter") || isActive("/proposal") ? "sidebarsmalllink-active" : ""}`}
           onClick={handleDashboardClick}
         >
           <FontAwesomeIcon icon={faTableColumns} />
-          <span id="bids-table">Tender Dashboard</span>
+          {!isCollapsed && <span id="bids-table">Tender Dashboard</span>}
         </Link>
 
         <Link
           to="/library"
-          className={`bordered-sidebar-link sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}
+          className={`sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}
         >
           <FontAwesomeIcon icon={farBookOpen} />
-          <span id="library-title">Content Library</span>
+          {!isCollapsed && <span id="library-title">Content Library</span>}
         </Link>
 
-        <div className="sidebar-section-header">Tool Box</div>
+        {!isCollapsed && <div className="sidebar-section-header">Tool Box</div>}
+
         <Link
           to="/chatResponse"
           className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
         >
           <FontAwesomeIcon icon={farComments} />
-          <span id="welcome">Quick Question</span>
+          {!isCollapsed && <span id="welcome">Quick Question</span>}
         </Link>
 
         <Link
@@ -122,7 +150,7 @@ const SideBarSmall = () => {
           className={`sidebarsmalllink ${isActive("/question-answer") ? "sidebarsmalllink-active" : ""}`}
         >
           <FontAwesomeIcon icon={faGears} />
-          <span>Q&A Generator</span>
+          {!isCollapsed && <span>Q&A Generator</span>}
         </Link>
 
         <Link
@@ -131,8 +159,9 @@ const SideBarSmall = () => {
           onClick={handleWordAddInClick}
         >
           <FontAwesomeIcon icon={farFileWord} />
-          <span>Wordpane</span>
+          {!isCollapsed && <span>Wordpane</span>}
         </Link>
+
         <Link
           to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
           className="sidebarsmalllink"
@@ -140,7 +169,7 @@ const SideBarSmall = () => {
           rel="noopener noreferrer"
         >
           <FontAwesomeIcon icon={faGraduationCap} />
-          <span>Tutorial</span>
+          {!isCollapsed && <span>Tutorial</span>}
         </Link>
       </div>
 
@@ -150,14 +179,14 @@ const SideBarSmall = () => {
           className={`sidebarsmalllink ${isActive("/profile") ? "sidebarsmalllink-active" : ""}`}
         >
           <FontAwesomeIcon icon={farUser} />
-          <span>Profile</span>
+          {!isCollapsed && <span>Profile</span>}
         </Link>
         <Link
           to="/logout"
           className={`sidebarsmalllink ${isActive("/logout") ? "sidebarsmalllink-active" : ""}`}
         >
           <FontAwesomeIcon icon={faReply} />
-          <span>Logout</span>
+          {!isCollapsed && <span>Logout</span>}
         </Link>
       </div>
     </div>
