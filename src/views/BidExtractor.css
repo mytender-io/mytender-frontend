@@ -13,6 +13,7 @@
     align-items: center;
     /* Add line height to prevent text clipping */
     line-height: 1.5;
+    font-size: 2.5rem !important;
 }
 
 .bidname-wrapper {

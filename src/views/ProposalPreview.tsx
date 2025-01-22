@@ -121,7 +121,7 @@ const ProposalPreview = () => {
               flex: 1,
               display: "flex",
               flexDirection: "column",
-              height: "calc(100vh - 120px)"
+              height: "102vh"
             }}
           >
             <CardContent

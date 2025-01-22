@@ -15,23 +15,45 @@
 .bidnav-item {
   margin-right: 20px;
   font-size: 16px;
+  font-weight: 600;
   text-decoration: none;
   color: #999;
   padding: 5px 10px;
   cursor: pointer;
-  transition: all 0.05s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
 }
 
-.bidnav-item.active,
+.bidnav-item::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: black;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .bidnav-item:hover {
-  background-color: transparent;
   color: black;
 }
 
+.bidnav-item:hover::after {
+  width: 100%;
+}
+
 .bidnav-item.active {
-  border-bottom: 2px solid black;
+  color: black;
+}
+
+.bidnav-item.active::after {
+  width: 100%;
+}
+
+/* Remove the separate border-bottom and use the ::after pseudo-element exclusively */
+
+.bidnav-item.active {
   color: black;
 }
 
