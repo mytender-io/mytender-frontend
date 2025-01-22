@@ -1,27 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./SidebarSmall.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import sidebarIcon from "../resources/images/mytender.io_badge.png";
 import {
-  faChevronLeft,
-  faChevronRight
-} from "@fortawesome/free-solid-svg-icons";
-
-import {
-  faAddressBook as farBookOpen,
-  faComments as farComments,
-  faCircleQuestion as farCircleQuestion,
-  faFileWord as farFileWord,
-  faUser as farUser
-} from "@fortawesome/free-regular-svg-icons";
-import {
-  faGears,
-  faGraduationCap,
-  faLayerGroup,
-  faReply,
-  faTableColumns
-} from "@fortawesome/free-solid-svg-icons";
+  ChevronLeft,
+  ChevronRight,
+  MessageSquare,
+  HelpCircle,
+  FileText,
+  User,
+  Settings,
+  GraduationCap,
+  Layers,
+  Library,
+  LogOut,
+  LayoutDashboard
+} from "lucide-react";
 import { Tooltip } from "@mui/material";
 
 interface LastActiveBid {
@@ -102,28 +96,31 @@ const SideBarSmall = () => {
     <div className={`sidebarsmall ${isCollapsed ? "collapsed" : ""}`}>
       <div>
         <div className="sidebar-header">
-          {!isCollapsed && <img src={sidebarIcon} alt="mytender.io logo" />}
+          <img src={sidebarIcon} alt="mytender.io logo" />
           {!isCollapsed && <span>mytender.io</span>}
         </div>
 
         <Tooltip
           title={isCollapsed ? "Expand" : "Collapse"}
           placement="right"
-          enterDelay={1000} // 1 second delay before showing
-          leaveDelay={0} // No delay when hiding
+          enterDelay={1000}
+          leaveDelay={0}
         >
           <button className="collapse-toggle" onClick={toggleCollapse}>
-            <FontAwesomeIcon
-              icon={isCollapsed ? faChevronRight : faChevronLeft}
-            />
+            {isCollapsed ? (
+              <ChevronRight size={20} />
+            ) : (
+              <ChevronLeft size={20} />
+            )}
           </button>
         </Tooltip>
+
         <Link
           to="#"
           className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor") || isActive("/question-crafter") || isActive("/proposal") ? "sidebarsmalllink-active" : ""}`}
           onClick={handleDashboardClick}
         >
-          <FontAwesomeIcon icon={faTableColumns} />
+          <LayoutDashboard size={20} />
           {!isCollapsed && <span id="bids-table">Tender Dashboard</span>}
         </Link>
 
@@ -131,7 +128,7 @@ const SideBarSmall = () => {
           to="/library"
           className={`sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}
         >
-          <FontAwesomeIcon icon={farBookOpen} />
+          <Library size={20} />
           {!isCollapsed && <span id="library-title">Content Library</span>}
         </Link>
 
@@ -141,7 +138,7 @@ const SideBarSmall = () => {
           to="/chatResponse"
           className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
         >
-          <FontAwesomeIcon icon={farComments} />
+          <MessageSquare size={20} />
           {!isCollapsed && <span id="welcome">Quick Question</span>}
         </Link>
 
@@ -149,7 +146,7 @@ const SideBarSmall = () => {
           to="/question-answer"
           className={`sidebarsmalllink ${isActive("/question-answer") ? "sidebarsmalllink-active" : ""}`}
         >
-          <FontAwesomeIcon icon={faGears} />
+          <Settings size={20} />
           {!isCollapsed && <span>Q&A Generator</span>}
         </Link>
 
@@ -158,7 +155,7 @@ const SideBarSmall = () => {
           className="sidebarsmalllink"
           onClick={handleWordAddInClick}
         >
-          <FontAwesomeIcon icon={farFileWord} />
+          <FileText size={20} />
           {!isCollapsed && <span>Wordpane</span>}
         </Link>
 
@@ -168,7 +165,7 @@ const SideBarSmall = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <FontAwesomeIcon icon={faGraduationCap} />
+          <GraduationCap size={20} />
           {!isCollapsed && <span>Tutorial</span>}
         </Link>
       </div>
@@ -178,14 +175,14 @@ const SideBarSmall = () => {
           to="/profile"
           className={`sidebarsmalllink ${isActive("/profile") ? "sidebarsmalllink-active" : ""}`}
         >
-          <FontAwesomeIcon icon={farUser} />
+          <User size={20} />
           {!isCollapsed && <span>Profile</span>}
         </Link>
         <Link
           to="/logout"
           className={`sidebarsmalllink ${isActive("/logout") ? "sidebarsmalllink-active" : ""}`}
         >
-          <FontAwesomeIcon icon={faReply} />
+          <LogOut size={20} />
           {!isCollapsed && <span>Logout</span>}
         </Link>
       </div>

@@ -1,156 +1,160 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap");
 .sidebarsmall {
-    height: 125vh;
-    width: 290px;
-    position: fixed;
-    z-index: 200;
-    top: 0;
-    left: 0;
-    background-color: #f8f9fb;
-    padding-top: 20px;
-    margin-bottom: 0;
-    border: none;
-    border-right: #d9d1e0 solid 0.5px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: width 0.3s ease;
+  height: 125vh;
+  width: 290px;
+  position: fixed;
+  z-index: 200;
+  top: 0;
+  left: 0;
+  background-color: #f8f9fb;
+  padding-top: 20px;
+  margin-bottom: 0;
+  border: none;
+  border-right: #d9d1e0 solid 0.5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: width 0.3s ease;
 }
 
 .sidebarsmall.collapsed {
-    width: 80px;
+  width: 80px;
 }
 
 .sidebarsmall a {
-    justify-content: start;
-    padding: 12px 10px;
-    text-decoration: none;
-    color: #535e65;
-    display: flex;
-    align-items: center;
-    border-radius: 8px;
-    margin: 0 8px;
-    transition: all 0.2s ease;
-    white-space: nowrap;
+  justify-content: start;
+  padding: 12px 10px;
+  text-decoration: none;
+  color: #535e65;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  margin: 0 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .sidebarsmall.collapsed a {
-    justify-content: center;
-    padding: 12px 0;
+  justify-content: center;
+  padding: 12px 0;
 }
 
 .sidebarsmall a span {
-    font-size: 17px;
-    font-weight: 700;
-    opacity: 1;
-    transition: opacity 0.2s ease;
+  font-size: 17px;
+  font-weight: 700;
+  opacity: 1;
+  transition: opacity 0.2s ease;
 }
 
 .sidebarsmall.collapsed a span {
-    opacity: 0;
-    width: 0;
-    display: none;
+  opacity: 0;
+  width: 0;
+  display: none;
 }
 
 .sidebarsmall a:hover {
-    color: #535e65;
-    background-color: #f0f0f0 !important;
+  color: #535e65;
+  background-color: #f0f0f0 !important;
 }
 
 .sidebarsmall a.sidebarsmalllink-active {
-    background-color: transparent;
-    color: #ff6b3d;
-    font-weight: 800;
+  background-color: transparent;
+  color: #ff6b3d;
+  font-weight: 800;
 }
 
 .sidebarsmall a.sidebarsmalllink-active span {
-    font-weight: 800;
+  font-weight: 800;
 }
 
 .sidebarsmall a svg {
-    margin: 0 15px 0 0;
-    margin-left: 5px;
-    width: 26px;
-    height: 26px;
-    min-width: 26px;
-    transition: margin 0.3s ease;
+  margin: 0 15px 0 0;
+  margin-left: 5px;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  transition: margin 0.3s ease;
 }
 
 .sidebarsmall.collapsed a svg {
-    margin: 0;
+  margin: 0;
 }
 
 .collapse-toggle {
-    position: absolute;
-    top: 62.5vh;
-    right: -15px;
-    width: 32px;
-    height: 32px;
-    background: #f8f9fb;
-    border: 1px solid #d9d1e0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 999 !important;
-    transition: all 0.2s ease;
+  position: absolute;
+  top: 62.5vh;
+  right: -15px;
+  width: 32px;
+  height: 32px;
+  background: #f8f9fb;
+  border: 1px solid #d9d1e0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 999 !important;
+  transition: all 0.2s ease;
 }
 
 .collapse-toggle:hover {
-    background: #f0f0f0;
+  background: #f0f0f0;
 }
 
 .collapse-toggle svg {
-    width: 12px;
-    height: 12px;
-    color: #535e65;
+  width: 12px;
+  height: 12px;
+  color: #535e65;
 }
 
 .sidebar-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    padding-left: 20px;
-    padding-right: 20px;
-    overflow: hidden;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-left: 16px;
+  padding-right: 20px;
+  overflow: hidden;
 }
 
 .sidebarsmall.collapsed .sidebar-header {
-    justify-content: center;
-    padding: 0 10px;
+  padding: 0;
+  justify-content: center;
 }
 
 .sidebar-header img {
-    width: 42px;
-    height: 42px;
-    margin-right: 10px;
+  width: 38px;
+  height: 38px;
+  margin-right: 10px;
+}
+
+.sidebarsmall.collapsed .sidebar-header img {
+  margin-right: 0;
 }
 
 .sidebar-header span {
-    font-family: "Poppins", sans-serif;
-    font-size: 25px;
-    font-weight: 700;
-    color: black;
+  font-family: "Poppins", sans-serif;
+  font-size: 25px;
+  font-weight: 700;
+  color: black;
 }
 
 .sidebar-section-header {
-    font-family: "Poppins", sans-serif;
-    color: #8c8c8c;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 16px 24px 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  font-family: "Poppins", sans-serif;
+  color: #8c8c8c;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 16px 24px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .signout-container {
-    padding-bottom: 10px;
+  padding-bottom: 10px;
 }
 
 .bordered-sidebar-link {
-    border-top: #d9d1e0 solid 2px;
-    border-bottom: #d9d1e0 solid 2px;
-    margin: 0 !important;
-    border-radius: 0 !important;
+  border-top: #d9d1e0 solid 2px;
+  border-bottom: #d9d1e0 solid 2px;
+  margin: 0 !important;
+  border-radius: 0 !important;
 }
