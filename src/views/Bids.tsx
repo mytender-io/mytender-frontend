@@ -31,6 +31,7 @@ const Bids = () => {
   const [bidName, setBidName] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [bidToDelete, setBidToDelete] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const getAuth = useAuthUser();
@@ -394,9 +395,10 @@ const Bids = () => {
 
   return (
     <div>
-      <SideBarSmall />
-
-      <div className="lib-container">
+      <SideBarSmall onCollapseChange={setSidebarCollapsed} />
+      <div
+        className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+      >
         <div>
           <div className="proposal-header">
             <h1 id="dashboard-title">Tender Dashboard</h1>

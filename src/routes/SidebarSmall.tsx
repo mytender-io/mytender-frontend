@@ -29,7 +29,11 @@ interface BidUpdateEvent extends Event {
   detail: LastActiveBid;
 }
 
-const SideBarSmall = () => {
+interface SideBarSmallProps {
+  onCollapseChange?: (isCollapsed: boolean) => void;
+}
+
+const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [lastActiveBid, setLastActiveBid] = useState<LastActiveBid | null>(
@@ -70,6 +74,7 @@ const SideBarSmall = () => {
     const newState = !isCollapsed;
     setIsCollapsed(newState);
     localStorage.setItem("sidebarCollapsed", JSON.stringify(newState));
+    onCollapseChange?.(newState); // Emit the change
   };
 
   const handleDashboardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
