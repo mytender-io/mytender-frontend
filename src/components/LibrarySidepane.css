@@ -46,7 +46,7 @@
 
 /* Main Content */
 
-.sidepane-content {
+.library-sidepane-content {
   width: 100%;
   overflow: hidden;
   opacity: 0;
@@ -54,7 +54,7 @@
   padding: 20px;
 }
 
-.sidepane-content.visible {
+.library-sidepane-content.visible {
   opacity: 1;
 }
 

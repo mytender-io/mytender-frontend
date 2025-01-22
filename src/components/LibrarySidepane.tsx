@@ -25,7 +25,7 @@ const LibrarySidepane: React.FC<LibrarySidepaneProps> = ({
         />
       </button>
       {/* Main content */}
-      <div className={`sidepane-content ${isOpen ? "visible" : ""}`}>
+      <div className={`library-sidepane-content ${isOpen ? "visible" : ""}`}>
         <h3 className="content-title">Company Data</h3>
         {/* Accordion sections */}
         <div className="accordion-container">

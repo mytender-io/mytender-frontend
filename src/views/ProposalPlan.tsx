@@ -711,16 +711,17 @@ const ProposalPlan = () => {
                           <tr
                             onContextMenu={(e) => handleContextMenu(e, index)}
                             onClick={(e) => handleRowClick(e, index)}
-                            className="hover:bg-gray-50 cursor-pointer"
+                            className="cursor-pointer"
                           >
                             <td className="">
-                              <div className="flex items-center gap-2">
+                              <div className="truncate-wrapper">
                                 <Link
                                   to="#"
-                                  className="bg-transparent border-0 cursor-pointer text-black me-2"
                                   onClick={() => toggleSection(index)}
-                                ></Link>
+                                  className="truncate-text"
+                                >
                                 <span>{section.heading}</span>
+                                </Link>
                               </div>
                             </td>
                             <td className="">
