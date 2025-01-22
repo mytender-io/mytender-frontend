@@ -9,9 +9,10 @@
     padding: 0;
     font-weight: 600;
     position: relative;
-    min-height: 36px;
     display: flex;
     align-items: center;
+    /* Add line height to prevent text clipping */
+    line-height: 1.5;
 }
 
 .bidname-wrapper {
@@ -21,6 +22,7 @@
     max-width: 1350px;
     position: relative;
     cursor: pointer;
+    /* Increase padding to accommodate full text height */
 }
 
 .bidname-header span {
@@ -35,12 +37,18 @@
     text-align: left;
     direction: ltr;
     color: #000;
+    /* Add padding to prevent text clipping */
+    padding: 2px 0;
+    /* Ensure proper line height */
+    line-height: 1.5;
 }
 
 .bidname-header .editable {
     outline: none;
     border: 2px solid #86b7fe;
     border-radius: 4px;
+    /* Add padding inside editable area */
+    padding: 2px 4px;
 }
 
 .edit-tag {

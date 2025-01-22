@@ -13,7 +13,13 @@ import { displayAlert } from "../helper/Alert";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 import TenderAnalysis from "../components/TenderAnalysis.tsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronUp, faMaximize, faMinimize } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronDown,
+  faChevronUp,
+  faMaximize,
+  faMinimize
+} from "@fortawesome/free-solid-svg-icons";
+import { ChevronDown } from "lucide-react";
 
 const BidPlanner = () => {
   const getAuth = useAuthUser();
@@ -179,12 +185,12 @@ const BidPlanner = () => {
           />
           <div>
             <div className="library-toggle-bar" onClick={toggleLibrary}>
-              <FontAwesomeIcon
-                icon={faMaximize}
+              <ChevronDown
+                size={20}
+                className={`toggle-icon ${isLibraryVisible ? "rotate" : ""}`}
               />
               <span>View Tender Library Documents</span>
             </div>
-
             <div
               className={`library-section ${!isLibraryVisible ? "collapsed" : ""}`}
             >

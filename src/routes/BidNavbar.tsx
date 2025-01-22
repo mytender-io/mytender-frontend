@@ -112,7 +112,7 @@ const BidNavbar = ({
 
   return (
     <div>
-      <div className="bidnav"></div>
+
       <div className="proposal-header">
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <button
@@ -133,7 +133,7 @@ const BidNavbar = ({
         </div>
       </div>
       <div className="proposal-header">
-        <div className="bidnav-section mt-3 mb-1">
+        <div className="bidnav-section mt-2 mb-1">
           <NavLink
             to="/bid-extractor"
             className={`bidnav-item ${activeTab === "/bid-extractor" ? "active" : ""}`}

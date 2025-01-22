@@ -6,13 +6,22 @@
     border: 1px solid #e9ecef;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.2s ease;
     margin-top: 20px;
     font-size: 18px;
     font-weight: 500;
 }
 
 .library-toggle-bar:hover {
-    background-color: #e9ecef;
+    background-color: #f0f0f0;
+}
+
+.library-toggle-bar .toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.library-toggle-bar .toggle-icon.rotate {
+    transform: rotate(-180deg);
 }
 
 .library-toggle-bar svg {

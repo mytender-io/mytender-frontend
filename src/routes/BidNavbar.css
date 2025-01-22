@@ -1,45 +1,60 @@
 /* BidNavbar.css */
 
 .bidnav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: none;
 }
 
 .bidnav-section {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .bidnav-item {
-    margin-right: 20px;
-    font-size: 16px;
-    text-decoration: none;
-    color: #999;
-    padding: 5px 10px;
-    cursor: pointer;
-    transition: all 0.05s ease;
-    position: relative;
-    overflow: hidden;
+  margin-right: 20px;
+  font-size: 16px;
+  text-decoration: none;
+  color: #999;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.05s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .bidnav-item.active,
 .bidnav-item:hover {
-    background-color: transparent;
-    color: black;
+  background-color: transparent;
+  color: black;
 }
 
 .bidnav-item.active {
-    border-bottom: 2px solid black;
-    color: black;
+  border-bottom: 2px solid black;
+  color: black;
 }
 
 .back-arrow-button {
-    background: none;
-    border: none;
-    color: #333;
-    transition: color 0.05s ease;
-    cursor: pointer;
-    margin: 0;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  margin: 0;
+  padding: 5x;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.back-arrow-button:hover {
+  transform: translateX(-3px);
+  color: #666;
+  /* Lighter shade of #333 */
+}
+
+.back-arrow-button:focus {
+  outline: none;
+}
+
+.back-arrow-button:active {
+  transform: translateX(-2px);
 }

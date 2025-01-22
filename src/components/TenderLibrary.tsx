@@ -373,8 +373,7 @@ const TenderLibrary = ({ object_id }) => {
     <>
       <Row>
         <Col md={12}>
-          <Card className="mb-2 p-2 card-custom-shadow">
-            <Card.Body className="tenderlibrary-card-body-content">
+          
               <div>
                 <div  id="tender-library">
                   <div className="tender-library-title">Tender Upload</div>
@@ -432,8 +431,7 @@ const TenderLibrary = ({ object_id }) => {
                   </div>
                 </div>
               </div>
-            </Card.Body>
-          </Card>
+            
         </Col>
       </Row>
 
