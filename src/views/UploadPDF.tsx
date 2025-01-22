@@ -53,25 +53,19 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
 
   const [uploadProgress, setUploadProgress] = useState<UploadProgress>({});
 
-  const getFileMode = (fileType) => {
-    if (fileType === "application/pdf") {
-      return "pdf";
-    } else if (
-      fileType === "application/msword" ||
-      fileType ===
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ) {
-      return "word";
-    } else if (
-      fileType === "application/vnd.ms-excel" ||
-      fileType ===
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    ) {
-      return "excel";
+  const getFileMode = (fileType: string) => {
+    switch (fileType) {
+      case "application/pdf":
+        return "pdf";
+      case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        return "word";
+      case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+      case "application/vnd.ms-excel":
+        return "excel";
+      default:
+        return null;
     }
-    return null;
   };
-
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -106,22 +100,37 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }
   };
 
-  const handleFiles = (newFiles) => {
-    const allowedTypes = [
+  const isAllowedFileType = (file: File): boolean => {
+    // Check MIME types
+    const allowedMimeTypes = [
       "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+      "application/vnd.ms-excel" // .xls
     ];
 
-    const invalidTypeFiles = newFiles.filter(
-      (file) => !allowedTypes.includes(file.type)
-    );
+    // Check file extensions
+    const allowedExtensions = [".pdf", ".docx", ".xlsx", ".xls"];
+    const fileName = file.name.toLowerCase();
+    const fileExtension = fileName.substring(fileName.lastIndexOf("."));
 
-    const validFiles = newFiles.filter((file) =>
-      allowedTypes.includes(file.type)
+    return (
+      allowedMimeTypes.includes(file.type) &&
+      allowedExtensions.includes(fileExtension)
     );
+  };
+
+  const handleFiles = (newFiles: File[]) => {
+    const validFiles = [];
+    const invalidFiles = [];
+
+    for (const file of newFiles) {
+      if (isAllowedFileType(file)) {
+        validFiles.push(file);
+      } else {
+        invalidFiles.push(file);
+      }
+    }
 
     setSelectedFiles((prevFiles) => [...prevFiles, ...validFiles]);
 
@@ -132,14 +141,14 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       });
     }
 
-    if (invalidTypeFiles.length > 0) {
+    if (invalidFiles.length > 0) {
       displayAlert(
-        "Some files were not added due to invalid file type. Please select PDF, Word, or Excel files only.",
+        "Some files were not added. Only PDF (.pdf), Word (.docx), and Excel (.xlsx, .xls) files are allowed.",
         "danger"
       );
       posthog.capture("pdf_upload_invalid_file_types", {
-        fileCount: invalidTypeFiles.length,
-        fileTypes: invalidTypeFiles.map((f) => f.type)
+        fileCount: invalidFiles.length,
+        fileTypes: invalidFiles.map((f) => f.type)
       });
     }
   };
