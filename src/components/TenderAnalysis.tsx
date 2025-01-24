@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { Row, Col, Spinner } from "react-bootstrap";
 import "./TenderAnalysis.css";
 import axios from "axios";
@@ -6,8 +6,86 @@ import { displayAlert } from "../helper/Alert";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import { useAuthUser } from "react-auth-kit";
-import { FileText, Scale, Lightbulb, Star } from "lucide-react";
+import { FileText, Scale, Lightbulb, Star, RefreshCw } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+
+// Create an error boundary component
+class MarkdownErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Markdown rendering error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <div className="error-message">Error rendering content</div>;
+    }
+
+    return this.props.children;
+  }
+}
+
+const CustomTable = ({ content }) => {
+  // Parse table content into structured data
+  const parseTable = (text: string) => {
+    const lines = text.split('\n').filter(line => line.trim());
+    
+    // Get headers
+    const headerLine = lines[0];
+    const headers = headerLine
+      .split('|')
+      .map(cell => cell.trim())
+      .filter(Boolean);
+
+    // Skip separator line and get data rows
+    const dataRows = lines.slice(2)
+      .map(line => {
+        const cells = line
+          .split('|')
+          .map(cell => cell.trim())
+          .filter(Boolean);
+        return cells;
+      })
+      .filter(row => row.length > 0);
+
+    return { headers, rows: dataRows };
+  };
+
+  const { headers, rows } = parseTable(content);
+
+  return (
+    <div className="table-container">
+      <table className="markdown-table">
+        <thead>
+          <tr>
+            {headers.map((header, index) => (
+              <th key={index}>{header}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {row.map((cell, cellIndex) => (
+                <td key={cellIndex}>{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 const TenderAnalysis = ({ canUserEdit }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
@@ -15,6 +93,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
   const { sharedState, setSharedState } = useContext(BidContext);
   const getAuth = useAuthUser();
   const auth = getAuth();
+  const mounted = useRef(false);
 
   const {
     object_id,
@@ -72,12 +151,16 @@ const TenderAnalysis = ({ canUserEdit }) => {
   };
 
   useEffect(() => {
+    mounted.current = true;
     setTabContent({
       0: tender_summary || "",
       1: evaluation_criteria || "",
       2: derive_insights || "",
       3: differentiation_opportunities || ""
     });
+    return () => {
+      mounted.current = false;
+    };
   }, [
     tender_summary,
     evaluation_criteria,
@@ -137,51 +220,92 @@ const TenderAnalysis = ({ canUserEdit }) => {
     }
   };
 
-  const formatContent = (content) => {
-    if (!content) return "";
-  
-    let formatted = content;
+  const handleRegenerateClick = async (index, event) => {
+    event.stopPropagation();
     
-    // Handle main heading
-    formatted = formatted.replace(/^##\s(.+?)(?=\n)/, '<h1>$1</h1>');
+    if (!canUserEdit || !mounted.current) return;
     
-    // Handle Roman numeral sections
-    formatted = formatted.replace(/\*\*([IVX]+\.)\s([^:]+):\*\*/g, '<h2>$1 $2</h2>');
-    
-    // Handle letter subsections
-    formatted = formatted.replace(/\*\*([A-Z]\.)\s([^:]+):\*\*/g, '<h3>$1 $2</h3>');
-    
-    // Handle numbered sections
-    formatted = formatted.replace(/(\d+\.)\s([^:\n]+)/g, '<h2>$1 $2</h2>');
-    
-    // Handle list items
-    formatted = formatted.replace(/\*\s\*\*(.*?):\*\*/g, '<li><strong>$1:</strong>');
-    formatted = formatted.replace(/\*\s(.*?)(?=\n|$)/g, '<li>$1</li>');
-    
-    // Handle remaining bold text
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    
-    // Wrap lists
-    formatted = formatted.replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>');
-    
-    // Handle paragraphs
-    formatted = formatted.split('\n\n').map(p => 
-      p.includes('<h') || p.includes('<ul') ? p : `<p>${p}</p>`
-    ).join('');
-  
-    return `
-      <style>
-        h1 { font-size: 24px; font-weight: 600; margin: 0 0 20px 0; }
-        h2 { font-size: 18px; font-weight: 600; margin: 24px 0 16px 0; }
-        h3 { font-size: 16px; font-weight: 600; margin: 16px 0 12px 0; }
-        p { font-size: 11pt; line-height: 1.5; margin-bottom: 12px; }
-        ul { padding-left: 20px; margin: 12px 0; }
-        li { margin-bottom: 8px; line-height: 1.5; }
-        strong { font-weight: 600; }
-      </style>
-      ${formatted}
-    `;
+    if (!object_id) {
+      displayAlert("Please save the bid first.", "warning");
+      return;
+    }
+
+    const tab = tabs[index];
+    setLoadingTab(index);
+
+    try {
+      const formData = new FormData();
+      formData.append("bid_id", object_id);
+      formData.append("prompt", tab.prompt);
+
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/generate_tender_insights`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${auth?.token}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      if (mounted.current) {
+        const generatedContent = result.data.requirements;
+        setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
+        setSharedState((prev) => ({ ...prev, [tab.stateKey]: generatedContent }));
+        displayAlert("Regenerated successfully!", "success");
+      }
+    } catch (err) {
+      if (mounted.current) {
+        const errorMsg =
+          err.response?.status === 404
+            ? "No documents found in the tender library. Please upload documents before generating"
+            : "An error occurred while regenerating. Please try again.";
+        displayAlert(
+          errorMsg,
+          err.response?.status === 404 ? "warning" : "danger"
+        );
+      }
+    } finally {
+      if (mounted.current) {
+        setLoadingTab(null);
+      }
+    }
   };
+
+  const renderContent = (content: string) => {
+    // Split content into sections
+    const sections = content.split(/(?=\n\d+\.|#)/);
+    
+    return sections.map((section, index) => {
+      // Check if section contains a table
+      if (section.includes('|')) {
+        const parts = section.split(/(\n.*\|.*\n[\s|-]+\|.*[\s\S]*?)(?=\n\n|\n(?=\d+\.|#)|$)/);
+        
+        return parts.map((part, partIndex) => {
+          if (part.includes('|') && part.includes('-|-')) {
+            return <CustomTable key={`${index}-${partIndex}`} content={part} />;
+          }
+          return (
+            <div key={`${index}-${partIndex}`}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {part}
+              </ReactMarkdown>
+            </div>
+          );
+        });
+      }
+      
+      return (
+        <div key={index}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {section}
+          </ReactMarkdown>
+        </div>
+      );
+    });
+  };
+
   return (
     <div className="tender-analysis mt-5">
       <div>
@@ -195,27 +319,34 @@ const TenderAnalysis = ({ canUserEdit }) => {
                 onClick={() => handleTabClick(index)}
               >
                 <span className="tab-content">
-                  {loadingTab === index ? (
-                    <Spinner animation="border" size="sm" />
-                  ) : (
-                    <TabIcon className="tab-icon" size={16} />
-                  )}
+                  <TabIcon className="tab-icon" size={16} />
                   <span className="tab-name">{tab.name}</span>
+                  {tabContent[index] && (
+                    <RefreshCw
+                      className={`regenerate-icon ${loadingTab === index ? 'spinning' : ''}`}
+                      size={14}
+                      onClick={(e) => handleRegenerateClick(index, e)}
+                    />
+                  )}
                 </span>
               </div>
             );
           })}
         </div>
-
-        <div className="proposal-container">
-        
-            <div className="tender-insights-content"
-             
-              dangerouslySetInnerHTML={{
-                __html: formatContent(tabContent[currentTabIndex])
-              }}
-            />
-          
+        <div className="tab-content-container">
+          {currentTabIndex !== null && (
+            <div className="tab-content">
+              {loadingTab === currentTabIndex ? (
+                <div className="loading-spinner">
+                  <Spinner animation="border" />
+                </div>
+              ) : (
+                <div className="markdown-content">
+                  {renderContent(tabContent[currentTabIndex] || '')}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -188,3 +188,141 @@
   background: white;
   min-height: 300px;
 }
+
+.regenerate-icon {
+  margin-left: 8px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.regenerate-icon.spinning {
+  opacity: 1;
+  animation: spin 1s linear infinite;
+  cursor: not-allowed;
+}
+
+.regenerate-icon:not(.spinning):hover {
+  opacity: 1;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tab:hover .regenerate-icon:not(.spinning) {
+  opacity: 0.8;
+}
+
+.markdown-content {
+  padding: 20px;
+  line-height: 1.6;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  font-weight: 600;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  padding-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.markdown-content li {
+  margin-bottom: 0.5em;
+}
+
+.markdown-content p {
+  margin-bottom: 1em;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+}
+
+.markdown-content blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1em;
+  margin: 1em 0;
+  color: #4b5563;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1rem 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.markdown-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  white-space: normal;
+}
+
+.markdown-table td {
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.markdown-table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.markdown-content > * {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    margin: 0.5rem -16px;
+    width: calc(100% + 32px);
+    border-radius: 0;
+  }
+
+  .markdown-table {
+    font-size: 13px;
+  }
+
+  .markdown-table th,
+  .markdown-table td {
+    padding: 8px 12px;
+  }
+}
+
+.markdown-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.error-message {
+  padding: 1rem;
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  margin: 1rem 0;
+}

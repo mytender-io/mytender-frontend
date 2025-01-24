@@ -59,7 +59,9 @@
         "react-pdf": "^9.1.1",
         "react-plotly.js": "^2.6.0",
         "react-router-dom": "^6.17.0",
-        "react-tooltip": "^5.25.0"
+        "react-tooltip": "^5.25.0",
+        "rehype-raw": "^7.0.0",
+        "remark-gfm": "^4.0.0"
     },
     "devDependencies": {
         "@testing-library/jest-dom": "^6.6.3",
