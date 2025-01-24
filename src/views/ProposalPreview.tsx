@@ -114,91 +114,97 @@ const ProposalPreview = () => {
             initialBidName={"initialBidName"}
           />
             <div className="bidplanner-padded-container ">
-          
-       
-       
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "1rem"
+                  flexDirection: "column",
+                  height: "calc(100vh - 120px)",
+                  overflow: "hidden"
                 }}
               >
                 <div
                   style={{
                     display: "flex",
+                    justifyContent: "space-between",
                     alignItems: "center",
-                    gap: "0.5rem"
+                    marginBottom: "1rem"
                   }}
                 >
-                  <DescriptionIcon />
-                  <h3
-                    style={{ fontSize: "1.2rem", fontWeight: 600, margin: 0 }}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem"
+                    }}
                   >
-                    Proposal Preview
-                  </h3>
+                    <DescriptionIcon />
+                    <h3
+                      style={{ fontSize: "1.2rem", fontWeight: 600, margin: 0 }}
+                    >
+                      Proposal Preview
+                    </h3>
+                  </div>
+                  <Button
+                    variant="outlined"
+                    onClick={handleWordDownload}
+                    startIcon={<ArticleIcon />}
+                  >
+                    Download Word
+                  </Button>
                 </div>
-                <Button
-                  variant="outlined"
-                  onClick={handleWordDownload}
-                  startIcon={<ArticleIcon />}
-                >
-                  Download Word
-                </Button>
-              </div>
 
-              <div
-                style={{
-                  flex: 1,
-                  border: "1px solid #e0e0e0",
-                  borderRadius: "4px",
-                  overflow: "auto",
-                  backgroundColor: "#ffffff",
-                  padding: "2rem 3rem"
-                }}
-              >
-                {isLoading ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "100%",
-                      backgroundColor: "#f5f5f5"
-                    }}
-                  >
-                    <CircularProgress />
-                  </div>
-                ) : htmlContent ? (
-                  <div
-                    dangerouslySetInnerHTML={{ __html: htmlContent }}
-                    style={{
-                      fontFamily: "Calibri, sans-serif",
-                      fontSize: "11pt",
-                      lineHeight: "1.5",
-                      width: "100%",
-                      margin: "0"
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "100%",
-                      backgroundColor: "#f5f5f5",
-                      padding: "20px",
-                      textAlign: "center"
-                    }}
-                  >
-                    <p>Generate a Proposal to preview it here.</p>
-                  </div>
-                )}
+                <div
+                  style={{
+                    flex: 1,
+                    border: "1px solid #e0e0e0",
+                    borderRadius: "4px",
+                    overflow: "auto",
+                    backgroundColor: "#ffffff",
+                    padding: "2rem 3rem",
+                    height: "100%"
+                  }}
+                >
+                  {isLoading ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "100%",
+                        backgroundColor: "#f5f5f5"
+                      }}
+                    >
+                      <CircularProgress />
+                    </div>
+                  ) : htmlContent ? (
+                    <div
+                      dangerouslySetInnerHTML={{ __html: htmlContent }}
+                      style={{
+                        fontFamily: "Calibri, sans-serif",
+                        fontSize: "11pt",
+                        lineHeight: "1.5",
+                        width: "100%",
+                        margin: "0"
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "100%",
+                        backgroundColor: "#f5f5f5",
+                        padding: "20px",
+                        textAlign: "center"
+                      }}
+                    >
+                      <p>Generate a Proposal to preview it here.</p>
+                    </div>
+                  )}
+                </div>
               </div>
-           
-        </div>
+            </div>
       </div>
       </div>
 
