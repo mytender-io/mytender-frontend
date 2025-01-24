@@ -2,7 +2,7 @@ import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { Button } from "react-bootstrap";
 import { Section } from "../views/BidWritingStateManagerView";
-import { Circle, Clock, CheckCircle } from "lucide-react";
+import { Circle, Clock, CheckCircle, Minus, TriangleAlert } from "lucide-react";
 
 type ValidStatus = "Not Started" | "In Progress" | "Completed";
 
@@ -55,9 +55,9 @@ const StatusMenu = ({
       case "In Progress":
         return <Clock className="status-icon" size={16} />;
       case "Not Started":
-        return <Circle className="status-icon" size={16} />;
+        return <TriangleAlert className="status-icon" size={16} />;
       default:
-        return <Circle className="status-icon" size={16} />;
+        return <TriangleAlert className="status-icon" size={16} />;
     }
   };
 

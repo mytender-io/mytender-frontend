@@ -122,21 +122,18 @@
 .status-not-started:hover,
 .status-not-started:focus,
 .status-not-started:active {
-    background-color: rgba(0, 0, 0, 0.08) !important;
     border: none;
 }
 
 .status-in-progress:hover,
 .status-in-progress:focus,
 .status-in-progress:active {
-    background-color: rgba(255, 140, 0, 0.08) !important;
     border: none;
 }
 
 .status-complete:hover,
 .status-complete:focus,
 .status-complete:active {
-    background-color: rgba(34, 139, 34, 0.08) !important;
     border: none;
 }
 

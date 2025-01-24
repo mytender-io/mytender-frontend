@@ -6,17 +6,17 @@ import { displayAlert } from "../helper/Alert";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import { useAuthUser } from "react-auth-kit";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFileLines,
   faLightbulb,
-  faStar
-} from "@fortawesome/free-regular-svg-icons";
-import { faScaleBalanced } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+  faStar,
+  faScaleBalanced
+} from "@fortawesome/free-solid-svg-icons";
 
 const TenderAnalysis = ({ canUserEdit }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
-  const [loadingPrompt, setLoadingPrompt] = useState(null);
+  const [loadingTab, setLoadingTab] = useState(null);
   const { sharedState, setSharedState } = useContext(BidContext);
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -37,67 +37,42 @@ const TenderAnalysis = ({ canUserEdit }) => {
   });
 
   const tabs = [
-    "Summarise Tender",
-    "Evaluation Criteria",
-    "Derive Insights",
-    "Differentiation Opportunities"
-  ];
-
-  const actionButtons = [
     {
+      name: "Summarise Tender",
       icon: faFileLines,
-      label: "Ask to summarise",
       prompt: "generate_summarise_tender",
-      stateKey: "tender_summary"
+      stateKey: "tender_summary",
+      placeholder: "Enter tender summary here..."
     },
     {
+      name: "Evaluation Criteria",
       icon: faScaleBalanced,
-      label: "Ask to evaluate",
       prompt: "generate_evaluation_criteria",
-      stateKey: "evaluation_criteria"
+      stateKey: "evaluation_criteria",
+      placeholder: "Document evaluation criteria..."
     },
     {
+      name: "Derive Insights",
       icon: faLightbulb,
-      label: "Ask for insights",
       prompt: "generate_derive_insights",
-      stateKey: "derive_insights"
+      stateKey: "derive_insights",
+      placeholder: "Note key insights..."
     },
     {
+      name: "Differentiation Opportunities",
       icon: faStar,
-      label: "Ask to differentiate",
       prompt: "generate_differentiation_opportunities",
-      stateKey: "differentiation_opportunities"
+      stateKey: "differentiation_opportunities",
+      placeholder: "List differentiation opportunities..."
     }
   ];
 
-  const getPlaceholderText = (index) => {
-    const placeholders = {
-      0: "Enter tender summary here...",
-      1: "Document evaluation criteria...",
-      2: "Note key insights...",
-      3: "List differentiation opportunities..."
-    };
-    return placeholders[index];
-  };
-
   const handleTextChange = (event) => {
     const newContent = event.target.value;
-
-    setTabContent((prev) => ({
-      ...prev,
-      [currentTabIndex]: newContent
-    }));
-
-    const stateKeys = {
-      0: "tender_summary",
-      1: "evaluation_criteria",
-      2: "derive_insights",
-      3: "differentiation_opportunities"
-    };
-
+    setTabContent((prev) => ({ ...prev, [currentTabIndex]: newContent }));
     setSharedState((prev) => ({
       ...prev,
-      [stateKeys[currentTabIndex]]: newContent
+      [tabs[currentTabIndex].stateKey]: newContent
     }));
   };
 
@@ -115,21 +90,27 @@ const TenderAnalysis = ({ canUserEdit }) => {
     differentiation_opportunities
   ]);
 
-  const handleActionClick = async (action, prompt) => {
+  const handleTabClick = async (index) => {
     if (!canUserEdit) {
       displayAlert("You only have permission to view this bid.", "danger");
       return;
     }
+
+    setCurrentTabIndex(index);
+
+    if (tabContent[index]) return; // Skip generation if content exists
 
     if (!object_id) {
       displayAlert("Please save the bid first.", "warning");
       return;
     }
 
-    setLoadingPrompt(prompt);
+    const tab = tabs[index];
+    setLoadingTab(index);
+
     const formData = new FormData();
     formData.append("bid_id", object_id);
-    formData.append("prompt", prompt);
+    formData.append("prompt", tab.prompt);
 
     try {
       const result = await axios.post(
@@ -143,74 +124,40 @@ const TenderAnalysis = ({ canUserEdit }) => {
         }
       );
 
-      const clickedButton = actionButtons.find((btn) => btn.prompt === prompt);
-      if (!clickedButton) return;
-
       const generatedContent = result.data.requirements;
-      const tabIndex = actionButtons.findIndex((btn) => btn.prompt === prompt);
-      if (tabIndex === -1) return;
-
-      setTabContent((prev) => ({
-        ...prev,
-        [tabIndex]: generatedContent
-      }));
-
-      setSharedState((prev) => ({
-        ...prev,
-        [clickedButton.stateKey]: generatedContent
-      }));
-
-      setCurrentTabIndex(tabIndex);
+      setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
+      setSharedState((prev) => ({ ...prev, [tab.stateKey]: generatedContent }));
       displayAlert("Generated successfully!", "success");
     } catch (err) {
-      console.error("Error generating:", err);
-      if (err.response?.status === 404) {
-        displayAlert(
-          "No documents found in the tender library. Please upload documents before generating",
-          "warning"
-        );
-      } else {
-        displayAlert(
-          "An error occurred while generating. Please try again.",
-          "danger"
-        );
-      }
+      const errorMsg =
+        err.response?.status === 404
+          ? "No documents found in the tender library. Please upload documents before generating"
+          : "An error occurred while generating. Please try again.";
+      displayAlert(
+        errorMsg,
+        err.response?.status === 404 ? "warning" : "danger"
+      );
     } finally {
-      setLoadingPrompt(null);
+      setLoadingTab(null);
     }
   };
-
   return (
-    <div className="tender-analysis">
-      <div className="action-buttons">
-        {actionButtons.map((button, index) => (
-          <button
-            key={index}
-            onClick={() => handleActionClick(button.label, button.prompt)}
-            className="action-button"
-            disabled={loadingPrompt !== null}
-          >
-            {loadingPrompt === button.prompt ? (
-              <Spinner animation="border" size="sm" />
-            ) : (
-              <>
-                <FontAwesomeIcon icon={button.icon} />
-                <span>{button.label}</span>
-              </>
-            )}
-          </button>
-        ))}
-      </div>
+    <div className="tender-analysis mt-5">
       <div>
         <div className="tabs-container">
           {tabs.map((tab, index) => (
             <div
               key={index}
               className={`tab ${currentTabIndex === index ? "active" : ""}`}
-              onClick={() => setCurrentTabIndex(index)}
+              onClick={() => handleTabClick(index)}
             >
               <span className="tab-content">
-                <span className="tab-name">{tab}</span>
+                {loadingTab === index ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  <FontAwesomeIcon icon={tab.icon} className="tab-icon" />
+                )}
+                <span className="tab-name">{tab.name}</span>
               </span>
             </div>
           ))}
@@ -221,7 +168,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
             className="tender-insights-textarea"
             value={tabContent[currentTabIndex]}
             onChange={handleTextChange}
-            placeholder={getPlaceholderText(currentTabIndex)}
+            placeholder={tabs[currentTabIndex].placeholder}
             disabled={!canUserEdit}
           />
         </div>

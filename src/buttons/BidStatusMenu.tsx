@@ -1,22 +1,10 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { Button } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMagnifyingGlass,
-  faClipboardList,
-  faFileCircleCheck,
-  faFileSignature,
-  faFileCircleExclamation
-} from "@fortawesome/free-solid-svg-icons";
+import { Search, ClipboardList, FileWarning, FileCheck, FileSignature } from "lucide-react";
 import "./BidStatusMenu.css";
 
-type BidStatus =
-  | "Planning"
-  | "Research"
-  | "First Draft"
-  | "Reviewing"
-  | "Complete";
+type BidStatus = "Planning" | "Research" | "First Draft" | "Reviewing" | "Complete";
 
 const BidStatusMenu = ({
   value,
@@ -27,7 +15,6 @@ const BidStatusMenu = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Map old status values to new ones
   const statusMapping: { [key: string]: BidStatus } = {
     Identification: "Planning",
     "Capture Planning": "Research",
@@ -37,17 +24,8 @@ const BidStatusMenu = ({
   };
 
   const normalizeStatus = (status: any): BidStatus => {
-    const validStatuses: BidStatus[] = [
-      "Planning",
-      "Research",
-      "First Draft",
-      "Reviewing",
-      "Complete"
-    ];
-    if (status in statusMapping) {
-      return statusMapping[status];
-    }
-    return validStatuses.includes(status) ? status : "Planning";
+    const validStatuses: BidStatus[] = ["Planning", "Research", "First Draft", "Reviewing", "Complete"];
+    return status in statusMapping ? statusMapping[status] : (validStatuses.includes(status) ? status : "Planning");
   };
 
   const currentStatus = normalizeStatus(value);
@@ -66,38 +44,28 @@ const BidStatusMenu = ({
   };
 
   const getStatusColor = (status: BidStatus) => {
-    switch (status) {
-      case "Planning":
-        return "status-identification";
-      case "Research":
-        return "status-capture";
-      case "First Draft":
-        return "status-first-review";
-      case "Reviewing":
-        return "status-final-review";
-      case "Complete":
-        return "status-submitted";
-      default:
-        return "status-identification";
-    }
+    const colors = {
+      Planning: "status-identification",
+      Research: "status-capture",
+      "First Draft": "status-first-review",
+      Reviewing: "status-final-review",
+      Complete: "status-submitted"
+    };
+    return colors[status] || "status-identification";
   };
 
   const getStatusIcon = (status: BidStatus) => {
-    switch (status) {
-      case "Planning":
-        return faMagnifyingGlass;
-      case "Research":
-        return faClipboardList;
-      case "First Draft":
-        return faFileCircleExclamation;
-      case "Reviewing":
-        return faFileCircleCheck;
-      case "Complete":
-        return faFileSignature;
-      default:
-        return faMagnifyingGlass;
-    }
+    const icons = {
+      Planning: Search,
+      Research: ClipboardList,
+      "First Draft": FileWarning,
+      Reviewing: FileCheck,
+      Complete: FileSignature
+    };
+    return icons[status] || Search;
   };
+
+  const StatusIcon = getStatusIcon(currentStatus);
 
   return (
     <div>
@@ -108,7 +76,7 @@ const BidStatusMenu = ({
         aria-haspopup="true"
       >
         {currentStatus}
-        <FontAwesomeIcon icon={getStatusIcon(currentStatus)} className="ms-2" />
+        <StatusIcon className="ms-2" size={16} />
       </Button>
       <Menu
         id="bid-status-menu"
@@ -119,22 +87,24 @@ const BidStatusMenu = ({
         PaperProps={{
           elevation: 1,
           style: {
-            width: "160px", // Reduced width since names are shorter
+            width: "160px",
             boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
           }
         }}
       >
-        {["Planning", "Research", "First Draft", "Reviewing", "Complete"].map(
-          (status) => (
+        {["Planning", "Research", "First Draft", "Reviewing", "Complete"].map((status) => {
+          const Icon = getStatusIcon(status as BidStatus);
+          return (
             <MenuItem
               key={status}
               onClick={() => handleSelect(status as BidStatus)}
               className="styled-menu-item"
             >
               {status}
+              <Icon className="ms-2" size={16} />
             </MenuItem>
-          )
-        )}
+          );
+        })}
       </Menu>
     </div>
   );
