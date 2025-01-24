@@ -1,9 +1,13 @@
+:root {
+    font-size: 14px;
+}
+
 .input-options-container {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 20px;
+    gap: 1.429rem;
     padding: 0;
     font-family: "Manrope", sans-serif;
 }
@@ -11,19 +15,16 @@
 .orange-button {
     background-color: #fff1e6;
     color: #ff6600;
-    border: 1px solid #ff6600;
-    padding: 6px 14px;
-    /* Increased padding */
+    border: none;
+    padding: 0.571rem 1rem;
+    border: none;
     cursor: pointer;
-    font-weight: 550;
-    font-size: 0.9rem;
-    /* Increased font size */
-    border-radius: 4px;
+    font-weight: 700;
+    font-size: 1.143rem !important;
+    border-radius: 0.429rem;
     outline: none !important;
     box-shadow: none !important;
     min-width: fit-content;
-    min-height: 38px;
-    /* Added min-height */
     transition: background-color 0.2s ease;
 }
 
@@ -43,14 +44,14 @@
 }
 
 .upload-button {
-    background-color: #262626;
+    background-color: black;
     color: white;
-    padding: 6px 14px;
+    padding: 0.571rem 1rem;
     border: none;
     cursor: pointer;
     font-weight: 700;
-    font-size: 16px;
-    border-radius: 4px;
+    font-size: 1.143rem !important;
+    border-radius: 0.429rem;
     outline: none !important;
     box-shadow: none !important;
     min-width: fit-content;
@@ -58,7 +59,7 @@
 }
 
 .uploader-input {
-    width: 700px !important;
+    width: 50rem !important;
     font-family: "Manrope", sans-serif !important;
     font-weight: bolder;
 }
@@ -66,7 +67,6 @@
 .upload-button:disabled,
 .upload-button.btn-disabled {
     background-color: #262626 !important;
-    /* Black background when disabled */
     color: white !important;
     cursor: not-allowed;
 }
@@ -84,5 +84,4 @@
     outline: none !important;
     box-shadow: none !important;
     background-color: #262626;
-    /* Ensures it doesn't flash blue */
 }

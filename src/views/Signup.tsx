@@ -89,7 +89,7 @@ const Signup = () => {
   }
 
   return (
-    <div style={{ overflow: "auto", height: "125vh" }}>
+    <div style={{ overflow: "auto", height: "100vh" }}>
       <div className="mt-5 create-account-container">
         <Card className="p-4">
           <Card.Body>

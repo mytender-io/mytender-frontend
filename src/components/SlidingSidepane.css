@@ -1,286 +1,258 @@
 .nav-button {
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    transition: color 0.2s;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
 .nav-button:hover:not(:disabled) {
-    color: #333;
+  color: #333;
 }
 
 .nav-button:disabled {
-    color: #ccc;
-    cursor: not-allowed;
+  color: #ccc;
+  cursor: not-allowed;
 }
 
-
-/* Sidepane base styles */
-
 .content-wrapper {
-    position: relative;
-    display: flex;
-    height: 100%;
+  position: relative;
+  display: flex;
+  height: 100%;
 }
 
 .sidepane {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 650px;
-    z-index: 800;
-    height: 125vh;
-    background: white;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-    transform: translateX(500px);
-    /* Simplified transform */
-    background-color: #faf7f7;
-    /* Remove problematic 3D properties */
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 40.625rem;
+  z-index: 800;
+  height: 100vh;
+  background: white;
+  box-shadow: -0.125rem 0 0.3125rem rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  transform: translateX(31.25rem);
+  background-color: #faf7f7;
+  font-size: 1.143rem;
 }
 
 .sidepane.open {
-    animation: slideInPane 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: slideInPane 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .sidepane:not(.open) {
-    animation: slideOutPane 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: slideOutPane 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-
-/* Simplified animations using translate3d */
-
 @keyframes slideInPane {
-    from {
-        transform: translateX(500px);
-    }
-    to {
-        transform: translateX(0);
-    }
+  from {
+    transform: translateX(31.25rem);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 @keyframes slideOutPane {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(500px);
-    }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(31.25rem);
+  }
 }
 
-
-/* Simplify content animations */
-
 @keyframes slideInContent {
-    0% {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  0% {
+    opacity: 0;
+    transform: translateX(1.25rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .sidepane-content-wrapper {
-    transform: translate3d(0, 0, 0);
-    -webkit-transform: translate3d(0, 0, 0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    z-index: inherit;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  z-index: inherit;
 }
 
-
-/* Update backdrop */
-
 .sidepane-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 125vw;
-    height: 125vh;
-    background: rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
-    z-index: 500;
-    overflow: hidden !important;
-    margin: 0;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.4s ease-out,
+    visibility 0.4s ease-out;
+  z-index: 500;
+  overflow: hidden !important;
+  margin: 0;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .sidepane-backdrop.visible {
-    opacity: 1;
-    visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
-
-/* Header styles */
-
 .sidepane-header {
-    padding: 20px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    top: 0;
-    background: white;
-    z-index: 2;
+  padding: 1.25rem;
+  border-bottom: 0.0625rem solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  top: 0;
+  background: white;
+  z-index: 2;
 }
 
 .section-heading-input {
-    flex: 1;
-    border: none;
-    padding: 4px 0;
-    font-size: 1.5rem;
-    font-weight: 550;
-    /* h3 equivalent size */
-    font-weight: bold;
-    background: transparent;
-    color: black;
-    resize: none;
-    height: 28px;
-    /* adjusted for heading size */
-    min-height: 28px;
-    overflow: hidden;
-    white-space: nowrap;
-    line-height: 20px;
-    margin: 0;
+  flex: 1;
+  border: none;
+  padding: 0.25rem 0;
+  font-size: 1.5rem;
+  font-weight: 550;
+  font-weight: bold;
+  background: transparent;
+  color: black;
+  resize: none;
+  height: 1.75rem;
+  min-height: 1.75rem;
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 1.25rem;
+  margin: 0;
 }
 
 .sidepane-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 550;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 550;
 }
 
 .close-button {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 0 8px;
-    color: black;
-    transition: transform 0.2s ease;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  color: black;
+  transition: transform 0.2s ease;
 }
 
 .close-button:hover {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }
 
-
-/* Content styles */
-
 .sidepane-content {
-    padding: 20px;
-    z-index: 999;
+  padding: 1.25rem;
+  z-index: 999;
 }
 
 .sidepane-section {
-    margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .section-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
-
-/* Additional styling */
-
 .selected-row {
-    background-color: #f8f9fa;
+  background-color: #f8f9fa;
 }
 
 .sidepane-actions {
-    margin-top: 20px;
-    margin-bottom: 20px;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
 }
 
 .sidepane-section:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .lib-container {
-    transition: margin-right 0.4s ease-out;
+  transition: margin-right 0.4s ease-out;
 }
 
 .lib-container.shifted {
-    margin-right: 500px;
+  margin-right: 31.25rem;
 }
 
-
-/* Subheading Styles */
-
 .subheadings-list {
-    border-radius: 4px;
+  border-radius: 0.25rem;
 }
 
 .subheading-item {
-    margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .subheading-item:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .subheading-content {
-    display: flex;
-    align-items: center;
-    background-color: white;
-    border-radius: 4px;
-    padding: 8px 12px;
-    border: 1px solid #dee2e6;
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border: 0.0625rem solid #dee2e6;
 }
 
 .subheading-input {
-    flex: 1;
-    border: none;
-    margin: 0 8px;
-    font-size: 0.875rem;
-    background: transparent;
-    color: black;
-    /* Add these properties for single-line behavior */
-    resize: none;
-    height: 24px;
-    /* or 1.5em for consistent height */
-    min-height: 24px;
-    overflow: hidden;
-    white-space: nowrap;
-    line-height: 16px;
-    /* matches the content height within the 24px container */
+  flex: 1;
+  border: none;
+  margin: 0 0.5rem;
+  font-size: 0.875rem;
+  background: transparent;
+  color: black;
+  resize: none;
+  height: 1.5rem;
+  min-height: 1.5rem;
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 1rem;
 }
 
 .subheading-input:focus {
-    outline: none;
-    background: #f8f9fa;
+  outline: none;
+  background: #f8f9fa;
 }
 
 .delete-subheading-button {
-    background: none;
-    border: none;
-    color: black;
-    cursor: pointer;
-    padding: 4px 8px;
-    opacity: 0.7;
-    transition: opacity 0.2s ease;
+  background: none;
+  border: none;
+  color: black;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
 }
 
 .delete-subheading-button:hover {
-    opacity: 1;
+  opacity: 1;
 }
 
 .compliance-text-area {
-    width: 100%;
-    background-color: white;
-    padding: 12px;
-    border-radius: 4px;
-    border: 1px solid #dee2e6;
-    height: 400px;
-    resize: none;
-    color: black;
-    border-radius: 8px;
+  width: 100%;
+  background-color: white;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  border: 0.0625rem solid #dee2e6;
+  height: 25rem;
+  resize: none;
+  color: black;
+  border-radius: 0.5rem;
 }

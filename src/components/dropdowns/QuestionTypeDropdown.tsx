@@ -2,9 +2,9 @@ import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 
 const selectStyle = {
   fontFamily: '"Manrope", sans-serif',
-  fontSize: "0.875rem",
-  minWidth: "220px",
-  backgroundColor: "white", // Add white background
+  fontSize: "1.143rem",
+  minWidth: "13.75rem",
+  backgroundColor: "white",
   "& MuiOutlinedInputNotchedOutline": {
     borderColor: "#ced4da"
   },
@@ -13,11 +13,12 @@ const selectStyle = {
   },
   "&.MuiFocused MuiOutlinedInputNotchedOutline": {
     borderColor: "#86b7fe",
-    borderWidth: "1px"
+    borderWidth: "0.0625rem"
   }
 };
+
 const menuStyle = {
-  fontSize: "12px",
+  fontSize: "0.75rem",
   fontFamily: '"Manrope", sans-serif'
 };
 

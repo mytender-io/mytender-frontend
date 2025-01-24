@@ -1,51 +1,49 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap");
 .sidebarsmall {
-    height: 125vh;
-    width: 290px;
+    height: 100vh;
+    width: 20rem;
     position: fixed;
     z-index: 200;
     top: 0;
     left: 0;
-    background-color: #f8f9fb;
-    padding-top: 25px;
+    background-color: white !important;
     margin-bottom: 0;
     border: none;
-    border-right: #d9d1e0 solid 0.5px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transform-origin: left;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-right: 0.143rem solid #ebecef;
+}
+
+.sidelinks {
+    padding-top: 1.429rem;
 }
 
 .sidebarsmall.collapsed {
-    width: 80px;
+    width: 5.714rem;
 }
 
 .sidebarsmall a {
     justify-content: start;
-    padding: 12px 10px;
+    padding: 0.857rem 0.857rem;
     text-decoration: none;
-    color: #535e65;
+    color: #404a50;
     display: flex;
     align-items: center;
-    border-radius: 8px;
-    margin: 0 8px;
-    transition: all 0.2s ease;
+    border-radius: 0.571rem;
+    margin: 0 0.857rem;
     white-space: nowrap;
 }
 
 .sidebarsmall.collapsed a {
     justify-content: center;
-    padding: 12px 0;
+    padding: 0.857rem 0;
 }
 
 .sidebarsmall a span {
-    font-size: 17px;
+    font-size: 1.143rem;
     font-weight: 700;
     opacity: 1;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-origin: left;
 }
 
 .sidebarsmall.collapsed a span {
@@ -56,13 +54,18 @@
 
 .sidebarsmall a:hover {
     color: #535e65;
-    background-color: #f0f0f0 !important;
+    background-color: #e2e4e8 !important;
 }
 
 .sidebarsmall a.sidebarsmalllink-active {
     background-color: transparent;
-    color: #ff6b3d;
+    color: black;
     font-weight: 800;
+}
+
+.sidebarsmall a.sidebarsmalllink-active svg {
+    color: black;
+    stroke-width: 2.5px;
 }
 
 .sidebarsmall a.sidebarsmalllink-active span {
@@ -70,55 +73,30 @@
 }
 
 .sidebarsmall a svg {
-    margin: 0 15px 0 0;
-    margin-left: 5px;
-    width: 26px;
-    height: 26px;
-    min-width: 26px;
-    transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: transform, margin;
+    margin: 0 1.071rem 0 0;
+    margin-left: 0.357rem;
+    width: 1.857rem;
+    height: 1.857rem;
+    min-width: 1.857rem;
+}
+
+.collapse-toggle {
+    position: absolute;
+    top: 62.5vh;
+    right: -1.071rem;
+    width: 2.286rem;
+    height: 2.286rem;
+    background: #f8f9fb;
+    border: 0.071rem solid #d9d1e0;
+    border-radius: 50%;
 }
 
 .sidebarsmall.collapsed a svg {
     margin: 0;
 }
 
-.collapse-toggle {
-    position: absolute;
-    top: 62.5vh;
-    right: -15px;
-    width: 32px;
-    height: 32px;
-    background: #f8f9fb;
-    border: 1px solid #d9d1e0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 999 !important;
-    transition: all 0.2s ease;
-}
-
 .collapse-toggle:hover {
-    background: #f0f0f0;
-}
-
-.collapse-toggle svg {
-    width: 12px;
-    height: 12px;
-    color: #535e65;
-}
-
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    padding-left: 16px;
-    padding-right: 20px;
-    overflow: hidden;
-    transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: transform, padding;
+    background: #e2e4e8;
 }
 
 .sidebarsmall.collapsed .sidebar-header {
@@ -126,29 +104,49 @@
     justify-content: center;
 }
 
-.sidebar-header img {
-    width: 38px;
-    height: 38px;
-    margin-right: 10px;
-}
-
 .sidebarsmall.collapsed .sidebar-header img {
     margin-right: 0;
 }
 
+.collapse-toggle svg {
+    width: 0.857rem;
+    height: 0.857rem;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.714rem;
+    padding: 1.786rem 1.429rem;
+    overflow: hidden;
+    border-bottom: 0.143rem solid #ebecef;
+    height: 7.143rem !important;
+}
+
+.sidebar-header img {
+    width: 3.143rem;
+    height: 3.143rem;
+    margin-right: 0.714rem;
+}
+
 .sidebar-header span {
     font-family: "Poppins", sans-serif;
-    font-size: 25px;
+    font-size: 1.7rem;
     font-weight: 700;
     color: black;
 }
 
 .sidebar-section-header {
+    font-size: 1rem;
+    padding: 1.143rem 1.714rem 0.571rem;
+}
+
+.sidebar-section-header {
     font-family: "Poppins", sans-serif;
     color: #8c8c8c;
-    font-size: 14px;
+    font-size: 1rem;
+    padding: 1.143rem 1.714rem 0.571rem;
     font-weight: 600;
-    padding: 16px 24px 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }

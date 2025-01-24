@@ -1,47 +1,38 @@
 .status-identification {
     background-color: #FFE4DC !important;
-    /* Lighter salmon */
     color: #D14D1F !important;
-    /* Darker salmon */
-    border: 1px solid #D14D1F !important;
+    border: none;
 }
 
 .status-capture {
     background-color: #E1F3FB !important;
-    /* Lighter sky blue */
     color: #2B87AF !important;
-    /* Darker sky blue */
-    border: 1px solid #2B87AF !important;
+    border: none;
 }
 
 .status-first-review {
     background-color: #E6FFE6 !important;
-    /* Lighter green */
     color: #2E8B2E !important;
-    /* Darker green */
-    border: 1px solid #2E8B2E !important;
+    border: none;
 }
 
 .status-final-review {
     background-color: #F8E6F8 !important;
-    /* Lighter plum */
     color: #8B488B !important;
-    /* Darker plum */
-    border: 1px solid #8B488B !important;
+    border: none;
 }
 
 .status-submitted {
     background-color: #E0F5E9 !important;
-    /* Lighter medium sea green */
     color: #2A7F4F !important;
-    /* Darker medium sea green */
-    border: 1px solid #2A7F4F !important;
+    border: none;
 }
 
 .styled-menu-item {
-    font-size: 14px;
-    padding: 8px 16px;
+    font-size: 1rem;
+    padding: 0.571rem 1.143rem;
     font-weight: 600 !important;
+    border: none;
 }
 
 .styled-menu-item:hover {
@@ -49,6 +40,6 @@
 }
 
 .bid-status-menu {
-    font-weight: 600;
-    font-size: 16px;
+    font-weight: 700;
+    font-size: 1.143rem;
 }

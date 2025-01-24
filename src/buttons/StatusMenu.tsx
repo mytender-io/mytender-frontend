@@ -2,6 +2,7 @@ import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { Button } from "react-bootstrap";
 import { Section } from "../views/BidWritingStateManagerView";
+import { Circle, Clock, CheckCircle } from "lucide-react";
 
 type ValidStatus = "Not Started" | "In Progress" | "Completed";
 
@@ -14,13 +15,8 @@ const StatusMenu = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Validate and normalize the status value
   const normalizeStatus = (status: any): ValidStatus => {
-    const validStatuses: ValidStatus[] = [
-      "Not Started",
-      "In Progress",
-      "Completed"
-    ];
+    const validStatuses: ValidStatus[] = ["Not Started", "In Progress", "Completed"];
     return validStatuses.includes(status) ? status : "Not Started";
   };
 
@@ -52,6 +48,19 @@ const StatusMenu = ({
     }
   };
 
+  const getStatusIcon = (status: ValidStatus) => {
+    switch (status) {
+      case "Completed":
+        return <CheckCircle className="status-icon" size={16} />;
+      case "In Progress":
+        return <Clock className="status-icon" size={16} />;
+      case "Not Started":
+        return <Circle className="status-icon" size={16} />;
+      default:
+        return <Circle className="status-icon" size={16} />;
+    }
+  };
+
   return (
     <div>
       <Button
@@ -61,6 +70,7 @@ const StatusMenu = ({
         aria-haspopup="true"
       >
         {currentStatus}
+        {getStatusIcon(currentStatus)}
       </Button>
       <Menu
         id="simple-menu"
@@ -76,23 +86,14 @@ const StatusMenu = ({
           }
         }}
       >
-        <MenuItem
-          onClick={() => handleSelect("Not Started")}
-          className="styled-menu-item"
-        >
-          Not Started
+        <MenuItem onClick={() => handleSelect("Not Started")} className="styled-menu-item">
+          Not Started {getStatusIcon("Not Started")}
         </MenuItem>
-        <MenuItem
-          onClick={() => handleSelect("In Progress")}
-          className="styled-menu-item"
-        >
-          In Progress
+        <MenuItem onClick={() => handleSelect("In Progress")} className="styled-menu-item">
+          In Progress {getStatusIcon("In Progress")}
         </MenuItem>
-        <MenuItem
-          onClick={() => handleSelect("Completed")}
-          className="styled-menu-item"
-        >
-          Completed
+        <MenuItem onClick={() => handleSelect("Completed")} className="styled-menu-item">
+          Completed {getStatusIcon("Completed")}
         </MenuItem>
       </Menu>
     </div>

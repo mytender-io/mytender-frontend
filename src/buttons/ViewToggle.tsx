@@ -1,8 +1,8 @@
 import React from "react";
 import { ButtonGroup, Button } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTable, faColumns } from "@fortawesome/free-solid-svg-icons";
+import { LayoutGrid, Columns } from "lucide-react";
 import "./ViewToggle.css";
+
 interface ViewToggleProps {
   value: string;
   onChange: (view: "table" | "kanban") => void;
@@ -10,24 +10,24 @@ interface ViewToggleProps {
 
 const ViewToggle: React.FC<ViewToggleProps> = ({ value, onChange }) => {
   return (
-    <ButtonGroup className="viewtoggle">
-      <Button
-        variant={value === "table" ? "primary" : "light"}
-        onClick={() => onChange("table")}
-        className="view-toggle-btn"
-      >
-        <FontAwesomeIcon icon={faTable} className="me-2" />
-        Table
-      </Button>
-      <Button
-        variant={value === "kanban" ? "primary" : "light"}
-        onClick={() => onChange("kanban")}
-        className="view-toggle-btn"
-      >
-        <FontAwesomeIcon icon={faColumns} className="me-2" />
-        Kanban
-      </Button>
-    </ButtonGroup>
+    <div className="toggle-wrapper">
+      <ButtonGroup>
+        <Button
+          variant={value === "table" ? "primary" : "light"}
+          onClick={() => onChange("table")}
+          className="view-toggle-btn"
+        >
+          <LayoutGrid size={18} strokeWidth={2} />
+        </Button>
+        <Button
+          variant={value === "kanban" ? "primary" : "light"}
+          onClick={() => onChange("kanban")}
+          className="view-toggle-btn"
+        >
+          <Columns size={18} strokeWidth={2} />
+        </Button>
+      </ButtonGroup>
+    </div>
   );
 };
 

@@ -644,16 +644,16 @@ const ProposalPlan = () => {
 
   return (
     <div className="chatpage">
-      <SideBarSmall />
-      <div className="lib-container">
-        <div className="scroll-container">
-          <BidNavbar
+        <SideBarSmall />
+      <div className="bidplanner-container">
+      <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}
             initialBidName={"initialBidName"}
             outline={outline}
             object_id={object_id}
             handleRegenerateClick={handleRegenerateClick}
           />
+             <div className="bidplanner-padded-container ">
           <OutlineInstructionsModal
             show={showModal}
             onHide={() => setShowModal(false)}
@@ -686,7 +686,7 @@ const ProposalPlan = () => {
                         Question Type
                       </th>
                       <th
-                        className="dropdown-col text-center"
+                        className="dropdown-col "
                         style={{ width: "140px", minWidth: "140px" }}
                       >
                         Completed
@@ -760,7 +760,8 @@ const ProposalPlan = () => {
                                 step="50"
                                 className="form-control d-inline-block word-count-input"
                                 style={{
-                                  width: "110px",
+                                  fontSize: "1.143rem",
+                                  width: "6.875rem",
                                   textAlign: "center"
                                 }}
                                 onChange={(e) => {
@@ -836,8 +837,9 @@ const ProposalPlan = () => {
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    
   );
 };
 

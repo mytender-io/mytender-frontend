@@ -29,11 +29,11 @@ const BidStatusMenu = ({
 
   // Map old status values to new ones
   const statusMapping: { [key: string]: BidStatus } = {
-    "Identification": "Planning",
+    Identification: "Planning",
     "Capture Planning": "Research",
     "First Review": "First Draft",
-    "Reviewing": "Reviewing",
-    "Submitted": "Complete"
+    Reviewing: "Reviewing",
+    Submitted: "Complete"
   };
 
   const normalizeStatus = (status: any): BidStatus => {
@@ -124,21 +124,17 @@ const BidStatusMenu = ({
           }
         }}
       >
-        {[
-          "Planning",
-          "Research",
-          "First Draft",
-          "Reviewing",
-          "Complete"
-        ].map((status) => (
-          <MenuItem
-            key={status}
-            onClick={() => handleSelect(status as BidStatus)}
-            className="styled-menu-item"
-          >
-            {status}
-          </MenuItem>
-        ))}
+        {["Planning", "Research", "First Draft", "Reviewing", "Complete"].map(
+          (status) => (
+            <MenuItem
+              key={status}
+              onClick={() => handleSelect(status as BidStatus)}
+              className="styled-menu-item"
+            >
+              {status}
+            </MenuItem>
+          )
+        )}
       </Menu>
     </div>
   );

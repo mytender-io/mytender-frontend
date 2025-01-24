@@ -1,56 +1,66 @@
 .table-wrapper {
     position: relative;
-    max-height: 102vh;
+    max-height: 50rem;
     overflow-x: auto;
     overflow-y: auto;
-    margin-top: 20px;
+    margin-top: 1.429rem;
+}
+
+.header-container {
+    height: 7.143rem !important;
+    padding-left: 22.857rem;
+    padding-right: 2.143rem;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    border-bottom: 0.143rem solid #ebecef;
+    align-items: center;
+    margin: 0 !important;
 }
 
 .bids-table {
     width: 100%;
-    min-width: 1200px;
+    min-width: 85.714rem;
     border-collapse: separate;
     border-spacing: 0;
     margin: 0;
-}
-
-
-/* Header styles */
-
-.bids-table thead {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background: white;
+    font-size: 1.286rem;
+    border-top-right-radius: 0.857rem;
+    border-top-left-radius: 0.857rem;
+    border: 0.143rem solid #ebecef !important;
 }
 
 .bids-table th {
     background-color: white;
-    font-weight: 800;
-    color: black;
-    font-size: 18px;
-    padding: 12px 16px;
+    color: #6b7280;
+    padding: 1.143rem 1.571rem;
     text-align: left;
-    border-bottom: 1.5px solid #d9d1e0;
-    border-top: 1.5px solid #d9d1e0;
+    border-bottom: 0.143rem solid #ebecef;
+}
+
+.bids-table th:first-child {
+    border-top-left-radius: 0.857rem;
+}
+
+.bids-table th:last-child {
+    border-top-right-radius: 0.857rem;
+}
+
+.bids-table tr {
+    background-color: white;
+    font-size: 1.143rem;
 }
 
 .bids-table tr:hover {
-    background-color: #f5f5f5;
+    background-color: #f3f4f6;
     transition: background-color 0.2s ease;
 }
 
-
-/* Cell styles */
-
 .bids-table td {
-    padding: 12px 16px;
-    border-bottom: 1.5px solid #d9d1e0;
+    padding: 1.143rem 1.571rem;
+    border-bottom: 0.143rem solid #ebecef;
     vertical-align: middle;
 }
-
-
-/* Column widths - consistent between th and td */
 
 .bids-table th:nth-child(1),
 .bids-table td:nth-child(1) {
@@ -83,9 +93,6 @@
     text-align: center;
 }
 
-
-/* Text truncation */
-
 .truncate-wrapper {
     width: 100%;
     overflow: hidden;
@@ -100,15 +107,11 @@
     color: #000000;
     text-decoration: none;
     transition: color 0.2s ease;
-    font-weight: 600;
 }
 
 .truncate-text:hover {
     color: #666666;
 }
-
-
-/* Sortable header styles */
 
 .sortable-header {
     cursor: pointer;
@@ -118,6 +121,6 @@
 
 .sortable-header svg {
     opacity: 0.5;
-    margin-left: 8px;
+    margin-left: 0.571rem;
     vertical-align: middle;
 }

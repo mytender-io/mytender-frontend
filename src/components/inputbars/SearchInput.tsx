@@ -21,10 +21,10 @@ const SearchInput: React.FC<SearchInputProps> = ({
   return (
     <div className="search-input-container">
       <div className="search-input-wrapper">
-        <FontAwesomeIcon icon={faSearch} className="search-icon" />
+        <FontAwesomeIcon icon={faSearch} className="bid-search-icon" />
         <input
           type="text"
-          className="search-input"
+          className="bid-search-input"
           placeholder={placeholder}
           value={value}
           onChange={handleChange}

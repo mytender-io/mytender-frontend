@@ -1,38 +1,36 @@
-/* Override Bootstrap's primary color for the active state */
-
-.btn-group .btn.view-toggle-btn.btn-primary {
-    background-color: #ff7f50 !important;
-    /* Coral orange - you can adjust this hex code */
-    border-color: #ff7f50 !important;
-    color: white !important;
-}
-
-
-/* Add hover state */
-
-.btn-group .btn.view-toggle-btn.btn-primary:hover {
-    background-color: #ff6b3d !important;
-    /* Slightly darker orange for hover */
-    border-color: #ff6b3d !important;
-}
-
-
-/* Keep the light variant styling but with orange border */
-
-.btn-group .btn.view-toggle-btn.btn-light {
-    border-color: #ff7f50 !important;
-    color: #ff7f50 !important;
-}
-
-
-/* Hover state for the inactive button */
-
-.btn-group .btn.view-toggle-btn.btn-light:hover {
-    background-color: #fff5f2 !important;
-    /* Very light orange background on hover */
+.toggle-wrapper {
+  padding: 0.429rem;
+  background-color: #f3f4f6;
+  border-radius: 0.571rem !important;
+  display: inline-block;
 }
 
 .btn-group .btn.view-toggle-btn {
-    font-weight: 700 !important;
-    font-size: 16px;
+  font-weight: 700;
+  font-size: 1.143rem;
+  margin: 0.143rem;
+  padding: 0.429rem 0.571rem;
+  border-radius: 0.571rem !important;
+}
+
+.btn-group .btn.view-toggle-btn.btn-primary {
+  background-color: white;
+  border-color: transparent;
+  color: #404a50;
+  box-shadow: 0 0.071rem 0.214rem rgba(0, 0, 0, 0.1);
+}
+
+.btn-group .btn.view-toggle-btn.btn-primary:hover {
+  background-color: white;
+  border-color: transparent;
+}
+
+.btn-group .btn.view-toggle-btn.btn-light {
+  background-color: transparent;
+  border-color: transparent;
+  color: #404a50;
+}
+
+.btn-group .btn.view-toggle-btn.btn-light:hover {
+  background-color: rgba(255, 255, 255, 0.5);
 }

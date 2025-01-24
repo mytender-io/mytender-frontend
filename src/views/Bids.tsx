@@ -396,13 +396,10 @@ const Bids = () => {
   return (
     <div>
       <SideBarSmall onCollapseChange={setSidebarCollapsed} />
-      <div
-        className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
-      >
-        <div>
-          <div className="proposal-header">
-            <h1 id="dashboard-title">Tender Dashboard</h1>
-            <div style={{ display: "flex" }}>
+      <div className="header-container">
+            <h1 >Tender Dashboard</h1>
+            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              <SearchInput value={searchTerm} onChange={setSearchTerm} />
               <Button
                 onClick={handleWriteProposalClick}
                 className="upload-button"
@@ -411,16 +408,20 @@ const Bids = () => {
                 <FontAwesomeIcon icon={faPlus} style={{ marginRight: "8px" }} />
                 New Tender
               </Button>
-              <label></label>
             </div>
           </div>
 
+      <div
+        className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+      >
+        <div>
+        
           <div
-            className="mt-2"
             style={{ display: "flex", justifyContent: "space-between" }}
+            className="mt-3"
           >
-            <SearchInput value={searchTerm} onChange={setSearchTerm} />
-            <ViewToggle value={viewType} onChange={handleViewChange} />
+            <p> 14 Results</p>
+              <ViewToggle value={viewType} onChange={handleViewChange} />
           </div>
           {viewType === "table" ? (
             <div className="table-wrapper">

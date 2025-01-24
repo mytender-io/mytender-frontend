@@ -1,41 +1,35 @@
-/* SearchInput.css */
-
 .search-input-container {
-    /* Changed from search-container */
     position: relative;
-    max-width: 47rem;
-    /* Increased from 50rem */
+    min-width: 45rem;
     width: 100%;
 }
 
 .search-input-wrapper {
-    /* Changed from search-wrapper */
     position: relative;
     display: flex;
     align-items: center;
 }
 
-.search-icon {
+.bid-search-icon {
     position: absolute;
-    left: 12px;
-    height: 24px;
-    width: 24px;
-    color: #535e65;
+    left: 0.857rem;
+    height: 1.714rem;
+    width: 1.714rem;
+    color: #6b7280 !important;
     z-index: 1;
-    /* Added to ensure icon stays above input */
 }
 
-.search-input {
+.bid-search-input {
     width: 100%;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    background-color: #ebecef;
-    padding: 8px 25px 8px 50px;
-    color: #535e65;
-    font-size: 16px;
+    border-radius: 0.429rem;
+    border: 0.143rem solid #ebecef;
+    background-color: white;
+    padding: 0.571rem 1.786rem 0.571rem 3.571rem;
+    color: #6b7280 !important;
+    font-size: 1.143rem;
     font-weight: 700;
 }
 
-.search-input:focus {
-    outline: none;
+.bid-search-input:focus {
+    outline: none !important;
 }

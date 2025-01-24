@@ -240,16 +240,7 @@ const TenderLibrary = ({ object_id }) => {
             >
               <div style={{ width: "750px" }}>
                 <p
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: "500",
-                    lineHeight: "1.6",
-                    textAlign: "center",
-                    margin: 0,
-                    wordWrap: "break-word",
-                    whiteSpace: "normal",
-                    marginBottom: "16px"
-                  }}
+                
                 >
                   Upload documents related to this specific tender here. This is
                   different from your previous bids and company information

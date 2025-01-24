@@ -102,10 +102,9 @@ const ProposalPreview = () => {
 
   return (
     <div className="chatpage">
-      <SideBarSmall />
-      <div className="lib-container">
-        <div className="scroll-container">
-          <BidNavbar
+        <SideBarSmall />
+      <div className="bidplanner-container">
+      <BidNavbar
             showViewOnlyMessage={() =>
               displayAlert(
                 "You only have permission to view this bid.",
@@ -114,25 +113,10 @@ const ProposalPreview = () => {
             }
             initialBidName={"initialBidName"}
           />
-          <Card
-            sx={{
-              width: "100%",
-              mt: 2,
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              height: "102vh"
-            }}
-          >
-            <CardContent
-              sx={{
-                p: 3,
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                overflow: "hidden"
-              }}
-            >
+            <div className="bidplanner-padded-container ">
+          
+       
+       
               <div
                 style={{
                   display: "flex",
@@ -213,11 +197,11 @@ const ProposalPreview = () => {
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+           
         </div>
       </div>
-    </div>
+      </div>
+
   );
 };
 

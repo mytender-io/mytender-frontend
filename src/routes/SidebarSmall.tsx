@@ -14,7 +14,11 @@ import {
   Layers,
   Library,
   LogOut,
-  LayoutDashboard
+  LayoutDashboard,
+  User2,
+  Files,
+  Bot,
+  BookMarked
 } from "lucide-react";
 import { Tooltip } from "@mui/material";
 
@@ -120,39 +124,43 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
           </button>
         </Tooltip>
 
+        <div className="sidelinks">
+
         <Link
           to="#"
-          className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor") || isActive("/question-crafter") || isActive("/proposal") ? "sidebarsmalllink-active" : ""}`}
+          className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor")  ? "sidebarsmalllink-active" : ""}`}
           onClick={handleDashboardClick}
         >
-          <LayoutDashboard size={20} />
-          {!isCollapsed && <span id="bids-table">Tender Dashboard</span>}
+          <LayoutDashboard size={24} />
+          {!isCollapsed && <span id="library-title">Tender Dashboard</span>}
         </Link>
 
         <Link
           to="/library"
           className={`sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}
         >
-          <Library size={20} />
+          <BookMarked size={24} />
           {!isCollapsed && <span id="library-title">Content Library</span>}
         </Link>
 
-        {!isCollapsed && <div className="sidebar-section-header">Tool Box</div>}
-
+        <div className="sidebar-section-header">
+          {!isCollapsed && "Tool Box"}
+        </div>
+        
         <Link
           to="/chatResponse"
           className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
         >
-          <MessageSquare size={20} />
-          {!isCollapsed && <span id="welcome">Quick Question</span>}
+          <Bot size={24} />
+          {!isCollapsed && <span id="welcome">Data Finder</span>}
         </Link>
 
         <Link
           to="/question-answer"
           className={`sidebarsmalllink ${isActive("/question-answer") ? "sidebarsmalllink-active" : ""}`}
         >
-          <Settings size={20} />
-          {!isCollapsed && <span>Q&A Generator</span>}
+          <Files size={24} />
+          {!isCollapsed && <span>Portal Responses </span>}
         </Link>
 
         <Link
@@ -160,7 +168,7 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
           className="sidebarsmalllink"
           onClick={handleWordAddInClick}
         >
-          <FileText size={20} />
+          <FileText size={24} />
           {!isCollapsed && <span>Wordpane</span>}
         </Link>
 
@@ -170,9 +178,10 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <GraduationCap size={20} />
-          {!isCollapsed && <span>Tutorial</span>}
+          <GraduationCap size={24} />
+          {!isCollapsed && <span>How To</span>}
         </Link>
+        </div>
       </div>
 
       <div className="signout-container">
@@ -180,14 +189,14 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
           to="/profile"
           className={`sidebarsmalllink ${isActive("/profile") ? "sidebarsmalllink-active" : ""}`}
         >
-          <User size={20} />
+          <User2 size={16} />
           {!isCollapsed && <span>Profile</span>}
         </Link>
         <Link
           to="/logout"
           className={`sidebarsmalllink ${isActive("/logout") ? "sidebarsmalllink-active" : ""}`}
         >
-          <LogOut size={20} />
+          <LogOut size={16} />
           {!isCollapsed && <span>Logout</span>}
         </Link>
       </div>

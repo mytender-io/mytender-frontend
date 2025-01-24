@@ -12,13 +12,6 @@ import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 import TenderAnalysis from "../components/TenderAnalysis.tsx";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronDown,
-  faChevronUp,
-  faMaximize,
-  faMinimize
-} from "@fortawesome/free-solid-svg-icons";
 import { ChevronDown } from "lucide-react";
 
 const BidPlanner = () => {
@@ -177,12 +170,14 @@ const BidPlanner = () => {
   return (
     <div className="chatpage">
       <SideBarSmall />
-      <div className="lib-container">
-        <div className="scroll-container">
-          <BidNavbar
+      <div className="bidplanner-container">
+      <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}
             initialBidName={initialBidName}
           />
+      <div >
+        <div className="bidplanner-padded-container ">
+          
           <div>
             <div className="library-toggle-bar" onClick={toggleLibrary}>
               <ChevronDown
@@ -210,6 +205,7 @@ const BidPlanner = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

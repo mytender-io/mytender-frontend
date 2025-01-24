@@ -145,7 +145,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   step="50"
                   className="form-control d-inline-block word-count-input"
                   style={{
-                    width: "100px",
+                    width: "6.875rem",
                     textAlign: "center"
                   }}
                   onChange={(e) => {

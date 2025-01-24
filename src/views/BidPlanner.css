@@ -1,14 +1,14 @@
 .library-toggle-bar {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
+    padding: 0.857rem 1.429rem;
     background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 4px;
+    border: 0.071rem solid #e9ecef;
+    border-radius: 0.286rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    margin-top: 20px;
-    font-size: 18px;
+    margin-top: 1.429rem;
+    font-size: 1.286rem;
     font-weight: 500;
 }
 
@@ -25,7 +25,7 @@
 }
 
 .library-toggle-bar svg {
-    margin-right: 10px;
+    margin-right: 0.714rem;
 }
 
 .library-section {
@@ -35,4 +35,26 @@
 
 .library-section.collapsed {
     max-height: 0;
+}
+
+.bidplanner-container {
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    justify-content: center;
+    overflow-x: hidden !important;
+    overflow-y: auto;
+    transition-delay: 0.05s;
+}
+
+.bidplanner-padded-container {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    justify-content: center;
+    padding-bottom: 1.071rem;
+    padding-left: 22.857rem;
+    padding-right: 2.143rem;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
 }

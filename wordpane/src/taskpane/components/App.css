@@ -15,7 +15,7 @@
   padding: 0;
   transform-origin: top left;
   transform: scale(0.8);
-  width: 125vw;
+  width: 100vw;
   height: 100vh;
   overflow: hidden !important;
   font-family: var(--font-family) !important;
@@ -95,8 +95,8 @@ select {
 }
 
 #container > div > div {
-  height: 125vh;
-  max-height: 125vh;
+  height: 100vh;
+  max-height: 100vh;
   overflow-y: hidden;
 }
 

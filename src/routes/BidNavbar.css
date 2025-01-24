@@ -1,82 +1,82 @@
-/* BidNavbar.css */
-
 .bidnav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: none;
 }
 
 .bidnav-section {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
+}
+
+.bidnav-container {
+    padding-left: 22.857rem;
+    padding-right: 2.143rem;
+    padding-top: 1.8rem;
+    width: 100%;
+    height: 6rem;
 }
 
 .bidnav-item {
-  margin-right: 20px;
-  font-size: 16px;
-  font-weight: 600;
-  text-decoration: none;
-  color: #999;
-  padding: 5px 10px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
+    margin-right: 1.429rem;
+    font-size: 1.143rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #999;
+    padding: 0.357rem 0.714rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 }
 
 .bidnav-item::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background-color: black;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0.143rem;
+    background-color: black;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bidnav-item:hover {
-  color: black;
+    color: black;
 }
 
 .bidnav-item:hover::after {
-  width: 100%;
+    width: 100%;
 }
 
 .bidnav-item.active {
-  color: black;
+    color: black;
 }
 
 .bidnav-item.active::after {
-  width: 100%;
-}
-
-/* Remove the separate border-bottom and use the ::after pseudo-element exclusively */
-
-.bidnav-item.active {
-  color: black;
+    width: 100%;
 }
 
 .back-arrow-button {
-  background: none;
-  border: none;
-  color: #333;
-  cursor: pointer;
-  margin: 0;
-  padding: 5x;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: none;
+    border: none;
+    color: #333;
+    cursor: pointer;
+    margin: 0;
+    padding: 0.357rem;
+    margin-right: 0.3rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .back-arrow-button:hover {
-  transform: translateX(-3px);
-  color: #666;
-  /* Lighter shade of #333 */
+    transform: translateX(-0.214rem);
+    color: #666;
 }
 
 .back-arrow-button:focus {
-  outline: none;
+    outline: none;
 }
 
 .back-arrow-button:active {
-  transform: translateX(-2px);
+    transform: translateX(-0.143rem);
 }

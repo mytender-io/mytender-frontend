@@ -11,8 +11,8 @@ interface ReviewerDropdownProps {
 
 const selectStyle = {
   fontFamily: '"Manrope", sans-serif',
-  fontSize: "0.875rem",
-  minWidth: "220px",
+  fontSize: "1.143rem",
+  minWidth: "13.75rem",
   backgroundColor: "white",
   "& MuiOutlinedInputNotchedOutline": {
     borderColor: "#ced4da"
@@ -22,12 +22,12 @@ const selectStyle = {
   },
   "&.MuiFocused MuiOutlinedInputNotchedOutline": {
     borderColor: "#86b7fe",
-    borderWidth: "1px"
+    borderWidth: "0.0625rem"
   }
 };
 
 const menuStyle = {
-  fontSize: "12px",
+  fontSize: "0.75rem",
   fontFamily: '"Manrope", sans-serif'
 };
 
@@ -35,7 +35,7 @@ const menuItemStyle = {
   ...menuStyle,
   display: "flex",
   alignItems: "center",
-  gap: "8px" // Adds space between icon and text
+  gap: "0.5rem"
 };
 
 const ReviewerDropdown: React.FC<ReviewerDropdownProps> = ({

@@ -4,11 +4,9 @@ import { Button, Spinner } from "react-bootstrap";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import {
   faArrowLeft,
-  faCheckCircle,
   faEdit,
   faEye,
   faPlus,
-  faTimesCircle,
   faUsers
 } from "@fortawesome/free-solid-svg-icons";
 import "./BidNavbar.css";
@@ -112,27 +110,27 @@ const BidNavbar = ({
 
   return (
     <div>
-
-      <div className="proposal-header">
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <button
-            className="back-arrow-button"
-            onClick={handleBackClick}
-            title="Back to Bids"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} size="xl" />
-          </button>
-          <BidTitle
-            canUserEdit={true}
-            displayAlert={displayAlert}
-            setSharedState={setSharedState}
-            sharedState={sharedState}
-            showViewOnlyMessage={showViewOnlyMessage}
-            initialBidName={initialBidName}
-          />
-        </div>
+      <div className="header-container">
+        <button
+          className="back-arrow-button"
+          onClick={handleBackClick}
+          title="Back to Bids"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} size="xl" />
+        </button>
+        <BidTitle
+          canUserEdit={true}
+          displayAlert={displayAlert}
+          setSharedState={setSharedState}
+          sharedState={sharedState}
+          showViewOnlyMessage={showViewOnlyMessage}
+          initialBidName={initialBidName}
+        />
+        <div></div>
       </div>
-      <div className="proposal-header">
+
+      <div className="bidnav-container">
+        <div style={{display: "flex", justifyContent: "space-between"}}>
         <div className="bidnav-section mt-2 mb-1">
           <NavLink
             to="/bid-extractor"
@@ -148,13 +146,13 @@ const BidNavbar = ({
           >
             Proposal Outline
           </NavLink>
-          <NavLink
+          {/* <NavLink
             to="/compliance-matrix"
             className={`bidnav-item ${activeTab === "/compliance-matrix" ? "active" : ""}`}
             onClick={() => handleTabClick("/compliance-matrix")}
           >
             Compliance Matrix
-          </NavLink>
+          </NavLink> */}
           <NavLink
             to="/proposal-preview"
             className={`bidnav-item ${activeTab === "/proposal-preview" ? "active" : ""}`}
@@ -178,6 +176,7 @@ const BidNavbar = ({
             <GenerateProposalModal bid_id={object_id} outline={outline} />
           </div>
         )}
+      </div>
       </div>
     </div>
   );
