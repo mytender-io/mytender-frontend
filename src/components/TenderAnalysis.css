@@ -1,182 +1,190 @@
 :root {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .proposal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-right: 12.857rem;
-    width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 12.857rem;
+  width: 100%;
 }
 
 .dropdown-container {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .proposal-title {
-    margin: 0;
-    font-size: 1.571rem;
+  margin: 0;
+  font-size: 1.571rem;
 }
 
 .tabs-container {
-    display: flex;
-    align-items: center;
-    background: #ffffff;
-    border-radius: 0 !important;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 0 !important;
 }
 
 .tab {
-    background-color: #f8f9fa;
-    padding: 0.857rem 1.714rem;
-    border: none;
-    margin: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: #6c757d;
-    font-weight: 500;
-    font-size: 1.071rem;
-    position: relative;
-    overflow: hidden;
-    border-radius: 0.571rem 0.571rem 0 0;
+  background-color: #f8f9fa;
+  padding: 0.857rem 1.714rem;
+  border: none;
+  margin: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #6c757d;
+  font-weight: 500;
+  font-size: 1.071rem;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.571rem 0.571rem 0 0;
 }
 
 .tab::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0.214rem;
-    background: #ffe4c4;
-    transition: width 0.3s ease;
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0.214rem;
+  background: #ffe4c4;
+  transition: width 0.3s ease;
 }
 
 .tab.active {
-    background: #fff;
-    color: #212529;
-    font-weight: 600;
-    box-shadow: 0 -0.143rem 0.429rem rgba(0, 0, 0, 0.05);
+  background: #fff;
+  color: #212529;
+  font-weight: 600;
+  box-shadow: 0 -0.143rem 0.429rem rgba(0, 0, 0, 0.05);
 }
 
 .tab.active::after {
-    width: 100%;
-    background: #ffb366;
+  width: 100%;
+  background: #ffb366;
 }
 
 .tab-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.571rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.571rem;
 }
 
 .tab:not(:last-of-type) {
-    border-right: none;
+  border-right: none;
 }
 
 .tab:last-of-type {
-    border-right: 0.143rem solid #ccc !important;
+  border-right: 0.143rem solid #ccc !important;
 }
 
 .doc-name {
-    margin-right: 0.357rem;
+  margin-right: 0.357rem;
 }
 
 .close-tab {
-    margin-left: 0.714rem !important;
-    color: #aaa;
-    cursor: pointer;
-    font-size: 1.286rem;
-    font-weight: bold;
+  margin-left: 0.714rem !important;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 1.286rem;
+  font-weight: bold;
 }
 
 .save-button {
-    background-color: green;
-    transition: background-color 0.3s ease;
-    color: white;
-    padding: 0.571rem 1rem;
-    border: none;
-    cursor: pointer;
-    font-weight: 550;
-    font-size: 0.9rem;
-    outline: none !important;
-    box-shadow: none !important;
+  background-color: green;
+  transition: background-color 0.3s ease;
+  color: white;
+  padding: 0.571rem 1rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 550;
+  font-size: 0.9rem;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .action-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1.429rem;
-    margin-bottom: 2.143rem;
-    width: 100%;
-    padding: 1.429rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.429rem;
+  margin-bottom: 2.143rem;
+  width: 100%;
+  padding: 1.429rem 0;
 }
 
 .action-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.857rem;
-    padding: 0.857rem 1.714rem;
-    color: black;
-    background-color: #ffffff;
-    border: 0.071rem solid #e0e0e0;
-    border-radius: 0.571rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 14.286rem;
-    height: 4.286rem;
-    font-size: 1.286rem;
-    font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.857rem;
+  padding: 0.857rem 1.714rem;
+  color: black;
+  background-color: #ffffff;
+  border: 0.071rem solid #e0e0e0;
+  border-radius: 0.571rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 14.286rem;
+  height: 4.286rem;
+  font-size: 1.286rem;
+  font-weight: 500;
 }
 
 .action-button:hover {
-    background: #ffb366;
-    transform: translateY(-0.143rem);
-    box-shadow: 0 0.286rem 0.571rem rgba(0, 0, 0, 0.1);
+  background: #ffb366;
+  transform: translateY(-0.143rem);
+  box-shadow: 0 0.286rem 0.571rem rgba(0, 0, 0, 0.1);
 }
 
 .tender-insights-textarea {
-    background-color: white;
-    color: black;
-    height: 100%;
-    width: 100%;
-    padding: 0.714rem;
-    font-size: 1.143rem;
-    border: none;
+  background-color: white;
+  color: black;
+  height: 100%;
+  width: 100%;
+  padding: 0.714rem;
+  font-size: 1.143rem;
+  border: none;
 }
 
 .tender-analysis {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
 
 .proposal-container {
-    box-shadow: 0 0.286rem 0.857rem rgba(0, 0, 0, 0.08);
-    border: 0.071rem solid #ccc;
-    margin-top: 0;
-    margin-bottom: 1.071rem;
-    background-color: white;
-    padding: 1.5%;
-    min-height: 30rem;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    border-radius: 0 0 0.571rem 0.571rem;
+  box-shadow: 0 0.286rem 0.857rem rgba(0, 0, 0, 0.08);
+  border: 0.071rem solid #ccc;
+  margin-top: 0;
+  margin-bottom: 1.071rem;
+  background-color: white;
+  padding: 1.5%;
+  min-height: 30rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-radius: 0 0 0.571rem 0.571rem;
+  position: relative;
+  z-index: 0;
 }
 
 .tender-insights-textarea {
-    background-color: white;
-    color: black;
-    width: 100%;
-    height: 100%;
-    padding: 1.071rem;
-    font-size: 1.143rem;
-    border: none;
+  background-color: white;
+  color: black;
+  width: 100%;
+  height: 100%;
+  padding: 1.071rem;
+  font-size: 1.143rem;
+  border: none;
+}
+
+.tender-insights-content {
+  padding: 10px;
+  background: white;
+  min-height: 300px;
 }

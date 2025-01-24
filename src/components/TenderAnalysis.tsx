@@ -6,13 +6,8 @@ import { displayAlert } from "../helper/Alert";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import { useAuthUser } from "react-auth-kit";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFileLines,
-  faLightbulb,
-  faStar,
-  faScaleBalanced
-} from "@fortawesome/free-solid-svg-icons";
+import { FileText, Scale, Lightbulb, Star } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 const TenderAnalysis = ({ canUserEdit }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
@@ -39,28 +34,28 @@ const TenderAnalysis = ({ canUserEdit }) => {
   const tabs = [
     {
       name: "Summarise Tender",
-      icon: faFileLines,
+      Icon: FileText,
       prompt: "generate_summarise_tender",
       stateKey: "tender_summary",
       placeholder: "Enter tender summary here..."
     },
     {
       name: "Evaluation Criteria",
-      icon: faScaleBalanced,
+      Icon: Scale,
       prompt: "generate_evaluation_criteria",
       stateKey: "evaluation_criteria",
       placeholder: "Document evaluation criteria..."
     },
     {
       name: "Derive Insights",
-      icon: faLightbulb,
+      Icon: Lightbulb,
       prompt: "generate_derive_insights",
       stateKey: "derive_insights",
       placeholder: "Note key insights..."
     },
     {
       name: "Differentiation Opportunities",
-      icon: faStar,
+      Icon: Star,
       prompt: "generate_differentiation_opportunities",
       stateKey: "differentiation_opportunities",
       placeholder: "List differentiation opportunities..."
@@ -98,7 +93,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
 
     setCurrentTabIndex(index);
 
-    if (tabContent[index]) return; // Skip generation if content exists
+    if (tabContent[index]) return;
 
     if (!object_id) {
       displayAlert("Please save the bid first.", "warning");
@@ -141,36 +136,86 @@ const TenderAnalysis = ({ canUserEdit }) => {
       setLoadingTab(null);
     }
   };
+
+  const formatContent = (content) => {
+    if (!content) return "";
+  
+    let formatted = content;
+    
+    // Handle main heading
+    formatted = formatted.replace(/^##\s(.+?)(?=\n)/, '<h1>$1</h1>');
+    
+    // Handle Roman numeral sections
+    formatted = formatted.replace(/\*\*([IVX]+\.)\s([^:]+):\*\*/g, '<h2>$1 $2</h2>');
+    
+    // Handle letter subsections
+    formatted = formatted.replace(/\*\*([A-Z]\.)\s([^:]+):\*\*/g, '<h3>$1 $2</h3>');
+    
+    // Handle numbered sections
+    formatted = formatted.replace(/(\d+\.)\s([^:\n]+)/g, '<h2>$1 $2</h2>');
+    
+    // Handle list items
+    formatted = formatted.replace(/\*\s\*\*(.*?):\*\*/g, '<li><strong>$1:</strong>');
+    formatted = formatted.replace(/\*\s(.*?)(?=\n|$)/g, '<li>$1</li>');
+    
+    // Handle remaining bold text
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Wrap lists
+    formatted = formatted.replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>');
+    
+    // Handle paragraphs
+    formatted = formatted.split('\n\n').map(p => 
+      p.includes('<h') || p.includes('<ul') ? p : `<p>${p}</p>`
+    ).join('');
+  
+    return `
+      <style>
+        h1 { font-size: 24px; font-weight: 600; margin: 0 0 20px 0; }
+        h2 { font-size: 18px; font-weight: 600; margin: 24px 0 16px 0; }
+        h3 { font-size: 16px; font-weight: 600; margin: 16px 0 12px 0; }
+        p { font-size: 11pt; line-height: 1.5; margin-bottom: 12px; }
+        ul { padding-left: 20px; margin: 12px 0; }
+        li { margin-bottom: 8px; line-height: 1.5; }
+        strong { font-weight: 600; }
+      </style>
+      ${formatted}
+    `;
+  };
   return (
     <div className="tender-analysis mt-5">
       <div>
         <div className="tabs-container">
-          {tabs.map((tab, index) => (
-            <div
-              key={index}
-              className={`tab ${currentTabIndex === index ? "active" : ""}`}
-              onClick={() => handleTabClick(index)}
-            >
-              <span className="tab-content">
-                {loadingTab === index ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  <FontAwesomeIcon icon={tab.icon} className="tab-icon" />
-                )}
-                <span className="tab-name">{tab.name}</span>
-              </span>
-            </div>
-          ))}
+          {tabs.map((tab, index) => {
+            const TabIcon = tab.Icon;
+            return (
+              <div
+                key={index}
+                className={`tab ${currentTabIndex === index ? "active" : ""}`}
+                onClick={() => handleTabClick(index)}
+              >
+                <span className="tab-content">
+                  {loadingTab === index ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    <TabIcon className="tab-icon" size={16} />
+                  )}
+                  <span className="tab-name">{tab.name}</span>
+                </span>
+              </div>
+            );
+          })}
         </div>
 
         <div className="proposal-container">
-          <textarea
-            className="tender-insights-textarea"
-            value={tabContent[currentTabIndex]}
-            onChange={handleTextChange}
-            placeholder={tabs[currentTabIndex].placeholder}
-            disabled={!canUserEdit}
-          />
+        
+            <div className="tender-insights-content"
+             
+              dangerouslySetInnerHTML={{
+                __html: formatContent(tabContent[currentTabIndex])
+              }}
+            />
+          
         </div>
       </div>
     </div>
