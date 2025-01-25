@@ -6,7 +6,7 @@ import { displayAlert } from "../helper/Alert";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import { useAuthUser } from "react-auth-kit";
-import { FileText, Scale, Lightbulb, Star, RefreshCw } from "lucide-react";
+import { FileText, Scale, Lightbulb, Star, RefreshCw, Search, Brain, Sparkles, Target, Filter, Crosshair, Gauge, ChartBar, CheckCircle2, Telescope } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -83,6 +83,90 @@ const CustomTable = ({ content }) => {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+};
+
+const LoadingState = () => {
+  const [activeStep, setActiveStep] = useState(0);
+  const steps = [
+    {
+      icon: Search,
+      text: "Scanning tender documents..."
+    },
+    {
+      icon: Filter,
+      text: "Filtering relevant sections..."
+    },
+    {
+      icon: FileText,
+      text: "Extracting key requirements..."
+    },
+    {
+      icon: Target,
+      text: "Identifying evaluation criteria..."
+    },
+    {
+      icon: Brain,
+      text: "Processing requirements..."
+    },
+    {
+      icon: Crosshair,
+      text: "Detecting critical success factors..."
+    },
+    {
+      icon: ChartBar,
+      text: "Analyzing competitive landscape..."
+    },
+    {
+      icon: Gauge,
+      text: "Evaluating market positioning..."
+    },
+    {
+      icon: Telescope,
+      text: "Exploring strategic opportunities..."
+    },
+    {
+      icon: Lightbulb,
+      text: "Generating innovative insights..."
+    },
+    {
+      icon: CheckCircle2,
+      text: "Finalizing recommendations..."
+    },
+    {
+      icon: Sparkles,
+      text: "Polishing final output..."
+    }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveStep((prev) => {
+        if (prev < steps.length - 1) {
+          return prev + 1;
+        }
+        clearInterval(interval);
+        return prev;
+      });
+    }, 750);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="loading-state">
+      <div className="loading-steps">
+        {steps.map((step, index) => (
+          <div 
+            key={index} 
+            className={`loading-step ${index === activeStep ? 'active' : ''}`}
+          >
+            <step.icon className="step-icon" size={20} />
+            <span className="step-text">{step.text}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -337,9 +421,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
           {currentTabIndex !== null && (
             <div className="tab-content">
               {loadingTab === currentTabIndex ? (
-                <div className="loading-spinner">
-                  <Spinner animation="border" />
-                </div>
+                <LoadingState />
               ) : (
                 <div className="markdown-content">
                   {renderContent(tabContent[currentTabIndex] || '')}
