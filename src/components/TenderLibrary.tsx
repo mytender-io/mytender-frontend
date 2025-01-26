@@ -239,9 +239,7 @@ const TenderLibrary = ({ object_id }) => {
               }}
             >
               <div style={{ width: "750px" }}>
-                <p
-                
-                >
+                <p>
                   Upload documents related to this specific tender here. This is
                   different from your previous bids and company information
                   which belong in your Content Library. They will also be used
@@ -364,65 +362,63 @@ const TenderLibrary = ({ object_id }) => {
     <>
       <Row>
         <Col md={12}>
-          
-              <div>
-                <div  id="tender-library">
-                  <div className="tender-library-title">Tender Upload</div>
-                </div>
-                <UploadPDF
-                  bid_id={object_id}
-                  get_collections={fetchDocuments}
-                  apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
-                  descriptionText="Upload documents and attatchments that are part of the tender"
-                />
-                <div style={{ width: "100%", marginTop: "30px" }}>
-                  <table className="tender-library-table">
-                    <thead>
-                      <tr>
-                        <th className="filename-column">
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                              cursor: "pointer"
-                            }}
-                            onClick={handleSort}
-                          >
-                            Filename
-                            <FontAwesomeIcon
-                              icon={getSortIcon()}
-                              style={{
-                                fontSize: "14px",
-                                color: isSorted ? "#000" : "#999"
-                              }}
-                            />
-                          </div>
-                        </th>
-                        <th className="timestamp-column">Upload Date</th>
-                        <th className="actions-column">Actions</th>
-                      </tr>
-                    </thead>
-                  </table>
+          <div>
+            <div id="tender-library">
+              <div className="tender-library-title">Tender Upload</div>
+            </div>
+            <UploadPDF
+              bid_id={object_id}
+              get_collections={fetchDocuments}
+              apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
+              descriptionText="Upload documents and attatchments that are part of the tender"
+            />
+            <div style={{ width: "100%", marginTop: "30px" }}>
+              <table className="tender-library-table">
+                <thead>
+                  <tr>
+                    <th className="filename-column">
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          cursor: "pointer"
+                        }}
+                        onClick={handleSort}
+                      >
+                        Filename
+                        <FontAwesomeIcon
+                          icon={getSortIcon()}
+                          style={{
+                            fontSize: "14px",
+                            color: isSorted ? "#000" : "#999"
+                          }}
+                        />
+                      </div>
+                    </th>
+                    <th className="timestamp-column">Upload Date</th>
+                    <th className="actions-column">Actions</th>
+                  </tr>
+                </thead>
+              </table>
 
-                  <div
-                    style={{
-                      overflowY: "auto",
-                      maxHeight: "400px",
-                      height: "100%",
-                      width: "100%"
-                    }}
-                  >
-                    <table
-                      style={{ width: "100%" }}
-                      className="tender-library-table"
-                    >
-                      <tbody>{renderDocuments()}</tbody>
-                    </table>
-                  </div>
-                </div>
+              <div
+                style={{
+                  overflowY: "auto",
+                  maxHeight: "400px",
+                  height: "100%",
+                  width: "100%"
+                }}
+              >
+                <table
+                  style={{ width: "100%" }}
+                  className="tender-library-table"
+                >
+                  <tbody>{renderDocuments()}</tbody>
+                </table>
               </div>
-            
+            </div>
+          </div>
         </Col>
       </Row>
 

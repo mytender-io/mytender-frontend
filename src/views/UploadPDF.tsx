@@ -172,9 +172,13 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       formData.append("profile_name", encodeURIComponent(folder));
     }
 
+    console.log(bid_id);
+
     if (bid_id) {
       formData.append("bid_id", bid_id);
     }
+
+    console.log(formData);
 
     // Calculate duration based on file size
     const fileSizeInMB = file.size / (1024 * 1024);

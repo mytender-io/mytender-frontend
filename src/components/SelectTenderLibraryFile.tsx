@@ -89,16 +89,17 @@ const SelectTenderLibraryFile = ({
     const endIdx = startIdx + rowsPerPage;
     const documentsToDisplay = documents.slice(startIdx, endIdx);
 
-    return documentsToDisplay.map((filename, index) => (
+    return documentsToDisplay.map((doc, index) => (
       <tr key={index} style={{ cursor: "pointer" }}>
-        <td>
-          <FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {filename}
+        <td className="filename-column">
+          <FontAwesomeIcon icon={faFileAlt} className="fa-icon" />{" "}
+          {doc.filename}
         </td>
         <td className="checkbox-cell">
           <Form.Check
             type="checkbox"
-            checked={selectedFiles.includes(filename)}
-            onChange={() => handleFileSelect(filename)}
+            checked={selectedFiles.includes(doc.filename)}
+            onChange={() => handleFileSelect(doc.filename)}
           />
         </td>
       </tr>
@@ -123,7 +124,8 @@ const SelectTenderLibraryFile = ({
             <table className="library-table mt-0 mb-0">
               <thead>
                 <tr>
-                  <th>Documents</th>
+                  <th className="filename-column">Documents</th>
+             
                   <th>Select</th>
                 </tr>
               </thead>
@@ -150,4 +152,4 @@ const SelectTenderLibraryFile = ({
   );
 };
 
-export default withAuth(SelectTenderLibraryFile);
+export default SelectTenderLibraryFile;

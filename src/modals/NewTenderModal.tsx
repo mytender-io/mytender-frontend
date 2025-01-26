@@ -52,13 +52,19 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   );
   const progressInterval = useRef(null);
 
-  // Then, add this useEffect near the top of the component:
   useEffect(() => {
     // When documents state changes and there are documents
     if (currentStep === "documents" && documents.length > 0) {
       handleNextStep();
     }
   }, [documents]); // Add other dependencies if needed
+
+  useEffect(() => {
+    if (show) {
+      console.log("cleared storage");
+      localStorage.clear();
+    }
+  }, [show]);
 
   const loadingMessages = [
     // Initial Analysis
@@ -222,7 +228,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   };
 
   const isDetailsStepValid = () => {
-    return clientName && deadline && contractValue;
+    return clientName && contractValue;
   };
 
   const isDocumentsStepValid = () => {
@@ -292,6 +298,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       ];
       keysToRemove.forEach((key) => localStorage.removeItem(key));
 
+      console.log(selectedFiles);
       await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_outline`,
         {
@@ -392,7 +399,6 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label className="card-label">Deadline:</Form.Label>
                 <Form.Group className="mb-3">
                   <Form.Label className="card-label">Deadline:</Form.Label>
                   <CustomDateInput

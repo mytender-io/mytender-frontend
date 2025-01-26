@@ -11,6 +11,7 @@ import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { useAuthUser } from "react-auth-kit";
 import { displayAlert } from "../helper/Alert";
+import { Console } from "console";
 
 export interface Document {
   name: string;
@@ -127,6 +128,7 @@ const BidManagement: React.FC = () => {
           : [];
 
         // Combine default state with saved state, ensuring all required fields exist
+        console.log(parsedState.object_id );
         return {
           ...defaultState.sharedState, // Start with default state
           ...parsedState, // Override with saved state
@@ -139,6 +141,8 @@ const BidManagement: React.FC = () => {
           object_id: parsedState.object_id || null,
           selectedFolders: parsedState.selectedFolders || ["default"]
         };
+
+        
       }
       return defaultState.sharedState;
     } catch (error) {
@@ -208,6 +212,7 @@ const BidManagement: React.FC = () => {
         derive_insights,
         differentiation_opportunities,
         bid_qualification_result,
+        selectedFolders,
         client_name,
         value,
         opportunity_owner,
@@ -234,10 +239,9 @@ const BidManagement: React.FC = () => {
       const backgroundInfo = getBackgroundInfo();
 
       const formData = new FormData();
-      const appendFormData = (key: string, value: string) => {
-        formData.append(key, value && value.trim() !== "" ? value : " ");
+      const appendFormData = (key: string, value: any) => {
+        formData.append(key, value?.toString()?.trim() || " ");
       };
-
       appendFormData("bid_title", bidInfo);
       appendFormData("status", "ongoing");
       appendFormData("contract_information", backgroundInfo);
@@ -258,6 +262,7 @@ const BidManagement: React.FC = () => {
       formData.append("contributors", JSON.stringify(contributors));
       appendFormData("submission_deadline", submission_deadline);
       appendFormData("questions", questions);
+      appendFormData("selectedFolders", selectedFolders);
       appendFormData("original_creator", original_creator);
       formData.append("outline", JSON.stringify(outline));
 
