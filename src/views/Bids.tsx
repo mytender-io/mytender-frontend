@@ -396,7 +396,7 @@ const Bids = () => {
   return (
     <div>
       <SideBarSmall onCollapseChange={setSidebarCollapsed} />
-      <div className="header-container">
+      <div className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
             <h1 >Tender Dashboard</h1>
             <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
               <SearchInput value={searchTerm} onChange={setSearchTerm} />

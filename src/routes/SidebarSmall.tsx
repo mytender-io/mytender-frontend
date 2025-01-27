@@ -43,7 +43,10 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
   const [lastActiveBid, setLastActiveBid] = useState<LastActiveBid | null>(
     null
   );
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const initialCollapsedState = JSON.parse(
+    localStorage.getItem("sidebarCollapsed") || "false"
+  );
+  const [isCollapsed, setIsCollapsed] = useState(initialCollapsedState);
 
   const isActive = (path: string): boolean => location.pathname === path;
 
@@ -53,10 +56,8 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
       setLastActiveBid(JSON.parse(storedBid));
     }
 
-    const storedCollapsedState = localStorage.getItem("sidebarCollapsed");
-    if (storedCollapsedState) {
-      setIsCollapsed(JSON.parse(storedCollapsedState));
-    }
+    // Notify parent component of initial state
+    onCollapseChange?.(initialCollapsedState);
 
     const handleBidUpdate = (event: BidUpdateEvent) => {
       const updatedBid = event.detail;
@@ -72,13 +73,13 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
         handleBidUpdate as EventListener
       );
     };
-  }, []);
+  }, [initialCollapsedState, onCollapseChange]);
 
   const toggleCollapse = () => {
     const newState = !isCollapsed;
     setIsCollapsed(newState);
     localStorage.setItem("sidebarCollapsed", JSON.stringify(newState));
-    onCollapseChange?.(newState); // Emit the change
+    onCollapseChange?.(newState);
   };
 
   const handleDashboardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -125,62 +126,61 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
         </Tooltip>
 
         <div className="sidelinks">
+          <Link
+            to="#"
+            className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor") ? "sidebarsmalllink-active" : ""}`}
+            onClick={handleDashboardClick}
+          >
+            <LayoutDashboard size={24} />
+            {!isCollapsed && <span id="library-title">Tender Dashboard</span>}
+          </Link>
 
-        <Link
-          to="#"
-          className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor")  ? "sidebarsmalllink-active" : ""}`}
-          onClick={handleDashboardClick}
-        >
-          <LayoutDashboard size={24} />
-          {!isCollapsed && <span id="library-title">Tender Dashboard</span>}
-        </Link>
+          <Link
+            to="/library"
+            className={`sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}
+          >
+            <BookMarked size={24} />
+            {!isCollapsed && <span id="library-title">Content Library</span>}
+          </Link>
 
-        <Link
-          to="/library"
-          className={`sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}
-        >
-          <BookMarked size={24} />
-          {!isCollapsed && <span id="library-title">Content Library</span>}
-        </Link>
+          <div className="sidebar-section-header">
+            {!isCollapsed && "Tool Box"}
+          </div>
 
-        <div className="sidebar-section-header">
-          {!isCollapsed && "Tool Box"}
-        </div>
-        
-        <Link
-          to="/chatResponse"
-          className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
-        >
-          <Bot size={24} />
-          {!isCollapsed && <span id="welcome">Data Finder</span>}
-        </Link>
+          <Link
+            to="/chatResponse"
+            className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
+          >
+            <Bot size={24} />
+            {!isCollapsed && <span id="welcome">Data Finder</span>}
+          </Link>
 
-        <Link
-          to="/question-answer"
-          className={`sidebarsmalllink ${isActive("/question-answer") ? "sidebarsmalllink-active" : ""}`}
-        >
-          <Files size={24} />
-          {!isCollapsed && <span>Portal Responses </span>}
-        </Link>
+          <Link
+            to="/question-answer"
+            className={`sidebarsmalllink ${isActive("/question-answer") ? "sidebarsmalllink-active" : ""}`}
+          >
+            <Files size={24} />
+            {!isCollapsed && <span>Portal Responses </span>}
+          </Link>
 
-        <Link
-          to="#"
-          className="sidebarsmalllink"
-          onClick={handleWordAddInClick}
-        >
-          <FileText size={24} />
-          {!isCollapsed && <span>Wordpane</span>}
-        </Link>
+          <Link
+            to="#"
+            className="sidebarsmalllink"
+            onClick={handleWordAddInClick}
+          >
+            <FileText size={24} />
+            {!isCollapsed && <span>Wordpane</span>}
+          </Link>
 
-        <Link
-          to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
-          className="sidebarsmalllink"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <GraduationCap size={24} />
-          {!isCollapsed && <span>How To</span>}
-        </Link>
+          <Link
+            to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
+            className="sidebarsmalllink"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <GraduationCap size={24} />
+            {!isCollapsed && <span>How To</span>}
+          </Link>
         </div>
       </div>
 

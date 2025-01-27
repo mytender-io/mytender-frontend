@@ -155,7 +155,7 @@ const Library = () => {
   const [newFolderParent, setNewFolderParent] = useState(null);
 
   const [folderStructure, setFolderStructure] = useState({});
-  const [expandedFolders, setExpandedFolders] = useState({});
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const [movingFiles, setMovingFiles] = useState<{ [key: string]: boolean }>(
     {}
@@ -275,7 +275,7 @@ const Library = () => {
 
       //console.log(response.data);
       setAvailableCollections(response.data.collections);
-      console.log(response.data.collections);
+      //console.log(response.data.collections);
       const structure = {};
       response.data.collections.forEach((collectionName) => {
         const parts = collectionName.split("FORWARDSLASH");
@@ -531,7 +531,7 @@ const Library = () => {
 
       setModalContent(newContent); // Update the modal content with the new content
 
-      console.log("Content updated successfully");
+      //console.log("Content updated successfully");
     } catch (error) {
       console.error("Error saving file content:", error);
     }
@@ -645,7 +645,7 @@ const Library = () => {
 
         handleGAEvent("Library", "Delete Folder", "Delete Folder Button");
         setUpdateTrigger((prev) => prev + 1);
-        console.log("folder deleted");
+        //console.log("folder deleted");
         await fetchFolderStructure();
 
         // If we're creating a subfolder, refresh the contents of the parent folder
@@ -666,12 +666,12 @@ const Library = () => {
   );
 
   const handleFolderClick = (folderPath) => {
-    console.log(`Folder clicked: ${folderPath}`);
+    //console.log(`Folder clicked: ${folderPath}`);
     setActiveFolder(folderPath);
     if (!folderContents[folderPath]) {
-      console.log(
-        `Fetching contents for ${folderPath} as they don't exist yet`
-      );
+      //console.log(
+      //  `Fetching contents for ${folderPath} as they don't exist yet`
+      //);
       fetchFolderContents(folderPath);
     } else {
       console.log(
@@ -730,13 +730,11 @@ const Library = () => {
 
   const renderFolderStructure = () => {
     const topLevelFolders = getTopLevelFolders();
-    const foldersToRender = topLevelFolders;
-
+    // Filter out the "default" folder
+    const foldersToRender = topLevelFolders.filter(folderName => folderName !== "default");
+    
     return foldersToRender.map((folderName) => {
-      const displayName =
-        folderName === "default"
-          ? "Whole Content Library"
-          : formatDisplayName(folderName);
+      const displayName = formatDisplayName(folderName);
       return (
         <tr
           key={folderName}
@@ -750,7 +748,7 @@ const Library = () => {
             <FontAwesomeIcon
               icon={faFolder}
               className="fa-icon"
-              style={{ marginRight: "10px" }}
+              style={{ marginRight: "0.625rem" }}
             />
             {displayName}
           </td>
@@ -768,7 +766,6 @@ const Library = () => {
       );
     });
   };
-
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
     mouseY: number;
@@ -799,35 +796,35 @@ const Library = () => {
   };
 
   const renderFolderContents = (folderPath) => {
-    console.log("Rendering contents for folder:", folderPath);
+    //console.log("Rendering contents for folder:", folderPath);
     const contents = folderContents[folderPath] || [];
-    console.log("Raw contents:", contents);
+    //console.log("Raw contents:", contents);
 
     // Filter to only show direct children
     const directChildren = contents.filter(
-      ({ filename, unique_id, isFolder }) => {
+      ({ unique_id, isFolder }) => {
         console.log("\nChecking item:", unique_id);
 
         if (!isFolder) return true; // Files are always direct children
 
         // Get the relative path by removing the current folder path
         const relativePath = unique_id.replace(folderPath + "FORWARDSLASH", "");
-        console.log("Relative path:", relativePath);
+        //console.log("Relative path:", relativePath);
 
         // Count how many FORWARDSLASH are in the relative path
         const forwardSlashCount = (relativePath.match(/FORWARDSLASH/g) || [])
           .length;
-        console.log("Forward slash count:", forwardSlashCount);
+        //console.log("Forward slash count:", forwardSlashCount);
 
         // A direct child should have no additional FORWARDSLASH in its relative path
         const isDirectChild = forwardSlashCount === 0;
-        console.log("Is direct child?", isDirectChild);
+        //onsole.log("Is direct child?", isDirectChild);
 
         return isDirectChild;
       }
     );
 
-    console.log("Filtered direct children:", directChildren);
+    //console.log("Filtered direct children:", directChildren);
 
     return directChildren.map(({ filename, unique_id, isFolder }, index) => {
       const fullPath = isFolder
@@ -853,7 +850,7 @@ const Library = () => {
             <FontAwesomeIcon
               icon={isFolder ? faFolder : faFileAlt}
               className="fa-icon"
-              style={{ marginRight: "10px" }}
+              style={{ marginRight: "0.625rem" }}
             />
             {displayName}
           </td>
@@ -952,23 +949,32 @@ const Library = () => {
       </>
     );
   };
-
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-
+ 
     if (query.length > 0) {
+      // Filter out the default folder from folder matches
       const folderMatches = availableCollections
-        .filter((collection) => collection.toLowerCase().includes(query))
+        .filter((collection) =>
+          collection.toLowerCase().includes(query) &&
+          collection !== "default" &&  // Exclude the default folder
+          !collection.startsWith("defaultFORWARDSLASH") // Exclude subfolders of default
+        )
         .map((collection) => ({
-          name: collection.split("FORWARDSLASH").pop(), // Get the last part of the path
+          name: collection.split("FORWARDSLASH").pop(),
           type: "folder",
           path: collection,
-          fullName: collection.replace(/FORWARDSLASH/g, "/") // Full path for display
+          fullName: collection.replace(/FORWARDSLASH/g, "/")
         }));
-
-      const fileMatches = Object.entries(folderContents).flatMap(
-        ([folder, contents]) =>
+ 
+      // Filter out files from the default folder and its contents
+      const fileMatches = Object.entries(folderContents)
+        .filter(([folder]) => 
+          folder !== "default" && 
+          !folder.startsWith("defaultFORWARDSLASH")
+        ) // Exclude both default folder and its subfolders
+        .flatMap(([folder, contents]) =>
           contents
             .filter((item) => item.filename.toLowerCase().includes(query))
             .map((item) => ({
@@ -978,8 +984,8 @@ const Library = () => {
               fullName: `${folder.replace(/FORWARDSLASH/g, "/")}/${item.filename}`,
               unique_id: item.unique_id
             }))
-      );
-
+        );
+ 
       const results = [...folderMatches, ...fileMatches];
       setFilteredResults(results);
       setShowSearchResults(true);
@@ -988,7 +994,6 @@ const Library = () => {
       setShowSearchResults(false);
     }
   };
-
   const handleSearchResultClick = async (result) => {
     if (result.type === "folder") {
       setActiveFolder(result.path);
@@ -1059,194 +1064,186 @@ const Library = () => {
 
   return (
     <div className="chatpage">
-      <SideBarSmall />
-      <div className={`lib-container ${isSidepaneOpen ? "sidepane-open" : ""}`}>
-        <div className="scroll-container">
+      <SideBarSmall onCollapseChange={setSidebarCollapsed} />
+      <div className="bidplanner-container">
+      <div className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
           <h1 className="heavy">Content Library</h1>
+        </div>
+        <div>
+          <div
+            className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+          >
+            <div className="header-row mt-2">
+              <div className="lib-title" id="library-table">
+                Resources
+              </div>
 
-          <Card className="library-card-custom">
-            <Card.Body className="library-card-body-content">
-              <div className="library-card-content-wrapper">
-                <div className="header-row mt-2">
-                  <div
-                    className="lib-title"
-                    id="library-table"
-                    style={{ marginLeft: "15px" }}
-                  >
-                    Resources
-                  </div>
-
-                  <div
-                    className="search-container"
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      width: "100%"
-                    }}
-                  >
-                    <InputGroup
-                      className={`search-bar-container ${showDropdown ? "dropdown-visible" : ""}`}
-                      ref={searchBarRef}
-                      style={{ maxWidth: "900px", width: "100%" }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faSearch}
-                        className="search-icon"
-                      />
-                      <FormControl
-                        placeholder="Search folders and files"
-                        aria-label="Search"
-                        aria-describedby="basic-addon2"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        onFocus={() => {
-                          setShowDropdown(true);
-                          setShowSearchResults(true);
-                        }}
-                        onBlur={() => {
-                          setTimeout(() => {
-                            setShowDropdown(false);
-                            setShowSearchResults(false);
-                          }, 200);
-                        }}
-                        className={`search-bar-library ${showDropdown ? "dropdown-visible" : ""}`}
-                      />
-                      {searchQuery && (
-                        <div
-                          className="clear-search-icon"
-                          onClick={() => {
-                            setSearchQuery("");
-                            setShowDropdown(false);
-                            setShowSearchResults(false);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faTimes} />
-                        </div>
-                      )}
-                      {renderSearchResults()}
-                    </InputGroup>
-                  </div>
-                  <label id="search-bar-container"> </label>
-                  <div
-                    className="button-container"
-                    style={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      minWidth: "150px",
-                      minHeight: "40px"
-                    }}
-                  >
-                    {!activeFolder && (
-                      <Button
-                        onClick={() => handleNewFolderClick(null)}
-                        className="upload-button"
-                        style={{ fontSize: "17px" }}
-                        id="new-folder"
-                      >
-                        <FontAwesomeIcon
-                          icon={faPlus}
-                          style={{ marginRight: "8px" }}
-                        />
-                        New Folder
-                      </Button>
-                    )}
-
-                    {activeFolder && (
-                      <Button
-                        aria-controls="simple-menu"
-                        aria-haspopup="true"
-                        onClick={handleMenuClick}
-                        className="upload-button"
-                        style={{ fontSize: "17px" }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faPlus}
-                          style={{ marginRight: "8px" }}
-                        />
-                        Upload
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                <Menu
-                  id="long-menu"
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={open}
-                  onClose={handleMenuClose}
-                  PaperProps={{
-                    style: {
-                      width: "220px" // Reduced width
-                    }
-                  }}
+              <div
+                className="search-container"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%"
+                }}
+              >
+                <InputGroup
+                  className={`search-bar-container ${showDropdown ? "dropdown-visible" : ""}`}
+                  ref={searchBarRef}
+                  style={{ maxWidth: "60rem", width: "100%" }}
                 >
-                  <MenuItem
-                    onClick={() => handleMenuItemClick("pdf")}
-                    className="styled-menu-item"
-                  >
-                    <i className="fas fa-file-pdf styled-menu-item-icon"></i>
-                    Upload PDF/Word/Excel
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => handleMenuItemClick("text")}
-                    className="styled-menu-item"
-                  >
-                    <i className="fas fa-file-alt styled-menu-item-icon"></i>
-                    Upload Text
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => handleNewFolderClick(activeFolder)}
-                    className="styled-menu-item"
+                  <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                  <FormControl
+                    placeholder="Search folders and files"
+                    aria-label="Search"
+                    aria-describedby="basic-addon2"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    onFocus={() => {
+                      setShowDropdown(true);
+                      setShowSearchResults(true);
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => {
+                        setShowDropdown(false);
+                        setShowSearchResults(false);
+                      }, 200);
+                    }}
+                    className={`search-bar-library ${showDropdown ? "dropdown-visible" : ""}`}
+                  />
+                  {searchQuery && (
+                    <div
+                      className="clear-search-icon"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setShowDropdown(false);
+                        setShowSearchResults(false);
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faTimes} />
+                    </div>
+                  )}
+                  {renderSearchResults()}
+                </InputGroup>
+              </div>
+              <label id="search-bar-container"> </label>
+              <div
+                className="button-container"
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  minWidth: "9.375rem", // 150px ÷ 16 = 9.375rem
+                  minHeight: "2.5rem" // 40px ÷ 16 = 2.5rem
+                }}
+              >
+                {!activeFolder && (
+                  <Button
+                    onClick={() => handleNewFolderClick(null)}
+                    className="upload-button"
+                    id="new-folder"
+                    style={{ whiteSpace: "nowrap" }} // Add this line
                   >
                     <FontAwesomeIcon
-                      icon={faFolder}
-                      className="styled-menu-item-icon"
+                      icon={faPlus}
+                      style={{ marginRight: "0.5rem" }}
                     />
-                    New Subfolder
-                  </MenuItem>
-                </Menu>
-                <div style={{ width: "100%", marginTop: "20px" }}>
-                  <table className="library-table">
-                    <thead>
-                      <tr>
-                        <th>{renderBreadcrumbs()}</th>
-                        <th colSpan={3}>
-                          {activeFolder && (
-                            <div
-                              className="back-button"
-                              onClick={() => handleBackClick()}
-                              style={{ cursor: "pointer", padding: "5px" }}
-                            >
-                              <FontAwesomeIcon icon={faReply} />
-                              <span style={{ marginLeft: "10px" }}>Back</span>
-                            </div>
-                          )}
-                        </th>
-                      </tr>
-                    </thead>
-                  </table>
+                    New Folder
+                  </Button>
+                )}
 
-                  <div
-                    style={{
-                      overflowY: "auto",
-                      maxHeight: "650px",
-                      height: "100%",
-                      width: "100%"
-                    }}
+                {activeFolder && (
+                  <Button
+                    aria-controls="simple-menu"
+                    aria-haspopup="true"
+                    onClick={handleMenuClick}
+                    className="upload-button"
+                    style={{ fontSize: "1.0625rem" }}
                   >
-                    <table style={{ width: "100%" }} className="library-table">
-                      <tbody>
-                        {activeFolder
-                          ? renderFolderContents(activeFolder)
-                          : renderFolderStructure()}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      style={{ marginRight: "0.5rem" }}
+                    />
+                    Upload
+                  </Button>
+                )}
               </div>
-            </Card.Body>
-          </Card>
+            </div>
+
+            <Menu
+              id="long-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={open}
+              onClose={handleMenuClose}
+              PaperProps={{
+                style: {
+                  width: "13.75rem"
+                }
+              }}
+            >
+              <MenuItem
+                onClick={() => handleMenuItemClick("pdf")}
+                className="styled-menu-item"
+              >
+                <i className="fas fa-file-pdf styled-menu-item-icon"></i>
+                Upload PDF/Word/Excel
+              </MenuItem>
+              <MenuItem
+                onClick={() => handleMenuItemClick("text")}
+                className="styled-menu-item"
+              >
+                <i className="fas fa-file-alt styled-menu-item-icon"></i>
+                Upload Text
+              </MenuItem>
+              <MenuItem
+                onClick={() => handleNewFolderClick(activeFolder)}
+                className="styled-menu-item"
+              >
+                <FontAwesomeIcon
+                  icon={faFolder}
+                  className="styled-menu-item-icon"
+                />
+                New Subfolder
+              </MenuItem>
+            </Menu>
+            <div style={{ width: "100%", marginTop: "2rem" }}>
+              <table className="library-table">
+                <thead>
+                  <tr>
+                    <th>{renderBreadcrumbs()}</th>
+                    <th colSpan={3}>
+                      {activeFolder && (
+                        <div
+                          className="back-button"
+                          onClick={() => handleBackClick()}
+                          style={{ cursor: "pointer", padding: "5px" }}
+                        >
+                          <FontAwesomeIcon icon={faReply} />
+                          <span style={{ marginLeft: "0.625rem" }}>Back</span>
+                        </div>
+                      )}
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+
+              <div
+                style={{
+                  overflowY: "auto",
+                  maxHeight: "46rem",
+                  height: "100%",
+                  width: "100%"
+                }}
+              >
+                <table style={{ width: "100%" }} className="library-table">
+                  <tbody>
+                    {activeFolder
+                      ? renderFolderContents(activeFolder)
+                      : renderFolderStructure()}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
 
           <FileContentModal
             showModal={showModal}
@@ -1370,16 +1367,16 @@ const Library = () => {
                     />
                   </div>
                 )}
-                <iframe src={pdfUrl} width="100%" height="700px"></iframe>
+                <iframe src={pdfUrl} width="100%" height="42rem"></iframe>
               </div>
             </div>
           )}
         </div>
         {/* <LibraryWizard /> */}
-        <LibrarySidepane
+        {/* <LibrarySidepane
           isOpen={isSidepaneOpen}
           onToggle={() => setIsSidepaneOpen(!isSidepaneOpen)}
-        />
+        /> */}
       </div>
     </div>
   );

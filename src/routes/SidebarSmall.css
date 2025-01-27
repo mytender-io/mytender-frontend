@@ -33,6 +33,8 @@
     border-radius: 0.571rem;
     margin: 0 0.857rem;
     white-space: nowrap;
+    transition: all 0.2s ease-in-out;
+    /* Add smooth transition */
 }
 
 .sidebarsmall.collapsed a {
@@ -53,8 +55,10 @@
 }
 
 .sidebarsmall a:hover {
-    color: #535e65;
-    background-color: #e2e4e8 !important;
+    color: #2c2f33;
+    /* Slightly darker text on hover */
+    background-color: #f5f6f8 !important;
+    /* Lighter, more subtle background */
 }
 
 .sidebarsmall a.sidebarsmalllink-active {
@@ -82,21 +86,39 @@
 
 .collapse-toggle {
     position: absolute;
-    top: 62.5vh;
+    top: 50%;
+    /* Center vertically */
+    transform: translateY(-50%);
+    /* Ensure perfect vertical centering */
     right: -1.071rem;
     width: 2.286rem;
     height: 2.286rem;
-    background: #f8f9fb;
+    background: white;
+    /* White background */
     border: 0.071rem solid #d9d1e0;
     border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.collapse-toggle svg {
+    width: 0.857rem;
+    height: 0.857rem;
+    color: #404a50;
+    /* Icon color */
+}
+
+.collapse-toggle:hover {
+    background: white;
+    /* Keep white background on hover */
+    border-color: #404a50;
+    /* Darken border on hover */
 }
 
 .sidebarsmall.collapsed a svg {
     margin: 0;
-}
-
-.collapse-toggle:hover {
-    background: #e2e4e8;
 }
 
 .sidebarsmall.collapsed .sidebar-header {
@@ -106,11 +128,6 @@
 
 .sidebarsmall.collapsed .sidebar-header img {
     margin-right: 0;
-}
-
-.collapse-toggle svg {
-    width: 0.857rem;
-    height: 0.857rem;
 }
 
 .sidebar-header {
