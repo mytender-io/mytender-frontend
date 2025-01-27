@@ -9,12 +9,14 @@ import handleGAEvent from "../utilities/handleGAEvent";
 import { HTTP_PREFIX, API_URL } from "../helper/Constants";
 import axios from "axios";
 import { Button, Modal } from "react-bootstrap";
+import { Bot, Copy, ThumbsDown, ThumbsUp, User } from "lucide-react";
+import { IconButton } from "@mui/material";
 
 const ChatbotResponse = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
-
+  const [messageFeedback, setMessageFeedback] = useState({});
   const [messages, setMessages] = useState(() => {
     const savedMessages = localStorage.getItem("chatResponseMessages");
     console.log("Saved messages:", savedMessages);
@@ -161,6 +163,29 @@ const ChatbotResponse = () => {
     setIsLoading(false);
   };
 
+  const handleCopyText = (text) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const handleFeedback = (messageIndex, feedbackType) => {
+    setMessageFeedback((prev) => {
+      const currentFeedback = prev[messageIndex];
+
+      // If clicking the same button, turn it off
+      if (currentFeedback === feedbackType) {
+        const newFeedback = { ...prev };
+        delete newFeedback[messageIndex];
+        return newFeedback;
+      }
+
+      // If clicking different button, switch to it
+      return {
+        ...prev,
+        [messageIndex]: feedbackType
+      };
+    });
+  };
+
   return (
     <div className="chatpage">
       <SideBarSmall />
@@ -168,15 +193,60 @@ const ChatbotResponse = () => {
         <div className="messages">
           {messages.map((message, index) => (
             <div key={index} className={`message-bubble ${message.type}`}>
-              {message.text === "loading" ? (
-                <div className="loading-dots">
-                  <span>. </span>
-                  <span>. </span>
-                  <span>. </span>
-                </div>
-              ) : (
-                <div dangerouslySetInnerHTML={{ __html: message.text }} />
-              )}
+              <div className="message-icon">
+                {message.type === "user" ? (
+                  <User color="#ffffff" />
+                ) : (
+                  <Bot color="#404a50" />
+                )}
+              </div>
+              <div className="message-content">
+                {message.text === "loading" ? (
+                  <div className="loading-dots">
+                    <span>. </span>
+                    <span>. </span>
+                    <span>. </span>
+                  </div>
+                ) : (
+                  <>
+                    <div dangerouslySetInnerHTML={{ __html: message.text }} />
+                    {message.type === "bot" && (
+                      <div className="message-actions">
+                        <IconButton
+                          size="small"
+                          className={`bot-action-button ${messageFeedback[index] === "positive" ? "active" : ""}`}
+                          onClick={() => handleFeedback(index, "positive")}
+                          sx={{
+                            bgcolor: "#f0f0f0",
+                            "&.active": { bgcolor: "#d1d1d1" }
+                          }}
+                        >
+                          <ThumbsUp size={16} />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          className={`bot-action-button ${messageFeedback[index] === "negative" ? "active" : ""}`}
+                          onClick={() => handleFeedback(index, "negative")}
+                          sx={{
+                            bgcolor: "#f0f0f0",
+                            "&.active": { bgcolor: "#d1d1d1" }
+                          }}
+                        >
+                          <ThumbsDown size={16} />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          className="bot-action-buttons"
+                          onClick={() => handleCopyText(message.text)}
+                          sx={{ bgcolor: "#f0f0f0" }}
+                        >
+                          <Copy size={16} />
+                        </IconButton>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           ))}
         </div>
