@@ -1,9 +1,14 @@
+.lib-container {
+    height: calc(100vh - 140px); /* Adjust based on your header height */
+    overflow: hidden;
+    padding: 0 32px;
+    margin-left: 80px;
+    transition: margin-left 0.3s ease;
+}
+
 .table-wrapper {
-    position: relative;
-    max-height: 50rem;
-    overflow-x: auto;
-    overflow-y: auto;
-    margin-top: 1.429rem;
+    height: calc(100% - 80px); /* Adjust based on the space needed for elements above the table */
+    overflow: auto;
 }
 
 .header-container {
@@ -122,4 +127,12 @@
     opacity: 0.5;
     margin-left: 0.571rem;
     vertical-align: middle;
+}
+
+/* Make sure the table header stays fixed while scrolling */
+.bids-table thead {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
 }
