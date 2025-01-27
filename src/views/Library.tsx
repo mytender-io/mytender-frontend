@@ -1066,7 +1066,7 @@ const Library = () => {
     <div className="chatpage">
       <SideBarSmall onCollapseChange={setSidebarCollapsed} />
       <div className="bidplanner-container">
-      <div className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+        <div className="header-container">
           <h1 className="heavy">Content Library</h1>
         </div>
         <div>

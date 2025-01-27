@@ -4,15 +4,12 @@ import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import SideBarSmall from "../routes/SidebarSmall.tsx";
-import handleGAEvent from "../utilities/handleGAEvent";
 import { Button, Card, Col, Form, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import "./QuestionsCrafter.css";
-import { Editor, EditorState, convertToRaw, ContentState } from "draft-js";
 import "draft-js/dist/Draft.css";
 import {
   BidContext,
-  Section,
   Subheading
 } from "./BidWritingStateManagerView.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -116,7 +113,6 @@ const QuestionCrafter = () => {
 
       <div className="lib-container">
         <div className="scroll-container">
-          <BidNavbar />
 
           <div>
             <Row
