@@ -30,7 +30,7 @@ const BidPlanner = () => {
   const [existingBidNames, setExistingBidNames] = useState([]);
   const [organizationUsers, setOrganizationUsers] = useState([]);
   const [currentUserEmail, setCurrentUserEmail] = useState("");
-
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isLibraryVisible, setIsLibraryVisible] = useState(false);
 
   const toggleLibrary = () => {
@@ -169,43 +169,49 @@ const BidPlanner = () => {
 
   return (
     <div className="chatpage">
-      <SideBarSmall />
+      <SideBarSmall onCollapseChange={setSidebarCollapsed} />
       <div className="bidplanner-container">
-      <BidNavbar
-            showViewOnlyMessage={showViewOnlyMessage}
-            initialBidName={initialBidName}
-          />
-      <div >
-        <div className="bidplanner-padded-container ">
-          
-          <div>
-            <div className="library-toggle-bar" onClick={toggleLibrary}>
-              <ChevronDown
-                size={20}
-                className={`toggle-icon ${isLibraryVisible ? "rotate" : ""}`}
-              />
-              <span>View Tender Library Documents</span>
-            </div>
-            <div
-              className={`library-section ${!isLibraryVisible ? "collapsed" : ""}`}
-            >
-              <Row className="mt-4">
-                <Col md={12}>
-                  <TenderLibrary key={object_id} object_id={object_id} />
-                </Col>
-              </Row>
-            </div>
-
+        <div
+       
+        >
+         <BidNavbar
+  showViewOnlyMessage={showViewOnlyMessage}
+  initialBidName={initialBidName}
+  sidebarCollapsed={sidebarCollapsed} // Pass the state value, not the setter
+/>
+        </div>
+        <div>
+          <div
+            className={`bidplanner-padded-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+          >
             <div>
-              <Row>
-                <Col md={12}>
-                  <TenderAnalysis canUserEdit={canUserEdit} />
-                </Col>
-              </Row>
+              <div className="library-toggle-bar" onClick={toggleLibrary}>
+                <ChevronDown
+                  size={20}
+                  className={`toggle-icon ${isLibraryVisible ? "rotate" : ""}`}
+                />
+                <span>View Tender Library Documents</span>
+              </div>
+              <div
+                className={`library-section ${!isLibraryVisible ? "collapsed" : ""}`}
+              >
+                <Row className="mt-4">
+                  <Col md={12}>
+                    <TenderLibrary key={object_id} object_id={object_id} />
+                  </Col>
+                </Row>
+              </div>
+
+              <div>
+                <Row>
+                  <Col md={12}>
+                    <TenderAnalysis canUserEdit={canUserEdit} />
+                  </Col>
+                </Row>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );

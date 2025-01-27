@@ -16,24 +16,37 @@
 .messages {
   flex: 1;
   overflow-y: auto;
-  padding: 15px;
-  border-radius: 8px;
-  margin-top: 15px;
+  border-radius: 0.5rem;
+  /* 8px */
   display: flex;
   flex-direction: column;
-  margin-left: 290px;
-  max-height: 110vh !important;
+  padding-left: 22.857rem;
+  padding-right: 2.143rem;
+  padding-top: 1.8rem;
+  max-height: 90vh !important;
+  font-size: 1.143rem;
+  font-weight: 600;
 }
 
 .message-bubble {
   display: flex;
-  /* Inline block to fit content */
   max-width: 70%;
-  min-width: 50px;
-  padding: 10px;
-  border-radius: 15px;
-  margin-bottom: 10px;
+  min-width: 3.125rem;
+  /* 50px */
+  padding: 1rem;
+  /* 10px */
+  border-radius: 0.9375rem;
+  /* 15px */
+  margin-bottom: 0.625rem;
+  /* 10px */
   word-wrap: break-word;
+}
+
+.message-bubble .loading-dots {
+  padding: 0rem;
+  /* Much smaller padding for loading dots */
+  line-height: 0.5;
+  /* Reduce line height */
 }
 
 .message-bubble.user {
@@ -52,40 +65,51 @@
 
 .input-bar {
   position: fixed;
-  bottom: -25%;
-  width: calc(80% - 215px);
+  bottom: 0%;
+  width: 100%;
   display: flex;
   align-items: center;
-  padding: 5px;
+  padding: 0.4rem 0.6rem;
+  /* Increased from 0.3125rem to 0.625rem horizontal, 1.25rem vertical */
   background-color: #333333;
-  /* Light shade of black */
   box-sizing: border-box;
   z-index: 1000;
-  border-radius: 25px;
-  margin-bottom: 15px;
+  border-radius: 3rem;
+  /* Increased from 1.5625rem to maintain pill shape with larger padding */
+  margin-bottom: 0.9375rem;
   background-color: #383838;
-  max-width: 1100px;
+  max-width: 80rem;
   left: 28%;
-  /* Light shade of black gradient */
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .input-bar input {
   flex: 1;
-  padding: 10px 20px;
+  padding: 1rem 1.2rem;
+  /* Increased from 0.625rem 1.25rem */
   border: none;
-  border-radius: 25px;
-  margin-right: 10px;
+  border-radius: 3rem;
+  /* Increased to match parent */
+  margin-right: 0.625rem;
   box-sizing: border-box;
   outline: none;
   background-color: #383838;
-  /* Light shade of black for input */
   color: #ffffff;
-  /* White text for better contrast */
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.input-bar input::-webkit-input-placeholder {
+  /* Chrome/Safari/Opera */
+  font-weight: 600;
 }
 
 .bar-button {
-  width: 40px;
-  height: 40px;
+  width: 3.5rem;
+  /* Increased from 2.5rem */
+  height: 3.5rem;
+  /* Increased from 2.5rem */
   border: none;
   border-radius: 50%;
   background-color: #ffa500;
@@ -101,40 +125,49 @@
 }
 
 .bar-button svg {
-  width: 16px;
-  /* Adjust the size of the icon */
-  height: 16px;
-  /* Adjust the size of the icon */
+  width: 1.5rem;
+  /* Increased from 1rem */
+  height: 1.5rem;
+  /* Increased from 1rem */
 }
 
 .chat-Response-Clear-Button {
   transform: translateX(180%);
   background-color: #383838;
   color: white;
-  padding: 8px 16px;
+  padding: 0.5rem 1rem;
+  /* 8px 16px */
   border: none;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9rem;
-  border-radius: 8px;
-  margin-left: 5px;
+  border-radius: 0.5rem;
+  /* 8px */
+  margin-left: 0.3125rem;
+  /* 5px */
 }
 
 .message-bubble ol,
 .message-bubble ul {
-  padding-left: 20px;
-  padding-right: 20px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  padding-left: 1.25rem;
+  /* 20px */
+  padding-right: 1.25rem;
+  /* 20px */
+  margin-top: 0.625rem;
+  /* 10px */
+  margin-bottom: 0.625rem;
+  /* 10px */
 }
 
 .message-bubble li {
-  margin-bottom: 5px;
+  margin-bottom: 0.3125rem;
+  /* 5px */
 }
 
 .message-bubble br {
   display: block;
-  margin: 5px 0;
+  margin: 0.3125rem 0;
+  /* 5px 0 */
   content: "";
 }
 
@@ -143,8 +176,9 @@
   border: none;
   color: #888;
   cursor: pointer;
-  font-size: 1.2em;
-  margin-right: 10px;
+  font-size: 1.5em;
+  /* Increased from 1.2em */
+  margin-right: 0.625rem;
   transition: color 0.3s ease;
 }
 

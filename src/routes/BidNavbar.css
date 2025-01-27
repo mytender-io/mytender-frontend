@@ -18,6 +18,10 @@
     height: 6rem;
 }
 
+.bidnav-container.sidebar-collapsed {
+    padding-left: 8.3rem;
+}
+
 .bidnav-item {
     margin-right: 1.429rem;
     font-size: 1.143rem;

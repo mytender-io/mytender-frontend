@@ -20,6 +20,7 @@ const BidNavbar = ({
   showViewOnlyMessage = () => {},
   initialBidName = "",
   outline = [], // default value
+  sidebarCollapsed,
   object_id = null,
   handleRegenerateClick = () => {}
 }) => {
@@ -110,7 +111,9 @@ const BidNavbar = ({
 
   return (
     <div>
-      <div className="header-container">
+      <div
+        className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+      >
         <button
           className="back-arrow-button"
           onClick={handleBackClick}
@@ -129,54 +132,57 @@ const BidNavbar = ({
         <div></div>
       </div>
 
-      <div className="bidnav-container">
-        <div style={{display: "flex", justifyContent: "space-between"}}>
-        <div className="bidnav-section mt-2 mb-1">
-          <NavLink
-            to="/bid-extractor"
-            className={`bidnav-item ${activeTab === "/bid-extractor" ? "active" : ""}`}
-            onClick={() => handleTabClick("/bid-extractor")}
-          >
-            Bid Planner
-          </NavLink>
-          <NavLink
-            to="/proposal-planner"
-            className={`bidnav-item ${activeTab === "/proposal-planner" || activeTab === "/question-crafter" ? "active" : ""}`}
-            onClick={() => handleTabClick("/proposal-planner")}
-          >
-            Proposal Outline
-          </NavLink>
-          {/* <NavLink
+      <div className={`bidnav-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div className="bidnav-section mt-2 mb-1">
+            <NavLink
+              to="/bid-extractor"
+              className={`bidnav-item ${activeTab === "/bid-extractor" ? "active" : ""}`}
+              onClick={() => handleTabClick("/bid-extractor")}
+            >
+              Bid Planner
+            </NavLink>
+            <NavLink
+              to="/proposal-planner"
+              className={`bidnav-item ${activeTab === "/proposal-planner" || activeTab === "/question-crafter" ? "active" : ""}`}
+              onClick={() => handleTabClick("/proposal-planner")}
+            >
+              Proposal Outline
+            </NavLink>
+            {/* <NavLink
             to="/compliance-matrix"
             className={`bidnav-item ${activeTab === "/compliance-matrix" ? "active" : ""}`}
             onClick={() => handleTabClick("/compliance-matrix")}
           >
             Compliance Matrix
           </NavLink> */}
-          <NavLink
-            to="/proposal-preview"
-            className={`bidnav-item ${activeTab === "/proposal-preview" ? "active" : ""}`}
-            onClick={() => handleTabClick("/proposal-preview")}
-          >
-            Preview Proposal
-          </NavLink>
-        </div>
-        {outline.length === 0 ? (
-          <div></div>
-        ) : (
-          <div>
-            <button
-              onClick={handleRegenerateClick}
-              className="upload-button me-2"
-              style={{ minWidth: "fit-content" }}
+            <NavLink
+              to="/proposal-preview"
+              className={`bidnav-item ${activeTab === "/proposal-preview" ? "active" : ""}`}
+              onClick={() => handleTabClick("/proposal-preview")}
             >
-              <FontAwesomeIcon icon={faPlus} className="pr-2"></FontAwesomeIcon>
-              New Outline
-            </button>
-            <GenerateProposalModal bid_id={object_id} outline={outline} />
+              Preview Proposal
+            </NavLink>
           </div>
-        )}
-      </div>
+          {outline.length === 0 ? (
+            <div></div>
+          ) : (
+            <div>
+              <button
+                onClick={handleRegenerateClick}
+                className="upload-button me-2"
+                style={{ minWidth: "fit-content" }}
+              >
+                <FontAwesomeIcon
+                  icon={faPlus}
+                  className="pr-2"
+                ></FontAwesomeIcon>
+                New Outline
+              </button>
+              <GenerateProposalModal bid_id={object_id} outline={outline} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -58,3 +58,7 @@
     overflow-x: hidden !important;
     overflow-y: hidden !important;
 }
+
+.bidplanner-padded-container.sidebar-collapsed {
+    padding-left: 8.3rem;
+}

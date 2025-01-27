@@ -110,7 +110,7 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
           {!isCollapsed && <span>mytender.io</span>}
         </div>
 
-        <Tooltip
+        {/* <Tooltip
           title={isCollapsed ? "Expand" : "Collapse"}
           placement="right"
           enterDelay={1000}
@@ -123,7 +123,7 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
               <ChevronLeft size={20} />
             )}
           </button>
-        </Tooltip>
+        </Tooltip> */}
 
         <div className="sidelinks">
           <Link
@@ -152,7 +152,7 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
             className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
           >
             <Bot size={24} />
-            {!isCollapsed && <span id="welcome">Data Finder</span>}
+            {!isCollapsed && <span id="welcome">Library Chat</span>}
           </Link>
 
           <Link
@@ -160,7 +160,7 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
             className={`sidebarsmalllink ${isActive("/question-answer") ? "sidebarsmalllink-active" : ""}`}
           >
             <Files size={24} />
-            {!isCollapsed && <span>Portal Responses </span>}
+            {!isCollapsed && <span>Q&A Generator</span>}
           </Link>
 
           <Link
