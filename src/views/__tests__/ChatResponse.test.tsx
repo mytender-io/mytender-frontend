@@ -17,7 +17,8 @@ describe("Quick Question", () => {
       {
         headers: {
           "Content-Type": "application/json"
-        }
+        },
+        timeout: 30000
       }
     );
     // Log response for debugging
@@ -27,5 +28,5 @@ describe("Quick Question", () => {
     // Basic assertions on the API response
     expect(questionResponse.status).toBe(200);
     expect(typeof questionResponse.data).toBe("string");
-  });
+  }, 30000);
 });
