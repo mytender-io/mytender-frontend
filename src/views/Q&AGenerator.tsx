@@ -21,6 +21,7 @@ import {
 import "draft-js/dist/Draft.css";
 import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
 import SelectFolderModal from "../modals/SelectFolderModal.tsx";
+import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 
 const QAGenerator = () => {
   const getAuth = useAuthUser();
@@ -1288,12 +1289,21 @@ const QAGenerator = () => {
     setResponseEditorState(newEditorState);
   };
 
+  const parentPages = [];
   return (
-    <div className="chatpage">
+    <div>
       <SideBarSmall />
+      <div className="header-container">
+        <BreadcrumbNavigation
+          currentPage="Q&A Generator"
+          parentPages={parentPages}
+          showHome={true}
+        />
+      </div>
 
       <div className="lib-container">
-        <div className="scroll-container">
+        <div>
+          <h1 className="mt-3">Q&A Generator</h1>
           <div>
             <Row
               className="justify-content-md-center"
@@ -1309,7 +1319,6 @@ const QAGenerator = () => {
             </Row>
 
             <Col md={12}>
-              <h1 className="heavy mb-3">Q&A Generator</h1>
               <div className="proposal-header mb-2">
                 <h1 className="lib-title" id="question-section">
                   Question
@@ -1330,11 +1339,11 @@ const QAGenerator = () => {
                   onChange={(e) => setInputText(e.target.value)}
                 ></textarea>
               </div>
-              <div className="text-muted mt-2">
+              <div className="text-muted word-count mt-2">
                 Word Count: {inputText.split(/\s+/).filter(Boolean).length}
               </div>
               <Button
-                className="upload-button mt-1"
+                className="upload-button mt-2"
                 onClick={sendQuestionToChatbot}
                 disabled={inputText.trim() === ""}
               >
@@ -1377,11 +1386,7 @@ const QAGenerator = () => {
                   </Button>
                 </div>
 
-                <div
-                  className="response-box draft-editor"
-                  style={{ height: "800px" }}
-                  ref={responseBoxRef}
-                >
+                <div className="response-box draft-editor" ref={responseBoxRef}>
                   <div className="editor-container" ref={editorRef}>
                     <Editor
                       editorState={responseEditorState}
@@ -1395,7 +1400,7 @@ const QAGenerator = () => {
                   </div>
                 </div>
 
-                <div className="text-muted mt-2">
+                <div className="text-muted word-count mt-2">
                   Word Count:{" "}
                   {
                     convertToRaw(responseEditorState.getCurrentContent())
@@ -1557,7 +1562,9 @@ const QAGenerator = () => {
                             </div>
                           ) : (
                             <div
-                              dangerouslySetInnerHTML={{ __html: message.text }}
+                              dangerouslySetInnerHTML={{
+                                __html: message.text
+                              }}
                             />
                           )}
                         </div>
@@ -1572,7 +1579,7 @@ const QAGenerator = () => {
                         id="bid-pilot-options"
                       >
                         <Dropdown.Toggle
-                          className="upload-button"
+                          className="option-button"
                           style={{
                             backgroundColor:
                               selectedDropdownOption === "custom-prompt"

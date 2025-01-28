@@ -13,6 +13,7 @@ import { displayAlert } from "../helper/Alert";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 import TenderAnalysis from "../components/TenderAnalysis.tsx";
 import { ChevronDown } from "lucide-react";
+import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 
 const BidPlanner = () => {
   const getAuth = useAuthUser();
@@ -24,7 +25,9 @@ const BidPlanner = () => {
 
   const location = useLocation();
   const bidData = location.state?.bid || "";
-  const initialBidName = location.state?.bidName;
+  const initialBidName = location.state?.bid.bid_title || sharedState.bidInfo;
+
+  console.log(location.state?.bid );
 
   const [loading, setLoading] = useState(false);
   const [existingBidNames, setExistingBidNames] = useState([]);
@@ -167,25 +170,41 @@ const BidPlanner = () => {
     window.dispatchEvent(new CustomEvent("bidUpdated", { detail: updatedBid }));
   }, []);
 
+  const parentPages = [
+    { name: "Tender Dashboard", path: "/bids" }
+  
+  ];
+
+  console.log(initialBidName);
+
   return (
     <div className="chatpage">
       <SideBarSmall onCollapseChange={setSidebarCollapsed} />
-      <div className="bidplanner-container">
+      <div className="bidplanner-container ">
         <div
-       
+          className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
         >
-         <BidNavbar
-  showViewOnlyMessage={showViewOnlyMessage}
-  initialBidName={initialBidName}
-  sidebarCollapsed={sidebarCollapsed} // Pass the state value, not the setter
-/>
+          {" "}
+          <BreadcrumbNavigation
+            currentPage={initialBidName}
+            parentPages={parentPages}
+            showHome={true}
+          />
         </div>
+
         <div>
           <div
-            className={`bidplanner-padded-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+            className={`lib-container mt-1 ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
           >
             <div>
-              <div className="library-toggle-bar" onClick={toggleLibrary}>
+              <div>
+                <BidNavbar
+                  showViewOnlyMessage={showViewOnlyMessage}
+                  initialBidName={initialBidName}
+                  sidebarCollapsed={sidebarCollapsed} // Pass the state value, not the setter
+                />
+              </div>
+              <div className="library-toggle-bar mt-5" onClick={toggleLibrary}>
                 <ChevronDown
                   size={20}
                   className={`toggle-icon ${isLibraryVisible ? "rotate" : ""}`}
@@ -195,7 +214,7 @@ const BidPlanner = () => {
               <div
                 className={`library-section ${!isLibraryVisible ? "collapsed" : ""}`}
               >
-                <Row className="mt-4">
+                <Row className="mt-5">
                   <Col md={12}>
                     <TenderLibrary key={object_id} object_id={object_id} />
                   </Col>

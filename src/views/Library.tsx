@@ -35,7 +35,9 @@ import FileContentModal from "../modals/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import LibraryContextMenu from "../modals/LibraryContextMenu.tsx";
 import EllipsisMenu from "../buttons/EllipsisMenu.tsx";
-import LibrarySidepane from "../components/LibrarySidepane.tsx";
+import { LibrarySidepane, LibraryLayout } from "../components/LibrarySidepane";
+import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
+import SearchInput from "../components/inputbars/SearchInput.tsx";
 
 const NewFolderModal = React.memo(
   ({ show, onHide, onCreateFolder, title, parentFolder }) => {
@@ -731,8 +733,10 @@ const Library = () => {
   const renderFolderStructure = () => {
     const topLevelFolders = getTopLevelFolders();
     // Filter out the "default" folder
-    const foldersToRender = topLevelFolders.filter(folderName => folderName !== "default");
-    
+    const foldersToRender = topLevelFolders.filter(
+      (folderName) => folderName !== "default"
+    );
+
     return foldersToRender.map((folderName) => {
       const displayName = formatDisplayName(folderName);
       return (
@@ -801,28 +805,26 @@ const Library = () => {
     //console.log("Raw contents:", contents);
 
     // Filter to only show direct children
-    const directChildren = contents.filter(
-      ({ unique_id, isFolder }) => {
-        console.log("\nChecking item:", unique_id);
+    const directChildren = contents.filter(({ unique_id, isFolder }) => {
+      console.log("\nChecking item:", unique_id);
 
-        if (!isFolder) return true; // Files are always direct children
+      if (!isFolder) return true; // Files are always direct children
 
-        // Get the relative path by removing the current folder path
-        const relativePath = unique_id.replace(folderPath + "FORWARDSLASH", "");
-        //console.log("Relative path:", relativePath);
+      // Get the relative path by removing the current folder path
+      const relativePath = unique_id.replace(folderPath + "FORWARDSLASH", "");
+      //console.log("Relative path:", relativePath);
 
-        // Count how many FORWARDSLASH are in the relative path
-        const forwardSlashCount = (relativePath.match(/FORWARDSLASH/g) || [])
-          .length;
-        //console.log("Forward slash count:", forwardSlashCount);
+      // Count how many FORWARDSLASH are in the relative path
+      const forwardSlashCount = (relativePath.match(/FORWARDSLASH/g) || [])
+        .length;
+      //console.log("Forward slash count:", forwardSlashCount);
 
-        // A direct child should have no additional FORWARDSLASH in its relative path
-        const isDirectChild = forwardSlashCount === 0;
-        //onsole.log("Is direct child?", isDirectChild);
+      // A direct child should have no additional FORWARDSLASH in its relative path
+      const isDirectChild = forwardSlashCount === 0;
+      //onsole.log("Is direct child?", isDirectChild);
 
-        return isDirectChild;
-      }
-    );
+      return isDirectChild;
+    });
 
     //console.log("Filtered direct children:", directChildren);
 
@@ -952,14 +954,15 @@ const Library = () => {
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
- 
+
     if (query.length > 0) {
       // Filter out the default folder from folder matches
       const folderMatches = availableCollections
-        .filter((collection) =>
-          collection.toLowerCase().includes(query) &&
-          collection !== "default" &&  // Exclude the default folder
-          !collection.startsWith("defaultFORWARDSLASH") // Exclude subfolders of default
+        .filter(
+          (collection) =>
+            collection.toLowerCase().includes(query) &&
+            collection !== "default" && // Exclude the default folder
+            !collection.startsWith("defaultFORWARDSLASH") // Exclude subfolders of default
         )
         .map((collection) => ({
           name: collection.split("FORWARDSLASH").pop(),
@@ -967,12 +970,12 @@ const Library = () => {
           path: collection,
           fullName: collection.replace(/FORWARDSLASH/g, "/")
         }));
- 
+
       // Filter out files from the default folder and its contents
       const fileMatches = Object.entries(folderContents)
-        .filter(([folder]) => 
-          folder !== "default" && 
-          !folder.startsWith("defaultFORWARDSLASH")
+        .filter(
+          ([folder]) =>
+            folder !== "default" && !folder.startsWith("defaultFORWARDSLASH")
         ) // Exclude both default folder and its subfolders
         .flatMap(([folder, contents]) =>
           contents
@@ -985,7 +988,7 @@ const Library = () => {
               unique_id: item.unique_id
             }))
         );
- 
+
       const results = [...folderMatches, ...fileMatches];
       setFilteredResults(results);
       setShowSearchResults(true);
@@ -1061,325 +1064,299 @@ const Library = () => {
       </div>
     );
   };
+  const parentPages = [
+ 
+  ];
 
   return (
-    <div className="chatpage">
+    <LibraryLayout>
+    <div className="library-wrapper">
       <SideBarSmall onCollapseChange={setSidebarCollapsed} />
-      <div className="bidplanner-container">
+      
       <div className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
-          <h1 className="heavy">Content Library</h1>
-        </div>
-        <div>
-          <div
-            className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
-          >
-            <div className="header-row mt-2">
-              <div className="lib-title" id="library-table">
-                Resources
-              </div>
+        <BreadcrumbNavigation
+          currentPage="Content Library"
+          parentPages={parentPages}
+          showHome={true}
+        />
+      </div>
 
-              <div
-                className="search-container"
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  width: "100%"
-                }}
-              >
-                <InputGroup
-                  className={`search-bar-container ${showDropdown ? "dropdown-visible" : ""}`}
-                  ref={searchBarRef}
-                  style={{ maxWidth: "60rem", width: "100%" }}
-                >
-                  <FontAwesomeIcon icon={faSearch} className="search-icon" />
-                  <FormControl
-                    placeholder="Search folders and files"
-                    aria-label="Search"
-                    aria-describedby="basic-addon2"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    onFocus={() => {
-                      setShowDropdown(true);
-                      setShowSearchResults(true);
-                    }}
-                    onBlur={() => {
-                      setTimeout(() => {
-                        setShowDropdown(false);
-                        setShowSearchResults(false);
-                      }, 200);
-                    }}
-                    className={`search-bar-library ${showDropdown ? "dropdown-visible" : ""}`}
-                  />
-                  {searchQuery && (
-                    <div
-                      className="clear-search-icon"
-                      onClick={() => {
-                        setSearchQuery("");
-                        setShowDropdown(false);
-                        setShowSearchResults(false);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faTimes} />
-                    </div>
-                  )}
-                  {renderSearchResults()}
-                </InputGroup>
-              </div>
-              <label id="search-bar-container"> </label>
-              <div
-                className="button-container"
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  minWidth: "9.375rem", // 150px ÷ 16 = 9.375rem
-                  minHeight: "2.5rem" // 40px ÷ 16 = 2.5rem
-                }}
-              >
-                {!activeFolder && (
-                  <Button
-                    onClick={() => handleNewFolderClick(null)}
-                    className="upload-button"
-                    id="new-folder"
-                    style={{ whiteSpace: "nowrap" }} // Add this line
-                  >
-                    <FontAwesomeIcon
-                      icon={faPlus}
-                      style={{ marginRight: "0.5rem" }}
-                    />
-                    New Folder
-                  </Button>
-                )}
-
-                {activeFolder && (
-                  <Button
-                    aria-controls="simple-menu"
-                    aria-haspopup="true"
-                    onClick={handleMenuClick}
-                    className="upload-button"
-                    style={{ fontSize: "1.0625rem" }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faPlus}
-                      style={{ marginRight: "0.5rem" }}
-                    />
-                    Upload
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            <Menu
-              id="long-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={open}
-              onClose={handleMenuClose}
-              PaperProps={{
-                style: {
-                  width: "13.75rem"
-                }
-              }}
-            >
-              <MenuItem
-                onClick={() => handleMenuItemClick("pdf")}
-                className="styled-menu-item"
-              >
-                <i className="fas fa-file-pdf styled-menu-item-icon"></i>
-                Upload PDF/Word/Excel
-              </MenuItem>
-              <MenuItem
-                onClick={() => handleMenuItemClick("text")}
-                className="styled-menu-item"
-              >
-                <i className="fas fa-file-alt styled-menu-item-icon"></i>
-                Upload Text
-              </MenuItem>
-              <MenuItem
-                onClick={() => handleNewFolderClick(activeFolder)}
-                className="styled-menu-item"
-              >
-                <FontAwesomeIcon
-                  icon={faFolder}
-                  className="styled-menu-item-icon"
-                />
-                New Subfolder
-              </MenuItem>
-            </Menu>
-            <div style={{ width: "100%", marginTop: "2rem" }}>
-              <table className="library-table">
-                <thead>
-                  <tr>
-                    <th>{renderBreadcrumbs()}</th>
-                    <th colSpan={3}>
-                      {activeFolder && (
-                        <div
-                          className="back-button"
-                          onClick={() => handleBackClick()}
-                          style={{ cursor: "pointer", padding: "5px" }}
-                        >
-                          <FontAwesomeIcon icon={faReply} />
-                          <span style={{ marginLeft: "0.625rem" }}>Back</span>
-                        </div>
-                      )}
-                    </th>
-                  </tr>
-                </thead>
-              </table>
-
-              <div
-                style={{
-                  overflowY: "auto",
-                  maxHeight: "46rem",
-                  height: "100%",
-                  width: "100%"
-                }}
-              >
-                <table style={{ width: "100%" }} className="library-table">
-                  <tbody>
-                    {activeFolder
-                      ? renderFolderContents(activeFolder)
-                      : renderFolderStructure()}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+      <div className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+      <h1 className="mt-3">Content Library</h1>
+        <div className="header-row mt-4">
+          <div className="lib-title" id="library-table">
+            Resources
           </div>
 
-          <FileContentModal
-            showModal={showModal}
-            setShowModal={setShowModal}
-            modalContent={modalContent}
-            onSave={(newContent) =>
-              saveFileContent(currentFileId, newContent, activeFolder)
-            }
-            documentId={currentFileId}
-            fileName={currentFileName}
-            folderName={activeFolder}
-            onViewPdf={viewPdfFile}
-            isLoading={isLoading}
-          />
+          <div className="search-container" style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+            <InputGroup
+              className={`search-bar-container ${showDropdown ? "dropdown-visible" : ""}`}
+              ref={searchBarRef}
+              style={{ maxWidth: "60rem", width: "100%" }}
+            >
+              <FontAwesomeIcon icon={faSearch} className="search-icon" />
+              <FormControl
+                placeholder="Search folders and files"
+                aria-label="Search"
+                aria-describedby="basic-addon2"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onFocus={() => {
+                  setShowDropdown(true);
+                  setShowSearchResults(true);
+                }}
+                onBlur={() => {
+                  setTimeout(() => {
+                    setShowDropdown(false);
+                    setShowSearchResults(false);
+                  }, 200);
+                }}
+                className={`search-bar-library ${showDropdown ? "dropdown-visible" : ""}`}
+              />
+              {searchQuery && (
+                <div
+                  className="clear-search-icon"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setShowDropdown(false);
+                    setShowSearchResults(false);
+                  }}
+                >
+                  <FontAwesomeIcon icon={faTimes} />
+                </div>
+              )}
+              {renderSearchResults()}
+            </InputGroup>
+          </div>
 
-          <DeleteFolderModal
-            show={showDeleteFolderModal}
-            onHide={() => setShowDeleteFolderModal(false)}
-            onDelete={() => handleDelete(folderToDelete)}
-            folderTitle={folderToDelete}
-          />
+          <label id="search-bar-container"> </label>
 
-          <DeleteFileModal
-            show={showDeleteFileModal}
-            onHide={() => setShowDeleteFileModal(false)}
-            onDelete={() => {
-              deleteDocument(fileToDelete.unique_id);
-              setShowDeleteFileModal(false);
+          <div className="button-container" 
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              minWidth: "9.375rem",
+              minHeight: "2.5rem"
             }}
-            fileName={fileToDelete ? fileToDelete.filename : ""}
-          />
+          >
+            {!activeFolder && (
+              <Button
+                onClick={() => handleNewFolderClick(null)}
+                className="upload-button"
+                id="new-folder"
+                style={{ whiteSpace: "nowrap" }}
+              >
+                <FontAwesomeIcon icon={faPlus} style={{ marginRight: "0.5rem" }} />
+                New Folder
+              </Button>
+            )}
 
-          <UploadPDFModal
-            show={showPDFModal}
-            onHide={() => setShowPDFModal(false)}
-            folder={uploadFolder}
-            get_collections={fetchFolderStructure}
-            onClose={handleOnClose}
-          />
-
-          <UploadTextModal
-            show={showTextModal}
-            onHide={() => setShowTextModal(false)}
-            folder={uploadFolder}
-            get_collections={fetchFolderStructure}
-          />
-
-          <NewFolderModal
-            show={showNewFolderModal}
-            onHide={handleHideNewFolderModal}
-            onCreateFolder={handleCreateFolder}
-            title={
-              newFolderParent ? "Create New Subfolder" : "Create New Folder"
-            }
-            parentFolder={newFolderParent}
-          />
-
-          {contextMenu && contextMenuTarget && (
-            <LibraryContextMenu
-              anchorPosition={{ x: contextMenu.mouseX, y: contextMenu.mouseY }}
-              isOpen={Boolean(contextMenu)}
-              onClose={handleContextMenuClose}
-              onDelete={() => {
-                if (contextMenuTarget.isFolder) {
-                  setFolderToDelete(contextMenuTarget.path);
-                  setShowDeleteFolderModal(true);
-                } else {
-                  setFileToDelete({
-                    unique_id: contextMenuTarget.id,
-                    filename:
-                      folderContents[activeFolder]?.find(
-                        (item) => item.unique_id === contextMenuTarget.id
-                      )?.filename || ""
-                  });
-                  setShowDeleteFileModal(true);
-                }
-                handleContextMenuClose();
-              }}
-              isFolder={contextMenuTarget.isFolder}
-              folderPath={contextMenuTarget.path}
-              onUploadPDF={(event) => {
-                handleShowPDFModal(event, contextMenuTarget.path);
-                handleContextMenuClose();
-              }}
-              onUploadText={(event) => {
-                handleShowTextModal(event, contextMenuTarget.path);
-                handleContextMenuClose();
-              }}
-              onNewSubfolder={() => {
-                handleNewFolderClick(contextMenuTarget.path);
-                handleContextMenuClose();
-              }}
-            />
-          )}
-
-          {showPdfViewerModal && (
-            <div className="pdf-viewer-modal" onClick={closeModal}>
-              <div className="pdf-viewer-modal-content" ref={modalRef}>
-                {isLoading && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: "rgba(255, 255, 255, 0.8)",
-                      zIndex: 1000
-                    }}
-                  >
-                    <Spinner
-                      animation="border"
-                      style={{
-                        width: "2rem",
-                        height: "2rem",
-                        color: "black"
-                      }}
-                    />
-                  </div>
-                )}
-                <iframe src={pdfUrl} width="100%" height="42rem"></iframe>
-              </div>
-            </div>
-          )}
+            {activeFolder && (
+              <Button
+                aria-controls="simple-menu"
+                aria-haspopup="true"
+                onClick={handleMenuClick}
+                className="upload-button"
+                style={{ fontSize: "1.0625rem" }}
+              >
+                <FontAwesomeIcon icon={faPlus} style={{ marginRight: "0.5rem" }} />
+                Upload
+              </Button>
+            )}
+          </div>
         </div>
-        {/* <LibraryWizard /> */}
-        {/* <LibrarySidepane
-          isOpen={isSidepaneOpen}
-          onToggle={() => setIsSidepaneOpen(!isSidepaneOpen)}
-        /> */}
+
+        <Menu
+          id="long-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={open}
+          onClose={handleMenuClose}
+          PaperProps={{
+            style: {
+              width: "13.75rem"
+            }
+          }}
+        >
+          <MenuItem onClick={() => handleMenuItemClick("pdf")} className="styled-menu-item">
+            <i className="fas fa-file-pdf styled-menu-item-icon"></i>
+            Upload PDF/Word/Excel
+          </MenuItem>
+          <MenuItem onClick={() => handleMenuItemClick("text")} className="styled-menu-item">
+            <i className="fas fa-file-alt styled-menu-item-icon"></i>
+            Upload Text
+          </MenuItem>
+          <MenuItem onClick={() => handleNewFolderClick(activeFolder)} className="styled-menu-item">
+            <FontAwesomeIcon icon={faFolder} className="styled-menu-item-icon" />
+            New Subfolder
+          </MenuItem>
+        </Menu>
+
+        <div style={{ width: "100%", marginTop: "2rem" }}>
+          <table className="library-table">
+            <thead>
+              <tr>
+                <th>{renderBreadcrumbs()}</th>
+                <th colSpan={3}>
+                  {activeFolder && (
+                    <div
+                      className="back-button"
+                      onClick={() => handleBackClick()}
+                      style={{ cursor: "pointer", padding: "5px" }}
+                    >
+                      <FontAwesomeIcon icon={faReply} />
+                      <span style={{ marginLeft: "0.625rem" }}>Back</span>
+                    </div>
+                  )}
+                </th>
+              </tr>
+            </thead>
+          </table>
+
+          <div style={{
+            overflowY: "auto",
+            maxHeight: "",
+            height: "calc(100vh - 220px)",
+            width: "100%"
+          }}>
+            <table style={{ width: "100%" }} className="library-table">
+              <tbody>
+                {activeFolder ? renderFolderContents(activeFolder) : renderFolderStructure()}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+
+      {/* Modals */}
+      <FileContentModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        modalContent={modalContent}
+        onSave={(newContent) => saveFileContent(currentFileId, newContent, activeFolder)}
+        documentId={currentFileId}
+        fileName={currentFileName}
+        folderName={activeFolder}
+        onViewPdf={viewPdfFile}
+        isLoading={isLoading}
+      />
+
+      <DeleteFolderModal
+        show={showDeleteFolderModal}
+        onHide={() => setShowDeleteFolderModal(false)}
+        onDelete={() => handleDelete(folderToDelete)}
+        folderTitle={folderToDelete}
+      />
+
+      <DeleteFileModal
+        show={showDeleteFileModal}
+        onHide={() => setShowDeleteFileModal(false)}
+        onDelete={() => {
+          deleteDocument(fileToDelete.unique_id);
+          setShowDeleteFileModal(false);
+        }}
+        fileName={fileToDelete ? fileToDelete.filename : ""}
+      />
+
+      <UploadPDFModal
+        show={showPDFModal}
+        onHide={() => setShowPDFModal(false)}
+        folder={uploadFolder}
+        get_collections={fetchFolderStructure}
+        onClose={handleOnClose}
+      />
+
+      <UploadTextModal
+        show={showTextModal}
+        onHide={() => setShowTextModal(false)}
+        folder={uploadFolder}
+        get_collections={fetchFolderStructure}
+      />
+
+      <NewFolderModal
+        show={showNewFolderModal}
+        onHide={handleHideNewFolderModal}
+        onCreateFolder={handleCreateFolder}
+        title={newFolderParent ? "Create New Subfolder" : "Create New Folder"}
+        parentFolder={newFolderParent}
+      />
+
+      {contextMenu && contextMenuTarget && (
+        <LibraryContextMenu
+          anchorPosition={{ x: contextMenu.mouseX, y: contextMenu.mouseY }}
+          isOpen={Boolean(contextMenu)}
+          onClose={handleContextMenuClose}
+          onDelete={() => {
+            if (contextMenuTarget.isFolder) {
+              setFolderToDelete(contextMenuTarget.path);
+              setShowDeleteFolderModal(true);
+            } else {
+              setFileToDelete({
+                unique_id: contextMenuTarget.id,
+                filename: folderContents[activeFolder]?.find(
+                  (item) => item.unique_id === contextMenuTarget.id
+                )?.filename || ""
+              });
+              setShowDeleteFileModal(true);
+            }
+            handleContextMenuClose();
+          }}
+          isFolder={contextMenuTarget.isFolder}
+          folderPath={contextMenuTarget.path}
+          onUploadPDF={(event) => {
+            handleShowPDFModal(event, contextMenuTarget.path);
+            handleContextMenuClose();
+          }}
+          onUploadText={(event) => {
+            handleShowTextModal(event, contextMenuTarget.path);
+            handleContextMenuClose();
+          }}
+          onNewSubfolder={() => {
+            handleNewFolderClick(contextMenuTarget.path);
+            handleContextMenuClose();
+          }}
+        />
+      )}
+
+      {showPdfViewerModal && (
+        <div className="pdf-viewer-modal" onClick={closeModal}>
+          <div className="pdf-viewer-modal-content" ref={modalRef}>
+            {isLoading && (
+              <div style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(255, 255, 255, 0.8)",
+                zIndex: 1000
+              }}>
+                <Spinner
+                  animation="border"
+                  style={{
+                    width: "2rem",
+                    height: "2rem",
+                    color: "black"
+                  }}
+                />
+              </div>
+            )}
+            <iframe src={pdfUrl} width="100%" height="42rem"></iframe>
+          </div>
+        </div>
+      )}
+
+      <LibrarySidepane
+        isOpen={isSidepaneOpen}
+        onToggle={() => setIsSidepaneOpen(!isSidepaneOpen)}
+      />
     </div>
+    /</LibraryLayout>
   );
+
 };
 
 export default withAuth(Library);

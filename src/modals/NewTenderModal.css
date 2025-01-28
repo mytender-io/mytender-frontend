@@ -87,34 +87,15 @@
 }
 
 .step-text {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-@media (max-width: 992px) {
-    .step {
-        min-width: 150px;
-        padding: 0 20px;
-    }
-    .step-text {
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 768px) {
-    .step {
-        min-width: 80px;
-        padding: 0 15px;
-    }
-    .step-text {
-        display: none;
-    }
-    .step-number {
-        margin: 0 auto;
-    }
+.new-bid-modal-header {
+    font-size: 1.8rem !important;
 }
 
 .custom-modal-width {
@@ -123,18 +104,6 @@
     width: 1000px;
     /* Set a reasonable default width */
     margin: 1.75rem auto;
-}
-
-@media (max-width: 992px) {
-    .step {
-        min-width: 150px;
-        /* Even smaller on mobile */
-        padding: 0 20px 0 20px;
-    }
-    .step-text {
-        font-size: 12px;
-        /* Smaller text on mobile */
-    }
 }
 
 .custom-modal-newbid .modal-content {
@@ -174,20 +143,21 @@
     }
 }
 
-.custom-modal-newbid h5,
-p {
+.custom-modal-newbid h5 {
     font-weight: 800;
 }
 
-.modal-content-wrapper {
-    background-color: #f5f5f5;
-    min-height: 64vh;
+.modal-content-wrapper form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .white-card {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    height: 100%;
 }
 
 .white-card .card-label {

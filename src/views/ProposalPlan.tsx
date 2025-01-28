@@ -13,7 +13,7 @@ import {
 } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import "./ProposalPlan.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import StatusMenu from "../buttons/StatusMenu.tsx";
 import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 import SectionMenu from "../buttons/SectionMenu.tsx";
@@ -23,6 +23,7 @@ import ProposalSidepane from "../components/SlidingSidepane.tsx";
 import ReviewerDropdown from "../components/dropdowns/ReviewerDropdown.tsx";
 import QuestionTypeDropdown from "../components/dropdowns/QuestionTypeDropdown.tsx";
 import SectionControls from "../buttons/SectionControls.tsx";
+import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
@@ -642,204 +643,240 @@ const ProposalPlan = () => {
     }
   };
 
+  const parentPages = [{ name: "Tender Dashboard", path: "/bids" }];
+  const location = useLocation();
+  const initialBidName = sharedState.bidInfo;
   return (
     <div className="chatpage">
-        <SideBarSmall />
-      <div className="bidplanner-container">
-      <BidNavbar
-            showViewOnlyMessage={showViewOnlyMessage}
-            initialBidName={"initialBidName"}
-            outline={outline}
-            object_id={object_id}
-            handleRegenerateClick={handleRegenerateClick}
+      <SideBarSmall />
+      <div className="bidplanner-container ">
+        <div className="header-container">
+          <BreadcrumbNavigation
+            currentPage={initialBidName}
+            parentPages={parentPages}
+            showHome={true}
           />
-             <div className="bidplanner-padded-container ">
-          <OutlineInstructionsModal
-            show={showModal}
-            onHide={() => setShowModal(false)}
-            bid_id={object_id}
-            fetchOutline={fetchOutline}
-          />
+        </div>
 
-          {outline.length === 0 ? (
-            <div></div>
-          ) : (
+        <div className="lib-container mt-1">
+          <div>
+            <BidNavbar
+              showViewOnlyMessage={showViewOnlyMessage}
+              initialBidName={initialBidName}
+              outline={outline}
+              object_id={object_id}
+              handleRegenerateClick={handleRegenerateClick}
+            />
+
             <div>
-              <div className="table-responsive mt-3">
-                <table
-                  className="outline-table"
-                  style={{ tableLayout: "fixed" }}
-                >
-                  <thead>
-                    <tr>
-                      <th className="section-col">Section</th>
-                      <th
-                        className="dropdown-col"
-                        style={{ width: "250px", minWidth: "250px" }}
-                      >
-                        Reviewer
-                      </th>
-                      <th
-                        className="dropdown-col"
-                        style={{ width: "250px", minWidth: "250px" }}
-                      >
-                        Question Type
-                      </th>
-                      <th
-                        className="dropdown-col "
-                        style={{ width: "140px", minWidth: "140px" }}
-                      >
-                        Completed
-                      </th>
-                      <th className="text-center" style={{ width: "120px" }}>
-                        Subsections
-                      </th>
-                      <th className="text-center" style={{ width: "130px" }}>
-                        Words
-                      </th>
-                      <th
-                        className="text-center"
-                        style={{ width: "60px" }}
-                      ></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {outline.map((section, index) => {
-                      const isExpanded = expandedSections.has(index);
-                      return (
-                        <React.Fragment key={index}>
-                          <tr
-                            onContextMenu={(e) => handleContextMenu(e, index)}
-                            onClick={(e) => handleRowClick(e, index)}
-                            className="cursor-pointer"
-                          >
-                            <td className="">
-                              <div className="truncate-wrapper">
-                                <Link
-                                  to="#"
-                                  onClick={() => toggleSection(index)}
-                                  className="truncate-text"
-                                >
-                                <span>{section.heading}</span>
-                                </Link>
-                              </div>
-                            </td>
-                            <td className="">
-                              <ReviewerDropdown
-                                value={section.reviewer}
-                                onChange={(value) =>
-                                  handleSectionChange(index, "reviewer", value)
-                                }
-                                contributors={contributors}
-                              />
-                            </td>
-                            <td className="">
-                              <QuestionTypeDropdown
-                                value={section.choice}
-                                onChange={(value) =>
-                                  handleSectionChange(index, "choice", value)
-                                }
-                              />
-                            </td>
-                            <td className="text-center">
-                              <StatusMenu
-                                value={section.status}
-                                onChange={(value) => {
-                                  handleSectionChange(index, "status", value);
-                                }}
-                              />
-                            </td>
-                            <td className="text-center">
-                              {section.subsections}
-                            </td>
-                            <td className="text-center">
-                              <input
-                                type="number"
-                                value={section.word_count || 0}
-                                min="0"
-                                step="50"
-                                className="form-control d-inline-block word-count-input"
-                                style={{
-                                  fontSize: "1.143rem",
-                                  width: "6.875rem",
-                                  textAlign: "center"
-                                }}
-                                onChange={(e) => {
-                                  const value = parseInt(e.target.value);
-                                  if (!isNaN(value) && value >= 0) {
-                                    handleSectionChange(
-                                      index,
-                                      "word_count",
-                                      value
-                                    );
-                                  }
-                                }}
-                              />
-                            </td>
+              <OutlineInstructionsModal
+                show={showModal}
+                onHide={() => setShowModal(false)}
+                bid_id={object_id}
+                fetchOutline={fetchOutline}
+              />
 
-                            <td className="text-center">
-                              <div className="d-flex justify-content-center pe-2">
-                                <SectionControls
-                                  onDelete={() =>
-                                    handleDeleteClick(section, index)
-                                  }
-                                  onMoveDown={() =>
-                                    handleMoveSection(index, "down")
-                                  }
-                                  onMoveUp={() =>
-                                    handleMoveSection(index, "up")
-                                  }
-                                  isFirst={index === 0}
-                                  isLast={index === outline.length - 1}
-                                />
-                              </div>
-                            </td>
-                          </tr>
-                        </React.Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              {contextMenu && (
-                <SectionMenu
-                  x={contextMenu.x}
-                  y={contextMenu.y}
-                  onClose={() => setContextMenu(null)}
-                  onAddSection={handleAddSection}
-                  onDeleteSection={handleDeleteSection}
-                />
-              )}
-              {selectedSection !== null && (
-                <ProposalSidepane
-                  section={outline[selectedSection]}
-                  contributors={contributors}
-                  index={selectedSection}
-                  isOpen={isSidepaneOpen}
-                  onClose={() => {
-                    setIsSidepaneOpen(false);
-                    setSelectedSection(null);
-                  }}
-                  isLoading={isLoading}
-                  isPreviewLoading={isPreviewLoading}
-                  handleEditClick={handleEditClick}
-                  handleSectionChange={handleSectionChange}
-                  sendQuestionToChatbot={sendQuestionToChatbot}
-                  apiChoices={apiChoices}
-                  renderChoices={renderChoices}
-                  selectedChoices={selectedChoices}
-                  submitSelections={submitSelections}
-                  handleDeleteSubheading={handleDeleteSubheading}
-                  totalSections={outline.length} // Add this
-                  onNavigate={handleSectionNavigation} // Add this
-                />
+              {outline.length === 0 ? (
+                <div></div>
+              ) : (
+                <div>
+                  <div className="table-responsive mt-5">
+                    <table
+                      className="outline-table"
+                      style={{ tableLayout: "fixed" }}
+                    >
+                      <thead>
+                        <tr>
+                          <th className="section-col">Section</th>
+                          <th
+                            className="dropdown-col"
+                            style={{ width: "250px", minWidth: "250px" }}
+                          >
+                            Reviewer
+                          </th>
+                          <th
+                            className="dropdown-col"
+                            style={{ width: "250px", minWidth: "250px" }}
+                          >
+                            Question Type
+                          </th>
+                          <th
+                            className="dropdown-col"
+                            style={{ width: "140px", minWidth: "140px" }}
+                          >
+                            Completed
+                          </th>
+                          <th
+                            className="text-center"
+                            style={{ width: "120px" }}
+                          >
+                            Subsections
+                          </th>
+                          <th
+                            className="text-center"
+                            style={{ width: "130px" }}
+                          >
+                            Words
+                          </th>
+                          <th
+                            className="text-center"
+                            style={{ width: "60px" }}
+                          ></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {outline.map((section, index) => {
+                          const isExpanded = expandedSections.has(index);
+                          return (
+                            <React.Fragment key={index}>
+                              <tr
+                                onContextMenu={(e) =>
+                                  handleContextMenu(e, index)
+                                }
+                                onClick={(e) => handleRowClick(e, index)}
+                                className="cursor-pointer"
+                              >
+                                <td>
+                                  <div className="truncate-wrapper">
+                                    <Link
+                                      to="#"
+                                      onClick={() => toggleSection(index)}
+                                      className="truncate-text"
+                                    >
+                                      <span>{section.heading}</span>
+                                    </Link>
+                                  </div>
+                                </td>
+                                <td>
+                                  <ReviewerDropdown
+                                    value={section.reviewer}
+                                    onChange={(value) =>
+                                      handleSectionChange(
+                                        index,
+                                        "reviewer",
+                                        value
+                                      )
+                                    }
+                                    contributors={contributors}
+                                  />
+                                </td>
+                                <td>
+                                  <QuestionTypeDropdown
+                                    value={section.choice}
+                                    onChange={(value) =>
+                                      handleSectionChange(
+                                        index,
+                                        "choice",
+                                        value
+                                      )
+                                    }
+                                  />
+                                </td>
+                                <td className="text-center">
+                                  <StatusMenu
+                                    value={section.status}
+                                    onChange={(value) => {
+                                      handleSectionChange(
+                                        index,
+                                        "status",
+                                        value
+                                      );
+                                    }}
+                                  />
+                                </td>
+                                <td className="text-center">
+                                  {section.subsections}
+                                </td>
+                                <td className="text-center">
+                                  <input
+                                    type="number"
+                                    value={section.word_count || 0}
+                                    min="0"
+                                    step="50"
+                                    className="form-control d-inline-block word-count-input"
+                                    style={{
+                                      fontSize: "1.143rem",
+                                      width: "6.875rem",
+                                      textAlign: "center"
+                                    }}
+                                    onChange={(e) => {
+                                      const value = parseInt(e.target.value);
+                                      if (!isNaN(value) && value >= 0) {
+                                        handleSectionChange(
+                                          index,
+                                          "word_count",
+                                          value
+                                        );
+                                      }
+                                    }}
+                                  />
+                                </td>
+                                <td className="text-center">
+                                  <div className="d-flex justify-content-center pe-2">
+                                    <SectionControls
+                                      onDelete={() =>
+                                        handleDeleteClick(section, index)
+                                      }
+                                      onMoveDown={() =>
+                                        handleMoveSection(index, "down")
+                                      }
+                                      onMoveUp={() =>
+                                        handleMoveSection(index, "up")
+                                      }
+                                      isFirst={index === 0}
+                                      isLast={index === outline.length - 1}
+                                    />
+                                  </div>
+                                </td>
+                              </tr>
+                            </React.Fragment>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {contextMenu && (
+                    <SectionMenu
+                      x={contextMenu.x}
+                      y={contextMenu.y}
+                      onClose={() => setContextMenu(null)}
+                      onAddSection={handleAddSection}
+                      onDeleteSection={handleDeleteSection}
+                    />
+                  )}
+
+                  {selectedSection !== null && (
+                    <ProposalSidepane
+                      section={outline[selectedSection]}
+                      contributors={contributors}
+                      index={selectedSection}
+                      isOpen={isSidepaneOpen}
+                      onClose={() => {
+                        setIsSidepaneOpen(false);
+                        setSelectedSection(null);
+                      }}
+                      isLoading={isLoading}
+                      isPreviewLoading={isPreviewLoading}
+                      handleEditClick={handleEditClick}
+                      handleSectionChange={handleSectionChange}
+                      sendQuestionToChatbot={sendQuestionToChatbot}
+                      apiChoices={apiChoices}
+                      renderChoices={renderChoices}
+                      selectedChoices={selectedChoices}
+                      submitSelections={submitSelections}
+                      handleDeleteSubheading={handleDeleteSubheading}
+                      totalSections={outline.length}
+                      onNavigate={handleSectionNavigation}
+                    />
+                  )}
+                </div>
               )}
             </div>
-          )}
-        </div>
+          </div>
         </div>
       </div>
-    
+    </div>
   );
 };
 

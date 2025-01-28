@@ -1,0 +1,208 @@
+.cards-container {
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+.cardmini {
+    justify-content: center !important;
+    width: 40%;
+    height: auto;
+    /* Adjust height to auto for better scaling */
+    background-color: white;
+    padding: 60px;
+    /* Reduce padding for smaller screens */
+    border-radius: 4px;
+}
+
+.cardmini-text h2 {
+    font-size: 1.6em;
+    font-weight: bold;
+    text-align: left;
+    padding-left: 0px;
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+.cardmini-text p {
+    text-align: left;
+    padding-left: 0px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+.input-field {
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+
+/* Add these styles to your Signin.css */
+
+
+/* Input field container styles */
+
+.input-field .MuiTextField-root {
+    /* Increase overall size of the input container */
+    margin: 8px 0;
+}
+
+
+/* Input text size */
+
+.input-field .MuiInputBase-input {
+    font-size: 1.1rem;
+    /* Increase input text size */
+    padding: 0px 14px;
+    /* Increase padding to make input field larger */
+}
+
+
+/* Label size when floating */
+
+.input-field .MuiInputLabel-root {
+    font-size: 1.1rem;
+    /* Increase label text size */
+}
+
+
+/* Label size when shrunk (floating above) */
+
+.input-field .MuiInputLabel-shrink {
+    font-size: 1.2rem;
+    /* Size of the floating label */
+    transform: translate(14px, -9px) scale(0.75);
+    /* Adjust position of shrunk label */
+}
+
+
+/* Make the input fields taller */
+
+.input-field .MuiOutlinedInput-root {
+    min-height: 50px;
+    /* Increase height of the input container */
+}
+
+
+/* Responsive adjustments */
+
+@media (max-width: 768px) {
+    .input-field .MuiInputBase-input {
+        font-size: 1rem;
+        padding: 12px 14px;
+    }
+    .input-field .MuiInputLabel-root {
+        font-size: 1rem;
+    }
+    .input-field .MuiInputLabel-shrink {
+        font-size: 1.1rem;
+    }
+    .input-field .MuiOutlinedInput-root {
+        min-height: 48px;
+    }
+}
+
+.login-button {
+    width: 100%;
+    padding: 8px 0;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    background-color: #262626 !important;
+    color: white;
+}
+
+.login-button:hover {
+    background-color: #707070;
+}
+
+
+/* Autofill styles */
+
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px white inset !important;
+    box-shadow: 0 0 0 1000px white inset !important;
+    -webkit-text-fill-color: black !important;
+}
+
+
+/* Responsive design */
+
+@media (max-width: 768px) {
+    .cardmini {
+        width: 80%;
+        padding: 40px;
+        /* Further reduce padding for smaller screens */
+    }
+    .cardmini-text h2 {
+        font-size: 1.4em;
+    }
+    .cardmini-text p {
+        margin-top: 8px;
+        margin-bottom: 20px;
+    }
+    .login-button {
+        padding: 6px 0;
+        margin-top: 12px;
+        margin-bottom: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cardmini {
+        width: 90%;
+        padding: 20px;
+        /* Further reduce padding for very small screens */
+    }
+    .cardmini-text h2 {
+        font-size: 1.2em;
+    }
+    .cardmini-text p {
+        margin-top: 6px;
+        margin-bottom: 15px;
+    }
+    .login-button {
+        padding: 4px 0;
+        margin-top: 10px;
+        margin-bottom: 4px;
+    }
+}
+
+
+/* Signin.css */
+
+.modal-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    margin: 100px auto;
+    /* Center the modal vertically */
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-container h2 {
+    margin-top: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.modal-container p {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    margin-left: 10px;
+}

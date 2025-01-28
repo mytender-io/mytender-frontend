@@ -9,7 +9,25 @@ import "./LibrarySidepane.css";
 interface LibrarySidepaneProps {
   isOpen: boolean;
   onToggle: () => void;
+  children?: React.ReactNode; // Add this to accept children props
 }
+
+// Main Layout Component
+const LibraryLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="library-layout">
+      <div className={`library-main-content ${isOpen ? 'sidebar-open' : ''}`}>
+        {children}
+      </div>
+      <LibrarySidepane 
+        isOpen={isOpen} 
+        onToggle={() => setIsOpen(!isOpen)} 
+      />
+    </div>
+  );
+};
 
 const LibrarySidepane: React.FC<LibrarySidepaneProps> = ({
   isOpen,
@@ -17,29 +35,70 @@ const LibrarySidepane: React.FC<LibrarySidepaneProps> = ({
 }) => {
   return (
     <div className={`library-sidepane ${isOpen ? "open" : ""}`}>
-      {/* Toggle button */}
       <button onClick={onToggle} className="toggle-button">
         <FontAwesomeIcon
           icon={isOpen ? faChevronRight : faChevronLeft}
           className="toggle-icon"
         />
       </button>
-      {/* Main content */}
       <div className={`library-sidepane-content ${isOpen ? "visible" : ""}`}>
         <h3 className="content-title">Company Data</h3>
-        {/* Accordion sections */}
         <div className="accordion-container">
           <AccordionItem title="What do I upload?">
-            Upload documents, spreadsheets, and other relevant company files
-            that you want to manage and organize.
+            <p>
+              We recommend you upload everything that a new intern that just
+              started at your company would need to create a bid response.
+            </p>
+            <p>
+              This includes all the relevant company details asked in PQQs and a
+              (recent) winning bid you have written for every service you bid
+              on.
+            </p>
+            <p>
+              The sweet spot is around 3 bids, but 1 will get you off the mark!
+            </p>
           </AccordionItem>
+
           <AccordionItem title="How is this information used?">
-            This information is securely stored and organized for easy access
-            and management within your library.
+            <p>
+              When you put a question through our system, it firstly considers
+              the question, inputs and information from the tender.
+            </p>
+            <p>
+              It looks through the company library to search for the most
+              relevant and contextually accurate piece of information to help
+              evidence your bid - all without you having to spend hours
+              searching through outdated bid libraries.
+            </p>
           </AccordionItem>
+
+          <AccordionItem title="How do we safely store your data?">
+            <p>
+              Security is key and a pillar of our philosophy at mytender.io.
+            </p>
+            <p>
+              The key point is that your data is in a completely separate area
+              and database from any other users of our platform and none of your
+              data is used to train any of our own or the models we use.
+            </p>
+            <p>We are also currently going through an ISO 27001 audit.</p>
+          </AccordionItem>
+
           <AccordionItem title="How much does the quality of my data matter?">
-            High-quality, well-organized data ensures better searchability and
-            usability of your content library.
+            <p>
+              A great question! Here's a formula we created to help understand
+              its impact:
+            </p>
+            <p>
+              Bid Context Quality = Data Quality + Relevance to Tender Context +
+              Integration into the narrative
+            </p>
+            <p>
+              So whilst we often hear people think it is solely reliant on the
+              quality of the content uploaded, we believe it is only one aspect
+              of the overall equation that supports the contextual support of
+              the overall bid.
+            </p>
           </AccordionItem>
         </div>
       </div>
@@ -75,4 +134,4 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ title, children }) => {
   );
 };
 
-export default LibrarySidepane;
+export { LibraryLayout, LibrarySidepane };

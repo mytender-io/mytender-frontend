@@ -1,13 +1,13 @@
 .table-wrapper {
     position: relative;
-    height: calc(100vh - 280px);
+    height: calc(100vh - 180px);
     overflow-x: auto;
     overflow-y: auto;
     margin-top: 1.429rem;
 }
 
 .header-container {
-    height: 7.143rem !important;
+    height: 5rem !important;
     padding-left: 22.857rem;
     padding-right: 2.143rem;
     display: flex;

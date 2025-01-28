@@ -16,7 +16,7 @@
 }
 
 .sidelinks {
-    padding-top: 1.429rem;
+    padding-top: 0rem;
 }
 
 .sidebarsmall.collapsed {
@@ -136,8 +136,8 @@
     margin-bottom: 0.714rem;
     padding: 1.786rem 1.429rem;
     overflow: hidden;
-    border-bottom: 0.143rem solid #ebecef;
-    height: 7.143rem !important;
+    /* border-bottom: 0.143rem solid #ebecef; */
+    height: 5rem !important;
 }
 
 .sidebar-header img {

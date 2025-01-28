@@ -388,28 +388,26 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         return (
           <div className="selectfolder-container mt-0 p-0">
             <div className="white-card p-4 ">
-              <Form.Group className="mb-3">
+              <Form.Group className="mb-4">
                 <Form.Label className="card-label">Tender Name:</Form.Label>
                 <Form.Control
                   type="text"
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
-                  placeholder="Enter client name"
+                  placeholder="Enter tender name"
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Group className="mb-3">
-                  <Form.Label className="card-label">Deadline:</Form.Label>
-                  <CustomDateInput
-                    value={deadline}
-                    onChange={(value) => setDeadline(value)} // Direct value handling
-                    defaultValue={new Date().toISOString().split("T")[0]}
-                  />
-                </Form.Group>
+              <Form.Group className="mb-4">
+                <Form.Label className="card-label">Deadline:</Form.Label>
+                <CustomDateInput
+                  value={deadline}
+                  onChange={(value) => setDeadline(value)} // Direct value handling
+                  defaultValue={new Date().toISOString().split("T")[0]}
+                />
               </Form.Group>
 
-              <Form.Group className="mb-3">
+              <Form.Group className="mb-4">
                 <Form.Label className="card-label">Contract Value:</Form.Label>
                 <Form.Control
                   type="text"
@@ -478,9 +476,10 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         return (
           <div>
             <div className="">
+              <p>
               Select the folders below from your content library to use as
               context in your final proposal. The AI will be able to use
-              information from these when generating an answer.
+              information from these when generating an answer.</p>
             </div>
 
             <div className="selectfolder-container mt-3">
@@ -556,10 +555,10 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
           </div>
         </div>
         <div
-          className="modal-content-wrapper px-4 py-3"
+          className="modal-content-wrapper px-5 py-5"
           style={{ backgroundColor: "#f5f5f5" }}
         >
-          <h5 className="mb-3">
+          <h5 className="mb-3 new-bid-modal-header">
             {currentStep === "details"
               ? "Tender Details"
               : currentStep === "documents"

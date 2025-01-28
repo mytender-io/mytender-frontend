@@ -24,6 +24,7 @@ import withAuth from "../routes/withAuth.tsx";
 import BidStatusMenu from "../buttons/BidStatusMenu.tsx";
 import KanbanView from "./KanbanView.tsx";
 import NewTenderModal from "../modals/NewTenderModal.tsx";
+import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 
 const Bids = () => {
   const [bids, setBids] = useState([]);
@@ -393,35 +394,54 @@ const Bids = () => {
     </tr>
   );
 
+  const parentPages = [
+ 
+  ];
+
+
   return (
     <div>
       <SideBarSmall onCollapseChange={setSidebarCollapsed} />
-      <div className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
-            <h1 >Tender Dashboard</h1>
-            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-              <SearchInput value={searchTerm} onChange={setSearchTerm} />
-              <Button
-                onClick={handleWriteProposalClick}
-                className="upload-button"
-                id="new-bid-button"
-              >
-                <FontAwesomeIcon icon={faPlus} style={{ marginRight: "8px" }} />
-                New Tender
-              </Button>
-            </div>
-          </div>
+      <div
+        className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+      >
+        <BreadcrumbNavigation
+          currentPage="Tender Dashboard"
+          parentPages={parentPages}
+          showHome={true}
+        />
+
+        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          <SearchInput value={searchTerm} onChange={setSearchTerm} />
+        </div>
+      </div>
 
       <div
         className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
       >
         <div>
-        
+          <h1 className="mt-3">Tender Dashboard</h1>
+
           <div
-            style={{ display: "flex", justifyContent: "space-between" }}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}
             className="mt-3"
           >
-            <p> 14 Results</p>
+            <p style={{ margin: 0 }}>{filteredBids.length} Results</p>
+            <div>
+              <Button
+                onClick={handleWriteProposalClick}
+                className="upload-button me-3"
+                id="new-bid-button"
+              >
+                <FontAwesomeIcon icon={faPlus} style={{ marginRight: "8px" }} />
+                New Tender
+              </Button>
               <ViewToggle value={viewType} onChange={handleViewChange} />
+            </div>
           </div>
           {viewType === "table" ? (
             <div className="table-wrapper">

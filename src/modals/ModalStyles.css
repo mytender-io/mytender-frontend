@@ -1,0 +1,14 @@
+.h6 {
+  font-size: 6rem !important;
+  font-weight: bold;
+}
+
+.modal-title {
+  font-weight: 800;
+  font-size: 2rem;
+}
+
+.modal-text {
+  font-weight: 600;
+  font-size: 2rem;
+}

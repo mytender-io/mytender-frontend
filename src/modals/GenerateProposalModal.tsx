@@ -329,7 +329,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
     <>
       <button className="orange-button" onClick={handleShow}>
         <FontAwesomeIcon icon={faRocket} className="pr-2" />
-        <span className="modal-title">Generate Proposal</span>
+        <span className="">Generate Proposal</span>
       </button>
       <Modal
         show={show}

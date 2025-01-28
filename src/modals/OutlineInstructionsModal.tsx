@@ -19,6 +19,7 @@ import SelectFolder from "../components/SelectFolder";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import SelectTenderLibraryFile from "../components/SelectTenderLibraryFile";
 import { LinearProgress, Typography, Box } from "@mui/material";
+import './ModalStyles.css';
 
 const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
   const getAuth = useAuthUser();
@@ -131,8 +132,8 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
             variant="determinate"
             {...props}
             sx={{
-              height: 10,
-              borderRadius: 5,
+              height: "0.625rem", // 10px
+              borderRadius: "0.3125rem", // 5px
               backgroundColor: "#ffd699",
               "& .MuiLinearProgress-bar": {
                 backgroundColor: "#ff9900"
@@ -140,7 +141,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
             }}
           />
         </Box>
-        <Box sx={{ minWidth: 35, mt: 1, textAlign: "center" }}>
+        <Box sx={{ minWidth: "2.1875rem", mt: 1, textAlign: "center" }}> {/* 35px */}
           <Typography variant="body2" color="text.secondary">
             {`${Math.round(props.value)}%`}
           </Typography>
@@ -286,6 +287,23 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
     }
   };
 
+
+
+  const onCancel = () => {
+    if (!sharedState.outline || sharedState.outline.length === 0) {
+      navigate("/bid-extractor");
+    } else {
+      onHide();
+    }
+  };
+
+  const getHeaderTitle = () => {
+    if (currentStep === 1) {
+      return "Instructions";
+    }
+    return `Step ${currentStep - 1} of 3`;
+  };
+
   const renderStepContent = () => {
     if (currentStep === 1) {
       return (
@@ -295,9 +313,9 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
               <div
                 className="text-white rounded-circle d-flex align-items-center justify-content-center"
                 style={{
-                  width: "32px",
-                  height: "32px",
-                  minWidth: "32px",
+                  width: "2rem", // 32px
+                  height: "2rem", // 32px
+                  minWidth: "2rem", // 32px
                   backgroundColor: "#FF8C00"
                 }}
               >
@@ -317,9 +335,9 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
               <div
                 className="text-white rounded-circle d-flex align-items-center justify-content-center"
                 style={{
-                  width: "32px",
-                  height: "32px",
-                  minWidth: "32px",
+                  width: "2rem", // 32px
+                  height: "2rem", // 32px
+                  minWidth: "2rem", // 32px
                   backgroundColor: "#FF8C00"
                 }}
               >
@@ -338,9 +356,9 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
               <div
                 className="text-white rounded-circle d-flex align-items-center justify-content-center"
                 style={{
-                  width: "32px",
-                  height: "32px",
-                  minWidth: "32px",
+                  width: "2rem", // 32px
+                  height: "2rem", // 32px
+                  minWidth: "2rem", // 32px
                   backgroundColor: "#FF8C00"
                 }}
               >
@@ -377,7 +395,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
             className="alert alert-info"
             style={{
               backgroundColor: "rgba(255, 140, 0, 0.08)",
-              border: "1px solid #FF8C00",
+              border: "0.0625rem solid #FF8C00", // 1px
               color: "#FF8C00"
             }}
           >
@@ -415,13 +433,13 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
       );
     } else if (currentStep === 4) {
       return (
-        <div className="px-4">
+        <div className="px-4 modal-text">
           <h4 className="mb-3">
             Outline Generated Successfully
             <FontAwesomeIcon
               icon={faCheck}
               className="text-success"
-              style={{ fontSize: "26px", marginLeft: "10px" }}
+              style={{ fontSize: "1.625rem", marginLeft: "0.625rem" }} // 26px, 10px
             />
           </h4>
           <p className="text-muted">
@@ -431,7 +449,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
 
           <div className="bg-gray-50 rounded-lg p-6">
             <h5 className="text-gray-600 mb-0">Next Steps:</h5>
-            <ol style={{ padding: "12px", paddingBottom: "0px" }}>
+            <ol style={{ padding: "0.75rem", paddingBottom: "0rem" }}> {/* 12px, 0px */}
               <li>
                 <strong>Review Questions:</strong>
                 <p className="text-muted mb-2">
@@ -465,20 +483,6 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
     }
   };
 
-  const onCancel = () => {
-    if (!sharedState.outline || sharedState.outline.length === 0) {
-      navigate("/bid-extractor");
-    } else {
-      onHide();
-    }
-  };
-
-  const getHeaderTitle = () => {
-    if (currentStep === 1) {
-      return "Instructions";
-    }
-    return `Step ${currentStep - 1} of 3`;
-  };
 
   return (
     <Modal show={show} onHide={onCancel} size="lg" centered>

@@ -2,12 +2,12 @@
     width: 100vw;
     background-color: white;
     justify-content: center;
-    padding-top: 1.429rem;
-    padding-bottom: 1.071rem;
+    padding-top: 0rem;
+    padding-bottom: 2.5rem;
     padding-left: 22.857rem;
     padding-right: 2.143rem;
     overflow-x: hidden !important;
-    overflow-y: auto;
+    overflow-y: hidden;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transition-delay: 0.05s;
 }
@@ -149,6 +149,7 @@
     border-radius: 1.786rem;
     z-index: 1;
     height: 3.214rem;
+    font-size: 1.143rem;
     margin-left: 0;
 }
 
@@ -166,6 +167,8 @@
     box-sizing: border-box;
     height: 3.214rem;
     padding-right: 2.143rem;
+    font-size: 1.143rem;
+    font-weight: 600;
 }
 
 .search-icon {
@@ -173,7 +176,7 @@
     left: 1.071rem;
     color: #333 !important;
     pointer-events: none;
-    font-size: 1rem !important;
+    font-size: 1.2rem !important;
     z-index: 100;
     margin: 0;
 }
@@ -190,6 +193,7 @@
 
 .search-results-dropdown {
     position: absolute;
+    font-size: 1.143rem;
     top: 100%;
     left: 0;
     background-color: white;

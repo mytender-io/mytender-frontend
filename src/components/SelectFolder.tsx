@@ -74,7 +74,9 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
                 }
               }}
             >
-              {formatDisplayName(part)}
+              {part === "default"
+                ? "Whole Content Library"
+                : formatDisplayName(part)}
             </span>
           </React.Fragment>
         ))}
@@ -83,7 +85,6 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   };
 
   const fetchFolderStructure = async () => {
-    setIsLoading(true); // Set loading to true before fetching
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/get_collections`,
@@ -91,7 +92,9 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
 
+      //console.log(response.data);
       setAvailableCollections(response.data.collections);
+      //console.log(response.data.collections);
       const structure = {};
       response.data.collections.forEach((collectionName) => {
         const parts = collectionName.split("FORWARDSLASH");
@@ -108,10 +111,9 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
     } catch (error) {
       console.error("Error fetching folder structure:", error);
     } finally {
-      setIsLoading(false); // Set loading to false after fetching
+      setIsLoading(false); // Set loading to false after fetching, whether successful or not
     }
   };
-
   const fetchFolderContents = async (folderPath) => {
     try {
       const response = await axios.post(
@@ -121,11 +123,12 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
       );
 
       const filesWithIds = response.data.map((item) => ({
-        filename: item.meta,
+        filename: item.filename,
         unique_id: item.unique_id,
         isFolder: false
       }));
 
+      // Get subfolders
       const subfolders = availableCollections
         .filter((collection) =>
           collection.startsWith(folderPath + "FORWARDSLASH")
@@ -140,17 +143,15 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
         });
 
       const allContents = [...subfolders, ...filesWithIds];
+
       setFolderContents((prevContents) => ({
         ...prevContents,
         [folderPath]: allContents
       }));
     } catch (error) {
       console.error("Error fetching folder contents:", error);
-    } finally {
-      setIsLoading(false); // Set loading to false after fetching
     }
   };
-
   const handleFolderClick = (folderPath) => {
     setActiveFolder(folderPath);
     if (!folderContents[folderPath]) {
@@ -217,6 +218,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   }, [activeFolder, folderContents, availableCollections]);
 
   const formatDisplayName = (name) => {
+    if (typeof name !== "string") return "";
     return name.replace(/_/g, " ");
   };
 
@@ -238,7 +240,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
             <FontAwesomeIcon
               icon={faFolder}
               className="fa-icon"
-              style={{ marginRight: "10px" }}
+              style={{ marginRight: "0.625rem" }}
             />
             {displayName}
           </td>
@@ -256,16 +258,39 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
 
   const renderFolderContents = (folderPath) => {
     const contents = folderContents[folderPath] || [];
-    const contentsToRender = contents;
-    console.log(contentsToRender.length);
+    //console.log("Raw contents:", contents);
 
-    return contentsToRender.map(({ filename, isFolder }, index) => {
+    // Filter to only show direct children
+    const directChildren = contents.filter(({ unique_id, isFolder }) => {
+      console.log("\nChecking item:", unique_id);
+
+      if (!isFolder) return true; // Files are always direct children
+
+      // Get the relative path by removing the current folder path
+      const relativePath = unique_id.replace(folderPath + "FORWARDSLASH", "");
+      //console.log("Relative path:", relativePath);
+
+      // Count how many FORWARDSLASH are in the relative path
+      const forwardSlashCount = (relativePath.match(/FORWARDSLASH/g) || [])
+        .length;
+      //console.log("Forward slash count:", forwardSlashCount);
+
+      // A direct child should have no additional FORWARDSLASH in its relative path
+      const isDirectChild = forwardSlashCount === 0;
+      //onsole.log("Is direct child?", isDirectChild);
+
+      return isDirectChild;
+    });
+
+    //console.log("Filtered direct children:", directChildren);
+
+    return directChildren.map(({ filename, unique_id, isFolder }, index) => {
       const fullPath = isFolder
         ? `${folderPath}FORWARDSLASH${filename}`
         : folderPath;
       const displayName = formatDisplayName(filename);
       return (
-        <tr key={`${folderPath}-${index}`}>
+        <tr key={`${folderPath}-${index}`} style={{ cursor: "pointer" }}>
           <td
             className="folder-name"
             onClick={() => isFolder && handleFolderClick(fullPath)}
@@ -329,11 +354,6 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
           )}
         </div>
       </Card.Body>
-      <style jsx>{`
-        .library-table td {
-          padding: 13px;
-        }
-      `}</style>
     </Card>
   );
 };

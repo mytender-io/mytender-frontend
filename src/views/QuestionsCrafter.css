@@ -3,34 +3,33 @@
   word-wrap: break-word;
   display: flex;
   flex-direction: column;
-  margin-bottom: 40px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid #ced4da;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 0.375rem 0.75rem rgba(0, 0, 0, 0.15);
+  border: 0.0625rem solid #ced4da;
   border-top: none;
   overflow-x: hidden;
-  height: 800px;
+  height: 50rem;
   overflow-y: none;
 }
 
 .input-header {
   flex: 1;
-  padding: 14px;
+  padding: 0.875rem;
   display: flex;
   flex-direction: column;
-  height: 66px;
+  height: 4.125rem;
   background-color: #262626;
-  border-top: 1px solid #ced4da;
-  border-right: 1px solid #ced4da;
-  border-left: 1px solid #ced4da;
-  /* Change this color to the desired border-bottom color */
+  border-top: 0.0625rem solid #ced4da;
+  border-right: 0.0625rem solid #ced4da;
+  border-left: 0.0625rem solid #ced4da;
 }
 
 .input-console {
   flex: 1;
-  padding: 14px;
+  padding: 0.875rem;
   display: flex;
   flex-direction: column;
-  max-height: 140px;
+  max-height: 9.5rem;
   background-color: #262626;
 }
 
@@ -40,7 +39,7 @@
   display: flex;
   flex-direction: column;
   background-color: white;
-  padding: 10px;
+  padding: 0.625rem;
 }
 
 .spinner-container {
@@ -49,51 +48,56 @@
   justify-content: center;
   align-items: center;
   height: 100%;
-  /* Ensure the spinner is centered within the container */
 }
 
 .spinner-container p {
-  margin-top: 10px;
+  margin-top: 0.625rem;
   font-size: 1rem;
   color: #333;
-  /* Adjust the color as needed */
+}
+
+.word-count {
+  font-size: 1.143rem;
+}
+
+.question-answer-box {
+  flex: 1;
+  border: 0.2rem solid #ebecef;
+  background-color: #fff;
+  padding: 0.3125rem;
+  transition: all 0.35s ease;
+  margin: 0;
+  word-wrap: break-word;
+  height: 6.25rem;
+  border-radius: 0.5rem;
+  font-size: 1.143rem !important;
 }
 
 .response-box {
   position: relative;
   flex: 1;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid #ced4da;
+  border: 0.2rem solid #ebecef;
   background-color: #fff;
-  padding: 20px;
   transition: all 0.35s ease;
   margin: 0;
   word-wrap: break-word;
-  width: 100%s;
-  height: 150px;
+  width: 100%;
   overflow-y: auto;
-  padding-top: 10px;
-  /* Show scrollbar only when necessary */
-}
-
-/* In your CSS file (e.g., Signin.css or a new CSS file) */
-
-.editor-container {
-  font-weight: 450;
-  /* Set desired font weight */
+  border-radius: 0.5rem;
+  height: 50rem !important;
+  font-size: 1.143rem;
 }
 
 .response-contenteditable {
   width: 100%;
   height: 100%;
-  padding: 10px;
-  font-size: 16px;
+  padding: 0.625rem;
+  font-size: 1rem;
   line-height: 1.5;
   outline: none;
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow: auto;
-  /* Ensure the content is scrollable */
 }
 
 .highlight {
@@ -106,89 +110,45 @@
   border-top-left-radius: 0;
   color: black;
   display: flex;
-  /* Inline block to fit content */
   max-width: 100%;
-  min-width: 60px;
-  padding: 14px;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  min-width: 3.75rem;
+  padding: 0.875rem;
+  border-radius: 0.625rem;
+  margin-bottom: 0.625rem;
   word-wrap: break-word;
-  font-size: 16px;
-  max-height: 540px;
-  /* Set your preferred maximum height */
+  font-size: 1rem;
+  max-height: 33.75rem;
   overflow-y: auto;
 }
 
 .option-item::-webkit-scrollbar-thumb {
   background: #888;
-  border-radius: 10px;
-  border: 3px solid;
+  border-radius: 0.625rem;
+  border: 0.1875rem solid;
   border-color: #e3e4e6;
-  max-height: 10px;
-}
-
-.options-button {
-  cursor: pointer;
-  background-color: #262626;
-  color: #fff;
-  padding: 8px 12px;
-  font-weight: 600;
-  font-size: 1rem;
-  position: relative;
-  transition: background 0s ease-in-out;
-  border: none;
-  border-radius: 12px;
-  /* Add rounded corners */
-}
-
-.options-button svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  fill: none;
-  stroke: #fff;
-  stroke-width: 4;
-  stroke-dasharray: 480;
-  stroke-dashoffset: 0;
-}
-
-.options-button svg rect {
-  rx: 12;
-  ry: 12;
-}
-
-.options-button span {
-  color: white;
-  position: relative;
-  z-index: 1;
-}
-
-.options-button.selected svg {
-  animation: dashAnimation 2s linear infinite;
+  max-height: 0.625rem;
 }
 
 @keyframes dashAnimation {
   0% {
-    stroke-dashoffset: 150;
+    stroke-dashoffset: 9.375rem;
   }
   25% {
-    stroke-dashoffset: 240;
+    stroke-dashoffset: 15rem;
   }
   50% {
-    stroke-dashoffset: 300;
+    stroke-dashoffset: 18.75rem;
   }
   75% {
-    stroke-dashoffset: 360;
+    stroke-dashoffset: 22.5rem;
   }
   100% {
-    stroke-dashoffset: 480;
+    stroke-dashoffset: 30rem;
   }
 }
 
 .option {
-  padding: 10px;
+  padding: 0.625rem;
 }
 
 .option-content {
@@ -198,8 +158,8 @@
 
 .tick-icon {
   cursor: pointer;
-  width: 10px;
-  height: 10px;
+  width: 0.625rem;
+  height: 0.625rem;
 }
 
 @keyframes pulse {
@@ -218,10 +178,10 @@
   background-color: green;
   color: #fff;
   border: none;
-  margin-left: 10px;
+  margin-left: 0.625rem;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -239,7 +199,6 @@
 
 .tick-button.clicked {
   background-color: darkgreen;
-  /* Optional: Stop animation on click */
 }
 
 .prompts-container {
@@ -254,10 +213,10 @@
 
 .prompts::-webkit-scrollbar-thumb {
   background: #888;
-  border-radius: 10px;
-  border: 3px solid;
+  border-radius: 0.625rem;
+  border: 0.1875rem solid;
   border-color: #262626 !important;
-  max-height: 10px;
+  max-height: 0.625rem;
 }
 
 .prompts-container.fade-out {
@@ -266,21 +225,20 @@
 
 .prompts {
   background-color: #262626;
-  /* Assuming each button is around 40px tall */
   overflow-y: auto;
 }
 
 .prompt-button {
-  padding: 10px;
+  padding: 0.625rem;
   border-radius: 0;
   background-color: #262626;
   color: white;
   text-align: left;
-  border: 2px solid #555555;
+  border: 0.125rem solid #555555;
   border-top: none;
   width: 100%;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 0.875rem;
   transition:
     font-size 0.3s ease,
     opacity 0.5s ease;
@@ -294,7 +252,7 @@
 
 @keyframes slideIn {
   0% {
-    transform: translateY(-20px);
+    transform: translateY(-1.25rem);
     opacity: 0;
   }
   100% {
@@ -309,53 +267,50 @@
     opacity: 1;
   }
   100% {
-    transform: translateY(-20px);
+    transform: translateY(-1.25rem);
     opacity: 0;
   }
 }
 
 .prompt-button:hover {
   background-color: #262626;
-  border: 2px solid #555555;
+  border: 0.125rem solid #555555;
   border-top: none;
 }
 
 .mini-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 10px;
+  padding: 0.625rem;
   display: flex;
   flex-direction: column;
   background-color: white;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.375rem 0.75rem rgba(0, 0, 0, 0.15);
   overflow-x: hidden;
   width: 100%;
 }
 
 .message-bubble-small {
   display: flex;
-  /* Inline block to fit content */
   max-width: 80%;
-  min-width: 50px;
-  padding: 10px;
-  border-radius: 15px;
-  margin-bottom: 10px;
+  min-width: 3.125rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: 0.9375rem;
+  margin-bottom: 0.625rem;
   word-wrap: break-word;
-  font-size: 17px;
+  font-size: 1.143rem !important;
+  font-weight: 600;
 }
 
 .message-bubble-small.user {
-  background-color: orange;
+  background-color: #ff9900;
   align-self: flex-end;
   border-top-right-radius: 0;
   color: white;
-  opacity: 1;
 }
 
 .message-bubble-small.bot {
-  background-color: #f5f5f5;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ced4da;
+  background-color: #f3f4f6;
   align-self: flex-start;
   border-top-left-radius: 0;
   color: black;
@@ -363,19 +318,19 @@
 
 .message-bubble-small ol,
 .message-bubble-small ul {
-  padding-left: 20px;
-  padding-right: 20px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  margin-top: 0.625rem;
+  margin-bottom: 0.625rem;
 }
 
 .message-bubble-small li {
-  margin-bottom: 5px;
+  margin-bottom: 0.3125rem;
 }
 
 .message-bubble-small br {
   display: block;
-  margin: 5px 0;
+  margin: 0.3125rem 0;
   content: "";
 }
 
@@ -383,29 +338,34 @@
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 5px;
+  padding: 0.4rem 0.6rem;
   background-color: #383838;
   box-sizing: border-box;
-  border-radius: 25px;
-  height: 50px;
+  border-radius: 3rem;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .bid-input-bar input {
   flex: 1;
-  padding: 10px 20px;
+  padding: 0.5rem 1rem;
+  /* Increased from 0.625rem 1.25rem */
   border: none;
-  border-radius: 25px;
-  margin-right: 10px;
+  border-radius: 3rem;
+  /* Increased to match parent */
+  margin-right: 0.625rem;
   box-sizing: border-box;
   outline: none;
   background-color: #383838;
   color: #ffffff;
-  width: 100%;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .bid-input-bar button {
-  width: 40px;
-  height: 40px;
+  width: 3rem;
+  /* Increased from 2.5rem */
+  height: 3rem;
   border: none;
   border-radius: 50%;
   background-color: orange;
@@ -421,37 +381,75 @@
 }
 
 .bid-input-bar button svg {
-  width: 16px;
-  /* Adjust the size of the icon */
-  height: 16px;
-  /* Adjust the size of the icon */
+  width: 1.2rem;
+  /* Increased from 1rem */
+  height: 1.2rem;
+  /* Increased from 1rem */
+}
+
+.options-button {
+  cursor: pointer;
+  background-color: #262626;
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  font-size: 1.2rem !important;
+  position: relative;
+  transition: background 0s ease-in-out;
+  border: none;
+  border-radius: 0.75rem;
+}
+
+.options-button svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0.25rem;
+  stroke-dasharray: 30rem;
+  stroke-dashoffset: 0;
+}
+
+.options-button svg rect {
+  rx: 0.75rem;
+  ry: 0.75rem;
+}
+
+.options-button span {
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+
+.options-button.selected svg {
+  animation: dashAnimation 2s linear infinite;
 }
 
 .arrow-button {
   background-color: #383838;
   color: white;
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem;
   border: none;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.7rem;
-  border-radius: 8px;
+  border-radius: 0.5rem;
 }
 
 .dropdown-container {
   display: flex;
   align-items: center;
-  /* Center align items vertically */
 }
 
 .dropdown-container .arrow-button + .arrow-button {
-  margin-left: 4px;
-  /* Adjust this value to reduce the distance */
+  margin-left: 0.25rem;
 }
 
 .dropdown-container .option-button + .option-button {
-  margin-left: 6px;
-  /* Adjust this value to reduce the distance */
+  margin-left: 0.375rem;
 }
 
 .checkbox-container {
@@ -460,57 +458,42 @@
 }
 
 .checkbox-label {
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
   color: white;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 
 .checkbox {
-  margin-right: 8px;
+  margin-right: 0.5rem;
 }
 
 .option-button {
   background-color: #383838;
   color: white;
-  padding: 8px 16px;
+  padding: 0.5rem 1rem;
   border: none;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.9rem;
-  border-radius: 8px;
-  margin-left: 5px;
+  font-size: 1.1rem;
+  border-radius: 0.5rem;
+  margin-left: 0.3125rem;
 }
 
 .option-button:hover {
   background-color: #505050;
-  /* Replace with a more appropriate color */
-}
-
-.question-answer-box {
-  flex: 1;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid #ced4da;
-  background-color: #fff;
-  padding: 5px;
-  transition: all 0.35s ease;
-  margin: 0;
-  word-wrap: break-word;
-  height: 100px;
-  /* Ensure children start at the top */
 }
 
 .tender-box {
   flex: 1;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid #ced4da;
+  box-shadow: 0 0.375rem 0.75rem rgba(0, 0, 0, 0.15);
+  border: 0.0625rem solid #ced4da;
   background-color: #fff;
-  padding: 5px;
+  padding: 0.3125rem;
   transition: all 0.35s ease;
   margin: 0;
   word-wrap: break-word;
-  height: 200px;
-  /* Ensure children start at the top */
+  height: 12.5rem;
 }
 
 .loading-dots {
@@ -518,7 +501,7 @@
   justify-content: center;
   align-items: center;
   height: 100%;
-  font-size: 24px;
+  font-size: 1.5rem;
   color: #000;
   font-weight: 600;
 }
@@ -548,8 +531,7 @@
 }
 
 .chat-dropdown .dropdown-menu {
-  min-width: 350px;
-  /* Adjust as necessary */
+  min-width: 21.875rem;
   max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
