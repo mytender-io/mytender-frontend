@@ -12,6 +12,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { displayAlert } from "../helper/Alert";
 import withAuth from "../routes/withAuth";
 import mammoth from "mammoth";
+import BreadcrumbNavigation from "../routes/BreadCrumbNavigation";
+import { useLocation } from "react-router-dom";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -99,115 +101,128 @@ const ProposalPreview = () => {
       document.body.removeChild(link);
     }
   };
+  const parentPages = [{ name: "Tender Dashboard", path: "/bids" }];
+  const location = useLocation();
+  const initialBidName = sharedState.bidInfo;
 
+  const showViewOnlyMessage = () => {
+    displayAlert("You only have permission to view this bid.", "danger");
+  };
   return (
     <div className="chatpage">
-        <SideBarSmall />
-      <div className="bidplanner-container">
-      <BidNavbar
-            showViewOnlyMessage={() =>
-              displayAlert(
-                "You only have permission to view this bid.",
-                "danger"
-              )
-            }
-            initialBidName={"initialBidName"}
+      <SideBarSmall />
+      <div className="bidplanner-container ">
+        <div className="header-container">
+          <BreadcrumbNavigation
+            currentPage={initialBidName}
+            parentPages={parentPages}
+            showHome={true}
           />
-            <div className="bidplanner-padded-container ">
+        </div>
+
+        <div className="lib-container mt-1">
+          <div>
+            <BidNavbar
+              showViewOnlyMessage={showViewOnlyMessage}
+              initialBidName={initialBidName}
+            />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                height: "calc(100vh - 120px)",
+                overflow: "hidden"
+              }}
+            >
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
-                  height: "calc(100vh - 120px)",
-                  overflow: "hidden"
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "1rem"
                 }}
               >
                 <div
                   style={{
                     display: "flex",
-                    justifyContent: "space-between",
                     alignItems: "center",
-                    marginBottom: "1rem"
+                    
                   }}
+                    className="mt-5 mb-4"
                 >
+                  <DescriptionIcon />
+                  <h3
+                    style={{ fontSize: "1.2rem", fontWeight: 600, margin: 0 }}
+                    className="ms-2"
+                  
+                  >
+                    Proposal Preview
+                  </h3>
+                </div>
+                <Button
+                  variant="outlined"
+                  onClick={handleWordDownload}
+                  startIcon={<ArticleIcon />}
+                >
+                  Download Word
+                </Button>
+              </div>
+
+              <div
+                style={{
+                  flex: 1,
+                  border: "1px solid #e0e0e0",
+                  borderRadius: "4px",
+                  overflow: "auto",
+                  backgroundColor: "#ffffff",
+                  padding: "2rem 3rem",
+                  height: "100%"
+                }}
+              >
+                {isLoading ? (
                   <div
                     style={{
                       display: "flex",
+                      justifyContent: "center",
                       alignItems: "center",
-                      gap: "0.5rem"
+                      height: "100%",
+                      backgroundColor: "#f5f5f5"
                     }}
                   >
-                    <DescriptionIcon />
-                    <h3
-                      style={{ fontSize: "1.2rem", fontWeight: 600, margin: 0 }}
-                    >
-                      Proposal Preview
-                    </h3>
+                    <CircularProgress />
                   </div>
-                  <Button
-                    variant="outlined"
-                    onClick={handleWordDownload}
-                    startIcon={<ArticleIcon />}
+                ) : htmlContent ? (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: htmlContent }}
+                    style={{
+                      fontFamily: "Calibri, sans-serif",
+                      fontSize: "11pt",
+                      lineHeight: "1.5",
+                      width: "100%",
+                      margin: "0"
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                      backgroundColor: "#f5f5f5",
+                      padding: "20px",
+                      textAlign: "center"
+                    }}
                   >
-                    Download Word
-                  </Button>
-                </div>
-
-                <div
-                  style={{
-                    flex: 1,
-                    border: "1px solid #e0e0e0",
-                    borderRadius: "4px",
-                    overflow: "auto",
-                    backgroundColor: "#ffffff",
-                    padding: "2rem 3rem",
-                    height: "100%"
-                  }}
-                >
-                  {isLoading ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "100%",
-                        backgroundColor: "#f5f5f5"
-                      }}
-                    >
-                      <CircularProgress />
-                    </div>
-                  ) : htmlContent ? (
-                    <div
-                      dangerouslySetInnerHTML={{ __html: htmlContent }}
-                      style={{
-                        fontFamily: "Calibri, sans-serif",
-                        fontSize: "11pt",
-                        lineHeight: "1.5",
-                        width: "100%",
-                        margin: "0"
-                      }}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "100%",
-                        backgroundColor: "#f5f5f5",
-                        padding: "20px",
-                        textAlign: "center"
-                      }}
-                    >
-                      <p>Generate a Proposal to preview it here.</p>
-                    </div>
-                  )}
-                </div>
+                    <p>Generate a Proposal to preview it here.</p>
+                  </div>
+                )}
               </div>
             </div>
+          </div>
+        </div>
       </div>
-      </div>
-
+    </div>
   );
 };
 

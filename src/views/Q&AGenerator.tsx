@@ -21,6 +21,7 @@ import {
 import "draft-js/dist/Draft.css";
 import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
 import SelectFolderModal from "../modals/SelectFolderModal.tsx";
+import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 
 const QAGenerator = () => {
   const getAuth = useAuthUser();
@@ -1288,379 +1289,378 @@ const QAGenerator = () => {
     setResponseEditorState(newEditorState);
   };
 
+  const parentPages = [];
   return (
-    <div className="chatpage">
+    <div>
       <SideBarSmall />
-      <div className="bidplanner-container">
-        <div className="header-container">
-          <h1 className="heavy">Q&A Generator</h1>
-        </div>
-        <div className="lib-container">
-          <div className="scroll-container">
-            <div>
-              <Row
-                className="justify-content-md-center"
-                style={{ visibility: "hidden", height: 0, overflow: "hidden" }}
-              >
-                <FolderLogic
-                  tokenRef={tokenRef}
-                  setAvailableCollections={setAvailableCollections}
-                  setFolderContents={setFolderContents}
-                  availableCollections={availableCollections}
-                  folderContents={folderContents}
-                />
-              </Row>
+      <div className="header-container">
+        <BreadcrumbNavigation
+          currentPage="Q&A Generator"
+          parentPages={parentPages}
+          showHome={true}
+        />
+      </div>
 
-              <Col md={12}>
-                <div className="proposal-header mb-2">
-                  <h1 className="lib-title" id="question-section">
-                    Question
+      <div className="lib-container">
+        <div>
+          <h1 className="mt-3">Q&A Generator</h1>
+          <div>
+            <Row
+              className="justify-content-md-center"
+              style={{ visibility: "hidden", height: 0, overflow: "hidden" }}
+            >
+              <FolderLogic
+                tokenRef={tokenRef}
+                setAvailableCollections={setAvailableCollections}
+                setFolderContents={setFolderContents}
+                availableCollections={availableCollections}
+                folderContents={folderContents}
+              />
+            </Row>
+
+            <Col md={12}>
+              <div className="proposal-header mb-2">
+                <h1 className="lib-title" id="question-section">
+                  Question
+                </h1>
+                <div className="dropdown-container">
+                  <SelectFolderModal
+                    onSaveSelectedFolders={handleSaveSelectedFolders}
+                    initialSelectedFolders={selectedFolders}
+                  />
+                </div>
+              </div>
+
+              <div className="question-answer-box">
+                <textarea
+                  className="card-textarea"
+                  placeholder="Enter question here..."
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                ></textarea>
+              </div>
+              <div className="text-muted word-count mt-2">
+                Word Count: {inputText.split(/\s+/).filter(Boolean).length}
+              </div>
+              <Button
+                className="upload-button mt-2"
+                onClick={sendQuestionToChatbot}
+                disabled={inputText.trim() === ""}
+              >
+                Submit
+              </Button>
+
+              <Row>
+                <div className="" style={{ textAlign: "left" }}>
+                  {isLoading && (
+                    <div className="my-3">
+                      <Spinner animation="border" />
+                      <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
+                    </div>
+                  )}
+                  {choice === "3a" && apiChoices.length > 0 && (
+                    <div>
+                      {renderChoices()}
+                      <Button
+                        variant="primary"
+                        onClick={submitSelections}
+                        className="upload-button mt-3"
+                        disabled={selectedChoices.length === 0}
+                      >
+                        Generate answers for selected subsections
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </Row>
+            </Col>
+
+            <Row className="mt-2">
+              <Col lg={7} md={12}>
+                <div className="proposal-header">
+                  <h1 id="answer-section" className="lib-title mt-4 mb-3">
+                    Answer
                   </h1>
-                  <div className="dropdown-container">
-                    <SelectFolderModal
-                      onSaveSelectedFolders={handleSaveSelectedFolders}
-                      initialSelectedFolders={selectedFolders}
+                  <Button className="upload-button" onClick={removeReferences}>
+                    Remove References
+                  </Button>
+                </div>
+
+                <div className="response-box draft-editor" ref={responseBoxRef}>
+                  <div className="editor-container" ref={editorRef}>
+                    <Editor
+                      editorState={responseEditorState}
+                      placeholder="Your response will be generated here..."
+                      onChange={handleEditorChange}
+                      customStyleMap={{
+                        ...styleMap,
+                        BOLD: { fontWeight: "bold" }
+                      }}
                     />
                   </div>
                 </div>
 
-                <div className="question-answer-box">
-                  <textarea
-                    className="card-textarea"
-                    placeholder="Enter question here..."
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                  ></textarea>
-                </div>
                 <div className="text-muted word-count mt-2">
-                  Word Count: {inputText.split(/\s+/).filter(Boolean).length}
+                  Word Count:{" "}
+                  {
+                    convertToRaw(responseEditorState.getCurrentContent())
+                      .blocks.map((block) => block.text)
+                      .join("\n")
+                      .split(/\s+/)
+                      .filter(Boolean).length
+                  }
                 </div>
-                <Button
-                  className="upload-button mt-2"
-                  onClick={sendQuestionToChatbot}
-                  disabled={inputText.trim() === ""}
-                >
-                  Submit
-                </Button>
-
-                <Row>
-                  <div className="" style={{ textAlign: "left" }}>
-                    {isLoading && (
-                      <div className="my-3">
-                        <Spinner animation="border" />
-                        <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
-                      </div>
-                    )}
-                    {choice === "3a" && apiChoices.length > 0 && (
-                      <div>
-                        {renderChoices()}
-                        <Button
-                          variant="primary"
-                          onClick={submitSelections}
-                          className="upload-button mt-3"
-                          disabled={selectedChoices.length === 0}
-                        >
-                          Generate answers for selected subsections
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </Row>
               </Col>
-
-              <Row className="mt-2">
-                <Col lg={7} md={12}>
-                  <div className="proposal-header">
-                    <h1 id="answer-section" className="lib-title mt-4 mb-3">
-                      Answer
-                    </h1>
-                    <Button
-                      className="upload-button"
-                      onClick={removeReferences}
+              <Col lg={5} md={12}>
+                <div className="input-header">
+                  <div className="proposal-header mb-2">
+                    <h1
+                      className="lib-title"
+                      style={{ color: "white" }}
+                      id="bid-pilot-section"
                     >
-                      Remove References
-                    </Button>
+                      Bid Pilot
+                    </h1>
+                    <div className="dropdown-container"></div>
                   </div>
+                </div>
 
-                  <div
-                    className="response-box draft-editor"
-                    ref={responseBoxRef}
-                  >
-                    <div className="editor-container" ref={editorRef}>
-                      <Editor
-                        editorState={responseEditorState}
-                        placeholder="Your response will be generated here..."
-                        onChange={handleEditorChange}
-                        customStyleMap={{
-                          ...styleMap,
-                          BOLD: { fontWeight: "bold" }
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="text-muted word-count mt-2">
-                    Word Count:{" "}
-                    {
-                      convertToRaw(responseEditorState.getCurrentContent())
-                        .blocks.map((block) => block.text)
-                        .join("\n")
-                        .split(/\s+/)
-                        .filter(Boolean).length
-                    }
-                  </div>
-                </Col>
-                <Col lg={5} md={12}>
-                  <div className="input-header">
-                    <div className="proposal-header mb-2">
-                      <h1
-                        className="lib-title"
-                        style={{ color: "white" }}
-                        id="bid-pilot-section"
-                      >
-                        Bid Pilot
-                      </h1>
-                      <div className="dropdown-container"></div>
-                    </div>
-                  </div>
-
-                  <div className="bid-pilot-container">
-                    {showOptions ? (
-                      <div
-                        className="options-container"
-                        ref={optionsContainerRef}
-                      >
-                        {copilotLoading ? (
-                          <div className="spinner-container">
-                            <Spinner animation="border" />
-                            <p>Generating Options...</p>
-                          </div>
-                        ) : (
-                          copilotOptions.map((option, index) => (
-                            <div key={index} className="option">
-                              <div className="option-content">
-                                <Button
-                                  onClick={() =>
-                                    handleOptionSelect(option, index)
-                                  }
-                                  className={`upload-button ${selectedOptionIndex === index ? "selected" : ""}`}
-                                  style={{
-                                    backgroundColor:
-                                      selectedOptionIndex === index
-                                        ? "orange"
-                                        : "#262626",
-                                    color:
-                                      selectedOptionIndex === index
-                                        ? "black"
-                                        : "#fff",
-                                    fontSize: "16px"
-                                  }}
-                                >
-                                  <span>Option {index + 1}</span>
-                                </Button>
-                                {selectedOptionIndex === index && (
-                                  <Button
-                                    onClick={handleTick}
-                                    className="tick-button"
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faCheck}
-                                      className="tick-icon"
-                                    />
-                                  </Button>
-                                )}
-                              </div>
-                              <div className="option-item mt-2">
-                                <p>{option}</p>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    ) : isCopilotVisible ? (
-                      <div
-                        className={`prompts-container ${!isCopilotVisible ? "fade-out" : ""}`}
-                        ref={promptsContainerRef}
-                      >
-                        <div className="prompts">
-                          <Button
-                            className="prompt-button"
-                            style={{ borderTop: "2px solid #555555" }}
-                            onClick={handleLinkClick("Summarise")}
-                          >
-                            Summarise
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Expand")}
-                          >
-                            Expand
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Rephrase")}
-                          >
-                            Rephrase
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Inject Company Voice")}
-                          >
-                            Inject Company Voice
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Inject Tender Context")}
-                          >
-                            Inject Tender Context
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Improve Grammar")}
-                          >
-                            Improve Grammar
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Add Statistics")}
-                          >
-                            Add Statistic
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("For Example")}
-                          >
-                            For Example
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Translate to English")}
-                          >
-                            Translate to English
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("We will Active Voice")}
-                          >
-                            We will
-                          </Button>
+                <div className="bid-pilot-container">
+                  {showOptions ? (
+                    <div
+                      className="options-container"
+                      ref={optionsContainerRef}
+                    >
+                      {copilotLoading ? (
+                        <div className="spinner-container">
+                          <Spinner animation="border" />
+                          <p>Generating Options...</p>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="mini-messages">
-                        {messages.map((message, index) => (
-                          <div
-                            key={index}
-                            className={`message-bubble-small ${message.type}`}
-                          >
-                            {message.text === "loading" ? (
-                              <div className="loading-dots">
-                                <span>. </span>
-                                <span>. </span>
-                                <span>. </span>
-                              </div>
-                            ) : (
-                              <div
-                                dangerouslySetInnerHTML={{
-                                  __html: message.text
+                      ) : (
+                        copilotOptions.map((option, index) => (
+                          <div key={index} className="option">
+                            <div className="option-content">
+                              <Button
+                                onClick={() =>
+                                  handleOptionSelect(option, index)
+                                }
+                                className={`upload-button ${selectedOptionIndex === index ? "selected" : ""}`}
+                                style={{
+                                  backgroundColor:
+                                    selectedOptionIndex === index
+                                      ? "orange"
+                                      : "#262626",
+                                  color:
+                                    selectedOptionIndex === index
+                                      ? "black"
+                                      : "#fff",
+                                  fontSize: "16px"
                                 }}
-                              />
-                            )}
+                              >
+                                <span>Option {index + 1}</span>
+                              </Button>
+                              {selectedOptionIndex === index && (
+                                <Button
+                                  onClick={handleTick}
+                                  className="tick-button"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faCheck}
+                                    className="tick-icon"
+                                  />
+                                </Button>
+                              )}
+                            </div>
+                            <div className="option-item mt-2">
+                              <p>{option}</p>
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="input-console">
-                      <div className="dropdown-clear-container mb-3">
-                        <Dropdown
-                          onSelect={(key) => setSelectedDropdownOption(key)}
-                          className="chat-dropdown"
-                          id="bid-pilot-options"
-                        >
-                          <Dropdown.Toggle
-                            className="option-button"
-                            style={{
-                              backgroundColor:
-                                selectedDropdownOption === "custom-prompt"
-                                  ? "orange"
-                                  : "#383838",
-                              color:
-                                selectedDropdownOption === "custom-prompt"
-                                  ? "black"
-                                  : "white"
-                            }}
-                          >
-                            {selectedDropdownOption === "internet-search"
-                              ? "Internet Search"
-                              : selectedDropdownOption === "custom-prompt"
-                                ? "Custom Prompt"
-                                : "Library Chat"}
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            <Dropdown.Item eventKey="internet-search">
-                              Internet Search
-                            </Dropdown.Item>
-                            <Dropdown.Item eventKey="library-chat">
-                              Library Chat
-                            </Dropdown.Item>
-                            {/* Removed the Custom Prompt option */}
-                          </Dropdown.Menu>
-                        </Dropdown>
+                        ))
+                      )}
+                    </div>
+                  ) : isCopilotVisible ? (
+                    <div
+                      className={`prompts-container ${!isCopilotVisible ? "fade-out" : ""}`}
+                      ref={promptsContainerRef}
+                    >
+                      <div className="prompts">
                         <Button
-                          className="option-button"
-                          onClick={handleClearMessages}
+                          className="prompt-button"
+                          style={{ borderTop: "2px solid #555555" }}
+                          onClick={handleLinkClick("Summarise")}
                         >
-                          Clear
+                          Summarise
+                        </Button>
+                        <Button
+                          className="prompt-button"
+                          onClick={handleLinkClick("Expand")}
+                        >
+                          Expand
+                        </Button>
+                        <Button
+                          className="prompt-button"
+                          onClick={handleLinkClick("Rephrase")}
+                        >
+                          Rephrase
+                        </Button>
+                        <Button
+                          className="prompt-button"
+                          onClick={handleLinkClick("Inject Company Voice")}
+                        >
+                          Inject Company Voice
+                        </Button>
+                        <Button
+                          className="prompt-button"
+                          onClick={handleLinkClick("Inject Tender Context")}
+                        >
+                          Inject Tender Context
+                        </Button>
+                        <Button
+                          className="prompt-button"
+                          onClick={handleLinkClick("Improve Grammar")}
+                        >
+                          Improve Grammar
+                        </Button>
+                        <Button
+                          className="prompt-button"
+                          onClick={handleLinkClick("Add Statistics")}
+                        >
+                          Add Statistic
+                        </Button>
+                        <Button
+                          className="prompt-button"
+                          onClick={handleLinkClick("For Example")}
+                        >
+                          For Example
+                        </Button>
+                        <Button
+                          className="prompt-button"
+                          onClick={handleLinkClick("Translate to English")}
+                        >
+                          Translate to English
+                        </Button>
+                        <Button
+                          className="prompt-button"
+                          onClick={handleLinkClick("We will Active Voice")}
+                        >
+                          We will
                         </Button>
                       </div>
-                      <div className="bid-input-bar" ref={bidPilotRef}>
-                        <input
-                          type="text"
-                          placeholder={
-                            selectedDropdownOption === "internet-search"
-                              ? "Please type your question in here..."
-                              : selectedDropdownOption === "custom-prompt"
-                                ? "Type in a custom prompt here..."
-                                : "Please type your question in here..."
-                          }
-                          value={inputValue}
-                          onFocus={
-                            selectedDropdownOption === "custom-prompt"
-                              ? handleCustomPromptFocus
-                              : null
-                          }
-                          onBlur={handleCustomPromptBlur}
-                          onChange={(e) => setInputValue(e.target.value)}
-                          onKeyDown={handleKeyDown}
+                    </div>
+                  ) : (
+                    <div className="mini-messages">
+                      {messages.map((message, index) => (
+                        <div
+                          key={index}
+                          className={`message-bubble-small ${message.type}`}
+                        >
+                          {message.text === "loading" ? (
+                            <div className="loading-dots">
+                              <span>. </span>
+                              <span>. </span>
+                              <span>. </span>
+                            </div>
+                          ) : (
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: message.text
+                              }}
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="input-console">
+                    <div className="dropdown-clear-container mb-3">
+                      <Dropdown
+                        onSelect={(key) => setSelectedDropdownOption(key)}
+                        className="chat-dropdown"
+                        id="bid-pilot-options"
+                      >
+                        <Dropdown.Toggle
+                          className="option-button"
                           style={{
+                            backgroundColor:
+                              selectedDropdownOption === "custom-prompt"
+                                ? "orange"
+                                : "#383838",
                             color:
                               selectedDropdownOption === "custom-prompt"
-                                ? "white"
-                                : "lightgray"
+                                ? "black"
+                                : "white"
                           }}
-                        />
-                        <button
-                          onMouseDown={handleMouseDownOnSubmit}
-                          onClick={
-                            !isBidPilotLoading
-                              ? selectedDropdownOption === "internet-search"
-                                ? handleInternetSearch
-                                : selectedDropdownOption === "custom-prompt" &&
-                                    isCopilotVisible
-                                  ? handleCustomPromptSubmit
-                                  : handleSendMessage
-                              : null
-                          }
-                          disabled={isBidPilotLoading}
                         >
-                          <FontAwesomeIcon icon={faPaperPlane} />
-                        </button>
-                      </div>
+                          {selectedDropdownOption === "internet-search"
+                            ? "Internet Search"
+                            : selectedDropdownOption === "custom-prompt"
+                              ? "Custom Prompt"
+                              : "Library Chat"}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Item eventKey="internet-search">
+                            Internet Search
+                          </Dropdown.Item>
+                          <Dropdown.Item eventKey="library-chat">
+                            Library Chat
+                          </Dropdown.Item>
+                          {/* Removed the Custom Prompt option */}
+                        </Dropdown.Menu>
+                      </Dropdown>
+                      <Button
+                        className="option-button"
+                        onClick={handleClearMessages}
+                      >
+                        Clear
+                      </Button>
+                    </div>
+                    <div className="bid-input-bar" ref={bidPilotRef}>
+                      <input
+                        type="text"
+                        placeholder={
+                          selectedDropdownOption === "internet-search"
+                            ? "Please type your question in here..."
+                            : selectedDropdownOption === "custom-prompt"
+                              ? "Type in a custom prompt here..."
+                              : "Please type your question in here..."
+                        }
+                        value={inputValue}
+                        onFocus={
+                          selectedDropdownOption === "custom-prompt"
+                            ? handleCustomPromptFocus
+                            : null
+                        }
+                        onBlur={handleCustomPromptBlur}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        style={{
+                          color:
+                            selectedDropdownOption === "custom-prompt"
+                              ? "white"
+                              : "lightgray"
+                        }}
+                      />
+                      <button
+                        onMouseDown={handleMouseDownOnSubmit}
+                        onClick={
+                          !isBidPilotLoading
+                            ? selectedDropdownOption === "internet-search"
+                              ? handleInternetSearch
+                              : selectedDropdownOption === "custom-prompt" &&
+                                  isCopilotVisible
+                                ? handleCustomPromptSubmit
+                                : handleSendMessage
+                            : null
+                        }
+                        disabled={isBidPilotLoading}
+                      >
+                        <FontAwesomeIcon icon={faPaperPlane} />
+                      </button>
                     </div>
                   </div>
-                </Col>
-              </Row>
-            </div>
+                </div>
+              </Col>
+            </Row>
           </div>
         </div>
       </div>

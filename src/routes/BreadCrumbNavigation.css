@@ -1,0 +1,28 @@
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 8px;
+    font-size: 1.143rem;
+    font-weight: 800 !important;
+}
+
+.breadcrumb-link {
+    color: #FF8019;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+    color: #cc6614;
+}
+
+.breadcrumb-current {
+    color: #111827;
+}
+
+.breadcrumb-chevron {
+    width: 16px;
+    height: 16px;
+    color: #9ca3af;
+}

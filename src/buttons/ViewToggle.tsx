@@ -17,14 +17,14 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ value, onChange }) => {
           onClick={() => onChange("table")}
           className="view-toggle-btn"
         >
-          <LayoutGrid size={18} strokeWidth={2} />
+          <LayoutGrid size={16} strokeWidth={2} />
         </Button>
         <Button
           variant={value === "kanban" ? "primary" : "light"}
           onClick={() => onChange("kanban")}
           className="view-toggle-btn"
         >
-          <Columns size={18} strokeWidth={2} />
+          <Columns size={16} strokeWidth={2} />
         </Button>
       </ButtonGroup>
     </div>

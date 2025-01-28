@@ -20,7 +20,7 @@ const BidNavbar = ({
   showViewOnlyMessage = () => {},
   initialBidName = "",
   outline = [], // default value
-  sidebarCollapsed,
+  sidebarCollapse= false,
   object_id = null,
   handleRegenerateClick = () => {}
 }) => {
@@ -109,18 +109,11 @@ const BidNavbar = ({
     }, 300); // 300ms matches our CSS transition time
   };
 
+  console.log(initialBidName);
   return (
     <div>
       <div
-        className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
       >
-        <button
-          className="back-arrow-button"
-          onClick={handleBackClick}
-          title="Back to Bids"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} size="xl" />
-        </button>
         <BidTitle
           canUserEdit={true}
           displayAlert={displayAlert}
@@ -129,12 +122,11 @@ const BidNavbar = ({
           showViewOnlyMessage={showViewOnlyMessage}
           initialBidName={initialBidName}
         />
-        <div></div>
       </div>
 
-      <div className={`bidnav-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+      <div >
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div className="bidnav-section mt-2 mb-1">
+          <div className="bidnav-section mt-3 mb-1">
             <NavLink
               to="/bid-extractor"
               className={`bidnav-item ${activeTab === "/bid-extractor" ? "active" : ""}`}

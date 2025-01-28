@@ -49,7 +49,7 @@ const BidTitle = ({
     }, [bidInfo]);
 
     return (
-        <div className="bidname-header">
+        <div className="bidname-header mt-0">
             <h1>
                 <div
                     className="bidname-wrapper"
