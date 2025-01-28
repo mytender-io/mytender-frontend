@@ -731,8 +731,10 @@ const Library = () => {
   const renderFolderStructure = () => {
     const topLevelFolders = getTopLevelFolders();
     // Filter out the "default" folder
-    const foldersToRender = topLevelFolders.filter(folderName => folderName !== "default");
-    
+    const foldersToRender = topLevelFolders.filter(
+      (folderName) => folderName !== "default"
+    );
+
     return foldersToRender.map((folderName) => {
       const displayName = formatDisplayName(folderName);
       return (
@@ -801,28 +803,26 @@ const Library = () => {
     //console.log("Raw contents:", contents);
 
     // Filter to only show direct children
-    const directChildren = contents.filter(
-      ({ unique_id, isFolder }) => {
-        console.log("\nChecking item:", unique_id);
+    const directChildren = contents.filter(({ unique_id, isFolder }) => {
+      console.log("\nChecking item:", unique_id);
 
-        if (!isFolder) return true; // Files are always direct children
+      if (!isFolder) return true; // Files are always direct children
 
-        // Get the relative path by removing the current folder path
-        const relativePath = unique_id.replace(folderPath + "FORWARDSLASH", "");
-        //console.log("Relative path:", relativePath);
+      // Get the relative path by removing the current folder path
+      const relativePath = unique_id.replace(folderPath + "FORWARDSLASH", "");
+      //console.log("Relative path:", relativePath);
 
-        // Count how many FORWARDSLASH are in the relative path
-        const forwardSlashCount = (relativePath.match(/FORWARDSLASH/g) || [])
-          .length;
-        //console.log("Forward slash count:", forwardSlashCount);
+      // Count how many FORWARDSLASH are in the relative path
+      const forwardSlashCount = (relativePath.match(/FORWARDSLASH/g) || [])
+        .length;
+      //console.log("Forward slash count:", forwardSlashCount);
 
-        // A direct child should have no additional FORWARDSLASH in its relative path
-        const isDirectChild = forwardSlashCount === 0;
-        //onsole.log("Is direct child?", isDirectChild);
+      // A direct child should have no additional FORWARDSLASH in its relative path
+      const isDirectChild = forwardSlashCount === 0;
+      //onsole.log("Is direct child?", isDirectChild);
 
-        return isDirectChild;
-      }
-    );
+      return isDirectChild;
+    });
 
     //console.log("Filtered direct children:", directChildren);
 
@@ -952,14 +952,15 @@ const Library = () => {
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
- 
+
     if (query.length > 0) {
       // Filter out the default folder from folder matches
       const folderMatches = availableCollections
-        .filter((collection) =>
-          collection.toLowerCase().includes(query) &&
-          collection !== "default" &&  // Exclude the default folder
-          !collection.startsWith("defaultFORWARDSLASH") // Exclude subfolders of default
+        .filter(
+          (collection) =>
+            collection.toLowerCase().includes(query) &&
+            collection !== "default" && // Exclude the default folder
+            !collection.startsWith("defaultFORWARDSLASH") // Exclude subfolders of default
         )
         .map((collection) => ({
           name: collection.split("FORWARDSLASH").pop(),
@@ -967,12 +968,12 @@ const Library = () => {
           path: collection,
           fullName: collection.replace(/FORWARDSLASH/g, "/")
         }));
- 
+
       // Filter out files from the default folder and its contents
       const fileMatches = Object.entries(folderContents)
-        .filter(([folder]) => 
-          folder !== "default" && 
-          !folder.startsWith("defaultFORWARDSLASH")
+        .filter(
+          ([folder]) =>
+            folder !== "default" && !folder.startsWith("defaultFORWARDSLASH")
         ) // Exclude both default folder and its subfolders
         .flatMap(([folder, contents]) =>
           contents
@@ -985,7 +986,7 @@ const Library = () => {
               unique_id: item.unique_id
             }))
         );
- 
+
       const results = [...folderMatches, ...fileMatches];
       setFilteredResults(results);
       setShowSearchResults(true);
@@ -1229,8 +1230,8 @@ const Library = () => {
               <div
                 style={{
                   overflowY: "auto",
-                  maxHeight: "46rem",
-                  height: "100%",
+                  maxHeight: "",
+                  height: "calc(100vh - 220px)",
                   width: "100%"
                 }}
               >
