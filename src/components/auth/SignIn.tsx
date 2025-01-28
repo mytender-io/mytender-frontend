@@ -1,31 +1,32 @@
-import React, { useState, useEffect, useCallback } from "react";
-import "./Signin.css";
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  Alert,
-  Button,
-  Snackbar,
-  TextField,
-  Modal,
-  Tooltip,
-  IconButton
-} from "@mui/material";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import useAuthSignIn from "./UseAuthsignIn";
 import AuthState from "./AuthState";
-import axios, { AxiosResponse } from "axios";
-import InfoIcon from "@mui/icons-material/Info";
+import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
+import MeshGradient from "../mesh-gradient/MeshGradient";
+import Logo from "@/resources/images/logo.png";
 
 const Signin = () => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const { toast } = useToast();
   const { submitSignIn, isLoading } = useAuthSignIn();
-  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "success" | "error" | "warning" | "info"
-  >("success");
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  const [forgotPasswordOpen, setForgotPasswordOpen] = useState<boolean>(false);
+
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState<string>("");
-  const [isMounted, setIsMounted] = useState(true);
+  const [isMounted, setIsMounted] = useState<boolean>(true);
 
   // Set up cleanup when component unmounts
   useEffect(() => {
@@ -34,44 +35,31 @@ const Signin = () => {
     };
   }, []);
 
-  // Safe setState wrapper
-  const safeSetState = useCallback(
-    <T extends unknown>(
-      setter: React.Dispatch<React.SetStateAction<T>>,
-      value: T
-    ) => {
-      if (isMounted) {
-        setter(value);
-      }
-    },
-    [isMounted]
-  );
-
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      safeSetState(setSnackbarMessage, "Username and Password are required");
-      safeSetState(setSnackbarSeverity, "error");
-      safeSetState(setSnackbarOpen, true);
+      toast({
+        variant: "destructive",
+        description: "Username and Password are required"
+      });
       return;
     }
 
     try {
       const { success, message } = await submitSignIn(formData);
       if (isMounted) {
-        safeSetState(
-          setSnackbarMessage,
-          success ? message : "Incorrect Username or Password"
-        );
-        safeSetState(setSnackbarSeverity, success ? "success" : "error");
-        safeSetState(setSnackbarOpen, true);
+        toast({
+          variant: success ? "default" : "destructive",
+          description: success ? message : "Incorrect Username or Password"
+        });
       }
     } catch (error) {
       if (isMounted) {
-        safeSetState(setSnackbarMessage, "Incorrect Username or Password");
-        safeSetState(setSnackbarSeverity, "error");
-        safeSetState(setSnackbarOpen, true);
+        toast({
+          variant: "destructive",
+          description: "Incorrect Username or Password"
+        });
       }
     }
   };
@@ -86,20 +74,17 @@ const Signin = () => {
     const controller = new AbortController();
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/forgot_password`,
         { email: forgotPasswordEmail },
         { signal: controller.signal }
       );
 
       if (isMounted) {
-        safeSetState(
-          setSnackbarMessage,
-          "Password reset email sent successfully"
-        );
-        safeSetState(setSnackbarSeverity, "success");
-        safeSetState(setSnackbarOpen, true);
-        safeSetState(setForgotPasswordOpen, false);
+        toast({
+          variant: "default",
+          description: "Password reset email sent successfully"
+        });
       }
     } catch (err) {
       if (axios.isCancel(err)) {
@@ -107,12 +92,10 @@ const Signin = () => {
       }
 
       if (isMounted) {
-        safeSetState(
-          setSnackbarMessage,
-          "Failed to send password reset email. Please try again."
-        );
-        safeSetState(setSnackbarSeverity, "error");
-        safeSetState(setSnackbarOpen, true);
+        toast({
+          variant: "destructive",
+          description: "Failed to send password reset email. Please try again."
+        });
       }
     }
 
@@ -121,156 +104,152 @@ const Signin = () => {
     };
   };
 
-  const inputProps = {
-    style: {
-      "&:WebkitAutofill": {
-        WebkitBoxShadow: "0 0 0 1000px white inset",
-        WebkitTextFillColor: "#000"
-      }
-    }
-  };
-
-  const labelProps = {
-    shrink: true
-  };
-
   return (
-    <div className="cards-container">
-      <div className="cardmini">
-        <div className="cardmini-text">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              marginBottom: "20px"
-            }}
-          >
-            <h2 style={{ fontWeight: "800", margin: "0" }}>Login</h2>
-            <Tooltip
-              title="Disclaimer: Answers generated with AI should always be checked for accuracy, we view our platform as a tool to create amazing proposals, but with the guidance of a human!"
-              arrow
-              componentsProps={{
-                tooltip: {
-                  sx: {
-                    fontSize: "1rem",
-                    padding: "10px"
-                  }
-                }
-              }}
-            >
-              <IconButton size="medium" style={{ padding: 0 }}>
-                <InfoIcon fontSize="medium" color="action" />
-              </IconButton>
-            </Tooltip>
-          </div>
-
-          <form onSubmit={onSubmit}>
-            <div className="input-field">
-              <TextField
-                id="email-input"
-                fullWidth
-                label="Enter your username"
-                variant="outlined"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                onKeyPress={handleKeyPress}
-                InputProps={inputProps}
-                InputLabelProps={labelProps}
-                autoComplete="username"
-              />
-            </div>
-            <div className="input-field">
-              <TextField
-                id="password-input"
-                fullWidth
-                label="Password"
-                variant="outlined"
-                type="password"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                onKeyPress={handleKeyPress}
-                InputProps={inputProps}
-                InputLabelProps={labelProps}
-                autoComplete="current-password"
-              />
-            </div>
-            <Button
-              className="login-button"
-              variant="contained"
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading ? "Loading..." : "Login"}
-            </Button>
-          </form>
-
-          <p
-            style={{ cursor: "pointer" }}
-            onClick={() => setForgotPasswordOpen(true)}
-          >
-            Forgot your password?
-          </p>
+    <div className="w-screen h-screen flex justify-center items-center m-0">
+      <MeshGradient>
+        <div className="flex items-center gap-2 max-w-[1080px] px-5 py-4 w-full">
+          <img src={Logo} className="h-20" alt="logo" />
         </div>
-
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={3000}
-          onClose={() => safeSetState(setSnackbarOpen, false)}
-          style={{
-            position: "fixed",
-            bottom: "-25%",
-            marginBottom: "15px"
-          }}
-        >
-          <Alert
-            onClose={() => safeSetState(setSnackbarOpen, false)}
-            severity={snackbarSeverity}
-          >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
-        <Modal
-          open={forgotPasswordOpen}
-          onClose={() => safeSetState(setForgotPasswordOpen, false)}
-        >
-          <div className="modal-container">
-            <h2>Forgot Password</h2>
-            <p>
-              Enter your email address and we'll send you a link to reset your
-              password.
-            </p>
-            <TextField
-              autoFocus
-              label="Email Address"
-              type="email"
-              fullWidth
-              value={forgotPasswordEmail}
-              onChange={(e) => setForgotPasswordEmail(e.target.value)}
-            />
-            <div className="modal-actions">
-              <Button
-                onClick={() => {
-                  safeSetState(setForgotPasswordOpen, false);
-                  safeSetState(setForgotPasswordEmail, ""); // Clear the email input
-                }}
-                color="primary"
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleForgotPassword} color="primary">
-                Send Email
-              </Button>
+        <div className="space-y-6 max-w-lg min-w-[512px] w-full">
+          <div className="p-12 rounded-lg bg-white shadow-card">
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-5">
+                <h2 className="text-4xl font-bold text-center w-full">
+                  Sign in to your account
+                </h2>
+              </div>
+              <form onSubmit={onSubmit}>
+                <div className="space-y-6">
+                  <div className="grid w-full items-center gap-3">
+                    <Label htmlFor="email" className="text-xl">
+                      Email
+                    </Label>
+                    <Input
+                      type="email"
+                      id="email"
+                      placeholder="Email"
+                      className="w-full md:text-xl h-12"
+                      value={formData.email}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
+                      onKeyDown={handleKeyPress}
+                    />
+                  </div>
+                  <div className="grid w-full items-center gap-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="email" className="text-xl">
+                        Password
+                      </Label>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="text-xl text-orange bg-transparent hover:text-orange_light"
+                          >
+                            Forgot Password?
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px] bg-white">
+                          <DialogHeader>
+                            <DialogTitle className="text-4xl font-bold mb-3">
+                              Forgot Password
+                            </DialogTitle>
+                            <DialogDescription className="text-xl font-medium">
+                              Enter your email address and we'll send you a link
+                              to reset your password.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <div className="grid w-full items-center gap-3">
+                              <Label htmlFor="email" className="text-xl">
+                                Email
+                              </Label>
+                              <Input
+                                id="email"
+                                placeholder="Email"
+                                className="w-full md:text-xl h-12"
+                                type="password"
+                                value={forgotPasswordEmail}
+                                onChange={(e) =>
+                                  setForgotPasswordEmail(e.target.value)
+                                }
+                              />
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                className="text-lg py-4 text-white"
+                              >
+                                Close
+                              </Button>
+                            </DialogClose>
+                            <Button
+                              onClick={handleForgotPassword}
+                              className="text-lg py-4 text-white bg-orange hover:bg-orange_light"
+                            >
+                              Send Email
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <Input
+                      type="password"
+                      id="password"
+                      placeholder="Password"
+                      className="w-full md:text-xl h-12"
+                      value={formData.password}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          password: e.target.value
+                        })
+                      }
+                      onKeyDown={handleKeyPress}
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full bg-orange h-14 text-xl text-white hover:bg-orange_light"
+                    size="lg"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Loading..." : "Sign in"}
+                  </Button>
+                </div>
+              </form>
             </div>
+            <AuthState />
           </div>
-        </Modal>
-
-        <AuthState />
-      </div>
+          <div className="px-2">
+            <span className="block text-xl font-medium text-muted-foreground">
+              Disclaimer: Answers generated with AI should always be checked for
+              accuracy, we view our platform as a tool to create amazing
+              proposals, but with the guidance of a human!
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 max-w-[1080px] px-5 py-4 text-left justify-start w-full">
+          <a
+            href="https://mytender.io/data_protection_overview"
+            className="text-xl font-semibold text-black"
+            target="_blank"
+          >
+            Privacy & Policy
+          </a>
+          <a
+            href="https://mytender.io/terms_and_conditions"
+            className="text-xl font-semibold text-black"
+            target="_blank"
+          >
+            Terms & Conditions
+          </a>
+        </div>
+      </MeshGradient>
     </div>
   );
 };
