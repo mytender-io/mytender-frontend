@@ -10,6 +10,7 @@ import "./Widget.css";
 import SupportChat from "./components/SupportChat.tsx";
 import AutoLogout from "./components/auth/AutoLogout.tsx";
 import posthog from "posthog-js";
+import { Toaster } from "@/components/ui/toaster";
 
 ReactGA4.initialize("G-X8S1ZMRM3C");
 
@@ -51,11 +52,11 @@ const Layout = () => {
   return (
     <>
       {isAuthenticated && <AutoLogout />}
-     
       <div className="main-content">
         <Routing />
+        <Toaster />
       </div>
-      {isAuthenticated && <SupportChat auth={auth} />}{" "}
+      {isAuthenticated && <SupportChat auth={auth} />}
       {/* Use the ChatBot component */}
     </>
   );
