@@ -1,0 +1,30 @@
+#gradient-canvas {
+  --gradient-color-1: #6ec3f4;
+  --gradient-color-2: #3a3aff;
+  --gradient-color-3: #ff61ab;
+  --gradient-color-4: #e63946;
+}
+
+.gradient-background {
+  background: linear-gradient(
+    45deg,
+    var(--gradient-color-1),
+    var(--gradient-color-2),
+    var(--gradient-color-3),
+    var(--gradient-color-4)
+  );
+  background-size: 200% 200%;
+  animation: gradient-animation 20s ease infinite;
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
