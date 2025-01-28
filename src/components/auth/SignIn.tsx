@@ -122,12 +122,12 @@ const Signin = () => {
                 <div className="space-y-6">
                   <div className="grid w-full items-center gap-3">
                     <Label htmlFor="email" className="text-xl">
-                      Email
+                      Username
                     </Label>
                     <Input
-                      type="email"
+                      type="text"
                       id="email"
-                      placeholder="Email"
+                      placeholder="Username"
                       className="w-full md:text-xl h-12"
                       value={formData.email}
                       onChange={(e) =>
