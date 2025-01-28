@@ -146,13 +146,21 @@ const Signin = () => {
               marginBottom: "20px"
             }}
           >
-            <h2 style={{ margin: 0 }}>Login</h2>
+            <h2 style={{ fontWeight: "800", margin: "0" }}>Login</h2>
             <Tooltip
               title="Disclaimer: Answers generated with AI should always be checked for accuracy, we view our platform as a tool to create amazing proposals, but with the guidance of a human!"
               arrow
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: "1rem",
+                    padding: "10px"
+                  }
+                }
+              }}
             >
-              <IconButton size="small" style={{ padding: 0 }}>
-                <InfoIcon fontSize="small" color="action" />
+              <IconButton size="medium" style={{ padding: 0 }}>
+                <InfoIcon fontSize="medium" color="action" />
               </IconButton>
             </Tooltip>
           </div>
@@ -226,7 +234,6 @@ const Signin = () => {
             {snackbarMessage}
           </Alert>
         </Snackbar>
-
         <Modal
           open={forgotPasswordOpen}
           onClose={() => safeSetState(setForgotPasswordOpen, false)}
@@ -239,7 +246,6 @@ const Signin = () => {
             </p>
             <TextField
               autoFocus
-              margin="dense"
               label="Email Address"
               type="email"
               fullWidth
@@ -248,7 +254,10 @@ const Signin = () => {
             />
             <div className="modal-actions">
               <Button
-                onClick={() => safeSetState(setForgotPasswordOpen, false)}
+                onClick={() => {
+                  safeSetState(setForgotPasswordOpen, false);
+                  safeSetState(setForgotPasswordEmail, ""); // Clear the email input
+                }}
                 color="primary"
               >
                 Cancel

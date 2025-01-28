@@ -100,14 +100,6 @@
     overflow-y: auto;
 }
 
-.content-scaler {
-    transform: scale(0.8);
-    transform-origin: top left;
-    width: 125%;
-    /* 1 / 0.8 = 1.25, so 125% */
-    height: 125%;
-}
-
 .modal-body {
     overflow: hidden;
     padding-bottom: 0;

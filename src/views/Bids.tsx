@@ -420,7 +420,7 @@ const Bids = () => {
             style={{ display: "flex", justifyContent: "space-between" }}
             className="mt-3"
           >
-            <p> 14 Results</p>
+              <p>{filteredBids.length} Results</p>
               <ViewToggle value={viewType} onChange={handleViewChange} />
           </div>
           {viewType === "table" ? (

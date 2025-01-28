@@ -51,12 +51,7 @@ interface AppProps {
 
 const useStyles = makeStyles({
   root: {
-    minHeight: "100vh",
-    transform: "scale(0.8)",
-    transformOrigin: "top left",
-    width: "125%",
-    height: "125%",
-  },
+  }
 });
 
 const REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
