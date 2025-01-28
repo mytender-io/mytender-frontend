@@ -1,172 +1,172 @@
 .outline-table {
-  width: 100%;
-  min-width: 85.714rem;
-  border-collapse: separate;
-  border-spacing: 0;
-  margin: 0;
-  font-size: 1.286rem;
-  border-top-right-radius: 0.857rem;
-  border-top-left-radius: 0.857rem;
-  border: 0.143rem solid #ebecef !important;
+    width: 100%;
+    min-width: 85.714rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+    font-size: 1.286rem;
+    border-top-right-radius: 0.857rem;
+    border-top-left-radius: 0.857rem;
+    border: 0.143rem solid #ebecef !important;
 }
 
 .outline-table th {
-  background-color: white;
-  color: #6b7280;
-  padding: 1.143rem 1.571rem;
-  text-align: left;
-  border-bottom: 0.143rem solid #ebecef;
+    background-color: white;
+    color: #6b7280;
+    padding: 1.143rem 1.571rem;
+    text-align: left;
+    border-bottom: 0.143rem solid #ebecef;
 }
 
 .outline-table th:first-child {
-  border-top-left-radius: 0.857rem;
+    border-top-left-radius: 0.857rem;
 }
 
 .outline-table th:last-child {
-  border-top-right-radius: 0.857rem;
+    border-top-right-radius: 0.857rem;
 }
 
 .outline-table td {
-  padding: 1.143rem 1.571rem;
-  border-bottom: 0.143rem solid #ebecef;
-  vertical-align: middle;
+    padding: 1.143rem 1.571rem;
+    border-bottom: 0.143rem solid #ebecef;
+    vertical-align: middle;
 }
 
 .outline-table tr {
-  background-color: white;
-  font-size: 1.143rem;
+    background-color: white;
+    font-size: 1.143rem;
 }
 
 .outline-table tr:hover {
-  background-color: #f3f4f6;
-  transition: background-color 0.2s ease;
+    background-color: #f3f4f6;
+    transition: background-color 0.2s ease;
 }
 
 .writingplan-box {
-  background-color: #f2f2f2;
-  font-weight: 500;
-  color: black;
+    background-color: #f2f2f2;
+    font-weight: 500;
+    color: black;
 }
 
 .writingplan-text-area {
-  width: 100%;
-  background-color: white;
-  padding: 0.857rem;
-  border-radius: 0.286rem;
-  border: 0.071rem solid #dee2e6;
-  height: 10rem;
-  resize: none;
-  color: black;
-  border-radius: 0.571rem;
+    width: 100%;
+    background-color: white;
+    padding: 0.857rem;
+    border-radius: 0.286rem;
+    border: 0.071rem solid #dee2e6;
+    height: 10rem;
+    resize: none;
+    color: black;
+    border-radius: 0.571rem;
 }
 
 .truncate-wrapper {
-  width: 100%;
-  overflow: hidden;
+    width: 100%;
+    overflow: hidden;
 }
 
 .truncate-text {
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-  color: #000000;
-  text-decoration: none;
-  transition: color 0.2s ease;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    color: #000000;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 .truncate-text:hover {
-  color: #666666;
+    color: #666666;
 }
 
 .outline-table td:first-child,
 .outline-table th:first-child {
-  padding-left: 1.429rem;
+    padding-left: 1.429rem;
 }
 
 .outline-table th:last-child,
 .outline-table td:last-child {
-  width: 12%;
-  justify-content: center;
+    width: 12%;
+    justify-content: center;
 }
 
 .status-menu-button {
-  font-weight: 700;
-  font-size: 1.143rem;
+    font-weight: 700;
+    font-size: 1.143rem;
 }
 
 .status-not-started {
-  background-color: #ffe4dc !important;
-  color: #d14d1f !important;
-  border: none;
+    background-color: #FFE4DC !important;
+    color: #D14D1F !important;
+    border: none;
 }
 
 .status-icon {
-  margin-left: 8px;
-  vertical-align: middle;
+    margin-left: 8px;
+    vertical-align: middle;
 }
 
 .status-in-progress {
-  color: #ff8c00;
-  background-color: rgba(255, 140, 0, 0.1);
-  border: none;
+    color: #FF8C00;
+    background-color: rgba(255, 140, 0, 0.1);
+    border: none;
 }
 
 .status-complete {
-  background-color: #e0f5e9 !important;
-  color: #2a7f4f !important;
-  border: none;
+    background-color: #E0F5E9 !important;
+    color: #2A7F4F !important;
+    border: none;
 }
 
 .status-not-started:hover,
 .status-not-started:focus,
 .status-not-started:active {
-  border: none;
+    border: none;
 }
 
 .status-in-progress:hover,
 .status-in-progress:focus,
 .status-in-progress:active {
-  border: none;
+    border: none;
 }
 
 .status-complete:hover,
 .status-complete:focus,
 .status-complete:active {
-  border: none;
+    border: none;
 }
 
 .relative {
-  position: relative;
+    position: relative;
 }
 
-/* .group:hover {
+.group:hover {
     background-color: rgba(0, 0, 0, 0.02);
-} */
+}
 
 .preview-button {
-  background-color: #f0f0f0;
-  color: #333333;
-  border: 0.071rem solid #d0d0d0;
-  border-radius: 0.286rem;
-  padding: 0.429rem 0.857rem;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+    background-color: #f0f0f0;
+    color: #333333;
+    border: 0.071rem solid #d0d0d0;
+    border-radius: 0.286rem;
+    padding: 0.429rem 0.857rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 .preview-button:hover {
-  background-color: #e0e0e0;
+    background-color: #e0e0e0;
 }
 
 .preview-button:active {
-  background-color: #d5d5d5;
+    background-color: #d5d5d5;
 }
 
 .preview-button:disabled {
-  background-color: #f5f5f5;
-  color: #999999;
-  cursor: not-allowed;
+    background-color: #f5f5f5;
+    color: #999999;
+    cursor: not-allowed;
 }
