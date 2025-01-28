@@ -1332,11 +1332,11 @@ const QAGenerator = () => {
                     onChange={(e) => setInputText(e.target.value)}
                   ></textarea>
                 </div>
-                <div className="text-muted mt-2">
+                <div className="text-muted word-count mt-2">
                   Word Count: {inputText.split(/\s+/).filter(Boolean).length}
                 </div>
                 <Button
-                  className="upload-button mt-1"
+                  className="upload-button mt-2"
                   onClick={sendQuestionToChatbot}
                   disabled={inputText.trim() === ""}
                 >
@@ -1384,7 +1384,6 @@ const QAGenerator = () => {
 
                   <div
                     className="response-box draft-editor"
-                    style={{ height: "800px" }}
                     ref={responseBoxRef}
                   >
                     <div className="editor-container" ref={editorRef}>
@@ -1400,7 +1399,7 @@ const QAGenerator = () => {
                     </div>
                   </div>
 
-                  <div className="text-muted mt-2">
+                  <div className="text-muted word-count mt-2">
                     Word Count:{" "}
                     {
                       convertToRaw(responseEditorState.getCurrentContent())

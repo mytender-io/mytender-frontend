@@ -110,6 +110,8 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
       setFolderStructure(structure);
     } catch (error) {
       console.error("Error fetching folder structure:", error);
+    } finally {
+      setIsLoading(false); // Set loading to false after fetching, whether successful or not
     }
   };
   const fetchFolderContents = async (folderPath) => {
@@ -352,11 +354,6 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
           )}
         </div>
       </Card.Body>
-      <style jsx>{`
-        .library-table td {
-          padding: 13px;
-        }
-      `}</style>
     </Card>
   );
 };

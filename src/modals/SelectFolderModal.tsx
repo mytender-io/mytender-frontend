@@ -37,14 +37,14 @@ const SelectFolderModal = ({
         contentClassName="select-folder-modal-content"
       >
         <Modal.Header
-          className="px-5 py-3"
+          className="px-5 py-4"
           closeButton
         >
-          <Modal.Title style={{ fontSize: "20px", fontWeight: "600" }}>
+          <Modal.Title >
             Select Folders to Use as Context
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="px-4">
           <div>
             <SelectFolder
               onFolderSelect={handleFolderSelection}
