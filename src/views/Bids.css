@@ -1,6 +1,6 @@
 .table-wrapper {
     position: relative;
-    height: calc(100vh - 280px);
+    max-height: 50rem;
     overflow-x: auto;
     overflow-y: auto;
     margin-top: 1.429rem;
