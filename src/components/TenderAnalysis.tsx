@@ -254,8 +254,13 @@ const TenderAnalysis = ({ canUserEdit }) => {
       formData.append("bid_id", object_id);
       formData.append("prompt", tab.prompt);
 
+      // Use the new endpoint for differentiation opportunities
+      const endpoint = tab.prompt === "generate_differentiation_opportunities" 
+        ? `generate_differentiation_opportunities`
+        : `generate_tender_insights`;
+
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/generate_tender_insights`,
+        `http${HTTP_PREFIX}://${API_URL}/${endpoint}`,
         formData,
         {
           headers: {
@@ -265,7 +270,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
         }
       );
 
-      const generatedContent = result.data.requirements;
+      const generatedContent = result.data.requirements || result.data.analysis;
       setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
       setSharedState((prev) => ({ ...prev, [tab.stateKey]: generatedContent }));
       displayAlert("Generated successfully!", "success");
@@ -299,8 +304,13 @@ const TenderAnalysis = ({ canUserEdit }) => {
       formData.append("bid_id", object_id);
       formData.append("prompt", tab.prompt);
 
+      // Use the new endpoint for differentiation opportunities
+      const endpoint = tab.prompt === "generate_differentiation_opportunities" 
+        ? `generate_differentiation_opportunities`
+        : `generate_tender_insights`;
+
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/generate_tender_insights`,
+        `http${HTTP_PREFIX}://${API_URL}/${endpoint}`,
         formData,
         {
           headers: {
@@ -311,7 +321,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
       );
 
       if (mounted.current) {
-        const generatedContent = result.data.requirements;
+        const generatedContent = result.data.requirements || result.data.analysis;
         setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
         setSharedState((prev) => ({
           ...prev,
