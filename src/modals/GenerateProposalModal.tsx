@@ -252,7 +252,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
       return (
         <div className="px-2 py-4">
           <div className="px-3">
-            <p className="modal-text">
+            <p className="mb-4">
               This is where the magic happens! The proposal will be generated as
               a Word document that you can then edit and format as needed. You
               can preview the document in the Preview Proposal tab. Make sure
@@ -295,7 +295,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
               gravity={0.3}
             />
           )}
-          <div className="success-animation mb-4">
+          <div className="success-animation mb-4 mt-4">
             <div className="success-icon">
               <FontAwesomeIcon
                 icon={faCheckCircle}
@@ -304,15 +304,15 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
               />
             </div>
           </div>
-          <h4 className="success-title mb-4">
+          <h4 className="text-3xl font-bold  mb-6">
             Fantastic! Your proposal is ready! 🚀
           </h4>
-          <p className="success-message mb-4">
+          <p className="text-xl text-gray-600 mb-6">
             Your proposal has been generated & is ready for editing. Time to
             review and make it shine! ✨
           </p>
           <Button
-            className="upload-button"
+            className="upload-button  mt-2 mb-4"
             onClick={() => {
               handleClose();
               navigate(`/proposal-preview`);

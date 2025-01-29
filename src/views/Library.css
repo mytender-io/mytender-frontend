@@ -261,6 +261,7 @@
     max-width: 92.857rem;
     background: white;
     border-radius: 0.571rem;
+    min-height: 80vh;
     overflow: hidden;
 }
 

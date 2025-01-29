@@ -321,7 +321,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
     <Card className="select-library-card-custom mt-0 mb-0">
       <Card.Body className="select-library-card-body-content">
         <div
-          className="select-library-card-content-wrapper p-4"
+          className="select-library-card-content-wrapper p-2"
           style={{ overflowY: "auto" }}
         >
           <div className="breadcrumb-and-back-container">

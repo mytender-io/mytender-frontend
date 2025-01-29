@@ -19,7 +19,8 @@ import SelectFolder from "../components/SelectFolder";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import SelectTenderLibraryFile from "../components/SelectTenderLibraryFile";
 import { LinearProgress, Typography, Box } from "@mui/material";
-import './ModalStyles.css';
+import "./ModalStyles.css";
+import { Check, Edit, Upload } from "lucide-react";
 
 const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
   const getAuth = useAuthUser();
@@ -141,7 +142,9 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
             }}
           />
         </Box>
-        <Box sx={{ minWidth: "2.1875rem", mt: 1, textAlign: "center" }}> {/* 35px */}
+        <Box sx={{ minWidth: "2.1875rem", mt: 1, textAlign: "center" }}>
+          {" "}
+          {/* 35px */}
           <Typography variant="body2" color="text.secondary">
             {`${Math.round(props.value)}%`}
           </Typography>
@@ -287,8 +290,6 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
     }
   };
 
-
-
   const onCancel = () => {
     if (!sharedState.outline || sharedState.outline.length === 0) {
       navigate("/bid-extractor");
@@ -308,68 +309,57 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
     if (currentStep === 1) {
       return (
         <div className="px-4 py-2">
-          <div className="mb-4">
-            <div className="d-flex align-items-center mb-3">
-              <div
-                className="text-white rounded-circle d-flex align-items-center justify-content-center"
-                style={{
-                  width: "2rem", // 32px
-                  height: "2rem", // 32px
-                  minWidth: "2rem", // 32px
-                  backgroundColor: "#FF8C00"
-                }}
-              >
-                1
+          <div className="mb-4 space-y-8">
+            {/* Step 1 */}
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange text-white text-2xl font-bold shadow-sm">
+                  1
+                </div>
               </div>
-              <div className="ms-3">
-                <h6 className="mb-1">Select Tender Questions Document</h6>
-                <p className="text-muted mb-0">
+              <div className="ml-4">
+                <h6 className="text-xl font-bold">
+                  Select Tender Questions Document
+                </h6>
+                <p className="text-gray-500 mt-1">
                   First, select the tender question document as the outline will
                   extract the questions from here
-                  <FontAwesomeIcon icon={faFileUpload} className="ms-2" />
+                  <Upload className="inline-block ml-2" size={16} />
                 </p>
               </div>
             </div>
 
-            <div className="d-flex align-items-center mb-3">
-              <div
-                className="text-white rounded-circle d-flex align-items-center justify-content-center"
-                style={{
-                  width: "2rem", // 32px
-                  height: "2rem", // 32px
-                  minWidth: "2rem", // 32px
-                  backgroundColor: "#FF8C00"
-                }}
-              >
-                2
+            {/* Step 2 */}
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange text-white text-2xl font-bold shadow-sm">
+                  2
+                </div>
               </div>
-              <div className="ms-3">
-                <h6 className="mb-1">Select Company Library Docs</h6>
-                <p className="text-muted mb-0">
+              <div className="ml-4">
+                <h6 className="text-xl font-bold">
+                  Select Company Library Docs
+                </h6>
+                <p className="text-gray-500 mt-1">
                   Select previous bids from your company library to use as
                   context.
                 </p>
               </div>
             </div>
 
-            <div className="d-flex align-items-center">
-              <div
-                className="text-white rounded-circle d-flex align-items-center justify-content-center"
-                style={{
-                  width: "2rem", // 32px
-                  height: "2rem", // 32px
-                  minWidth: "2rem", // 32px
-                  backgroundColor: "#FF8C00"
-                }}
-              >
-                3
+            {/* Step 3 */}
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange text-white text-2xl font-bold shadow-sm">
+                  3
+                </div>
               </div>
-              <div className="ms-3">
-                <h6 className="mb-1">Generate Outline</h6>
-                <p className="text-muted mb-0">
+              <div className="ml-4">
+                <h6 className="text-xl font-bold">Generate Outline</h6>
+                <p className="text-gray-500 mt-1">
                   Click the button below to automatically generate your proposal
                   outline based on the tender questions.
-                  <FontAwesomeIcon icon={faEdit} className="ms-2" />
+                  <Edit className="inline-block ml-2" size={16} />
                 </p>
               </div>
             </div>
@@ -379,48 +369,41 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
     } else if (currentStep === 2) {
       return (
         <div className="px-4 py-2">
-          <p>
+          <p className="text-gray-700 mb-4">
             Select the documents which contain the questions you need to answer
             in your bid. These will be used to generate the outline for your
             proposal.
           </p>
-          <div className="selectfolder-container mt-0 p-0">
+          <div className="mt-0 px-2">
             <SelectTenderLibraryFile
               bid_id={bid_id}
               onFileSelect={handleFileSelection}
               initialSelectedFiles={selectedFiles}
             />
           </div>
-          <div
-            className="alert alert-info"
-            style={{
-              backgroundColor: "rgba(255, 140, 0, 0.08)",
-              border: "0.0625rem solid #FF8C00", // 1px
-              color: "#FF8C00"
-            }}
-          >
-            <strong>Note:</strong> Please verify your selections before
-            proceeding. The outline will be generated based on the selected
-            documents.
+          <div className="mt-4 p-4 rounded-lg bg-orange_ultra_light text-orange">
+            <span className="font-semibold">Note:</span> Please verify your
+            selections before proceeding. The outline will be generated based on
+            the selected documents.
           </div>
         </div>
       );
-    } else if (currentStep === 3) {
+    }
+
+    if (currentStep === 3) {
       return (
         <div className="px-4 py-2">
-          <div className="">
+          <p className="text-gray-700 mb-4">
             Select the folders below from your content library to use as context
             in your final proposal. The AI will be able to use information from
             these when generating an answer.
-          </div>
-
-          <div className="selectfolder-container mt-3">
+          </p>
+          <div className="mt-3 p-0">
             <SelectFolder
               onFolderSelect={handleFolderSelection}
               initialSelectedFolders={selectedFolders}
             />
           </div>
-
           {isGeneratingOutline && (
             <div className="mt-4">
               <LinearProgressWithLabel
@@ -431,28 +414,28 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
           )}
         </div>
       );
-    } else if (currentStep === 4) {
+    }
+
+    if (currentStep === 4) {
       return (
-        <div className="px-4 modal-text">
-          <h4 className="mb-3">
-            Outline Generated Successfully
-            <FontAwesomeIcon
-              icon={faCheck}
-              className="text-success"
-              style={{ fontSize: "1.625rem", marginLeft: "0.625rem" }} // 26px, 10px
-            />
-          </h4>
-          <p className="text-muted">
+        <div className="px-4">
+          <div className="flex items-center mb-3">
+            <h4 className="text-xl font-bold">
+              Outline Generated Successfully
+            </h4>
+            <Check className="ml-2 text-green-500 w-6 h-6" />
+          </div>
+          <p className="text-gray-500 mb-6">
             Your outline has been created based on your tender question
             documents.
           </p>
 
-          <div className="bg-gray-50 rounded-lg p-6">
-            <h5 className="text-gray-600 mb-0">Next Steps:</h5>
-            <ol style={{ padding: "0.75rem", paddingBottom: "0rem" }}> {/* 12px, 0px */}
+          <div >
+            <h5 className="text-gray-600 text-xl font-bold mb-4">Next Steps:</h5>
+            <ol className="space-y-4 list-decimal list-inside">
               <li>
-                <strong>Review Questions:</strong>
-                <p className="text-muted mb-2">
+                <div className="font-semibold inline text-xl">Review Questions</div>
+                <p className="text-gray-500 mt-2 ml-6">
                   Check that all questions extracted match your tender
                   questions. You can edit these in the sidepane by clicking on a
                   section or add new sections by right clicking on a row in the
@@ -460,8 +443,8 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
                 </p>
               </li>
               <li>
-                <strong>Start Writing:</strong>
-                <p className="text-muted">
+                <div className="font-semibold inline text-xl">Start Writing</div>
+                <p className="text-gray-500 mt-2 ml-6">
                   If you want to add more detail to a section, click on the
                   section to show the sidepane. This will let you add talking
                   points you want the AI to cover in the final proposal for that
@@ -469,8 +452,8 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
                 </p>
               </li>
               <li>
-                <strong>Create Proposal</strong>
-                <p className="text-muted mb-2">
+                <div className="font-semibold inline text-xl">Create Proposal</div>
+                <p className="text-gray-500 mt-2 ml-6">
                   Click the Create Proposal button to generate a proposal. Once
                   your proposal has been generated you can go to the Preview
                   Proposal tab to download it as a word document.
@@ -483,7 +466,6 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
     }
   };
 
-
   return (
     <Modal show={show} onHide={onCancel} size="lg" centered>
       <Modal.Header className="px-4 d-flex justify-content-between align-items-center">
@@ -494,7 +476,11 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
       </Modal.Header>
       <Modal.Body className="px-0 py-4">{renderStepContent()}</Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleBack}>
+        <Button
+          variant="secondary"
+          className="upload-button"
+          onClick={handleBack}
+        >
           {currentStep === 1 ? "Cancel" : "Back"}
         </Button>
         <Button

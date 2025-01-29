@@ -45,7 +45,7 @@ const SelectFolderModal = ({
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="px-4">
-          <div>
+          <div className="px-4">
             <SelectFolder
               onFolderSelect={handleFolderSelection}
               initialSelectedFolders={selectedFolders}

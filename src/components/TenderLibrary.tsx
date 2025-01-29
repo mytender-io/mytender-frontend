@@ -257,7 +257,7 @@ const TenderLibrary = ({ object_id }) => {
       <tr key={index} style={{ cursor: "pointer" }}>
         <td
           className="filename-column"
-          onClick={() => viewFile(doc.filename || doc)}
+          // onClick={() => viewFile(doc.filename || doc)}
         >
           <FontAwesomeIcon icon={faFileAlt} className="fa-icon" />{" "}
           {doc.filename || doc}
