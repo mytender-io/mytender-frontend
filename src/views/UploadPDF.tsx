@@ -323,7 +323,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
   };
   return (
     <div>
-      <p className="description-text">{descriptionText}</p>
+      <p className="description-text mt-4 mb-4">{descriptionText}</p>
 
       <div
         className={`drop-zone ${dragActive ? "active" : ""} ${

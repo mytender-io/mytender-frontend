@@ -364,7 +364,7 @@ const TenderLibrary = ({ object_id }) => {
         <Col md={12}>
           <div>
             <div id="tender-library">
-              <div className="tender-library-title">Tender Upload</div>
+            
             </div>
             <UploadPDF
               bid_id={object_id}

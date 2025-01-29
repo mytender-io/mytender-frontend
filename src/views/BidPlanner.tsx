@@ -12,10 +12,17 @@ import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 import TenderAnalysis from "../components/TenderAnalysis.tsx";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 import theme from "@/components/ui/theme.tsx";
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from "@mui/material/styles";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton
+} from "@mui/material";
 
 const BidPlanner = () => {
   const getAuth = useAuthUser();
@@ -37,6 +44,11 @@ const BidPlanner = () => {
   const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isLibraryVisible, setIsLibraryVisible] = useState(false);
+
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+
+  const handleOpenLibrary = () => setIsLibraryOpen(true);
+  const handleCloseLibrary = () => setIsLibraryOpen(false);
 
   const toggleLibrary = () => {
     setIsLibraryVisible(!isLibraryVisible);
@@ -179,11 +191,10 @@ const BidPlanner = () => {
   return (
     <div className="chatpage">
       <SideBarSmall onCollapseChange={setSidebarCollapsed} />
-      <div className="bidplanner-container ">
+      <div className="bidplanner-container">
         <div
           className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
         >
-          {" "}
           <BreadcrumbNavigation
             currentPage={initialBidName}
             parentPages={parentPages}
@@ -200,25 +211,53 @@ const BidPlanner = () => {
                 <BidNavbar
                   showViewOnlyMessage={showViewOnlyMessage}
                   initialBidName={initialBidName}
-                  sidebarCollapsed={sidebarCollapsed} // Pass the state value, not the setter
+                  sidebarCollapsed={sidebarCollapsed}
                 />
               </div>
-              <div className="library-toggle-bar mt-5" onClick={toggleLibrary}>
-                <ChevronDown
-                  size={20}
-                  className={`toggle-icon ${isLibraryVisible ? "rotate" : ""}`}
-                />
-                <span>View Tender Library Documents</span>
-              </div>
-              <div
-                className={`library-section ${!isLibraryVisible ? "collapsed" : ""}`}
+
+              {/* Library Button */}
+              <button
+                onClick={handleOpenLibrary}
+                className="w-full mt-5 py-3 px-4 flex items-center justify-between bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
               >
-                <Row className="mt-5">
-                  <Col md={12}>
-                    <TenderLibrary key={object_id} object_id={object_id} />
-                  </Col>
-                </Row>
-              </div>
+                <div className="flex items-center space-x-2">
+                  <ChevronDown size={20} className="text-gray-600" />
+                  <span className="text-gray-800 text-lg font-medium">
+                    View Tender Library Documents
+                  </span>
+                </div>
+              </button>
+
+              {/* Library Modal */}
+              <Dialog
+                open={isLibraryOpen}
+                onClose={handleCloseLibrary}
+                maxWidth="lg"
+                fullWidth
+                sx={{
+                  "& .MuiDialog-paper": {
+                    minHeight: "80vh"
+                  }
+                }}
+              >
+                <DialogTitle
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    borderBottom: "1px solid #E5E7EB",
+                    py: 2
+                  }}
+                >
+                  <h1>Tender Upload</h1>
+                  <IconButton onClick={handleCloseLibrary} size="small">
+                    <X size={20} />
+                  </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ p: 3 }}>
+                  <TenderLibrary key={object_id} object_id={object_id} />
+                </DialogContent>
+              </Dialog>
 
               <div>
                 <Row>
