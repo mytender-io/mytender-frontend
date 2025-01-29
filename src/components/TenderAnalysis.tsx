@@ -47,7 +47,7 @@ const LoadingState = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
-    }, 750);
+    }, 375);
     return () => clearInterval(interval);
   }, []);
 
