@@ -14,6 +14,8 @@ import TenderLibrary from "../components/TenderLibrary.tsx";
 import TenderAnalysis from "../components/TenderAnalysis.tsx";
 import { ChevronDown } from "lucide-react";
 import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
+import theme from "@/components/ui/theme.tsx";
+import { ThemeProvider } from '@mui/material/styles';
 
 const BidPlanner = () => {
   const getAuth = useAuthUser();
@@ -27,7 +29,7 @@ const BidPlanner = () => {
   const bidData = location.state?.bid || "";
   const initialBidName = location.state?.bid.bid_title || sharedState.bidInfo;
 
-  console.log(location.state?.bid );
+  console.log(location.state?.bid);
 
   const [loading, setLoading] = useState(false);
   const [existingBidNames, setExistingBidNames] = useState([]);
@@ -170,10 +172,7 @@ const BidPlanner = () => {
     window.dispatchEvent(new CustomEvent("bidUpdated", { detail: updatedBid }));
   }, []);
 
-  const parentPages = [
-    { name: "Tender Dashboard", path: "/bids" }
-  
-  ];
+  const parentPages = [{ name: "Tender Dashboard", path: "/bids" }];
 
   console.log(initialBidName);
 
@@ -224,7 +223,9 @@ const BidPlanner = () => {
               <div>
                 <Row>
                   <Col md={12}>
-                    <TenderAnalysis canUserEdit={canUserEdit} />
+                    <ThemeProvider theme={theme}>
+                      <TenderAnalysis canUserEdit={canUserEdit} />
+                    </ThemeProvider>
                   </Col>
                 </Row>
               </div>
