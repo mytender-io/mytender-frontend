@@ -60,10 +60,11 @@ const ProposalPlan = () => {
   const [isSidepaneOpen, setIsSidepaneOpen] = useState(false);
 
   const handleRowClick = (e: React.MouseEvent, index: number) => {
+    // Expand the list of elements to ignore to include MUI Select components
     const isInteractiveElement = (e.target as HTMLElement).closest(
-      'input, select, button, a, .MuiSelect-select, [role="button"], .editable-cell'
+      'input, select, button, a, [role="button"], .editable-cell, .dropdown, .dropdown-toggle, .MuiSelect-root, .MuiSelect-select, .MuiMenuItem-root, .MuiPaper-root, .MuiList-root, .css-1dimb5e-singleValue, .css-1s2u09g-control, .css-b62m3t-container'
     );
-
+  
     if (!isInteractiveElement) {
       e.preventDefault();
       setSelectedSection(index);
@@ -85,19 +86,6 @@ const ProposalPlan = () => {
         ...prevState,
         outline: newOutline
       };
-    });
-  };
-
-  // Add this function to handle toggling sections
-  const toggleSection = (index: number) => {
-    setExpandedSections((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(index)) {
-        newSet.delete(index);
-      } else {
-        newSet.add(index);
-      }
-      return newSet;
     });
   };
 
@@ -738,13 +726,12 @@ const ProposalPlan = () => {
                               >
                                 <td>
                                   <div className="truncate-wrapper">
-                                    <Link
-                                      to="#"
-                                      onClick={() => toggleSection(index)}
+                                    <div
+                                  
                                       className="truncate-text"
                                     >
                                       <span>{section.heading}</span>
-                                    </Link>
+                                    </div>
                                   </div>
                                 </td>
                                 <td>

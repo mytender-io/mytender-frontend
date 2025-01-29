@@ -1,8 +1,19 @@
 import { Menu, MenuItem, Button } from "@mui/material";
 import { useState } from "react";
-import { Search, ClipboardList, FileWarning, FileCheck, FileSignature } from "lucide-react";
+import {
+  Search,
+  ClipboardList,
+  FileWarning,
+  FileCheck,
+  FileSignature
+} from "lucide-react";
 
-type BidStatus = "Planning" | "Research" | "First Draft" | "Reviewing" | "Complete";
+type BidStatus =
+  | "Planning"
+  | "Research"
+  | "First Draft"
+  | "Reviewing"
+  | "Complete";
 
 const BidStatusMenu = ({
   value,
@@ -22,8 +33,18 @@ const BidStatusMenu = ({
   };
 
   const normalizeStatus = (status: any): BidStatus => {
-    const validStatuses: BidStatus[] = ["Planning", "Research", "First Draft", "Reviewing", "Complete"];
-    return status in statusMapping ? statusMapping[status] : (validStatuses.includes(status) ? status : "Planning");
+    const validStatuses: BidStatus[] = [
+      "Planning",
+      "Research",
+      "First Draft",
+      "Reviewing",
+      "Complete"
+    ];
+    return status in statusMapping
+      ? statusMapping[status]
+      : validStatuses.includes(status)
+        ? status
+        : "Planning";
   };
 
   const currentStatus = normalizeStatus(value);
@@ -44,36 +65,37 @@ const BidStatusMenu = ({
   const getStatusStyles = (status: BidStatus): { sx: any } => {
     const baseStyles = {
       fontWeight: 700,
-      fontSize: '1.143rem',
-      whiteSpace: 'nowrap',
-      textTransform: 'none',
-      border: 'none',
-      '&:hover': {
+      fontSize: "1.143rem",
+      fontFamily: '"Manrope", sans-serif',
+      whiteSpace: "nowrap",
+      textTransform: "none",
+      border: "none",
+      "&:hover": {
         opacity: 0.9,
-        border: 'none'
+        border: "none"
       }
     };
 
     const colors = {
       Planning: {
-        backgroundColor: '#FFE4DC',
-        color: '#D14D1F',
+        backgroundColor: "#FFE4DC",
+        color: "#D14D1F"
       },
       Research: {
-        backgroundColor: '#E1F3FB',
-        color: '#2B87AF',
+        backgroundColor: "#E1F3FB",
+        color: "#2B87AF"
       },
       "First Draft": {
-        backgroundColor: '#E6FFE6',
-        color: '#2E8B2E',
+        backgroundColor: "#E6FFE6",
+        color: "#2E8B2E"
       },
       Reviewing: {
-        backgroundColor: '#F8E6F8',
-        color: '#8B488B',
+        backgroundColor: "#F8E6F8",
+        color: "#8B488B"
       },
       Complete: {
-        backgroundColor: '#E0F5E9',
-        color: '#2A7F4F',
+        backgroundColor: "#E0F5E9",
+        color: "#2A7F4F"
       }
     };
 
@@ -82,9 +104,9 @@ const BidStatusMenu = ({
         ...baseStyles,
         backgroundColor: colors[status].backgroundColor,
         color: colors[status].color,
-        '&:hover': {
-          ...baseStyles['&:hover'],
-          backgroundColor: colors[status].backgroundColor,
+        "&:hover": {
+          ...baseStyles["&:hover"],
+          backgroundColor: colors[status].backgroundColor
         }
       }
     };
@@ -117,7 +139,7 @@ const BidStatusMenu = ({
         {currentStatus}
         <StatusIcon className="ml-2" size={16} />
       </Button>
-      
+
       <Menu
         id="bid-status-menu"
         open={Boolean(anchorEl)}
@@ -127,31 +149,32 @@ const BidStatusMenu = ({
         PaperProps={{
           elevation: 1,
           sx: {
-            width: '120px',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+            width: "120px",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
           }
         }}
       >
-        {["Planning", "Research", "First Draft", "Reviewing", "Complete"].map((status) => {
-          const Icon = getStatusIcon(status as BidStatus);
-          return (
-            <MenuItem
-              key={status}
-              onClick={() => handleSelect(status as BidStatus)}
-              sx={{
-                fontSize: '1rem',
-                padding: '0.571rem 1.143rem',
-                fontWeight: 600,
-                '&:hover': {
-                  backgroundColor: '#f5f5f5'
-                }
-              }}
-            >
-              {status}
-             
-            </MenuItem>
-          );
-        })}
+        {["Planning", "Research", "First Draft", "Reviewing", "Complete"].map(
+          (status) => {
+            const Icon = getStatusIcon(status as BidStatus);
+            return (
+              <MenuItem
+                key={status}
+                onClick={() => handleSelect(status as BidStatus)}
+                sx={{
+                  fontSize: "1.1rem",
+                  padding: "0.571rem 1.143rem",
+                  fontWeight: 600,
+                  "&:hover": {
+                    backgroundColor: "#f5f5f5"
+                  }
+                }}
+              >
+                {status}
+              </MenuItem>
+            );
+          }
+        )}
       </Menu>
     </div>
   );

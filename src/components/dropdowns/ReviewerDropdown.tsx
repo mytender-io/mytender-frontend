@@ -27,7 +27,7 @@ const selectStyle = {
 };
 
 const menuStyle = {
-  fontSize: "0.75rem",
+  fontSize: "1.1rem",
   fontFamily: '"Manrope", sans-serif'
 };
 
