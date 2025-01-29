@@ -11,7 +11,9 @@ import {
   faPlus,
   faSort,
   faSortUp,
-  faSortDown
+  faSortDown,
+  faCheck,
+  faXmark
 } from "@fortawesome/free-solid-svg-icons";
 import { Menu, MenuItem } from "@mui/material";
 import { displayAlert } from "../helper/Alert.tsx";
@@ -19,23 +21,50 @@ import InterrogateTenderModal from "../modals/InterrogateTenderModal.tsx";
 import posthog from "posthog-js";
 import UploadPDF from "../views/UploadPDF.tsx";
 import "./TenderLibrary.css";
+import { Check, X } from "lucide-react";
 
+const DeleteConfirmation = ({ onConfirm, onCancel, isDeleting }) => {
+  if (isDeleting) {
+    return <Spinner animation="border" size="md" />;
+  }
+
+  return (
+    <div>
+      <FontAwesomeIcon
+        icon={faCheck}
+        style={{
+          width: "20px",
+          height: "20px",
+          color: "#16a34a",
+          cursor: "pointer"
+        }}
+        onClick={onConfirm}
+        className="me-2"
+      />
+      <FontAwesomeIcon
+        icon={faXmark}
+        style={{
+          width: "20px",
+          height: "20px",
+          color: "black",
+          cursor: "pointer"
+        }}
+        onClick={onCancel}
+      />
+    </div>
+  );
+};
 const TenderLibrary = ({ object_id }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  // Updated state to include timestamps
   const [documents, setDocuments] = useState([]);
   const [currentFileName, setCurrentFileName] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 6;
   const [totalPages, setTotalPages] = useState(0);
   const [showPDFModal, setShowPDFModal] = useState(false);
-  const [showDeleteFileModal, setShowDeleteFileModal] = useState(false);
-  const [fileToDelete, setFileToDelete] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
   const [showPdfViewerModal, setShowPdfViewerModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState("");
   const [isPdfLoading, setIsPdfLoading] = useState(false);
@@ -44,11 +73,14 @@ const TenderLibrary = ({ object_id }) => {
   const [wordFileContent, setWordFileContent] = useState(null);
   const [showExcelModal, setShowExcelModal] = useState(false);
   const [excelData, setExcelData] = useState(null);
-
   const [sortOrder, setSortOrder] = useState("asc");
   const [isSorted, setIsSorted] = useState(false);
+  const [isDeletingFile, setIsDeletingFile] = useState(false);
+  const [deleteConfirmationState, setDeleteConfirmationState] = useState({
+    showFor: null,
+    filename: null
+  });
 
-  // Add this new function to handle sorting
   const handleSort = () => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newSortOrder);
@@ -68,34 +100,30 @@ const TenderLibrary = ({ object_id }) => {
     setDocuments(sortedDocs);
   };
 
-  // Get the correct sort icon based on current state
   const getSortIcon = () => {
     if (!isSorted) return faSort;
     return sortOrder === "asc" ? faSortUp : faSortDown;
   };
 
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const handleMenuItemClick = (action) => {
-    handleMenuClose();
-    if (action === "pdf") setShowPDFModal(true);
-  };
-
-  const handleDeleteFileClick = (event, filename) => {
+  const handleDeleteInitiate = (event, filename) => {
     event.stopPropagation();
     posthog.capture("tender_library_delete_file_clicked", { filename });
-    setFileToDelete({ filename });
-    setShowDeleteFileModal(true);
+    setDeleteConfirmationState({
+      showFor: filename,
+      filename: filename
+    });
+  };
+
+  const handleDeleteConfirm = async (event, filename) => {
+    event.stopPropagation();
+    setIsDeletingFile(true);
+    await deleteDocument(filename, object_id);
+    setIsDeletingFile(false);
+    setDeleteConfirmationState({ showFor: null, filename: null });
+  };
+  const handleDeleteCancel = (event) => {
+    event.stopPropagation();
+    setDeleteConfirmationState({ showFor: null, filename: null });
   };
 
   const fetchDocuments = async () => {
@@ -103,15 +131,14 @@ const TenderLibrary = ({ object_id }) => {
       if (object_id) {
         const response = await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/get_tender_library_doc_filenames`,
-          { bid_id: object_id }, // Send as JSON body
+          { bid_id: object_id },
           {
             headers: {
               Authorization: `Bearer ${tokenRef.current}`,
-              "Content-Type": "application/json" // Changed to JSON
+              "Content-Type": "application/json"
             }
           }
         );
-        console.log("tender library docs", response);
         setDocuments(response.data.filenames);
         const pages = Math.ceil(response.data.filenames.length / rowsPerPage);
         setTotalPages(pages);
@@ -126,7 +153,6 @@ const TenderLibrary = ({ object_id }) => {
     const formData = new FormData();
     formData.append("bid_id", bidId);
     formData.append("filename", filename);
-    console.log(formData);
     try {
       await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/delete_file_tenderlibrary`,
@@ -138,8 +164,6 @@ const TenderLibrary = ({ object_id }) => {
           }
         }
       );
-
-      // Refresh the document list or update the state as needed
       fetchDocuments();
       setDocumentListVersion((prev) => prev + 1);
       displayAlert("Document deleted successfully", "success");
@@ -161,122 +185,37 @@ const TenderLibrary = ({ object_id }) => {
     }
   };
 
-  const viewFile = async (fileName) => {
-    try {
-      posthog.capture("tender_library_view_file", {
-        fileName,
-        fileType: fileName.split(".").pop().toLowerCase()
-      });
-      const formData = new FormData();
-      formData.append("bid_id", object_id);
-      formData.append("file_name", fileName);
-
-      const fileExtension = fileName.split(".").pop().toLowerCase();
-
-      if (fileExtension === "pdf") {
-        setIsPdfLoading(true);
-        setShowPdfViewerModal(true);
-
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_pdf_format`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-              "Content-Type": "multipart/form-data"
-            },
-            responseType: "blob"
-          }
-        );
-        const fileURL = URL.createObjectURL(
-          new Blob([response.data], { type: "application/pdf" })
-        );
-        setPdfUrl(fileURL);
-        setIsPdfLoading(false);
-      } else if (["doc", "docx"].includes(fileExtension)) {
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_word_format`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-              "Content-Type": "multipart/form-data"
-            }
-          }
-        );
-        setWordFileContent(response.data.content);
-        setCurrentFileName(fileName);
-        setShowWordModal(true);
-      } else if (["xls", "xlsx"].includes(fileExtension)) {
-        console.log("viewing excel files not supported yet");
-      } else {
-        throw new Error("Unsupported file type");
-      }
-    } catch (error) {
-      console.error("Error viewing file:", error);
-      displayAlert("Error viewing file", "danger");
-      setIsPdfLoading(false);
-      setShowPdfViewerModal(false);
-    }
-  };
-
   useEffect(() => {
     fetchDocuments();
   }, [object_id, documentListVersion]);
 
   const renderDocuments = () => {
-    if (documents.length === 0) {
-      return (
-        <tr>
-          <td colSpan="3" className="py-5">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-                minHeight: "250px"
-              }}
-            >
-              <div style={{ width: "750px" }}>
-                <p>
-                  Upload documents related to this specific tender here. This is
-                  different from your previous bids and company information
-                  which belong in your Content Library. They will also be used
-                  as context in the Q&A Generator to answer questions about this
-                  tender.
-                </p>
-              </div>
-            </div>
-          </td>
-        </tr>
-      );
-    }
-
     return documents.map((doc, index) => (
       <tr key={index} style={{ cursor: "pointer" }}>
-        <td
-          className="filename-column"
-          // onClick={() => viewFile(doc.filename || doc)}
-        >
+        <td className="filename-column">
           <FontAwesomeIcon icon={faFileAlt} className="fa-icon" />{" "}
           {doc.filename || doc}
         </td>
-
         <td className="timestamp-column">
           {doc.upload_date
             ? new Date(doc.upload_date).toLocaleDateString("en-GB")
             : "N/A"}
         </td>
         <td className="actions-column">
-          <FontAwesomeIcon
-            icon={faTrash}
-            className="action-icon delete-icon"
-            onClick={(event) =>
-              handleDeleteFileClick(event, doc.filename || doc)
-            }
-            style={{ cursor: "pointer" }}
-          />
+          {deleteConfirmationState.showFor === (doc.filename || doc) ? (
+            <DeleteConfirmation
+              onConfirm={(e) => handleDeleteConfirm(e, doc.filename || doc)}
+              onCancel={handleDeleteCancel}
+              isDeleting={isDeletingFile}
+            />
+          ) : (
+            <FontAwesomeIcon
+              icon={faTrash}
+              className="action-icon delete-icon"
+              onClick={(e) => handleDeleteInitiate(e, doc.filename || doc)}
+              style={{ cursor: "pointer" }}
+            />
+          )}
         </td>
       </tr>
     ));
@@ -287,90 +226,17 @@ const TenderLibrary = ({ object_id }) => {
     fetchDocuments();
   };
 
-  const UploadPDFModal = ({ show, onHide, get_collections, onClose }) => (
-    <Modal show={show} onHide={onHide} size="lg" centered>
-      <Modal.Header className="px-4">
-        <Modal.Title>Upload Files</Modal.Title>
-        <button className="close-button ms-auto" onClick={onHide}>
-          ×
-        </button>
-      </Modal.Header>
-      <Modal.Body className="px-4 py-4"></Modal.Body>
-    </Modal>
-  );
-
-  const DeleteFileModal = ({ show, onHide, onDelete, fileName }) => (
-    <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Delete File</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        Are you sure you want to delete the file "{fileName}"?
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          className="upload-button"
-          style={{ backgroundColor: "red" }}
-          onClick={() => onDelete()}
-        >
-          Delete
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-
-  // Add Excel Modal Component
-  const ExcelViewerModal = ({ show, onHide, data, fileName }) => (
-    <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>{fileName}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body style={{ maxHeight: "70vh", overflowY: "auto" }}>
-        {data && data.sheets ? (
-          Object.entries(data.sheets).map(([sheetName, sheetData]) => (
-            <div key={sheetName} className="mb-4">
-              <h4>{sheetName}</h4>
-              <Table striped bordered hover responsive>
-                <thead>
-                  <tr>
-                    {sheetData[0] &&
-                      sheetData[0].map((header, index) => (
-                        <th key={index}>{header}</th>
-                      ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {sheetData.slice(1).map((row, rowIndex) => (
-                    <tr key={rowIndex}>
-                      {row.map((cell, cellIndex) => (
-                        <td key={cellIndex}>{cell}</td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-          ))
-        ) : (
-          <p>No data available</p>
-        )}
-      </Modal.Body>
-    </Modal>
-  );
-
   return (
     <>
       <Row>
         <Col md={12}>
           <div>
-            <div id="tender-library">
-            
-            </div>
+            <div id="tender-library"></div>
             <UploadPDF
               bid_id={object_id}
               get_collections={fetchDocuments}
               apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
-              descriptionText="Upload documents and attatchments that are part of the tender"
+              descriptionText="Upload documents and attachments that are part of the tender"
             />
             <div style={{ width: "100%", marginTop: "30px" }}>
               <table className="tender-library-table">
@@ -421,30 +287,6 @@ const TenderLibrary = ({ object_id }) => {
           </div>
         </Col>
       </Row>
-
-      <DeleteFileModal
-        show={showDeleteFileModal}
-        onHide={() => setShowDeleteFileModal(false)}
-        onDelete={() => {
-          deleteDocument(fileToDelete.filename, object_id);
-          setShowDeleteFileModal(false);
-        }}
-        fileName={fileToDelete ? fileToDelete.filename : ""}
-      />
-
-      <UploadPDFModal
-        show={showPDFModal}
-        onHide={() => setShowPDFModal(false)}
-        get_collections={fetchDocuments}
-        onClose={handleOnClose}
-      />
-
-      <ExcelViewerModal
-        show={showExcelModal}
-        onHide={() => setShowExcelModal(false)}
-        data={excelData}
-        fileName={currentFileName}
-      />
 
       {showPdfViewerModal && (
         <div
