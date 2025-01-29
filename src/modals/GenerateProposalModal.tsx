@@ -305,7 +305,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
             </div>
           </div>
           <h4 className="text-3xl font-bold  mb-6">
-            Fantastic! Your proposal is ready! 🚀
+            Fantastic. Your proposal is ready! 🚀
           </h4>
           <p className="text-xl text-gray-600 mb-6">
             Your proposal has been generated & is ready for editing. Time to

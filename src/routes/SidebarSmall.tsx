@@ -18,7 +18,8 @@ import {
   User2,
   Files,
   Bot,
-  BookMarked
+  BookMarked,
+  Sparkles
 } from "lucide-react";
 import { Tooltip } from "@mui/material";
 
@@ -135,20 +136,19 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
             componentsProps={{
               tooltip: {
                 sx: {
-                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
-                  color: 'white',
-                  fontSize: '14px',
-                  padding: '8px 12px',
-                  maxWidth: '300px',
-                  backdropFilter: 'blur(4px)'
+                  backgroundColor: "rgba(51, 51, 51, 0.7)",
+                  color: "white",
+                  fontSize: "14px",
+                  padding: "8px 12px",
+                  maxWidth: "300px",
+                  backdropFilter: "blur(4px)"
                 }
               }
             }}
           >
             <Link
-              to="#"
-              className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor") ? "sidebarsmalllink-active" : ""}`}
-              onClick={handleDashboardClick}
+              to="/bids"
+              className={`sidebarsmalllink ${isActive("/bids") ? "sidebarsmalllink-active" : ""}`}
             >
               <LayoutDashboard size={24} />
               {!isCollapsed && <span id="library-title">Tender Dashboard</span>}
@@ -164,12 +164,12 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
             componentsProps={{
               tooltip: {
                 sx: {
-                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
-                  color: 'white',
-                  fontSize: '14px',
-                  padding: '8px 12px',
-                  maxWidth: '300px',
-                  backdropFilter: 'blur(4px)'
+                  backgroundColor: "rgba(51, 51, 51, 0.7)",
+                  color: "white",
+                  fontSize: "14px",
+                  padding: "8px 12px",
+                  maxWidth: "300px",
+                  backdropFilter: "blur(4px)"
                 }
               }
             }}
@@ -196,12 +196,12 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
             componentsProps={{
               tooltip: {
                 sx: {
-                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
-                  color: 'white',
-                  fontSize: '14px',
-                  padding: '8px 12px',
-                  maxWidth: '300px',
-                  backdropFilter: 'blur(4px)'
+                  backgroundColor: "rgba(51, 51, 51, 0.7)",
+                  color: "white",
+                  fontSize: "14px",
+                  padding: "8px 12px",
+                  maxWidth: "300px",
+                  backdropFilter: "blur(4px)"
                 }
               }
             }}
@@ -210,7 +210,7 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
               to="/chatResponse"
               className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
             >
-              <Bot size={24} />
+              <Sparkles size={24} />
               {!isCollapsed && <span id="welcome">Library Chat</span>}
             </Link>
           </Tooltip>
@@ -224,12 +224,12 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
             componentsProps={{
               tooltip: {
                 sx: {
-                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
-                  color: 'white',
-                  fontSize: '14px',
-                  padding: '8px 12px',
-                  maxWidth: '300px',
-                  backdropFilter: 'blur(4px)'
+                  backgroundColor: "rgba(51, 51, 51, 0.7)",
+                  color: "white",
+                  fontSize: "14px",
+                  padding: "8px 12px",
+                  maxWidth: "300px",
+                  backdropFilter: "blur(4px)"
                 }
               }
             }}
@@ -252,12 +252,12 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
             componentsProps={{
               tooltip: {
                 sx: {
-                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
-                  color: 'white',
-                  fontSize: '14px',
-                  padding: '8px 12px',
-                  maxWidth: '300px',
-                  backdropFilter: 'blur(4px)'
+                  backgroundColor: "rgba(51, 51, 51, 0.7)",
+                  color: "white",
+                  fontSize: "14px",
+                  padding: "8px 12px",
+                  maxWidth: "300px",
+                  backdropFilter: "blur(4px)"
                 }
               }
             }}
@@ -281,12 +281,12 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
             componentsProps={{
               tooltip: {
                 sx: {
-                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
-                  color: 'white',
-                  fontSize: '14px',
-                  padding: '8px 12px',
-                  maxWidth: '300px',
-                  backdropFilter: 'blur(4px)'
+                  backgroundColor: "rgba(51, 51, 51, 0.7)",
+                  color: "white",
+                  fontSize: "14px",
+                  padding: "8px 12px",
+                  maxWidth: "300px",
+                  backdropFilter: "blur(4px)"
                 }
               }
             }}
@@ -314,12 +314,12 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
           componentsProps={{
             tooltip: {
               sx: {
-                backgroundColor: 'rgba(51, 51, 51, 0.7)',
-                color: 'white',
-                fontSize: '14px',
-                padding: '8px 12px',
-                maxWidth: '300px',
-                backdropFilter: 'blur(4px)'
+                backgroundColor: "rgba(51, 51, 51, 0.7)",
+                color: "white",
+                fontSize: "14px",
+                padding: "8px 12px",
+                maxWidth: "300px",
+                backdropFilter: "blur(4px)"
               }
             }
           }}
@@ -332,7 +332,7 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
             {!isCollapsed && <span>Profile</span>}
           </Link>
         </Tooltip>
-        
+
         <Tooltip
           title="Logout - Sign out of your mytender.io account"
           placement="right"
@@ -342,12 +342,12 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
           componentsProps={{
             tooltip: {
               sx: {
-                backgroundColor: 'rgba(51, 51, 51, 0.7)',
-                color: 'white',
-                fontSize: '14px',
-                padding: '8px 12px',
-                maxWidth: '300px',
-                backdropFilter: 'blur(4px)'
+                backgroundColor: "rgba(51, 51, 51, 0.7)",
+                color: "white",
+                fontSize: "14px",
+                padding: "8px 12px",
+                maxWidth: "300px",
+                backdropFilter: "blur(4px)"
               }
             }
           }}

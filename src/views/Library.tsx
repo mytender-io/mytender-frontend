@@ -1069,11 +1069,12 @@ const Library = () => {
   ];
 
   return (
-    <LibraryLayout>
+  
     <div className="library-wrapper">
       <SideBarSmall onCollapseChange={setSidebarCollapsed} />
       
-      <div className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+      <div className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} 
+        ${isSidepaneOpen ? "sidepane-open" : ""}`}>
         <BreadcrumbNavigation
           currentPage="Content Library"
           parentPages={parentPages}
@@ -1081,7 +1082,8 @@ const Library = () => {
         />
       </div>
 
-      <div className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+      <div className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} 
+        ${isSidepaneOpen ? "sidepane-open" : ""}`}>
       <h1 className="mt-3">Content Library</h1>
         <div className="header-row mt-4">
           <div className="lib-title" id="library-table">
@@ -1348,13 +1350,13 @@ const Library = () => {
           </div>
         </div>
       )}
-
-      <LibrarySidepane
-        isOpen={isSidepaneOpen}
-        onToggle={() => setIsSidepaneOpen(!isSidepaneOpen)}
-      />
+  <LibrarySidepane 
+          isOpen={isSidepaneOpen} 
+          onToggle={() => setIsSidepaneOpen(!isSidepaneOpen)} 
+        />
+  
     </div>
-    /</LibraryLayout>
+
   );
 
 };
