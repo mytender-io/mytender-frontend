@@ -126,79 +126,240 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
         </Tooltip> */}
 
         <div className="sidelinks">
-          <Link
-            to="#"
-            className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor") ? "sidebarsmalllink-active" : ""}`}
-            onClick={handleDashboardClick}
+          <Tooltip
+            title="Tender Dashboard - View and manage all your tenders in one place and generate a full tender document"
+            placement="right"
+            enterDelay={2000}
+            enterNextDelay={2000}
+            leaveDelay={0}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
+                  color: 'white',
+                  fontSize: '14px',
+                  padding: '8px 12px',
+                  maxWidth: '300px',
+                  backdropFilter: 'blur(4px)'
+                }
+              }
+            }}
           >
-            <LayoutDashboard size={24} />
-            {!isCollapsed && <span id="library-title">Tender Dashboard</span>}
-          </Link>
+            <Link
+              to="#"
+              className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor") ? "sidebarsmalllink-active" : ""}`}
+              onClick={handleDashboardClick}
+            >
+              <LayoutDashboard size={24} />
+              {!isCollapsed && <span id="library-title">Tender Dashboard</span>}
+            </Link>
+          </Tooltip>
 
-          <Link
-            to="/library"
-            className={`sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}
+          <Tooltip
+            title="Content Library - Access and manage your organization's knowledge base and templates"
+            placement="right"
+            enterDelay={2000}
+            enterNextDelay={2000}
+            leaveDelay={0}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
+                  color: 'white',
+                  fontSize: '14px',
+                  padding: '8px 12px',
+                  maxWidth: '300px',
+                  backdropFilter: 'blur(4px)'
+                }
+              }
+            }}
           >
-            <BookMarked size={24} />
-            {!isCollapsed && <span id="library-title">Content Library</span>}
-          </Link>
+            <Link
+              to="/library"
+              className={`sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}
+            >
+              <BookMarked size={24} />
+              {!isCollapsed && <span id="library-title">Content Library</span>}
+            </Link>
+          </Tooltip>
 
           <div className="sidebar-section-header">
             {!isCollapsed && "Tool Box"}
           </div>
 
-          <Link
-            to="/chatResponse"
-            className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
+          <Tooltip
+            title="Library Chat - Interact with AI to get insights from your content library"
+            placement="right"
+            enterDelay={2000}
+            enterNextDelay={2000}
+            leaveDelay={0}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
+                  color: 'white',
+                  fontSize: '14px',
+                  padding: '8px 12px',
+                  maxWidth: '300px',
+                  backdropFilter: 'blur(4px)'
+                }
+              }
+            }}
           >
-            <Bot size={24} />
-            {!isCollapsed && <span id="welcome">Library Chat</span>}
-          </Link>
+            <Link
+              to="/chatResponse"
+              className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
+            >
+              <Bot size={24} />
+              {!isCollapsed && <span id="welcome">Library Chat</span>}
+            </Link>
+          </Tooltip>
 
-          <Link
-            to="/question-answer"
-            className={`sidebarsmalllink ${isActive("/question-answer") ? "sidebarsmalllink-active" : ""}`}
+          <Tooltip
+            title="Q&A Generator - Automatically generate question and answer pairs from your documents"
+            placement="right"
+            enterDelay={2000}
+            enterNextDelay={2000}
+            leaveDelay={0}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
+                  color: 'white',
+                  fontSize: '14px',
+                  padding: '8px 12px',
+                  maxWidth: '300px',
+                  backdropFilter: 'blur(4px)'
+                }
+              }
+            }}
           >
-            <Files size={24} />
-            {!isCollapsed && <span>Q&A Generator</span>}
-          </Link>
+            <Link
+              to="/question-answer"
+              className={`sidebarsmalllink ${isActive("/question-answer") ? "sidebarsmalllink-active" : ""}`}
+            >
+              <Files size={24} />
+              {!isCollapsed && <span>Q&A Generator</span>}
+            </Link>
+          </Tooltip>
 
-          <Link
-            to="#"
-            className="sidebarsmalllink"
-            onClick={handleWordAddInClick}
+          <Tooltip
+            title="Wordpane - Access your tender content directly within Microsoft Word"
+            placement="right"
+            enterDelay={2000}
+            enterNextDelay={2000}
+            leaveDelay={0}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
+                  color: 'white',
+                  fontSize: '14px',
+                  padding: '8px 12px',
+                  maxWidth: '300px',
+                  backdropFilter: 'blur(4px)'
+                }
+              }
+            }}
           >
-            <FileText size={24} />
-            {!isCollapsed && <span>Wordpane</span>}
-          </Link>
+            <Link
+              to="#"
+              className="sidebarsmalllink"
+              onClick={handleWordAddInClick}
+            >
+              <FileText size={24} />
+              {!isCollapsed && <span>Wordpane</span>}
+            </Link>
+          </Tooltip>
 
-          <Link
-            to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
-            className="sidebarsmalllink"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Tooltip
+            title="How To - Interactive guide to help you get the most out of mytender.io"
+            placement="right"
+            enterDelay={2000}
+            enterNextDelay={2000}
+            leaveDelay={0}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: 'rgba(51, 51, 51, 0.7)',
+                  color: 'white',
+                  fontSize: '14px',
+                  padding: '8px 12px',
+                  maxWidth: '300px',
+                  backdropFilter: 'blur(4px)'
+                }
+              }
+            }}
           >
-            <GraduationCap size={24} />
-            {!isCollapsed && <span>How To</span>}
-          </Link>
+            <Link
+              to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
+              className="sidebarsmalllink"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <GraduationCap size={24} />
+              {!isCollapsed && <span>How To</span>}
+            </Link>
+          </Tooltip>
         </div>
       </div>
 
       <div className="signout-container">
-        <Link
-          to="/profile"
-          className={`sidebarsmalllink ${isActive("/profile") ? "sidebarsmalllink-active" : ""}`}
+        <Tooltip
+          title="Profile - Manage your account settings and preferences"
+          placement="right"
+          enterDelay={2000}
+          enterNextDelay={2000}
+          leaveDelay={0}
+          componentsProps={{
+            tooltip: {
+              sx: {
+                backgroundColor: 'rgba(51, 51, 51, 0.7)',
+                color: 'white',
+                fontSize: '14px',
+                padding: '8px 12px',
+                maxWidth: '300px',
+                backdropFilter: 'blur(4px)'
+              }
+            }
+          }}
         >
-          <User2 size={16} />
-          {!isCollapsed && <span>Profile</span>}
-        </Link>
-        <Link
-          to="/logout"
-          className={`sidebarsmalllink ${isActive("/logout") ? "sidebarsmalllink-active" : ""}`}
+          <Link
+            to="/profile"
+            className={`sidebarsmalllink ${isActive("/profile") ? "sidebarsmalllink-active" : ""}`}
+          >
+            <User2 size={16} />
+            {!isCollapsed && <span>Profile</span>}
+          </Link>
+        </Tooltip>
+        
+        <Tooltip
+          title="Logout - Sign out of your mytender.io account"
+          placement="right"
+          enterDelay={2000}
+          enterNextDelay={2000}
+          leaveDelay={0}
+          componentsProps={{
+            tooltip: {
+              sx: {
+                backgroundColor: 'rgba(51, 51, 51, 0.7)',
+                color: 'white',
+                fontSize: '14px',
+                padding: '8px 12px',
+                maxWidth: '300px',
+                backdropFilter: 'blur(4px)'
+              }
+            }
+          }}
         >
-          <LogOut size={16} />
-          {!isCollapsed && <span>Logout</span>}
-        </Link>
+          <Link
+            to="/logout"
+            className={`sidebarsmalllink ${isActive("/logout") ? "sidebarsmalllink-active" : ""}`}
+          >
+            <LogOut size={16} />
+            {!isCollapsed && <span>Logout</span>}
+          </Link>
+        </Tooltip>
       </div>
     </div>
   );
