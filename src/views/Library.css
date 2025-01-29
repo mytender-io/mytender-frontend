@@ -315,11 +315,12 @@
 
 .styled-menu-item {
   font-family: "Manrope", sans-serif !important;
-  font-size: 1rem !important;
+  font-size: 1.1rem !important;
   padding: 0.429rem 0.857rem !important;
+  font-weight: 600 !important;
 }
 
 .styled-menu-item-icon {
-  margin-right: 0.571rem;
-  font-size: 1rem;
+  margin-right: 0.8rem;
+  font-size: 1.1rem;
 }

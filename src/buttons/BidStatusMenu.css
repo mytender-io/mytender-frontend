@@ -28,17 +28,6 @@
     border: none;
 }
 
-.styled-menu-item {
-    font-size: 1rem;
-    padding: 0.571rem 1.143rem;
-    font-weight: 600 !important;
-    border: none;
-}
-
-.styled-menu-item:hover {
-    background-color: #f5f5f5;
-}
-
 .bid-status-menu {
     font-weight: 700;
     font-size: 1.143rem;
