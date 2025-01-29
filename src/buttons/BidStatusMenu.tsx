@@ -1,8 +1,6 @@
-import { Menu, MenuItem } from "@mui/material";
+import { Menu, MenuItem, Button } from "@mui/material";
 import { useState } from "react";
-import { Button } from "react-bootstrap";
 import { Search, ClipboardList, FileWarning, FileCheck, FileSignature } from "lucide-react";
-import "./BidStatusMenu.css";
 
 type BidStatus = "Planning" | "Research" | "First Draft" | "Reviewing" | "Complete";
 
@@ -43,15 +41,53 @@ const BidStatusMenu = ({
     handleClose();
   };
 
-  const getStatusColor = (status: BidStatus) => {
-    const colors = {
-      Planning: "status-identification",
-      Research: "status-capture",
-      "First Draft": "status-first-review",
-      Reviewing: "status-final-review",
-      Complete: "status-submitted"
+  const getStatusStyles = (status: BidStatus): { sx: any } => {
+    const baseStyles = {
+      fontWeight: 700,
+      fontSize: '1.143rem',
+      whiteSpace: 'nowrap',
+      textTransform: 'none',
+      border: 'none',
+      '&:hover': {
+        opacity: 0.9,
+        border: 'none'
+      }
     };
-    return colors[status] || "status-identification";
+
+    const colors = {
+      Planning: {
+        backgroundColor: '#FFE4DC',
+        color: '#D14D1F',
+      },
+      Research: {
+        backgroundColor: '#E1F3FB',
+        color: '#2B87AF',
+      },
+      "First Draft": {
+        backgroundColor: '#E6FFE6',
+        color: '#2E8B2E',
+      },
+      Reviewing: {
+        backgroundColor: '#F8E6F8',
+        color: '#8B488B',
+      },
+      Complete: {
+        backgroundColor: '#E0F5E9',
+        color: '#2A7F4F',
+      }
+    };
+
+    return {
+      sx: {
+        ...baseStyles,
+        backgroundColor: colors[status].backgroundColor,
+        color: colors[status].color,
+        '&:hover': {
+          ...baseStyles['&:hover'],
+          backgroundColor: colors[status].backgroundColor,
+        }
+      }
+    };
   };
 
   const getStatusIcon = (status: BidStatus) => {
@@ -71,13 +107,17 @@ const BidStatusMenu = ({
     <div>
       <Button
         onClick={handleClick}
-        className={`${getStatusColor(currentStatus)} text-nowrap d-inline-block bid-status-menu`}
+        {...getStatusStyles(currentStatus)}
+        disableElevation
+        disableRipple
+        variant="contained"
         aria-controls="bid-status-menu"
         aria-haspopup="true"
       >
         {currentStatus}
-        <StatusIcon className="ms-2" size={16} />
+        <StatusIcon className="ml-2" size={16} />
       </Button>
+      
       <Menu
         id="bid-status-menu"
         open={Boolean(anchorEl)}
@@ -86,9 +126,9 @@ const BidStatusMenu = ({
         keepMounted
         PaperProps={{
           elevation: 1,
-          style: {
-            width: "160px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+          sx: {
+            width: '120px',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
           }
         }}
       >
@@ -98,10 +138,17 @@ const BidStatusMenu = ({
             <MenuItem
               key={status}
               onClick={() => handleSelect(status as BidStatus)}
-              className="styled-menu-item"
+              sx={{
+                fontSize: '1rem',
+                padding: '0.571rem 1.143rem',
+                fontWeight: 600,
+                '&:hover': {
+                  backgroundColor: '#f5f5f5'
+                }
+              }}
             >
               {status}
-              <Icon className="ms-2" size={16} />
+             
             </MenuItem>
           );
         })}

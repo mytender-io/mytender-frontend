@@ -1,6 +1,5 @@
-import { Menu, MenuItem } from "@mui/material";
+import { Menu, MenuItem, Button } from "@mui/material";
 import { useState } from "react";
-import { Button } from "react-bootstrap";
 import { Section } from "../views/BidWritingStateManagerView";
 import { Circle, Clock, CheckCircle, Minus, TriangleAlert } from "lucide-react";
 
@@ -35,29 +34,80 @@ const StatusMenu = ({
     handleClose();
   };
 
-  const getStatusColor = (status: ValidStatus) => {
+  const getStatusStyles = (status: ValidStatus): { sx: any } => {
+    const baseStyles = {
+      fontWeight: 700,
+      fontSize: '1.125rem',
+      whiteSpace: 'nowrap',
+      textTransform: 'none',
+      '&:hover': {
+        opacity: 0.9,
+      }
+    };
+
     switch (status) {
       case "Completed":
-        return "status-complete";
+        return {
+          sx: {
+            ...baseStyles,
+            backgroundColor: '#e0f5e9',
+            color: '#2a7f4f',
+            '&:hover': {
+              backgroundColor: '#e0f5e9',
+            }
+          }
+        };
       case "In Progress":
-        return "status-in-progress";
+        return {
+          sx: {
+            ...baseStyles,
+            backgroundColor: 'rgba(255, 140, 0, 0.1)',
+            color: '#ff8c00',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 140, 0, 0.1)',
+            }
+          }
+        };
       case "Not Started":
-        return "status-not-started";
+        return {
+          sx: {
+            ...baseStyles,
+            backgroundColor: '#ffe4dc',
+            color: '#d14d1f',
+            '&:hover': {
+              backgroundColor: '#ffe4dc',
+            }
+          }
+        };
       default:
-        return "status-not-started";
+        return {
+          sx: {
+            ...baseStyles,
+            backgroundColor: '#ffe4dc',
+            color: '#d14d1f',
+            '&:hover': {
+              backgroundColor: '#ffe4dc',
+            }
+          }
+        };
     }
   };
 
   const getStatusIcon = (status: ValidStatus) => {
+    const iconProps = {
+      className: "ml-2 inline-block align-middle",
+      size: 16
+    };
+
     switch (status) {
       case "Completed":
-        return <CheckCircle className="status-icon" size={16} />;
+        return <CheckCircle {...iconProps} />;
       case "In Progress":
-        return <Clock className="status-icon" size={16} />;
+        return <Clock {...iconProps} />;
       case "Not Started":
-        return <TriangleAlert className="status-icon" size={16} />;
+        return <TriangleAlert {...iconProps} />;
       default:
-        return <TriangleAlert className="status-icon" size={16} />;
+        return <TriangleAlert {...iconProps} />;
     }
   };
 
@@ -65,7 +115,10 @@ const StatusMenu = ({
     <div>
       <Button
         onClick={handleClick}
-        className={`${getStatusColor(currentStatus)} text-nowrap d-inline-block status-menu-button`}
+        {...getStatusStyles(currentStatus)}
+        disableElevation
+        disableRipple
+        variant="contained"
         aria-controls="simple-menu"
         aria-haspopup="true"
       >
@@ -80,20 +133,29 @@ const StatusMenu = ({
         keepMounted
         PaperProps={{
           elevation: 1,
-          style: {
-            width: "120px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+          sx: {
+            width: '120px',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
           }
         }}
       >
-        <MenuItem onClick={() => handleSelect("Not Started")} className="styled-menu-item">
-          Not Started {getStatusIcon("Not Started")}
+        <MenuItem
+          onClick={() => handleSelect("Not Started")}
+          sx={{ '&:hover': { backgroundColor: '#f3f4f6' } }}
+        >
+          Not Started
         </MenuItem>
-        <MenuItem onClick={() => handleSelect("In Progress")} className="styled-menu-item">
-          In Progress {getStatusIcon("In Progress")}
+        <MenuItem
+          onClick={() => handleSelect("In Progress")}
+          sx={{ '&:hover': { backgroundColor: '#f3f4f6' } }}
+        >
+          In Progress
         </MenuItem>
-        <MenuItem onClick={() => handleSelect("Completed")} className="styled-menu-item">
-          Completed {getStatusIcon("Completed")}
+        <MenuItem
+          onClick={() => handleSelect("Completed")}
+          sx={{ '&:hover': { backgroundColor: '#f3f4f6' } }}
+        >
+          Completed
         </MenuItem>
       </Menu>
     </div>
