@@ -17,6 +17,7 @@ import "./Profile.css";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import BreadcrumbNavigation from "@/routes/BreadCrumbNavigation.tsx";
 
 const ProfilePage = () => {
   const getAuth = useAuthUser();
@@ -228,13 +229,22 @@ const ProfilePage = () => {
       </div>
     );
   }
-
+  const parentPages = [];
   return (
-    <div className="chatpage">
+    <div>
       <SideBarSmall />
-      <div className="lib-container">
-        <div className="scroll-container">
-          <h1 className="heavy">Profile</h1>
+      <div className="bidplanner-container ">
+        <div className="header-container">
+          <BreadcrumbNavigation
+            currentPage="Profile"
+            parentPages={parentPages}
+            showHome={true}
+          />
+        </div>
+
+        <div className="lib-container">
+          <div>
+            <h1 className="mt-3 mb-3">Profile</h1>
           <Card>
             <Card.Body>
               <Form>
@@ -446,6 +456,7 @@ const ProfilePage = () => {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 };
