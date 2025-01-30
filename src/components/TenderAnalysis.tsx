@@ -260,9 +260,10 @@ const TenderAnalysis = ({ canUserEdit }) => {
       formData.append("prompt", tab.prompt);
 
       // Use the new endpoint for differentiation opportunities
-      const endpoint = tab.prompt === "generate_differentiation_opportunities" 
-        ? `generate_differentiation_opportunities`
-        : `generate_tender_insights`;
+      const endpoint =
+        tab.prompt === "generate_differentiation_opportunities"
+          ? `generate_differentiation_opportunities`
+          : `generate_tender_insights`;
 
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/${endpoint}`,
@@ -280,6 +281,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
       setSharedState((prev) => ({ ...prev, [tab.stateKey]: generatedContent }));
       displayAlert("Generated successfully!", "success");
     } catch (err) {
+      console.log(err);
       const errorMsg =
         err.response?.status === 404
           ? "No documents found in the tender library. Please upload documents before generating"
@@ -310,9 +312,10 @@ const TenderAnalysis = ({ canUserEdit }) => {
       formData.append("prompt", tab.prompt);
 
       // Use the new endpoint for differentiation opportunities
-      const endpoint = tab.prompt === "generate_differentiation_opportunities" 
-        ? `generate_differentiation_opportunities`
-        : `generate_tender_insights`;
+      const endpoint =
+        tab.prompt === "generate_differentiation_opportunities"
+          ? `generate_differentiation_opportunities`
+          : `generate_tender_insights`;
 
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/${endpoint}`,
@@ -326,7 +329,8 @@ const TenderAnalysis = ({ canUserEdit }) => {
       );
 
       if (mounted.current) {
-        const generatedContent = result.data.requirements || result.data.analysis;
+        const generatedContent =
+          result.data.requirements || result.data.analysis;
         setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
         setSharedState((prev) => ({
           ...prev,
