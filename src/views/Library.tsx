@@ -1084,7 +1084,7 @@ const Library = () => {
 
       <div className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} 
         ${isSidepaneOpen ? "sidepane-open" : ""}`}>
-      <h1 className="mt-3">Content Library</h1>
+      <h1 className="mt-3">Build your knowledge base</h1>
         <div className="header-row mt-4">
           <div className="lib-title" id="library-table">
             Resources

@@ -420,7 +420,7 @@ const Bids = () => {
         className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
       >
         <div>
-          <h1 className="mt-3">Tender Dashboard</h1>
+          <h1 className="mt-3">Track your tenders</h1>
 
           <div
             style={{
