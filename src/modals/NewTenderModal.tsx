@@ -23,6 +23,32 @@ interface NewTenderModalProps {
 
 type Step = "details" | "documents" | "content" | "questions";
 
+// Add this initial state object at the top of the file, after imports
+const initialBidState = {
+  bidInfo: "",
+  opportunity_information: "",
+  compliance_requirements: "",
+  tender_summary: "",
+  evaluation_criteria: "",
+  derive_insights: "",
+  differentiation_opportunities: "",
+  questions: "",
+  value: "",
+  client_name: "",
+  bid_qualification_result: "",
+  opportunity_owner: "",
+  submission_deadline: "",
+  bid_manager: "",
+  contributors: {},
+  original_creator: "",
+  isSaved: false,
+  isLoading: false,
+  saveSuccess: null,
+  object_id: null,
+  selectedFolders: ["default"],
+  outline: []
+};
+
 const NewTenderModal: React.FC<NewTenderModalProps> = ({
   show,
   onHide,
@@ -61,10 +87,16 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
 
   useEffect(() => {
     if (show) {
-      console.log("cleared storage");
+      // Clear localStorage and reset shared state when modal opens
       localStorage.clear();
+      setSharedState((prevState) => ({
+        ...initialBidState,
+        original_creator: auth.email,
+        contributors: auth.email ? { [auth.email]: "admin" } : {},
+        lastUpdated: Date.now()
+      }));
     }
-  }, [show]);
+  }, [show, auth.email, setSharedState]);
 
   const loadingMessages = [
     "Looking at the tender docs...",
