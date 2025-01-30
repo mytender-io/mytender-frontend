@@ -67,85 +67,11 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   }, [show]);
 
   const loadingMessages = [
-    // Initial Analysis
-    "Analyzing tender documents...",
-    "Extracting key requirements...",
-    "Scanning compliance criteria...",
-    "Identifying mandatory requirements...",
-
-    // Opportunity Analysis
-    "Analyzing market opportunity...",
-    "Evaluating competitive landscape...",
-    "Identifying key differentiators...",
-    "Assessing strategic advantages...",
-    "Analyzing win probability factors...",
-
-    // Compliance Processing
-    "Processing compliance matrix...",
-    "Mapping regulatory requirements...",
-    "Validating certification needs...",
-    "Checking accreditation requirements...",
-    "Analyzing quality standards...",
-    "Reviewing safety requirements...",
-    "Checking environmental compliance...",
-
-    // Structure Building
-    "Building section framework...",
-    "Organizing content hierarchy...",
-    "Structuring response format...",
-    "Creating section dependencies...",
-    "Mapping cross-references...",
-
-    // Requirements Processing
-    "Processing technical requirements...",
-    "Analyzing scope requirements...",
-    "Evaluating delivery timelines...",
-    "Mapping resource requirements...",
-    "Assessing risk factors...",
-
-    // Evaluation Criteria
-    "Analyzing evaluation criteria...",
-    "Mapping scoring elements...",
-    "Identifying critical success factors...",
-    "Processing weighted criteria...",
-    "Validating scoring mechanisms...",
-
-    // Value Proposition
-    "Analyzing value propositions...",
-    "Identifying unique selling points...",
-    "Mapping innovation opportunities...",
-    "Processing strategic benefits...",
-
-    // Documentation
-    "Structuring executive summary...",
-    "Organizing methodology sections...",
-    "Mapping past performance requirements...",
-    "Processing capability statements...",
-
-    // Quality Checks
-    "Validating section flow...",
-    "Checking requirement coverage...",
-    "Verifying compliance alignment...",
-    "Reviewing structural integrity...",
-
-    // Financial Elements
-    "Analyzing pricing requirements...",
-    "Mapping cost breakdown structure...",
-    "Reviewing payment milestones...",
-    "Checking financial criteria...",
-
-    // Social Value
-    "Processing social value requirements...",
-    "Analyzing community benefits...",
-    "Mapping sustainability requirements...",
-    "Evaluating environmental impact...",
-
-    // Final Steps
-    "Optimizing outline structure...",
-    "Finalizing section ordering...",
-    "Validating completeness...",
-    "Performing final compliance check...",
-    "Generating final outline format... Please wait a little bit longer..."
+    "Looking at the tender docs...",
+    "Searching for questions...",
+    "Extracting information...",
+    "Planning outline...",
+    "Generating outline... Please wait a little bit longer..."
   ];
 
   function LinearProgressWithLabel(props) {
@@ -287,16 +213,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       setIsGeneratingOutline(true);
       startProgressBar();
 
-      const keysToRemove = [
-        "bidInfo",
-        "backgroundInfo",
-        "response",
-        "inputText",
-        "editorState",
-        "messages",
-        "bidState"
-      ];
-      keysToRemove.forEach((key) => localStorage.removeItem(key));
+      localStorage.clear();
 
       console.log(selectedFiles);
       await axios.post(
@@ -322,6 +239,10 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         // Initialize other required fields with empty values
         opportunity_information: "",
         compliance_requirements: "",
+        differentiation_opportunities: "",
+        derive_insights: "",
+        evaluation_criteria: "",
+        tender_summary: "",
         client_name: "",
         bid_qualification_result: "",
         questions: "",
@@ -477,9 +398,10 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
           <div>
             <div className="">
               <p>
-              Select the folders below from your content library to use as
-              context in your final proposal. The AI will be able to use
-              information from these when generating an answer.</p>
+                Select the folders below from your content library to use as
+                context in your final proposal. The AI will be able to use
+                information from these when generating an answer.
+              </p>
             </div>
 
             <div className="selectfolder-container mt-3">

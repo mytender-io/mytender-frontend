@@ -106,7 +106,7 @@ const AccordionItem = ({ title, children }) => {
     <div className="border-b border-gray-200 pb-3">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full text-left hover:bg-gray-50 transition-colors duration-200 pt-3 relative pr-8"
+        className="w-full text-left transition-colors duration-200 pt-3 relative pr-8"
       >
         <span className="font-semibold text-gray-800 text-xl">{title}</span>
         <ChevronRight 

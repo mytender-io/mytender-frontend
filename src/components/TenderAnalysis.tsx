@@ -52,9 +52,13 @@ const LoadingState = () => {
   }, []);
 
   return (
-    <Box className="w-80 ml-4 mt-4 mb-4"> {/* Added mb-4 for bottom margin */}
+    <Box className="w-80 ml-4 mt-4 mb-4">
+      {" "}
+      {/* Added mb-4 for bottom margin */}
       <Box className="flex flex-col space-y-3">
-        <Box className="max-h-[400px] overflow-y-auto pr-2"> {/* Added scrollable container with padding */}
+        <Box className="max-h-[400px] overflow-y-auto pr-2">
+          {" "}
+          {/* Added scrollable container with padding */}
           {steps.map((step, index) => {
             const StepIcon = step.icon;
             return (
@@ -70,7 +74,7 @@ const LoadingState = () => {
                   className={`w-5 h-5 ${
                     index === activeStep ? "animate-pulse" : ""
                   }`}
-                  style={{ 
+                  style={{
                     color: theme.palette.primary.main // Use theme color for icons
                   }}
                 />
@@ -235,12 +239,13 @@ const TenderAnalysis = ({ canUserEdit }) => {
       displayAlert("You only have permission to view this bid.", "danger");
       return;
     }
-    handleTabClick(newValue);
+    setCurrentTabIndex(newValue); // Only handle the tab switch
   };
 
   const handleTabClick = async (index) => {
     setCurrentTabIndex(index);
-    if (tabContent[index]) return;
+    console.log("tab click");
+    if (tabContent[index]?.trim()) return; // Only return if there's actual content
     if (!object_id) {
       displayAlert("Please save the bid first.", "warning");
       return;
@@ -536,6 +541,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
             return (
               <Tab
                 key={index}
+                onClick={() => handleTabClick(index)}
                 icon={
                   <Box className="flex items-center space-x-2">
                     <TabIcon
@@ -614,18 +620,20 @@ const TenderAnalysis = ({ canUserEdit }) => {
           {tabs.map((tab, index) => (
             <TabPanel key={index} value={currentTabIndex} index={index}>
               <Box className="relative p-8">
+                {/* Show loading state overlay if this tab is loading */}
                 {loadingTab === index && tabRects[index] && (
                   <Box
                     className="absolute z-10 bg-white rounded-lg shadow-lg"
                     sx={{
-                      left: `${tabRects[index].left - tabRects[0].left}px`, // Position relative to first tab
-                      top: "-1px" // Adjust as needed
+                      left: `${tabRects[index].left - tabRects[0].left}px`,
+                      top: "-1px"
                     }}
                   >
                     <LoadingState />
                   </Box>
                 )}
-                {!loadingTab && renderContent(tabContent[index] || "")}
+                {/* Always render content, regardless of loading state */}
+                {renderContent(tabContent[index] || "")}
               </Box>
             </TabPanel>
           ))}
