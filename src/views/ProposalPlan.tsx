@@ -105,7 +105,7 @@ const ProposalPlan = () => {
   const handleRowClick = (e: React.MouseEvent, index: number) => {
     // Expand the list of elements to ignore to include MUI Select components
     const isInteractiveElement = (e.target as HTMLElement).closest(
-      'input, select, button, a, [role="button"], .editable-cell, .dropdown, .dropdown-toggle, .MuiSelect-root, .MuiSelect-select, .MuiMenuItem-root, .MuiPaper-root, .MuiList-root, .css-1dimb5e-singleValue, .css-1s2u09g-control, .css-b62m3t-container'
+      'input, select, button, a, [role="button"], .editable-cell, .dropdown, .dropdown-toggle, .MuiSelect-root, .MuiSelect-select, .MuiMenuItem-root, .MuiPaper-root, .MuiList-root, .css-1dimb5e-singleValue, .css-1s2u09g-control, .css-b62m3t-container, [data-checkbox]'
     );
 
     if (!isInteractiveElement) {
@@ -768,8 +768,12 @@ const ProposalPlan = () => {
                       </thead>
                       <tbody>
                         {outline.map((section, index) => (
-                          <tr key={index} className="cursor-pointer">
-                            <td className="w-12 p-4">
+                          <tr
+                            key={index}
+                            className="cursor-pointer"
+                            onClick={(e) => handleRowClick(e, index)}
+                          >
+                            <td className="w-12 p-4" data-checkbox>
                               <div className="flex items-center justify-center">
                                 <CustomCheckbox
                                   checked={selectedSections.has(index)}
