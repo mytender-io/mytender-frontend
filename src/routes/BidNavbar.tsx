@@ -20,7 +20,7 @@ const BidNavbar = ({
   showViewOnlyMessage = () => {},
   initialBidName = "",
   outline = [], // default value
-  sidebarCollapse= false,
+  sidebarCollapse = false,
   object_id = null,
   handleRegenerateClick = () => {}
 }) => {
@@ -112,8 +112,7 @@ const BidNavbar = ({
   console.log(initialBidName);
   return (
     <div>
-      <div
-      >
+      <div>
         <BidTitle
           canUserEdit={true}
           displayAlert={displayAlert}
@@ -124,8 +123,15 @@ const BidNavbar = ({
         />
       </div>
 
-      <div >
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderBottom: "0.143rem solid #ebecef"
+          }}
+        >
           <div className="bidnav-section mt-3 mb-1">
             <NavLink
               to="/bid-extractor"
@@ -159,16 +165,13 @@ const BidNavbar = ({
           {outline.length === 0 ? (
             <div></div>
           ) : (
-            <div>
+            <div className="buttons-container">
               <button
                 onClick={handleRegenerateClick}
                 className="upload-button me-2"
                 style={{ minWidth: "fit-content" }}
               >
-                <FontAwesomeIcon
-                  icon={faPlus}
-                  className="pr-2"
-                ></FontAwesomeIcon>
+                <FontAwesomeIcon icon={faPlus} className="pr-2" />
                 New Outline
               </button>
               <GenerateProposalModal bid_id={object_id} outline={outline} />

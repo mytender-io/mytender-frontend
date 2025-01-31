@@ -515,6 +515,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
               backgroundColor: `${theme.palette.primary.main} !important`
             },
             // More specific selector for tab root
+            // Change this part in the Tabs sx prop
             "& .MuiTab-root": {
               textTransform: "none",
               minHeight: "48px",
@@ -524,8 +525,8 @@ const TenderAnalysis = ({ canUserEdit }) => {
                 color: "#000000"
               },
               "&:hover": {
-                color: `${theme.palette.primary.main} !important`,
-                backgroundColor: `${theme.palette.custom.lighter} !important`,
+                color: `${theme.palette.primary.main} !important`, // Changed to main orange
+                backgroundColor: `${theme.palette.custom.lighter} !important`, // Keep light orange background
                 ".lucide": {
                   color: `${theme.palette.primary.main} !important`
                 }

@@ -8,6 +8,7 @@
 .bidnav-section {
     display: flex;
     align-items: center;
+    /* Remove width: 100% */
 }
 
 .bidnav-container {
@@ -28,7 +29,7 @@
     font-weight: 600;
     text-decoration: none;
     color: #999;
-    padding: 0.357rem 0.714rem;
+    padding: 0.6rem 0.714rem;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -37,16 +38,18 @@
 .bidnav-item::after {
     content: "";
     position: absolute;
-    bottom: 0;
+    bottom: -0.3rem;
+    /* Align with the grey border */
     left: 0;
     width: 0;
     height: 0.143rem;
-    background-color: black;
+    background-color: #FF8019;
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bidnav-item:hover {
-    color: black;
+    color: #FF8019;
+    /* Changed from black to orange */
 }
 
 .bidnav-item:hover::after {
@@ -54,7 +57,8 @@
 }
 
 .bidnav-item.active {
-    color: black;
+    color: #FF8019;
+    /* Changed from black to orange */
 }
 
 .bidnav-item.active::after {
@@ -74,7 +78,8 @@
 
 .back-arrow-button:hover {
     transform: translateX(-0.214rem);
-    color: #666;
+    color: #FF8019;
+    /* Changed from #666 to orange */
 }
 
 .back-arrow-button:focus {
@@ -83,4 +88,13 @@
 
 .back-arrow-button:active {
     transform: translateX(-0.143rem);
+}
+
+.buttons-container {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    /* Prevent shrinking */
+    margin-bottom: 1rem;
+    /* Match the nav items spacing */
 }

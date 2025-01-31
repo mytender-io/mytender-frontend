@@ -31,28 +31,6 @@
     padding-right: calc(2.143rem + 320px);
 }
 
-
-/* Header container styles */
-
-.header-container {
-    padding-left: 22.857rem;
-    padding-right: 2.143rem;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.header-container.sidebar-collapsed {
-    padding-left: 8.3rem;
-}
-
-
-/* Add this new class for sidepane open state */
-
-.header-container.sidepane-open {
-    padding-right: calc(2.143rem + 300px);
-}
-
-.scroll-container {}
-
 .library-container {
     box-shadow: 0 0.429rem 0.857rem rgba(0, 0, 0, 0.15);
     border: 0.071rem solid #ced4da;
