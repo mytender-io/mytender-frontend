@@ -12,7 +12,7 @@ import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 import TenderAnalysis from "../components/TenderAnalysis.tsx";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, Fullscreen, X } from "lucide-react";
 import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 import theme from "@/components/ui/theme.tsx";
 import { ThemeProvider } from "@mui/material/styles";
@@ -220,8 +220,8 @@ const BidPlanner = () => {
                 onClick={handleOpenLibrary}
                 className="w-full mt-5 py-3 px-4 flex items-center justify-between bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
               >
-                <div className="flex items-center space-x-2">
-                  <ChevronDown size={20} className="text-gray-600" />
+                <div className="flex items-center space-x-3">
+                  <Fullscreen size={20} className="text-gray-600" />
                   <span className="text-gray-800 text-lg font-medium">
                     View Tender Library Documents
                   </span>

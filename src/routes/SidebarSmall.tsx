@@ -19,7 +19,10 @@ import {
   Files,
   Bot,
   BookMarked,
-  Sparkles
+  Sparkles,
+  BookOpen,
+  BookOpenCheck,
+  BookOpenText
 } from "lucide-react";
 import { Tooltip } from "@mui/material";
 
@@ -178,7 +181,7 @@ const SideBarSmall = ({ onCollapseChange }: SideBarSmallProps) => {
               to="/library"
               className={`sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}
             >
-              <BookMarked size={24} />
+              <BookOpenText   size={24} />
               {!isCollapsed && <span id="library-title">Content Library</span>}
             </Link>
           </Tooltip>

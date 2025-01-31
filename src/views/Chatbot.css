@@ -17,19 +17,6 @@
   font-weight: 600;
 }
 
-@keyframes fadeInScaleUp {
-  from {
-    opacity: 0;
-    transform: scale(0.99);
-    /* Start slightly smaller */
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-    /* Scale to actual size */
-  }
-}
-
 .chatbot-container,
 .lib-container {
   animation: fadeInScaleUp 0.1s ease-out;

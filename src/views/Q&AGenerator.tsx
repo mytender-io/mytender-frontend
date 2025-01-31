@@ -1304,7 +1304,7 @@ const QAGenerator = () => {
 
         <div className="lib-container">
           <div>
-            <h1 className="mt-3">Q&A Generator</h1>
+            <h1 className="mt-3">Respond to single-questions</h1>
             <div>
               <Row
                 className="justify-content-md-center"
