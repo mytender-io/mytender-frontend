@@ -9,7 +9,7 @@ import handleGAEvent from "../utilities/handleGAEvent";
 import { HTTP_PREFIX, API_URL } from "../helper/Constants";
 import axios from "axios";
 import { Button, Modal } from "react-bootstrap";
-import { Bot, Copy, ThumbsDown, ThumbsUp, User } from "lucide-react";
+import { Bot, Copy, Sparkles, ThumbsDown, ThumbsUp, User } from "lucide-react";
 import { IconButton } from "@mui/material";
 
 const ChatbotResponse = () => {
@@ -197,7 +197,7 @@ const ChatbotResponse = () => {
                 {message.type === "user" ? (
                   <User color="#ffffff" />
                 ) : (
-                  <Bot color="#404a50" />
+                  <Sparkles color="#404a50" />
                 )}
               </div>
               <div className="message-content">
@@ -258,7 +258,11 @@ const ChatbotResponse = () => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-          <button onClick={handleShowModal} className="clear-button" id="clear">
+          <button
+            onClick={handleShowModal}
+            className="clear-button me-3"
+            id="clear"
+          >
             <FontAwesomeIcon icon={faTrash} />
           </button>
           {/* <Button className="chat-Response-Clear-Button" onClick={handleClearMessages}>Clear</Button> */}
@@ -273,11 +277,14 @@ const ChatbotResponse = () => {
       </div>
 
       <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
+        <Modal.Header className="px-4">
           <Modal.Title>Clear Conversation</Modal.Title>
+          <button className="close-button ms-auto" onClick={handleCloseModal}>
+            ×
+          </button>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to clear the entire conversation?
+        <Modal.Body className="px-4 py-4">
+          <p>Are you sure you want to clear the entire conversation?</p>
         </Modal.Body>
         <Modal.Footer>
           <Button
