@@ -510,12 +510,9 @@ const TenderAnalysis = ({ canUserEdit }) => {
           scrollButtons="auto"
           aria-label="tender analysis tabs"
           sx={{
-            // Override the indicator color more specifically
             "& .MuiTabs-indicator": {
               backgroundColor: `${theme.palette.primary.main} !important`
             },
-            // More specific selector for tab root
-            // Change this part in the Tabs sx prop
             "& .MuiTab-root": {
               textTransform: "none",
               minHeight: "48px",
@@ -525,16 +522,15 @@ const TenderAnalysis = ({ canUserEdit }) => {
                 color: "#000000"
               },
               "&:hover": {
-                color: `${theme.palette.primary.main} !important`, // Changed to main orange
-                backgroundColor: `${theme.palette.custom.lighter} !important`, // Keep light orange background
+                color: theme.palette.primary.main,
+                backgroundColor: "#FFF0E6", // Using the orange_ultra_light color directly
                 ".lucide": {
-                  color: `${theme.palette.primary.main} !important`
+                  color: theme.palette.primary.main
                 }
               },
               "&:active": {
                 backgroundColor: theme.palette.action.hover
               },
-              // Override the ripple effect color
               "& .MuiTouchRipple-root": {
                 color: `${theme.palette.primary.main} !important`
               }

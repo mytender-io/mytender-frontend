@@ -57,7 +57,7 @@ const theme = createTheme({
             },
             '&:hover': {
               color: `${orangeColors.main} !important`,
-              backgroundColor: `${orangeColors.light} !important`,
+              backgroundColor: `${orangeColors.lighter} !important`, // Changed from light to lighter
               '.lucide': {
                 color: `${orangeColors.main} !important`
               }
@@ -93,7 +93,7 @@ const theme = createTheme({
             },
             '&:hover': {
               color: `${orangeColors.main} !important`,
-              backgroundColor: `${orangeColors.light} !important`
+              backgroundColor: `${orangeColors.lighter} !important` // Changed from light to lighter
             }
           }
         }
