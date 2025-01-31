@@ -20,7 +20,8 @@ posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
   person_profiles: "identified_only"
 });
 
-const REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+// Change from 24 hours to 1 hour
+const CHECK_INTERVAL = 60 * 60 * 1000; // 1 hour in milliseconds
 
 const Layout = () => {
   const location = useLocation();
@@ -28,17 +29,43 @@ const Layout = () => {
   const auth = getAuth();
 
   useEffect(() => {
-    // Check last refresh time
-    const lastRefresh = localStorage.getItem("lastAppRefresh");
-    const now = Date.now();
+    const checkForUpdates = async () => {
+      try {
+        const timestamp = Date.now(); // Add cache-busting parameter
+        // Fetch the manifest with cache-busting query parameter
+        const response = await fetch(`/manifest.json?t=${timestamp}`, {
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch manifest');
+        }
 
-    if (!lastRefresh || now - parseInt(lastRefresh) > REFRESH_INTERVAL) {
-      // Store new refresh time
-      localStorage.setItem("lastAppRefresh", now.toString());
+        const manifest = await response.json();
+        const currentBuildHash = manifest.hash;
+        const storedHash = localStorage.getItem('buildHash');
+        
+        if (storedHash && storedHash !== currentBuildHash) {
+          if (window.confirm('A new version of the application is available. Would you like to reload to get the latest updates?')) {
+            localStorage.setItem('buildHash', currentBuildHash);
+            window.location.reload();
+          }
+        } else if (!storedHash) {
+          localStorage.setItem('buildHash', currentBuildHash);
+        }
+      } catch (error) {
+        console.error('Failed to check for updates:', error);
+      }
+    };
 
-      // Force refresh the page
-      window.location.reload();
-    }
+    // Check for updates immediately when component mounts
+    checkForUpdates();
+
+    // Set up periodic checks
+    const intervalId = setInterval(checkForUpdates, CHECK_INTERVAL);
 
     if (auth?.token) {
       console.log("User authenticated");
@@ -46,6 +73,9 @@ const Layout = () => {
         email: auth.email
       });
     }
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
   }, [auth?.token]);
 
   const isAuthenticated = auth?.token !== undefined;
