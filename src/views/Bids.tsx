@@ -430,7 +430,7 @@ const Bids = () => {
             }}
             className="mt-3"
           >
-            <p style={{ margin: 0 }}>{filteredBids.length} Results</p>
+            <p className="mt-3">{filteredBids.length} Results</p>
             <div>
               <Button
                 onClick={handleWriteProposalClick}

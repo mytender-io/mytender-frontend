@@ -1,9 +1,22 @@
 import { createTheme } from '@mui/material/styles';
 
+declare module '@mui/material/styles' {
+  interface Palette {
+    custom: {
+      lighter: string;
+    }
+  }
+  interface PaletteOptions {
+    custom?: {
+      lighter: string;
+    }
+  }
+}
+
 const orangeColors = {
-  main: "#ffb366",
-  light: "rgba(255, 179, 102, 0.1)",
-  lighter: "rgba(255, 179, 102, 0.05)",
+  main: "#FF8019",
+  light: "#FF8F29",
+  lighter: "#FFF0E6",
   hover: "rgba(255, 179, 102, 0.2)",
   active: "#ff9933",
   dark: "#ff8000",
@@ -21,6 +34,9 @@ const theme = createTheme({
     action: {
       hover: orangeColors.hover,
       selected: orangeColors.light,
+    },
+    custom: {
+      lighter: orangeColors.lighter
     }
   },
   components: {

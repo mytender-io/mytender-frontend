@@ -1064,17 +1064,16 @@ const Library = () => {
       </div>
     );
   };
-  const parentPages = [
- 
-  ];
+  const parentPages = [];
 
   return (
-  
     <div className="library-wrapper">
       <SideBarSmall onCollapseChange={setSidebarCollapsed} />
-      
-      <div className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} 
-        ${isSidepaneOpen ? "sidepane-open" : ""}`}>
+
+      <div
+        className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} 
+        ${isSidepaneOpen ? "sidepane-open" : ""}`}
+      >
         <BreadcrumbNavigation
           currentPage="Content Library"
           parentPages={parentPages}
@@ -1082,15 +1081,20 @@ const Library = () => {
         />
       </div>
 
-      <div className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} 
-        ${isSidepaneOpen ? "sidepane-open" : ""}`}>
-      <h1 className="mt-3">Build your knowledge base</h1>
+      <div
+        className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} 
+        ${isSidepaneOpen ? "sidepane-open" : ""}`}
+      >
+        <h1 className="mt-3">Build your knowledge base</h1>
         <div className="header-row mt-4">
           <div className="lib-title" id="library-table">
             Resources
           </div>
 
-          <div className="search-container" style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+          <div
+            className="search-container"
+            style={{ display: "flex", justifyContent: "center", width: "100%" }}
+          >
             <InputGroup
               className={`search-bar-container ${showDropdown ? "dropdown-visible" : ""}`}
               ref={searchBarRef}
@@ -1133,7 +1137,8 @@ const Library = () => {
 
           <label id="search-bar-container"> </label>
 
-          <div className="button-container" 
+          <div
+            className="button-container"
             style={{
               display: "flex",
               justifyContent: "flex-end",
@@ -1148,7 +1153,10 @@ const Library = () => {
                 id="new-folder"
                 style={{ whiteSpace: "nowrap" }}
               >
-                <FontAwesomeIcon icon={faPlus} style={{ marginRight: "0.5rem" }} />
+                <FontAwesomeIcon
+                  icon={faPlus}
+                  style={{ marginRight: "0.5rem" }}
+                />
                 New Folder
               </Button>
             )}
@@ -1161,7 +1169,10 @@ const Library = () => {
                 className="upload-button"
                 style={{ fontSize: "1.0625rem" }}
               >
-                <FontAwesomeIcon icon={faPlus} style={{ marginRight: "0.5rem" }} />
+                <FontAwesomeIcon
+                  icon={faPlus}
+                  style={{ marginRight: "0.5rem" }}
+                />
                 Upload
               </Button>
             )}
@@ -1174,22 +1185,29 @@ const Library = () => {
           keepMounted
           open={open}
           onClose={handleMenuClose}
-          PaperProps={{
-            style: {
-              width: "13.75rem"
-            }
-          }}
         >
-          <MenuItem onClick={() => handleMenuItemClick("pdf")} className="styled-menu-item">
+          <MenuItem
+            onClick={() => handleMenuItemClick("pdf")}
+            className="styled-menu-item"
+          >
             <i className="fas fa-file-pdf styled-menu-item-icon"></i>
             Upload PDF/Word/Excel
           </MenuItem>
-          <MenuItem onClick={() => handleMenuItemClick("text")} className="styled-menu-item">
+          <MenuItem
+            onClick={() => handleMenuItemClick("text")}
+            className="styled-menu-item"
+          >
             <i className="fas fa-file-alt styled-menu-item-icon"></i>
             Upload Text
           </MenuItem>
-          <MenuItem onClick={() => handleNewFolderClick(activeFolder)} className="styled-menu-item">
-            <FontAwesomeIcon icon={faFolder} className="styled-menu-item-icon" />
+          <MenuItem
+            onClick={() => handleNewFolderClick(activeFolder)}
+            className="styled-menu-item"
+          >
+            <FontAwesomeIcon
+              icon={faFolder}
+              className="styled-menu-item-icon"
+            />
             New Subfolder
           </MenuItem>
         </Menu>
@@ -1215,15 +1233,19 @@ const Library = () => {
             </thead>
           </table>
 
-          <div style={{
-            overflowY: "auto",
-            maxHeight: "",
-            height: "calc(100vh - 220px)",
-            width: "100%"
-          }}>
+          <div
+            style={{
+              overflowY: "auto",
+              maxHeight: "",
+              height: "calc(100vh - 220px)",
+              width: "100%"
+            }}
+          >
             <table style={{ width: "100%" }} className="library-table">
               <tbody>
-                {activeFolder ? renderFolderContents(activeFolder) : renderFolderStructure()}
+                {activeFolder
+                  ? renderFolderContents(activeFolder)
+                  : renderFolderStructure()}
               </tbody>
             </table>
           </div>
@@ -1235,7 +1257,9 @@ const Library = () => {
         showModal={showModal}
         setShowModal={setShowModal}
         modalContent={modalContent}
-        onSave={(newContent) => saveFileContent(currentFileId, newContent, activeFolder)}
+        onSave={(newContent) =>
+          saveFileContent(currentFileId, newContent, activeFolder)
+        }
         documentId={currentFileId}
         fileName={currentFileName}
         folderName={activeFolder}
@@ -1295,9 +1319,10 @@ const Library = () => {
             } else {
               setFileToDelete({
                 unique_id: contextMenuTarget.id,
-                filename: folderContents[activeFolder]?.find(
-                  (item) => item.unique_id === contextMenuTarget.id
-                )?.filename || ""
+                filename:
+                  folderContents[activeFolder]?.find(
+                    (item) => item.unique_id === contextMenuTarget.id
+                  )?.filename || ""
               });
               setShowDeleteFileModal(true);
             }
@@ -1324,18 +1349,20 @@ const Library = () => {
         <div className="pdf-viewer-modal" onClick={closeModal}>
           <div className="pdf-viewer-modal-content" ref={modalRef}>
             {isLoading && (
-              <div style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "rgba(255, 255, 255, 0.8)",
-                zIndex: 1000
-              }}>
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(255, 255, 255, 0.8)",
+                  zIndex: 1000
+                }}
+              >
                 <Spinner
                   animation="border"
                   style={{
@@ -1350,15 +1377,12 @@ const Library = () => {
           </div>
         </div>
       )}
-  <LibrarySidepane 
-          isOpen={isSidepaneOpen} 
-          onToggle={() => setIsSidepaneOpen(!isSidepaneOpen)} 
-        />
-  
+      <LibrarySidepane
+        isOpen={isSidepaneOpen}
+        onToggle={() => setIsSidepaneOpen(!isSidepaneOpen)}
+      />
     </div>
-
   );
-
 };
 
 export default withAuth(Library);

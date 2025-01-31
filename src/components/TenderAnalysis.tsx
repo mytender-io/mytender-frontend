@@ -525,7 +525,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
               },
               "&:hover": {
                 color: `${theme.palette.primary.main} !important`,
-                backgroundColor: `${theme.palette.primary.light} !important`,
+                backgroundColor: `${theme.palette.custom.lighter} !important`,
                 ".lucide": {
                   color: `${theme.palette.primary.main} !important`
                 }
@@ -565,11 +565,11 @@ const TenderAnalysis = ({ canUserEdit }) => {
                           padding: "4px",
                           color: "#6B7280",
                           "&:hover": {
-                            backgroundColor: theme.palette.primary.light,
-                            color: theme.palette.primary.main
+                            backgroundColor: `${theme.palette.custom.lighter} !important`,
+                            color: theme.palette.custom.lighter
                           },
                           "&:active": {
-                            backgroundColor: theme.palette.action.hover
+                            backgroundColor: theme.palette.custom.lighter
                           }
                         }}
                       >
