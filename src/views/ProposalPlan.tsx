@@ -24,6 +24,8 @@ import ReviewerDropdown from "../components/dropdowns/ReviewerDropdown.tsx";
 import QuestionTypeDropdown from "../components/dropdowns/QuestionTypeDropdown.tsx";
 import SectionControls from "../buttons/SectionControls.tsx";
 import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
+import BulkControls from "@/components/BulkControls.tsx";
+import CustomCheckbox from "@/buttons/CustomCheckbox.tsx";
 
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
@@ -57,14 +59,55 @@ const ProposalPlan = () => {
   );
 
   const [selectedSection, setSelectedSection] = useState(null);
+  const [selectedSections, setSelectedSections] = useState(new Set());
+
   const [isSidepaneOpen, setIsSidepaneOpen] = useState(false);
+
+  // Bulk Update functions
+  const handleSelectSection = (index) => {
+    setSelectedSections((prev) => {
+      const newSelection = new Set(prev);
+      if (newSelection.has(index)) {
+        newSelection.delete(index);
+      } else {
+        newSelection.add(index);
+      }
+      return newSelection;
+    });
+  };
+
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      // Select all sections
+      setSelectedSections(new Set(outline.map((_, index) => index)));
+    } else {
+      // Clear all selections
+      setSelectedSections(new Set());
+    }
+  };
+  const handleBulkUpdate = (updates) => {
+    setSharedState((prevState) => {
+      const newOutline = [...prevState.outline];
+      selectedSections.forEach((index) => {
+        newOutline[index] = {
+          ...newOutline[index],
+          ...updates
+        };
+      });
+      return {
+        ...prevState,
+        outline: newOutline
+      };
+    });
+  };
+  ////////////////////////////////////////////
 
   const handleRowClick = (e: React.MouseEvent, index: number) => {
     // Expand the list of elements to ignore to include MUI Select components
     const isInteractiveElement = (e.target as HTMLElement).closest(
       'input, select, button, a, [role="button"], .editable-cell, .dropdown, .dropdown-toggle, .MuiSelect-root, .MuiSelect-select, .MuiMenuItem-root, .MuiPaper-root, .MuiList-root, .css-1dimb5e-singleValue, .css-1s2u09g-control, .css-b62m3t-container'
     );
-  
+
     if (!isInteractiveElement) {
       e.preventDefault();
       setSelectedSection(index);
@@ -675,6 +718,17 @@ const ProposalPlan = () => {
                     >
                       <thead>
                         <tr>
+                          <th className="w-12 p-4">
+                            <div className="flex items-center justify-center">
+                              <CustomCheckbox
+                                checked={
+                                  selectedSections.size === outline.length
+                                }
+                                onChange={(checked) => handleSelectAll(checked)}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </div>
+                          </th>
                           <th className="section-col">Section</th>
                           <th
                             className="dropdown-col"
@@ -713,112 +767,95 @@ const ProposalPlan = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {outline.map((section, index) => {
-                          const isExpanded = expandedSections.has(index);
-                          return (
-                            <React.Fragment key={index}>
-                              <tr
-                                onContextMenu={(e) =>
-                                  handleContextMenu(e, index)
+                        {outline.map((section, index) => (
+                          <tr key={index} className="cursor-pointer">
+                            <td className="w-12 p-4">
+                              <div className="flex items-center justify-center">
+                                <CustomCheckbox
+                                  checked={selectedSections.has(index)}
+                                  onChange={() => handleSelectSection(index)}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                              </div>
+                            </td>
+                            <td>
+                              <div className="truncate-wrapper">
+                                <div className="truncate-text">
+                                  <span>{section.heading}</span>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <ReviewerDropdown
+                                value={section.reviewer}
+                                onChange={(value) =>
+                                  handleSectionChange(index, "reviewer", value)
                                 }
-                                onClick={(e) => handleRowClick(e, index)}
-                                className="cursor-pointer"
-                              >
-                                <td>
-                                  <div className="truncate-wrapper">
-                                    <div
-                                  
-                                      className="truncate-text"
-                                    >
-                                      <span>{section.heading}</span>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td>
-                                  <ReviewerDropdown
-                                    value={section.reviewer}
-                                    onChange={(value) =>
-                                      handleSectionChange(
-                                        index,
-                                        "reviewer",
-                                        value
-                                      )
-                                    }
-                                    contributors={contributors}
-                                  />
-                                </td>
-                                <td>
-                                  <QuestionTypeDropdown
-                                    value={section.choice}
-                                    onChange={(value) =>
-                                      handleSectionChange(
-                                        index,
-                                        "choice",
-                                        value
-                                      )
-                                    }
-                                  />
-                                </td>
-                                <td className="text-center">
-                                  <StatusMenu
-                                    value={section.status}
-                                    onChange={(value) => {
-                                      handleSectionChange(
-                                        index,
-                                        "status",
-                                        value
-                                      );
-                                    }}
-                                  />
-                                </td>
-                                <td className="text-center">
-                                  {section.subsections}
-                                </td>
-                                <td className="text-center">
-                                  <input
-                                    type="number"
-                                    value={section.word_count || 0}
-                                    min="0"
-                                    step="50"
-                                    className="form-control d-inline-block word-count-input"
-                                    style={{
-                                      fontSize: "1.143rem",
-                                      width: "6.875rem",
-                                      textAlign: "center"
-                                    }}
-                                    onChange={(e) => {
-                                      const value = parseInt(e.target.value);
-                                      if (!isNaN(value) && value >= 0) {
-                                        handleSectionChange(
-                                          index,
-                                          "word_count",
-                                          value
-                                        );
-                                      }
-                                    }}
-                                  />
-                                </td>
-                                <td className="text-center">
-                                  <div className="d-flex justify-content-center pe-2">
-                                    <SectionControls
-                                      onDelete={() =>
-                                        handleDeleteClick(section, index)
-                                      }
-                                      onMoveDown={() =>
-                                        handleMoveSection(index, "down")
-                                      }
-                                      onMoveUp={() =>
-                                        handleMoveSection(index, "up")
-                                      }
-                                      isFirst={index === 0}
-                                      isLast={index === outline.length - 1}
-                                    />
-                                  </div>
-                                </td>
-                              </tr>
-                            </React.Fragment>
-                          );
-                        })}
+                                contributors={contributors}
+                              />
+                            </td>
+                            <td>
+                              <QuestionTypeDropdown
+                                value={section.choice}
+                                onChange={(value) =>
+                                  handleSectionChange(index, "choice", value)
+                                }
+                              />
+                            </td>
+                            <td className="text-center">
+                              <StatusMenu
+                                value={section.status}
+                                onChange={(value) => {
+                                  handleSectionChange(index, "status", value);
+                                }}
+                              />
+                            </td>
+                            <td className="text-center">
+                              {section.subsections}
+                            </td>
+                            <td className="text-center">
+                              <input
+                                type="number"
+                                value={section.word_count || 0}
+                                min="0"
+                                step="50"
+                                className="form-control d-inline-block word-count-input"
+                                style={{
+                                  fontSize: "1.143rem",
+                                  width: "6.875rem",
+                                  textAlign: "center"
+                                }}
+                                onChange={(e) => {
+                                  const value = parseInt(e.target.value);
+                                  if (!isNaN(value) && value >= 0) {
+                                    handleSectionChange(
+                                      index,
+                                      "word_count",
+                                      value
+                                    );
+                                  }
+                                }}
+                              />
+                            </td>
+                            <td className="text-center">
+                              <div className="d-flex justify-content-center pe-2">
+                                <SectionControls
+                                  onDelete={() =>
+                                    handleDeleteClick(section, index)
+                                  }
+                                  onMoveDown={() =>
+                                    handleMoveSection(index, "down")
+                                  }
+                                  onMoveUp={() =>
+                                    handleMoveSection(index, "up")
+                                  }
+                                  isFirst={index === 0}
+                                  isLast={index === outline.length - 1}
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
@@ -855,6 +892,15 @@ const ProposalPlan = () => {
                       handleDeleteSubheading={handleDeleteSubheading}
                       totalSections={outline.length}
                       onNavigate={handleSectionNavigation}
+                    />
+                  )}
+
+                  {selectedSections.size > 0 && (
+                    <BulkControls
+                      selectedCount={selectedSections.size}
+                      onClose={() => setSelectedSections(new Set())}
+                      onUpdateSections={handleBulkUpdate}
+                      contributors={contributors}
                     />
                   )}
                 </div>
