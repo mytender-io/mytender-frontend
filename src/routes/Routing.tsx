@@ -42,7 +42,7 @@ function Routing() {
   return (
     <div>
       <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
+        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         <Route path="/calculator" element={<Calculator />} />
         <Route path="/" element={<Bids />} />
         <Route path="/chatResponse" element={<ChatbotResponse />} />
