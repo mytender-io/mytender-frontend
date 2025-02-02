@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ITenderBid } from "../../types";
 import { useAuthUser } from "react-auth-kit";
-import axios from "axios";
+import axios from "../helper/axios";
 import { apiURL } from "../helper/urls";
 
 const useTenderBids = () => {
