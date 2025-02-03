@@ -2,7 +2,7 @@ import { IChatTypes, IMessage, IMessageRequest, IPromptType } from "../../../typ
 import { v4 } from "uuid";
 import { getBase64FromBlob } from "../../helper/file";
 import { apiURL } from "../../helper/urls";
-import axios from "axios";
+import axios from "../../helper/axios";
 import {
   ALLOWED_ATTRIBUTES,
   ALLOWED_TAGS,
