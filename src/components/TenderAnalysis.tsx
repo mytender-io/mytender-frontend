@@ -185,19 +185,22 @@ const TenderAnalysis = ({ canUserEdit }) => {
       name: "Evaluation Criteria",
       Icon: Scale,
       prompt: "generate_evaluation_criteria",
-      stateKey: "evaluation_criteria"
+      stateKey: "evaluation_criteria",
+      summaryKey: "win_themes"
     },
     {
       name: "Derive Insights",
       Icon: Lightbulb,
       prompt: "generate_derive_insights",
-      stateKey: "derive_insights"
+      stateKey: "derive_insights",
+      summaryKey: "customer_pain_points"
     },
     {
       name: "Differentiation Opportunities",
       Icon: Star,
       prompt: "generate_differentiation_opportunities",
-      stateKey: "differentiation_opportunities"
+      stateKey: "differentiation_opportunities",
+      summaryKey: "differentiating_factors"
     }
   ];
 
@@ -259,7 +262,6 @@ const TenderAnalysis = ({ canUserEdit }) => {
       formData.append("bid_id", object_id);
       formData.append("prompt", tab.prompt);
 
-      // Use the new endpoint for differentiation opportunities
       const endpoint =
         tab.prompt === "generate_differentiation_opportunities"
           ? `generate_differentiation_opportunities`
@@ -279,6 +281,15 @@ const TenderAnalysis = ({ canUserEdit }) => {
       const generatedContent = result.data.requirements || result.data.analysis;
       setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
       setSharedState((prev) => ({ ...prev, [tab.stateKey]: generatedContent }));
+
+      // Only update summary if it exists in response and we have a summaryKey
+      if (result.data.summary && tab.summaryKey) {
+        setSharedState((prev) => ({
+          ...prev,
+          [tab.summaryKey]: result.data.summary
+        }));
+      }
+
       displayAlert("Generated successfully!", "success");
     } catch (err) {
       console.log(err);
@@ -311,7 +322,6 @@ const TenderAnalysis = ({ canUserEdit }) => {
       formData.append("bid_id", object_id);
       formData.append("prompt", tab.prompt);
 
-      // Use the new endpoint for differentiation opportunities
       const endpoint =
         tab.prompt === "generate_differentiation_opportunities"
           ? `generate_differentiation_opportunities`
@@ -336,6 +346,15 @@ const TenderAnalysis = ({ canUserEdit }) => {
           ...prev,
           [tab.stateKey]: generatedContent
         }));
+
+        // Only update summary if it exists in response and we have a summaryKey
+        if (result.data.summary && tab.summaryKey) {
+          setSharedState((prev) => ({
+            ...prev,
+            [tab.summaryKey]: result.data.summary
+          }));
+        }
+
         displayAlert("Regenerated successfully!", "success");
       }
     } catch (err) {

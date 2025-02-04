@@ -167,7 +167,10 @@ const BidPlanner = () => {
           contributors: contributors,
           original_creator: original_creator,
           object_id: bidData?._id || "",
-          outline: bidData?.outline || []
+          outline: bidData?.outline || [],
+          win_themes: bidData?.win_themes || [],
+          customer_pain_points: bidData?.customer_pain_points || [],
+          differentiating_factors: bidData?.differentiating_factors || []
         };
       });
 

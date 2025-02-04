@@ -26,6 +26,7 @@ import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import ComplianceMatrix from "../views/ComplianceMatrix.tsx";
 import BidPlanner from "../views/BidPlanner.tsx";
+import BidIntel from "@/views/BidIntel.tsx";
 
 function Routing() {
   const location = useLocation();
@@ -62,6 +63,7 @@ function Routing() {
         <Route element={<BidManagement />}>
           {/* <Route path="/bid-extractor" element={<BidExtractor />} /> */}
           <Route path="/bid-extractor" element={<BidPlanner />} />
+          <Route path="/bid-intel" element={<BidIntel />} />
           <Route path="/proposal-planner" element={<ProposalPlan />} />
           <Route path="/question-crafter" element={<QuestionCrafter />} />
           <Route path="/compliance-matrix" element={<ComplianceMatrix />} />

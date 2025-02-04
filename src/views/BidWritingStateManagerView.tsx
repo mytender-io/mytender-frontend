@@ -11,7 +11,6 @@ import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { useAuthUser } from "react-auth-kit";
 import { displayAlert } from "../helper/Alert";
-import { Console } from "console";
 
 export interface Document {
   name: string;
@@ -71,6 +70,9 @@ export interface SharedState {
   selectedFolders: string[];
   lastUpdated?: number;
   outline: Section[];
+  win_themes: string[];
+  customer_pain_points: string[];
+  differentiating_factors: string[];
 }
 
 export interface BidContextType {
@@ -103,7 +105,10 @@ const defaultState: BidContextType = {
     saveSuccess: null,
     object_id: null,
     selectedFolders: ["default"],
-    outline: []
+    outline: [],
+    win_themes: [],
+    customer_pain_points: [],
+    differentiating_factors: []
   },
   setSharedState: () => {},
   saveProposal: () => {},
@@ -128,7 +133,7 @@ const BidManagement: React.FC = () => {
           : [];
 
         // Combine default state with saved state, ensuring all required fields exist
-        console.log(parsedState.object_id );
+        console.log(parsedState.object_id);
         return {
           ...defaultState.sharedState, // Start with default state
           ...parsedState, // Override with saved state
@@ -141,8 +146,6 @@ const BidManagement: React.FC = () => {
           object_id: parsedState.object_id || null,
           selectedFolders: parsedState.selectedFolders || ["default"]
         };
-
-        
       }
       return defaultState.sharedState;
     } catch (error) {
@@ -222,7 +225,10 @@ const BidManagement: React.FC = () => {
         questions,
         object_id,
         original_creator,
-        outline
+        outline,
+        win_themes,
+        customer_pain_points,
+        differentiating_factors
       } = stateCopy;
 
       if (!bidInfo || bidInfo.trim() === "") {
@@ -259,12 +265,23 @@ const BidManagement: React.FC = () => {
       appendFormData("bid_qualification_result", bid_qualification_result);
       appendFormData("opportunity_owner", opportunity_owner);
       appendFormData("bid_manager", bid_manager);
-      formData.append("contributors", JSON.stringify(contributors));
+      formData.append("contributors", JSON.stringify(contributors || []));
       appendFormData("submission_deadline", submission_deadline);
       appendFormData("questions", questions);
       appendFormData("selectedFolders", selectedFolders);
       appendFormData("original_creator", original_creator);
-      formData.append("outline", JSON.stringify(outline));
+      formData.append("outline", JSON.stringify(outline || []));
+      // Remove these from the appendFormData helper since they are arrays
+      // In saveProposal function, modify how we append the array fields:
+      formData.append("win_themes", JSON.stringify(win_themes || []));
+      formData.append(
+        "customer_pain_points",
+        JSON.stringify(customer_pain_points || [])
+      );
+      formData.append(
+        "differentiating_factors",
+        JSON.stringify(differentiating_factors || [])
+      );
 
       if (object_id) {
         appendFormData("object_id", object_id);
@@ -378,6 +395,9 @@ const BidManagement: React.FC = () => {
     sharedState.original_creator,
     sharedState.selectedFolders,
     sharedState.lastUpdated,
+    sharedState.win_themes,
+    sharedState.differentiating_factors,
+    sharedState.customer_pain_points,
     JSON.stringify(
       sharedState.outline.map((s) => ({
         id: s.section_id,
