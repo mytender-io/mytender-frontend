@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { PenLine, Users2, HelpCircle, Trash2, X, Clock } from "lucide-react";
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@mui/material";
 
 const BulkControls = ({
   selectedCount,
   onClose,
   onUpdateSections,
+  onDeleteSections,
   contributors
 }) => {
   const [wordCount, setWordCount] = useState("500");
@@ -12,11 +14,12 @@ const BulkControls = ({
   const [questionType, setQuestionType] = useState("3b");
   const [status, setStatus] = useState("");
   const [openMenu, setOpenMenu] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     // Apply initial word count
     handleUpdate("word_count", wordCount);
-  }, []); // Run once on mount
+  }, []); 
 
   const handleUpdate = (field, value) => {
     const updates = {};
@@ -44,6 +47,15 @@ const BulkControls = ({
     const newValue = e.target.value;
     setWordCount(newValue);
     handleUpdate("word_count", newValue);
+  };
+
+  const handleDelete = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    onDeleteSections();
+    setShowDeleteDialog(false);
   };
 
   useEffect(() => {
@@ -118,95 +130,134 @@ const BulkControls = ({
   ];
 
   return (
-    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg py-4 px-6 z-40 border border-gray-100">
-      <div className="flex items-center gap-6">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center bg-[#FF8019] text-white rounded-full w-10 h-10 justify-center text-base text-xl">
-            {selectedCount}
-          </div>
-          <span className="text-base text-gray-600 text-xl">
-            Items Selected
-          </span>
-        </div>
-
-        <div className="h-8 w-px bg-gray-200" />
-
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              value={wordCount}
-              onChange={handleWordCountChange}
-              className="w-28 h-12 px-2 text-center text-base border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:border-[#FF8019]"
-              min="0"
-              step="50"
-            />
+    <>
+      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg py-4 px-6 z-40 border border-gray-100">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center bg-[#FF8019] text-white rounded-full w-10 h-10 justify-center text-base text-xl">
+              {selectedCount}
+            </div>
+            <span className="text-base text-gray-600 text-xl">
+              Items Selected
+            </span>
           </div>
 
-          <div className="relative">
+          <div className="h-8 w-px bg-gray-200" />
+
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                value={wordCount}
+                onChange={handleWordCountChange}
+                className="w-28 h-12 px-2 text-center text-base border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:border-[#FF8019]"
+                min="0"
+                step="50"
+              />
+            </div>
+
+            <div className="relative">
+              <button
+                onClick={() =>
+                  setOpenMenu(openMenu === "questionType" ? null : "questionType")
+                }
+                className="text-gray-500 hover:text-[#FF8019] transition-colors"
+                title="Question Type"
+              >
+                <HelpCircle size={22} />
+              </button>
+              <Dropdown
+                items={questionTypeOptions}
+                type="questionType"
+                title="Select Question Type"
+              />
+            </div>
+
+            <div className="relative">
+              <button
+                onClick={() =>
+                  setOpenMenu(openMenu === "reviewer" ? null : "reviewer")
+                }
+                className="text-gray-500 hover:text-[#FF8019] transition-colors"
+              >
+                <Users2 size={22} />
+              </button>
+              <Dropdown
+                items={Object.entries(contributors || {}).map(
+                  ([email, role]) => ({
+                    value: email,
+                    label: email,
+                    role: role
+                  })
+                )}
+                type="reviewer"
+                title="Select Reviewer"
+              />
+            </div>
+
+            <div className="relative">
+              <button
+                onClick={() =>
+                  setOpenMenu(openMenu === "status" ? null : "status")
+                }
+                className="text-gray-500 hover:text-[#FF8019] transition-colors"
+              >
+                <Clock size={22} />
+              </button>
+              <Dropdown
+                items={statusOptions}
+                type="status"
+                title="Select Status"
+              />
+            </div>
+
             <button
-              onClick={() =>
-                setOpenMenu(openMenu === "questionType" ? null : "questionType")
-              }
-              className="text-gray-500 hover:text-[#FF8019] transition-colors"
-              title="Question Type"
+              onClick={handleDelete}
+              className="text-gray-500 hover:text-red-600 transition-colors"
+              title="Delete Selected"
             >
-              <HelpCircle size={22} />
+              <Trash2 size={22} />
             </button>
-            <Dropdown
-              items={questionTypeOptions}
-              type="questionType"
-              title="Select Question Type"
-            />
-          </div>
 
-          <div className="relative">
             <button
-              onClick={() =>
-                setOpenMenu(openMenu === "reviewer" ? null : "reviewer")
-              }
-              className="text-gray-500 hover:text-[#FF8019] transition-colors"
+              onClick={onClose}
+              className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <Users2 size={22} />
+              <X size={22} />
             </button>
-            <Dropdown
-              items={Object.entries(contributors || {}).map(
-                ([email, role]) => ({
-                  value: email,
-                  label: email,
-                  role: role
-                })
-              )}
-              type="reviewer"
-              title="Select Reviewer"
-            />
           </div>
-
-          <div className="relative">
-            <button
-              onClick={() =>
-                setOpenMenu(openMenu === "status" ? null : "status")
-              }
-              className="text-gray-500 hover:text-[#FF8019] transition-colors"
-            >
-              <Clock size={22} />
-            </button>
-            <Dropdown
-              items={statusOptions}
-              type="status"
-              title="Select Status"
-            />
-          </div>
-
-          <button
-            onClick={onClose}
-            className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X size={22} />
-          </button>
         </div>
       </div>
-    </div>
+
+      <Dialog
+        open={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Delete Selected Sections
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete {selectedCount} selected sections? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDeleteDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={confirmDelete}
+            color="error"
+            variant="contained"
+            autoFocus
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

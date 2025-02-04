@@ -100,6 +100,42 @@ const ProposalPlan = () => {
       };
     });
   };
+
+  const handleBulkDelete = async () => {
+    try {
+      // Track bulk delete action
+      posthog.capture("proposal_sections_bulk_delete", {
+        bidId: object_id,
+        numberOfSections: selectedSections.size,
+        sectionIndices: Array.from(selectedSections)
+      });
+
+      // Sort indices in descending order to avoid index shifting issues
+      const sectionsToDelete = Array.from(selectedSections).sort(
+        (a, b) => b - a
+      );
+
+      // Create a new outline by removing the selected sections
+      const updatedOutline = [...outline];
+      sectionsToDelete.forEach((index) => {
+        updatedOutline.splice(index, 1);
+      });
+
+      // Update state
+      setSharedState((prevState) => ({
+        ...prevState,
+        outline: updatedOutline
+      }));
+
+      // Clear selection
+      setSelectedSections(new Set());
+
+      displayAlert("Sections deleted successfully", "success");
+    } catch (error) {
+      console.error("Error deleting sections:", error);
+      displayAlert("Failed to delete sections", "danger");
+    }
+  };
   ////////////////////////////////////////////
 
   const handleRowClick = (e: React.MouseEvent, index: number) => {
@@ -904,6 +940,7 @@ const ProposalPlan = () => {
                       selectedCount={selectedSections.size}
                       onClose={() => setSelectedSections(new Set())}
                       onUpdateSections={handleBulkUpdate}
+                      onDeleteSections={handleBulkDelete}
                       contributors={contributors}
                     />
                   )}
