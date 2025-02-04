@@ -131,6 +131,17 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
     }));
   };
 
+  const resetModalState = () => {
+    setCurrentStep(1);
+    setIsGeneratingOutline(false);
+    setSelectedFiles([]);
+    setProgress(0);
+    setLoadingMessage("Analyzing tender documents...");
+    if (progressInterval.current) {
+      clearInterval(progressInterval.current);
+    }
+  };
+
   const generateOutline = async () => {
     if (isGeneratingOutline) return;
 
@@ -180,6 +191,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
     } else if (currentStep === 3) {
       generateOutline();
     } else if (currentStep === 4) {
+      resetModalState();
       onHide();
     }
   };
@@ -217,12 +229,14 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
   };
 
   const onCancel = () => {
+    resetModalState();
     if (!sharedState.outline || sharedState.outline.length === 0) {
       navigate("/bid-extractor");
     } else {
       onHide();
     }
   };
+
 
   const getHeaderTitle = () => {
     if (currentStep === 1) {

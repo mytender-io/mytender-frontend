@@ -349,7 +349,7 @@ const BidIntel = () => {
                         <input
                           type="text"
                           placeholder="Search for case study..."
-                          className="w-full p-3 ps-12 text-base border border-gray-200 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-200 focus:border-blue-400"
+                          className="w-full p-3 ps-5 text-base border border-gray-200 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-200 focus:border-blue-400"
                           disabled
                         />
                       </div>
