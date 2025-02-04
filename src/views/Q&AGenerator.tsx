@@ -22,6 +22,7 @@ import "draft-js/dist/Draft.css";
 import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
 import SelectFolderModal from "../modals/SelectFolderModal.tsx";
 import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
+import BidDropdown from "@/components/dropdowns/BidDropdown.tsx";
 
 const QAGenerator = () => {
   const getAuth = useAuthUser();
@@ -31,6 +32,8 @@ const QAGenerator = () => {
   const [dataset, setDataset] = useState("default");
   const [availableCollections, setAvailableCollections] = useState([]);
   const [folderContents, setFolderContents] = useState({});
+
+  const [selectedBidId, setSelectedBidId] = useState("");
 
   const [isCopilotVisible, setIsCopilotVisible] = useState(false);
   const [selectedText, setSelectedText] = useState("");
@@ -70,13 +73,6 @@ const QAGenerator = () => {
     setSelectedFolders(folders);
   };
   useEffect(() => {
-    console.log(
-      "selectedFolders state in QuestionCrafter updated:",
-      selectedFolders
-    );
-  }, [selectedFolders]);
-
-  useEffect(() => {
     localStorage.setItem(
       "response",
       convertToRaw(responseEditorState.getCurrentContent())
@@ -114,6 +110,7 @@ const QAGenerator = () => {
     handleGAEvent("Chatbot", "Copilot Input", copilotInput);
     setCopilotLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
+    console.log(selectedBidId);
 
     try {
       const requests = [
@@ -124,7 +121,7 @@ const QAGenerator = () => {
             extra_instructions: instructions,
             copilot_mode: copilot_mode,
             datasets: [],
-            bid_id: ""
+            bid_id: selectedBidId
           },
           {
             headers: {
@@ -924,6 +921,7 @@ const QAGenerator = () => {
     console.log(chatHistory);
     console.log(bidPilotbroadness);
     console.log(bidPilotchoice);
+    console.log(selectedBidId);
 
     try {
       const result = await axios.post(
@@ -934,7 +932,7 @@ const QAGenerator = () => {
           input_text: question,
           extra_instructions: chatHistory,
           datasets: ["default"],
-          bid_id: ""
+          bid_id: selectedBidId
         },
         {
           headers: {
@@ -976,6 +974,8 @@ const QAGenerator = () => {
     setStartTime(Date.now()); // Set start time for the timer
     console.log("DATASET");
     console.log(selectedFolders);
+    console.log(selectedBidId);
+
     try {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question`,
@@ -985,7 +985,7 @@ const QAGenerator = () => {
           input_text: inputText,
           extra_instructions: "",
           datasets: selectedFolders,
-          bid_id: ""
+          bid_id: selectedBidId
         },
         {
           headers: {
@@ -1140,6 +1140,8 @@ const QAGenerator = () => {
       console.log(word_amounts);
       const compliance_requirements = Array(word_amounts.length).fill("");
       console.log(compliance_requirements);
+      console.log(selectedBidId);
+
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
         {
@@ -1151,7 +1153,7 @@ const QAGenerator = () => {
           datasets: selectedFolders,
           word_amounts,
           compliance_requirements: compliance_requirements,
-          bid_id: ""
+          bid_id: selectedBidId
         },
         {
           headers: {
@@ -1325,6 +1327,11 @@ const QAGenerator = () => {
                     Question
                   </h1>
                   <div className="dropdown-container">
+                    <BidDropdown
+                      onBidSelect={setSelectedBidId}
+                      token={tokenRef.current}
+                      className="me-2"
+                    />
                     <SelectFolderModal
                       onSaveSelectedFolders={handleSaveSelectedFolders}
                       initialSelectedFolders={selectedFolders}
