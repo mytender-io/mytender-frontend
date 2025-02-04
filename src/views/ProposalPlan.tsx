@@ -46,6 +46,9 @@ const ProposalPlan = () => {
     null
   );
 
+  const [lastOutlineState, setLastOutlineState] = useState(null);
+  const [canRevert, setCanRevert] = useState(false);
+
   const { object_id, contributors, outline } = sharedState;
 
   const currentUserPermission = contributors[auth.email] || "viewer";
@@ -86,6 +89,10 @@ const ProposalPlan = () => {
     }
   };
   const handleBulkUpdate = (updates) => {
+    // Store current state before making changes
+    setLastOutlineState([...sharedState.outline]);
+    setCanRevert(true);
+
     setSharedState((prevState) => {
       const newOutline = [...prevState.outline];
       selectedSections.forEach((index) => {
@@ -101,8 +108,13 @@ const ProposalPlan = () => {
     });
   };
 
-  const handleBulkDelete = async () => {
+  // Add this handler for bulk delete
+  const handleBulkDelete = () => {
     try {
+      // Store current state before deleting
+      setLastOutlineState([...sharedState.outline]);
+      setCanRevert(true);
+
       // Track bulk delete action
       posthog.capture("proposal_sections_bulk_delete", {
         bidId: object_id,
@@ -110,30 +122,37 @@ const ProposalPlan = () => {
         sectionIndices: Array.from(selectedSections)
       });
 
-      // Sort indices in descending order to avoid index shifting issues
       const sectionsToDelete = Array.from(selectedSections).sort(
         (a, b) => b - a
       );
-
-      // Create a new outline by removing the selected sections
-      const updatedOutline = [...outline];
+      const updatedOutline = [...sharedState.outline];
       sectionsToDelete.forEach((index) => {
         updatedOutline.splice(index, 1);
       });
 
-      // Update state
       setSharedState((prevState) => ({
         ...prevState,
         outline: updatedOutline
       }));
 
-      // Clear selection
       setSelectedSections(new Set());
-
       displayAlert("Sections deleted successfully", "success");
     } catch (error) {
       console.error("Error deleting sections:", error);
       displayAlert("Failed to delete sections", "danger");
+    }
+  };
+
+  // Add this function to handle reverting changes
+  const handleRevert = () => {
+    if (lastOutlineState) {
+      setSharedState((prevState) => ({
+        ...prevState,
+        outline: lastOutlineState
+      }));
+      setLastOutlineState(null);
+      setCanRevert(false);
+      displayAlert("Changes reverted successfully", "success");
     }
   };
   ////////////////////////////////////////////
@@ -942,6 +961,8 @@ const ProposalPlan = () => {
                       onUpdateSections={handleBulkUpdate}
                       onDeleteSections={handleBulkDelete}
                       contributors={contributors}
+                      onRevert={handleRevert}
+                      canRevert={canRevert}
                     />
                   )}
                 </div>

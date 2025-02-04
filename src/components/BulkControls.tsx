@@ -1,12 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { PenLine, Users2, HelpCircle, Trash2, X, Clock } from "lucide-react";
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@mui/material";
+import {
+  PenLine,
+  Users2,
+  HelpCircle,
+  Trash2,
+  X,
+  Clock,
+  Undo2
+} from "lucide-react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  Tooltip
+} from "@mui/material";
 
 const BulkControls = ({
   selectedCount,
   onClose,
   onUpdateSections,
   onDeleteSections,
+  onRevert,
+  canRevert,
   contributors
 }) => {
   const [wordCount, setWordCount] = useState("500");
@@ -19,7 +37,7 @@ const BulkControls = ({
   useEffect(() => {
     // Apply initial word count
     handleUpdate("word_count", wordCount);
-  }, []); 
+  }, []);
 
   const handleUpdate = (field, value) => {
     const updates = {};
@@ -159,7 +177,9 @@ const BulkControls = ({
             <div className="relative">
               <button
                 onClick={() =>
-                  setOpenMenu(openMenu === "questionType" ? null : "questionType")
+                  setOpenMenu(
+                    openMenu === "questionType" ? null : "questionType"
+                  )
                 }
                 className="text-gray-500 hover:text-[#FF8019] transition-colors"
                 title="Question Type"
@@ -219,6 +239,25 @@ const BulkControls = ({
               <Trash2 size={22} />
             </button>
 
+            <Tooltip
+              title={canRevert ? "Undo last change" : "No changes to undo"}
+            >
+              <span>
+                <button
+                  onClick={onRevert}
+                  disabled={!canRevert}
+                  className={`text-gray-500 transition-colors ${
+                    canRevert
+                      ? "hover:text-[#FF8019]"
+                      : "opacity-50 cursor-not-allowed"
+                  }`}
+                  title="Undo last change"
+                >
+                  <Undo2 size={22} />
+                </button>
+              </span>
+            </Tooltip>
+
             <button
               onClick={onClose}
               className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
@@ -240,7 +279,8 @@ const BulkControls = ({
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete {selectedCount} selected sections? This action cannot be undone.
+            Are you sure you want to delete {selectedCount} selected sections?
+            This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
