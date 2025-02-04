@@ -8,7 +8,14 @@ import { useLocation } from "react-router-dom";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
-import { ChevronDown, Fullscreen, Pencil, Search, X } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  Fullscreen,
+  Pencil,
+  Search,
+  X
+} from "lucide-react";
 import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 
 const BidIntel = () => {
@@ -29,12 +36,17 @@ const BidIntel = () => {
   const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  // State for inline editing
+  const [editingState, setEditingState] = useState({
+    type: "",
+    index: -1,
+    text: ""
+  });
+
   // Process the shared state data for display
   const items = {
     painPoints: sharedState.customer_pain_points,
-
     winThemes: sharedState.win_themes,
-
     factors: sharedState.differentiating_factors
   };
 
@@ -46,22 +58,127 @@ const BidIntel = () => {
     displayAlert("You only have permission to view this bid.", "danger");
   };
 
-  const CardItem = ({ text, index }) => (
-    <div className="flex items-center justify-between p-3 border-b border-gray-200">
-      <span className="text-base text-gray-700">
-        {index + 1}. {text}
-      </span>
-      <div className="flex gap-2">
-        <button className="p-1.5 hover:bg-gray-100 rounded">
-          <Pencil className="w-5 h-5 text-gray-500" />
-        </button>
-        <button className="p-1.5 hover:bg-gray-100 rounded">
-          <X className="w-5 h-5 text-gray-500" />
-        </button>
-      </div>
-    </div>
-  );
+  const handleEditStart = (text: string, type: string, index: number) => {
+    if (!canUserEdit) {
+      showViewOnlyMessage();
+      return;
+    }
+    setEditingState({ type, index, text });
+  };
 
+  const handleDelete = (type: string, index: number) => {
+    if (!canUserEdit) {
+      showViewOnlyMessage();
+      return;
+    }
+
+    const updatedState = { ...sharedState };
+
+    switch (type) {
+      case "painPoints":
+        updatedState.customer_pain_points =
+          updatedState.customer_pain_points.filter((_, i) => i !== index);
+        break;
+      case "winThemes":
+        updatedState.win_themes = updatedState.win_themes.filter(
+          (_, i) => i !== index
+        );
+        break;
+      case "factors":
+        updatedState.differentiating_factors =
+          updatedState.differentiating_factors.filter((_, i) => i !== index);
+        break;
+    }
+
+    setSharedState(updatedState);
+    displayAlert("Item deleted successfully", "success");
+  };
+
+  const handleSaveEdit = () => {
+    if (editingState.text.trim() === "") {
+      displayAlert("Please enter valid text", "danger");
+      return;
+    }
+
+    const updatedState = { ...sharedState };
+
+    switch (editingState.type) {
+      case "painPoints":
+        updatedState.customer_pain_points[editingState.index] =
+          editingState.text;
+        break;
+      case "winThemes":
+        updatedState.win_themes[editingState.index] = editingState.text;
+        break;
+      case "factors":
+        updatedState.differentiating_factors[editingState.index] =
+          editingState.text;
+        break;
+    }
+
+    setSharedState(updatedState);
+    setEditingState({ type: "", index: -1, text: "" });
+    displayAlert("Item updated successfully", "success");
+  };
+
+  const handleCancelEdit = () => {
+    setEditingState({ type: "", index: -1, text: "" });
+  };
+
+  const CardItem = ({ text, index, type }) => {
+    const isEditing =
+      editingState.type === type && editingState.index === index;
+
+    return (
+      <div className="flex items-center justify-between p-3 border-b border-gray-200">
+        {isEditing ? (
+          <div className="flex-1 flex items-center gap-2">
+            <input
+              type="text"
+              value={editingState.text}
+              onChange={(e) =>
+                setEditingState((prev) => ({ ...prev, text: e.target.value }))
+              }
+              className="flex-1 p-1 border border-gray-300 rounded text-base text-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+              autoFocus
+            />
+            <button
+              className="p-1.5 hover:bg-green-50 rounded"
+              onClick={handleSaveEdit}
+            >
+              <Check className="w-5 h-5 text-green-600" />
+            </button>
+            <button
+              className="p-1.5 hover:bg-red-50 rounded"
+              onClick={handleCancelEdit}
+            >
+              <X className="w-5 h-5 text-red-500" />
+            </button>
+          </div>
+        ) : (
+          <>
+            <span className="text-base text-gray-700">
+              {index + 1}. {text}
+            </span>
+            <div className="flex gap-2">
+              <button
+                className="p-1.5 hover:bg-gray-100 rounded"
+                onClick={() => handleEditStart(text, type, index)}
+              >
+                <Pencil className="w-5 h-5 text-gray-500" />
+              </button>
+              <button
+                className="p-1.5 hover:bg-gray-100 rounded"
+                onClick={() => handleDelete(type, index)}
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
   // API calls
   const fetchOrganizationUsers = async () => {
     try {
@@ -127,21 +244,10 @@ const BidIntel = () => {
   }, []);
 
   const parentPages = [{ name: "Tender Dashboard", path: "/bids" }];
-
   return (
     <div className="chatpage">
       <SideBarSmall onCollapseChange={setSidebarCollapsed} />
       <div className="bidplanner-container">
-        <div
-          className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
-        >
-          <BreadcrumbNavigation
-            currentPage={initialBidName}
-            parentPages={parentPages}
-            showHome={true}
-          />
-        </div>
-
         <div>
           <div
             className={`lib-container mt-1 ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
@@ -175,6 +281,7 @@ const BidIntel = () => {
                             key={`pain-${index}`}
                             text={item}
                             index={index}
+                            type="painPoints"
                           />
                         ))
                       ) : (
@@ -197,6 +304,7 @@ const BidIntel = () => {
                             key={`win-${index}`}
                             text={item}
                             index={index}
+                            type="winThemes"
                           />
                         ))
                       ) : (
@@ -219,6 +327,7 @@ const BidIntel = () => {
                             key={`factor-${index}`}
                             text={item}
                             index={index}
+                            type="factors"
                           />
                         ))
                       ) : (
@@ -229,7 +338,7 @@ const BidIntel = () => {
                     </div>
                   </div>
 
-                  {/* Case Study Card */}
+                  {/* Keep existing Case Study Card */}
                   <div className="bg-white rounded-lg shadow">
                     <h3 className="text-lg font-medium p-4 bg-gray-100 rounded-t-lg border-b">
                       Add Relevant Case Study
@@ -240,7 +349,7 @@ const BidIntel = () => {
                         <input
                           type="text"
                           placeholder="Search for case study..."
-                          className="w-full p-3 ps-5 text-base border border-gray-200 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-200 focus:border-blue-400"
+                          className="w-full p-3 ps-12 text-base border border-gray-200 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-200 focus:border-blue-400"
                           disabled
                         />
                       </div>
