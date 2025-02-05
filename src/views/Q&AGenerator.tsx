@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import withAuth from "../routes/withAuth";
@@ -19,10 +19,9 @@ import {
   ContentState
 } from "draft-js";
 import "draft-js/dist/Draft.css";
-import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
 import SelectFolderModal from "../modals/SelectFolderModal.tsx";
-import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 import BidDropdown from "@/components/dropdowns/BidDropdown.tsx";
+import BreadcrumbNavigation from "../layout/BreadCrumbNavigation.tsx";
 
 const QAGenerator = () => {
   const getAuth = useAuthUser();

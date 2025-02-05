@@ -5,10 +5,6 @@
 /* Your custom CSS below */
 
 :root {
-  font-family: "Manrope", sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  font-size: 11px;
   color: #404a50;
   color-scheme: light dark;
   font-synthesis: none;
@@ -16,7 +12,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
-  overflow: none;
 }
 
 a {
@@ -34,17 +29,7 @@ body {
   padding: 0;
   display: flex;
   font-family: "Manrope", sans-serif;
-  font-weight: 450;
   overflow: hidden !important;
-}
-
-h1 {
-  font-size: 2rem;
-  font-weight: 800 !important;
-}
-
-p {
-  font-size: 1.3rem;
 }
 
 @media (prefers-color-scheme: light) {

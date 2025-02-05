@@ -23,9 +23,9 @@ import ProposalSidepane from "../components/SlidingSidepane.tsx";
 import ReviewerDropdown from "../components/dropdowns/ReviewerDropdown.tsx";
 import QuestionTypeDropdown from "../components/dropdowns/QuestionTypeDropdown.tsx";
 import SectionControls from "../buttons/SectionControls.tsx";
-import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 import BulkControls from "@/components/BulkControls.tsx";
 import CustomCheckbox from "@/buttons/CustomCheckbox.tsx";
+import BreadcrumbNavigation from "../layout/BreadCrumbNavigation.tsx";
 
 const ProposalPlan = () => {
   const getAuth = useAuthUser();

@@ -1,19 +1,24 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
-import { displayAlert } from "../helper/Alert";
+import { displayAlert } from "../../../helper/Alert";
 import "./NewTenderModal.css";
-import UploadPDF from "../views/UploadPDF";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import UploadPDF from "../../UploadPDF";
+import { API_URL, HTTP_PREFIX } from "../../../helper/Constants";
 import { useAuthUser } from "react-auth-kit";
-import { BidContext } from "../views/BidWritingStateManagerView";
-import SelectTenderLibraryFile from "../components/SelectTenderLibraryFile";
-import SelectFolder from "../components/SelectFolder";
+import { BidContext } from "../../BidWritingStateManagerView";
+import SelectTenderLibraryFile from "../../../components/SelectTenderLibraryFile";
+import SelectFolder from "../../../components/SelectFolder";
 import { Box, LinearProgress, Typography } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import CustomDateInput from "../buttons/CustomDateInput";
+import CustomDateInput from "../../../buttons/CustomDateInput";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import { Button as UiButton } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface NewTenderModalProps {
   show: boolean;
@@ -445,10 +450,14 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
 
             {isGeneratingOutline && (
               <div className="mt-4">
-                <LinearProgressWithLabel
+                <Progress
                   value={progress}
-                  message={loadingMessage}
+                  className="h-2.5 rounded-full bg-[#ffd699]"
                 />
+                <div className="mt-1 text-center">
+                  <p className="text-gray-600">{`${Math.round(progress)}%`}</p>
+                  <p className="text-gray-600 italic">{loadingMessage}</p>
+                </div>
               </div>
             )}
 
@@ -464,55 +473,36 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   };
 
   return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="xl"
-      dialogClassName="custom-modal-width"
-      className="custom-modal-newbid"
-    >
-      <Modal.Body className="p-0">
-        <div className="steps-container">
-          <div className="step-wrapper">
+    <Dialog open={show} onOpenChange={onHide}>
+      <DialogContent className="max-w-[90vw] w-[1000px] p-0">
+        <div className="bg-white border-b border-gray-200">
+          <div className="flex items-stretch w-full h-[60px] overflow-x-auto">
+            {/* Step indicators */}
             <div
-              className={`step ${currentStep === "details" ? "active" : ""}`}
+              className={`relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px] text-gray-600 
+              ${currentStep === "details" ? "text-black font-extrabold" : ""}`}
             >
-              <div className="step-content">
-                <span className="step-number">1</span>
-                <span className="step-text">Tender Details</span>
+              <div className="relative z-[3] flex items-center gap-2 w-full">
+                <span
+                  className={`w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center text-sm font-medium flex-shrink-0
+                  ${currentStep === "details" ? "bg-[#f9a01b] border-[#f9a01b] text-white" : ""}`}
+                >
+                  1
+                </span>
+                <span className="text-lg font-bold whitespace-nowrap overflow-hidden text-ellipsis">
+                  Tender Details
+                </span>
               </div>
+              {/* Step connector */}
+              <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
+              <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
             </div>
-            <div
-              className={`step ${currentStep === "documents" ? "active" : ""}`}
-            >
-              <div className="step-content">
-                <span className="step-number">2</span>
-                <span className="step-text">Upload Documents</span>
-              </div>
-            </div>
-            <div
-              className={`step ${currentStep === "content" ? "active" : ""}`}
-            >
-              <div className="step-content">
-                <span className="step-number">3</span>
-                <span className="step-text">Select Questions</span>
-              </div>
-            </div>
-            <div
-              className={`step ${currentStep === "questions" ? "active" : ""}`}
-            >
-              <div className="step-content">
-                <span className="step-number">4</span>
-                <span className="step-text">Select Context</span>
-              </div>
-            </div>
+            {/* Repeat similar structure for other steps */}
           </div>
         </div>
-        <div
-          className="modal-content-wrapper px-5 py-5"
-          style={{ backgroundColor: "#f5f5f5" }}
-        >
-          <h5 className="mb-3 new-bid-modal-header">
+
+        <div className="px-5 py-5 bg-gray-100">
+          <h5 className="mb-3 text-2xl font-extrabold">
             {currentStep === "details"
               ? "Tender Details"
               : currentStep === "documents"
@@ -522,10 +512,131 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                   : "Select Context"}
           </h5>
 
-          <Form onSubmit={handleFinalSubmit}>{renderStepContent()}</Form>
+          <form onSubmit={handleFinalSubmit}>
+            {currentStep === "details" && (
+              <div className="bg-white rounded-lg shadow-sm p-4">
+                <div className="mb-4">
+                  <Label className="font-extrabold">Tender Name:</Label>
+                  <Input
+                    type="text"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    placeholder="Enter tender name"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <Label className="font-extrabold">Deadline:</Label>
+                  <CustomDateInput
+                    value={deadline}
+                    onChange={(value) => setDeadline(value)}
+                    defaultValue={new Date().toISOString().split("T")[0]}
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <Label className="font-extrabold">Contract Value:</Label>
+                  <Input
+                    type="text"
+                    value={contractValue}
+                    onChange={handleValueChange}
+                    placeholder="Enter contract value"
+                  />
+                </div>
+
+                <div className="flex justify-end mt-4">
+                  <UiButton
+                    type="button"
+                    onClick={handleNextStep}
+                    className="hover:bg-[#e89109]"
+                  >
+                    Next Step →
+                  </UiButton>
+                </div>
+              </div>
+            )}
+
+            {currentStep === "documents" && (
+              <div className="white-card p-4">
+                <UploadPDF
+                  bid_id={sharedState.object_id}
+                  apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
+                  descriptionText="Documents uploaded to the Tender Library will be used as context by
+                      our AI to generate compliance requirements and opportunity
+                      information for the Tender."
+                  onUploadComplete={(uploadedFiles) => {
+                    setDocuments(uploadedFiles);
+                  }}
+                />
+              </div>
+            )}
+
+            {currentStep === "content" && (
+              <div className="white-card p-4 ">
+                <p className="description-text">
+                  Select the documents which contain the questions you need to
+                  answer in your bid. These will be used to generate the outline
+                  for your proposal.
+                </p>
+                <div className="selectfolder-container mt-0 p-0">
+                  <SelectTenderLibraryFile
+                    bid_id={sharedState.object_id}
+                    onFileSelect={handleFileSelection}
+                    initialSelectedFiles={selectedFiles}
+                    folderView={true}
+                  />
+                </div>
+                <div className="d-flex justify-content-end mt-4">
+                  <UiButton onClick={handleNextStep} className="upload-button">
+                    Next Step →
+                  </UiButton>
+                </div>
+              </div>
+            )}
+
+            {currentStep === "questions" && (
+              <div>
+                <div className="">
+                  <p>
+                    Select the folders below from your content library to use as
+                    context in your final proposal. The AI will be able to use
+                    information from these when generating an answer.
+                  </p>
+                </div>
+
+                <div className="selectfolder-container mt-3">
+                  <SelectFolder
+                    onFolderSelect={handleFolderSelection}
+                    initialSelectedFolders={selectedFolders}
+                  />
+                </div>
+
+                {isGeneratingOutline && (
+                  <div className="mt-4">
+                    <Progress
+                      value={progress}
+                      className="h-2.5 rounded-full bg-[#ffd699]"
+                    />
+                    <div className="mt-1 text-center">
+                      <p className="text-gray-600">{`${Math.round(progress)}%`}</p>
+                      <p className="text-gray-600 italic">{loadingMessage}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="d-flex justify-content-end mt-3">
+                  <UiButton type="submit" className="upload-button">
+                    <FontAwesomeIcon icon={faFileCirclePlus} className="me-2" />
+                    Create Tender
+                  </UiButton>
+                </div>
+              </div>
+            )}
+          </form>
         </div>
-      </Modal.Body>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   );
 };
 

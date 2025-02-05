@@ -34,10 +34,9 @@ import { Menu, MenuItem } from "@mui/material";
 import FileContentModal from "../modals/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import LibraryContextMenu from "../modals/LibraryContextMenu.tsx";
-import EllipsisMenu from "../buttons/EllipsisMenu.tsx";
+import EllipsisMenu from "@/buttons/EllipsisMenu.tsx";
 import { LibrarySidepane, LibraryLayout } from "../components/LibrarySidepane";
-import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
-import SearchInput from "../components/inputbars/SearchInput.tsx";
+import BreadcrumbNavigation from "../layout/BreadCrumbNavigation.tsx";
 
 const NewFolderModal = React.memo(
   ({ show, onHide, onCreateFolder, title, parentFolder }) => {
@@ -1068,8 +1067,6 @@ const Library = () => {
 
   return (
     <div className="library-wrapper">
-      <SideBarSmall onCollapseChange={setSidebarCollapsed} />
-
       <div
         className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} 
         ${isSidepaneOpen ? "sidepane-open" : ""}`}

@@ -321,7 +321,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
               initialSelectedFiles={selectedFiles}
             />
           </div>
-          <div className="mt-4 p-4 rounded-lg bg-orange_ultra_light text-orange">
+          <div className="mt-4 p-4 rounded-lg bg-orange-ultra_light text-orange">
             <span className="font-semibold">Note:</span> Please verify your
             selections before proceeding. The outline will be generated based on
             the selected documents.
@@ -370,11 +370,15 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
             documents.
           </p>
 
-          <div >
-            <h5 className="text-gray-600 text-xl font-bold mb-4">Next Steps:</h5>
+          <div>
+            <h5 className="text-gray-600 text-xl font-bold mb-4">
+              Next Steps:
+            </h5>
             <ol className="space-y-4 list-decimal list-inside">
               <li>
-                <div className="font-semibold inline text-xl">Review Questions</div>
+                <div className="font-semibold inline text-xl">
+                  Review Questions
+                </div>
                 <p className="text-gray-500 mt-2 ml-6">
                   Check that all questions extracted match your tender
                   questions. You can edit these in the sidepane by clicking on a
@@ -383,7 +387,9 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
                 </p>
               </li>
               <li>
-                <div className="font-semibold inline text-xl">Start Writing</div>
+                <div className="font-semibold inline text-xl">
+                  Start Writing
+                </div>
                 <p className="text-gray-500 mt-2 ml-6">
                   If you want to add more detail to a section, click on the
                   section to show the sidepane. This will let you add talking
@@ -392,7 +398,9 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
                 </p>
               </li>
               <li>
-                <div className="font-semibold inline text-xl">Create Proposal</div>
+                <div className="font-semibold inline text-xl">
+                  Create Proposal
+                </div>
                 <p className="text-gray-500 mt-2 ml-6">
                   Click the Create Proposal button to generate a proposal. Once
                   your proposal has been generated you can go to the Preview

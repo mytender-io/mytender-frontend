@@ -108,27 +108,25 @@ const Signin = () => {
     <div className="w-screen h-screen flex justify-center items-center m-0">
       <MeshGradient>
         <div className="flex items-center gap-2 max-w-[1080px] px-5 py-4 w-full">
-          <img src={Logo} className="h-20" alt="logo" />
+          <img src={Logo} className="h-14" alt="logo" />
         </div>
-        <div className="space-y-6 max-w-lg min-w-[512px] w-full">
+        <div className="space-y-6 max-w-lg w-full">
           <div className="p-12 rounded-lg bg-white shadow-card">
             <div className="relative">
               <div className="flex items-center gap-2 mb-5">
-                <h2 className="text-4xl font-bold text-center w-full">
+                <h2 className="text-2xl font-bold text-center w-full">
                   Sign in to your account
                 </h2>
               </div>
               <form onSubmit={onSubmit}>
                 <div className="space-y-6">
                   <div className="grid w-full items-center gap-3">
-                    <Label htmlFor="email" className="text-xl">
-                      Username
-                    </Label>
+                    <Label htmlFor="email">Username</Label>
                     <Input
                       type="text"
                       id="email"
                       placeholder="Username"
-                      className="w-full md:text-xl h-12"
+                      className="w-full h-12"
                       value={formData.email}
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
@@ -138,37 +136,33 @@ const Signin = () => {
                   </div>
                   <div className="grid w-full items-center gap-3">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="email" className="text-xl">
-                        Password
-                      </Label>
+                      <Label htmlFor="email">Password</Label>
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
                             variant="ghost"
-                            className="text-xl text-orange bg-transparent hover:text-orange_light"
+                            className="text-orange bg-transparent hover:text-orange-light"
                           >
                             Forgot Password?
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px] bg-white">
                           <DialogHeader>
-                            <DialogTitle className="text-4xl font-bold mb-3">
+                            <DialogTitle className="text-2xl font-bold mb-3">
                               Forgot Password
                             </DialogTitle>
-                            <DialogDescription className="text-xl font-medium">
+                            <DialogDescription className="font-medium">
                               Enter your email address and we'll send you a link
                               to reset your password.
                             </DialogDescription>
                           </DialogHeader>
                           <div className="grid gap-4 py-4">
                             <div className="grid w-full items-center gap-3">
-                              <Label htmlFor="email" className="text-xl">
-                                Email
-                              </Label>
+                              <Label htmlFor="email">Email</Label>
                               <Input
                                 id="email"
                                 placeholder="Email"
-                                className="w-full md:text-xl h-12"
+                                className="w-full h-12"
                                 type="password"
                                 value={forgotPasswordEmail}
                                 onChange={(e) =>
@@ -182,14 +176,14 @@ const Signin = () => {
                               <Button
                                 type="button"
                                 variant="secondary"
-                                className="text-lg py-4 text-white"
+                                className="text-sm py-4"
                               >
                                 Close
                               </Button>
                             </DialogClose>
                             <Button
                               onClick={handleForgotPassword}
-                              className="text-lg py-4 text-white bg-orange hover:bg-orange_light"
+                              className="text-sm py-4 text-white bg-orange hover:bg-orange-light"
                             >
                               Send Email
                             </Button>
@@ -201,7 +195,7 @@ const Signin = () => {
                       type="password"
                       id="password"
                       placeholder="Password"
-                      className="w-full md:text-xl h-12"
+                      className="w-full h-12"
                       value={formData.password}
                       onChange={(e) =>
                         setFormData({
@@ -214,7 +208,7 @@ const Signin = () => {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-orange h-14 text-xl text-white hover:bg-orange_light"
+                    className="w-full h-14 text-lg text-white"
                     size="lg"
                     disabled={isLoading}
                   >
@@ -226,7 +220,7 @@ const Signin = () => {
             <AuthState />
           </div>
           <div className="px-2">
-            <span className="block text-xl font-medium text-muted-foreground">
+            <span className="block text-sm font-medium text-muted-foreground">
               Disclaimer: Answers generated with AI should always be checked for
               accuracy, we view our platform as a tool to create amazing
               proposals, but with the guidance of a human!
@@ -236,14 +230,14 @@ const Signin = () => {
         <div className="flex items-center gap-4 max-w-[1080px] px-5 py-4 text-left justify-start w-full">
           <a
             href="https://mytender.io/data_protection_overview"
-            className="text-xl font-semibold text-black"
+            className="text-sm font-semibold text-black"
             target="_blank"
           >
             Privacy & Policy
           </a>
           <a
             href="https://mytender.io/terms_and_conditions"
-            className="text-xl font-semibold text-black"
+            className="text-sm font-semibold text-black"
             target="_blank"
           >
             Terms & Conditions

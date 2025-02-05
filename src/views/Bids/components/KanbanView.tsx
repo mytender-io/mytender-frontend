@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarAlt, faMoneyBill } from "@fortawesome/free-solid-svg-icons";
-import "./KanbanView.css";
+import DollarIcon from "@/components/icons/DollarIcon";
+import CalendarIcon from "@/components/icons/CalendarIcon";
+import { cn } from "@/utils";
 
 interface KanbanViewProps {
   bids: any[];
@@ -118,7 +118,11 @@ const KanbanView: React.FC<KanbanViewProps> = ({
     return (
       <div
         draggable
-        className={`kanban-card ${isDragging ? "is-dragging" : ""}`}
+        className={cn(
+          "bg-white rounded-lg p-3 shadow-sm cursor-grab select-none border border-typo-200",
+          "hover:translate-y-[-2px] hover:shadow-md transition-all duration-200",
+          isDragging && "opacity-50 shadow-lg"
+        )}
         onDragStart={(e) => {
           handleDragStart(e, bid);
           setIsDragging(true);
@@ -132,17 +136,20 @@ const KanbanView: React.FC<KanbanViewProps> = ({
         }}
         onClick={() => !isDragging && navigateToChatbot(bid)}
       >
-        <h3 className="bid-title">{bid.bid_title}</h3>
-        <div className="bid-details">
+        <h3 className="text-base font-medium mb-2 text-typo-900">
+          {bid.bid_title}
+        </h3>
+        <div className="flex justify-between items-center gap-4 text-sm text-typo-900">
           {bid.value && (
-            <div className="bid-detail">
-              <FontAwesomeIcon icon={faMoneyBill} />
+            <div className="flex items-center gap-1.5">
+              <DollarIcon className="h-4 w-4" />
               <span>{bid.value}</span>
             </div>
           )}
+
           {bid.submission_deadline && (
-            <div className="bid-detail">
-              <FontAwesomeIcon icon={faCalendarAlt} />
+            <div className="flex items-center gap-1.5">
+              <CalendarIcon className="h-4 w-4" />
               <span>{formatDate(bid.submission_deadline)}</span>
             </div>
           )}
@@ -152,15 +159,66 @@ const KanbanView: React.FC<KanbanViewProps> = ({
   };
 
   return (
-    <div className="kanban-container">
-      {statusColumns.map((status) => (
-        <div key={status} className="kanban-column">
-          <div className="kanban-column-header">
-            <h2>{status}</h2>
-            <span className="bid-count">{getBidsForStatus(status).length}</span>
+    <div className="flex gap-4 h-[calc(100vh-214px)] overflow-x-auto mt-5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-400 scrollbar-thumb-rounded-full scrollbar-thumb-border-white">
+      {statusColumns.map((status, index) => (
+        <div
+          key={status}
+          className={cn(
+            "flex-1 min-w-[260px] rounded-lg flex flex-col max-h-full",
+            "bg-typo-50",
+            // Apply different border colors based on status
+            {
+              "border-t-[3px] border-status-planning": index === 0,
+              "border-t-[3px] border-status-research": index === 1,
+              "border-t-[3px] border-status-draft": index === 2,
+              "border-t-[3px] border-status-review": index === 3,
+              "border-t-[3px] border-status-success": index === 4
+            }
+          )}
+        >
+          <div
+            className={cn(
+              "flex justify-between items-center py-3 px-4 mb-4 rounded-t-lg",
+              {
+                "bg-status-planning_light": index === 0,
+                "bg-status-research_light": index === 1,
+                "bg-status-draft_light": index === 2,
+                "bg-status-review_light": index === 3,
+                "bg-status-success_light": index === 4
+              }
+            )}
+          >
+            <h2
+              className={cn("text-base font-semibold m-0", {
+                "text-status-planning": index === 0,
+                "text-status-research": index === 1,
+                "text-status-draft": index === 2,
+                "text-status-review": index === 3,
+                "text-status-success": index === 4
+              })}
+            >
+              {status}
+            </h2>
+            <span
+              className={cn(
+                "flex items-center justify-center w-6 h-6 rounded-md bg-white text-sm font-semibold",
+                {
+                  "text-status-planning": index === 0,
+                  "text-status-research": index === 1,
+                  "text-status-draft": index === 2,
+                  "text-status-review": index === 3,
+                  "text-status-success": index === 4
+                }
+              )}
+            >
+              {getBidsForStatus(status).length}
+            </span>
           </div>
           <div
-            className="kanban-list"
+            className={cn(
+              "min-h-[100px] overflow-y-auto flex-grow px-3 space-y-4",
+              "transition-colors duration-200"
+            )}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, status)}

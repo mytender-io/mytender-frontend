@@ -3,7 +3,6 @@ import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
-import SideBarSmall from "../routes/SidebarSmall.tsx";
 import { useLocation } from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
@@ -12,8 +11,8 @@ import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 import TenderAnalysis from "../components/TenderAnalysis.tsx";
-import { ChevronDown, Fullscreen, X } from "lucide-react";
-import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
+import { Fullscreen, X } from "lucide-react";
+import BreadcrumbNavigation from "../layout/BreadCrumbNavigation.tsx";
 import theme from "@/components/ui/theme.tsx";
 import { ThemeProvider } from "@mui/material/styles";
 import {
@@ -193,7 +192,6 @@ const BidPlanner = () => {
 
   return (
     <div className="chatpage">
-      <SideBarSmall onCollapseChange={setSidebarCollapsed} />
       <div className="bidplanner-container">
         <div
           className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}

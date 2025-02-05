@@ -17,7 +17,7 @@ import "./Profile.css";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import BreadcrumbNavigation from "@/routes/BreadCrumbNavigation.tsx";
+import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
 
 const ProfilePage = () => {
   const getAuth = useAuthUser();
@@ -245,218 +245,225 @@ const ProfilePage = () => {
         <div className="lib-container">
           <div>
             <h1 className="mt-3 mb-3">Profile</h1>
-          <Card>
-            <Card.Body>
-              <Form>
-                <Row className="profile-form-row">
-                  <Col>
-                    <Form.Group controlId="formUsername">
-                      <Form.Label className="profile-form-label">
-                        Username
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter your username"
-                        name="username"
-                        value={formData.username}
-                        readOnly
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group controlId="formEmail">
-                      <Form.Label className="profile-form-label">
-                        Email
-                      </Form.Label>
-                      <Form.Control
-                        type="email"
-                        placeholder="name@company.com"
-                        name="email"
-                        value={formData.email}
-                        readOnly
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row className="profile-form-row">
-                  <Col>
-                    <Form.Group controlId="formCompany">
-                      <Form.Label className="profile-form-label">
-                        Company
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter your company"
-                        name="company"
-                        value={formData.company}
-                        readOnly
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group controlId="formJobRole">
-                      <Form.Label className="profile-form-label">
-                        Job Role
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter your job role"
-                        name="jobRole"
-                        value={formData.jobRole}
-                        readOnly
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row className="profile-form-row">
-                  <Col>
-                    <Form.Group controlId="formRegion">
-                      <Form.Label className="profile-form-label">
-                        Region
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter your region"
-                        name="region"
-                        value={formData.region}
-                        readOnly
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group controlId="formProductName">
-                      <Form.Label className="profile-form-label">
-                        Subscription Type
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter your product name"
-                        name="productName"
-                        value={formData.productName}
-                        readOnly
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Form>
-            </Card.Body>
-          </Card>
+            <Card>
+              <Card.Body>
+                <Form>
+                  <Row className="profile-form-row">
+                    <Col>
+                      <Form.Group controlId="formUsername">
+                        <Form.Label className="profile-form-label">
+                          Username
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter your username"
+                          name="username"
+                          value={formData.username}
+                          readOnly
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col>
+                      <Form.Group controlId="formEmail">
+                        <Form.Label className="profile-form-label">
+                          Email
+                        </Form.Label>
+                        <Form.Control
+                          type="email"
+                          placeholder="name@company.com"
+                          name="email"
+                          value={formData.email}
+                          readOnly
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row className="profile-form-row">
+                    <Col>
+                      <Form.Group controlId="formCompany">
+                        <Form.Label className="profile-form-label">
+                          Company
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter your company"
+                          name="company"
+                          value={formData.company}
+                          readOnly
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col>
+                      <Form.Group controlId="formJobRole">
+                        <Form.Label className="profile-form-label">
+                          Job Role
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter your job role"
+                          name="jobRole"
+                          value={formData.jobRole}
+                          readOnly
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row className="profile-form-row">
+                    <Col>
+                      <Form.Group controlId="formRegion">
+                        <Form.Label className="profile-form-label">
+                          Region
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter your region"
+                          name="region"
+                          value={formData.region}
+                          readOnly
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col>
+                      <Form.Group controlId="formProductName">
+                        <Form.Label className="profile-form-label">
+                          Subscription Type
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Enter your product name"
+                          name="productName"
+                          value={formData.productName}
+                          readOnly
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </Form>
+              </Card.Body>
+            </Card>
 
-          <Card className="mt-4 mb-4">
-            <Card.Body>
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="formCompanyObjectives">
-                  <Form.Label>Company Objectives</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={4}
-                    name="companyObjectives"
-                    value={formData.companyObjectives}
-                    onChange={handleInputChange}
-                    placeholder="Outline your company’s overall mission and key goals, focusing on how your products or services deliver value. Highlight your strengths, such as innovation, efficiency, or expertise, and how they align with client needs or industry challenges. Emphasise outcomes that demonstrate your ability to provide measurable impact (e.g., increased performance, cost savings, or long-term value)"
-                  />
-                </Form.Group>
+            <Card className="mt-4 mb-4">
+              <Card.Body>
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group
+                    className="mb-3"
+                    controlId="formCompanyObjectives"
+                  >
+                    <Form.Label>Company Objectives</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={4}
+                      name="companyObjectives"
+                      value={formData.companyObjectives}
+                      onChange={handleInputChange}
+                      placeholder="Outline your company’s overall mission and key goals, focusing on how your products or services deliver value. Highlight your strengths, such as innovation, efficiency, or expertise, and how they align with client needs or industry challenges. Emphasise outcomes that demonstrate your ability to provide measurable impact (e.g., increased performance, cost savings, or long-term value)"
+                    />
+                  </Form.Group>
 
-                <Form.Group className="mb-3" controlId="formToneOfVoice">
-                  <Form.Label>Tone of Voice</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    name="toneOfVoice"
-                    value={formData.toneOfVoice}
-                    onChange={handleInputChange}
-                    placeholder="Define the preferred tone for your bids, whether it should be professional, approachable, technical, or accessible. Ensure the tone matches the client’s level of formality and understanding. Specify whether industry-specific language should be detailed or simplified."
-                  />
-                </Form.Group>
+                  <Form.Group className="mb-3" controlId="formToneOfVoice">
+                    <Form.Label>Tone of Voice</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      name="toneOfVoice"
+                      value={formData.toneOfVoice}
+                      onChange={handleInputChange}
+                      placeholder="Define the preferred tone for your bids, whether it should be professional, approachable, technical, or accessible. Ensure the tone matches the client’s level of formality and understanding. Specify whether industry-specific language should be detailed or simplified."
+                    />
+                  </Form.Group>
 
-                {renderSaveButton()}
-              </Form>
-            </Card.Body>
-          </Card>
+                  {renderSaveButton()}
+                </Form>
+              </Card.Body>
+            </Card>
 
-          {formData.userType === "owner" && (
-            <>
-              <Card className="mb-3">
-                <Card.Body>
-                  <div className="proposal-header ">
-                    <Card.Title>Admin Panel</Card.Title>
-                    <div>
-                      <Button
-                        onClick={() => setShowModal(true)}
-                        className="upload-button"
-                      >
-                        Add New User
-                      </Button>
-                      <button
-                        className="orange-button ms-2"
-                        onClick={() =>
-                          window.open(
-                            "https://billing.stripe.com/p/login/00g6p52WPfRG22I8ww",
-                            "_blank"
-                          )
-                        }
-                      >
-                        Stripe Invoices
-                      </button>
+            {formData.userType === "owner" && (
+              <>
+                <Card className="mb-3">
+                  <Card.Body>
+                    <div className="proposal-header ">
+                      <Card.Title>Admin Panel</Card.Title>
+                      <div>
+                        <Button
+                          onClick={() => setShowModal(true)}
+                          className="upload-button"
+                        >
+                          Add New User
+                        </Button>
+                        <button
+                          className="orange-button ms-2"
+                          onClick={() =>
+                            window.open(
+                              "https://billing.stripe.com/p/login/00g6p52WPfRG22I8ww",
+                              "_blank"
+                            )
+                          }
+                        >
+                          Stripe Invoices
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <Card.Text>Licenses available: {formData.licences}</Card.Text>
+                    <Card.Text>
+                      Licenses available: {formData.licences}
+                    </Card.Text>
 
-                  <Table striped bordered hover>
-                    <thead>
-                      <tr>
-                        <th>Email</th>
-                        <th>Username</th>
-                        <th>Role</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {organizationUsers.map((user, index) => (
-                        <tr key={index}>
-                          <td>{user.email}</td>
-                          <td>{user.username || "Request Pending"}</td>
-                          <td>{user.role}</td>
+                    <Table striped bordered hover>
+                      <thead>
+                        <tr>
+                          <th>Email</th>
+                          <th>Username</th>
+                          <th>Role</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </Card.Body>
-              </Card>
-              <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                  <Modal.Title className="px-2">Invite New User</Modal.Title>
-                </Modal.Header>
-                <Modal.Body className="p-4">
-                  {inviteError && <p style={{ color: "red" }}>{inviteError}</p>}
-                  {inviteSuccess && (
-                    <p style={{ color: "green" }}>{inviteSuccess}</p>
-                  )}
-                  <p>
-                    This will consume a license. Licenses left:{" "}
-                    {formData.licences}
-                  </p>
-                  <Form onSubmit={handleInviteSubmit}>
-                    <Form.Group controlId="formInviteEmail">
-                      <Form.Label>Email address</Form.Label>
-                      <Form.Control
-                        type="email"
-                        placeholder="Enter email"
-                        value={inviteEmail}
-                        onChange={(e) => setInviteEmail(e.target.value)}
-                        required
-                      />
-                    </Form.Group>
-                    <Button className="upload-button mt-3" type="submit">
-                      Send Invite
-                    </Button>
-                  </Form>
-                </Modal.Body>
-              </Modal>
-            </>
-          )}
+                      </thead>
+                      <tbody>
+                        {organizationUsers.map((user, index) => (
+                          <tr key={index}>
+                            <td>{user.email}</td>
+                            <td>{user.username || "Request Pending"}</td>
+                            <td>{user.role}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </Card.Body>
+                </Card>
+                <Modal show={showModal} onHide={() => setShowModal(false)}>
+                  <Modal.Header closeButton>
+                    <Modal.Title className="px-2">Invite New User</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body className="p-4">
+                    {inviteError && (
+                      <p style={{ color: "red" }}>{inviteError}</p>
+                    )}
+                    {inviteSuccess && (
+                      <p style={{ color: "green" }}>{inviteSuccess}</p>
+                    )}
+                    <p>
+                      This will consume a license. Licenses left:{" "}
+                      {formData.licences}
+                    </p>
+                    <Form onSubmit={handleInviteSubmit}>
+                      <Form.Group controlId="formInviteEmail">
+                        <Form.Label>Email address</Form.Label>
+                        <Form.Control
+                          type="email"
+                          placeholder="Enter email"
+                          value={inviteEmail}
+                          onChange={(e) => setInviteEmail(e.target.value)}
+                          required
+                        />
+                      </Form.Group>
+                      <Button className="upload-button mt-3" type="submit">
+                        Send Invite
+                      </Button>
+                    </Form>
+                  </Modal.Body>
+                </Modal>
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 };

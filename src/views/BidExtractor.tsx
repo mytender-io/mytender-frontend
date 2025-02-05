@@ -3,7 +3,6 @@ import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
-import SideBarSmall from "../routes/SidebarSmall.tsx";
 import { useLocation } from "react-router-dom";
 import {
   Button,
@@ -481,7 +480,6 @@ const BidExtractor = () => {
 
   return (
     <div className="chatpage">
-      <SideBarSmall />
       <div className="lib-container">
         <div className="scroll-container">
           <BidNavbar
