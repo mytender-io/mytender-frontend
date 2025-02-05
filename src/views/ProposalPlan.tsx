@@ -827,6 +827,7 @@ const ProposalPlan = () => {
                             key={index}
                             className="cursor-pointer"
                             onClick={(e) => handleRowClick(e, index)}
+                            onContextMenu={(e) => handleContextMenu(e, index)} // Add this
                           >
                             <td className="w-12 p-4" data-checkbox>
                               <div className="flex items-center justify-center">
