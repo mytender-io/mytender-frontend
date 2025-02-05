@@ -329,7 +329,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
               initialSelectedFiles={selectedFiles}
             />
           </div>
-          <div className="mt-4 p-4 rounded-lg bg-orange_ultra_light text-orange">
+          <div className="mt-4 p-4 rounded-lg bg-orange-ultra_light text-orange">
             <span className="font-semibold">Note:</span> Please verify your
             selections before proceeding. The outline will be generated based on
             the selected documents.

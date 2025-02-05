@@ -12,7 +12,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { displayAlert } from "../helper/Alert";
 import withAuth from "../routes/withAuth";
 import mammoth from "mammoth";
-import BreadcrumbNavigation from "../routes/BreadCrumbNavigation";
+import BreadcrumbNavigation from "../layout/BreadCrumbNavigation";
 import { useLocation } from "react-router-dom";
 
 const ProposalPreview = () => {
@@ -145,16 +145,14 @@ const ProposalPreview = () => {
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "center",
-                    
+                    alignItems: "center"
                   }}
-                    className="mt-5 mb-4"
+                  className="mt-5 mb-4"
                 >
                   <DescriptionIcon />
                   <h3
                     style={{ fontSize: "1.2rem", fontWeight: 600, margin: 0 }}
                     className="ms-2"
-                  
                   >
                     Proposal Preview
                   </h3>

@@ -9,7 +9,7 @@ import "../resources/clash-display.css";
 import "./App.css";
 import "./Proposal.css";
 import "./Upload.css";
-import "bootstrap/dist/css/bootstrap.css";
+// import "bootstrap/dist/css/bootstrap.css";
 import ThemeProvider from "../providers/ThemeProvider";
 import posthog from "posthog-js";
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.css";
+// import "bootstrap/dist/css/bootstrap.css";
 import { useEffect, useRef, useState } from "react";
 import { useAuthUser, useSignOut } from "react-auth-kit";
 import { Link, useNavigate } from "react-router-dom";

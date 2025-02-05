@@ -1,39 +1,76 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuthUser } from "react-auth-kit";
 import axios from "axios";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import { Link } from "react-router-dom";
-import "./Bids.css";
 import { useNavigate } from "react-router-dom";
-import SideBarSmall from "../routes/SidebarSmall.tsx";
-import handleGAEvent from "../utilities/handleGAEvent.tsx";
-import { Button, Form, Modal } from "react-bootstrap";
-import { displayAlert } from "../helper/Alert.tsx";
-import {
-  faPlus,
-  faSort,
-  faSortDown,
-  faSortUp
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import handleGAEvent from "../../utilities/handleGAEvent.tsx";
+import { displayAlert } from "../../helper/Alert.tsx";
 import { Skeleton } from "@mui/material";
-import SearchInput from "../components/inputbars/SearchInput.tsx";
-import ViewToggle from "../buttons/ViewToggle.tsx";
-import EllipsisMenuDashboard from "../buttons/EllipsisMenuDashboard.tsx";
-import withAuth from "../routes/withAuth.tsx";
-import BidStatusMenu from "../buttons/BidStatusMenu.tsx";
-import KanbanView from "./KanbanView.tsx";
-import NewTenderModal from "../modals/NewTenderModal.tsx";
-import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
+import SearchInput from "@/components/SearchInput.tsx";
+import withAuth from "../../routes/withAuth.tsx";
+import NewTenderModal from "./components/NewTenderModal.tsx";
+import BreadcrumbNavigation from "../../layout/BreadCrumbNavigation.tsx";
+import PaginationRow from "@/components/PaginationRow.tsx";
+import EllipsisMenuDashboard from "./components/EllipsisMenuDashboard.tsx";
+import BidStatusMenu from "./components/BidStatusMenu.tsx";
+import KanbanView from "./components/KanbanView.tsx";
+import { Button } from "@/components/ui/button";
+import PlusIcon from "@/components/icons/PlusIcon.tsx";
+import ViewToggle from "@/views/Bids/components/ViewToggle.tsx";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
+import SortUpIcon from "@/components/icons/SortUpIcon.tsx";
+import { cn } from "@/utils";
+
+interface Bid {
+  _id: string;
+  bid_title: string;
+  status:
+    | "Identification"
+    | "Capture Planning"
+    | "First Review"
+    | "Final Review"
+    | "Submitted";
+  timestamp?: string;
+  submission_deadline?: string;
+  client_name?: string;
+  bid_manager?: string;
+  opportunity_owner?: string;
+  bid_qualification_result?: string;
+  [key: string]: string | undefined; // Index signature for dynamic access
+}
+
+interface SortConfig {
+  key: keyof Bid;
+  direction: "asc" | "desc";
+}
 
 const Bids = () => {
-  const [bids, setBids] = useState([]);
+  const [bids, setBids] = useState<Bid[]>([]);
+  const [filteredBids, setFilteredBids] = useState<Bid[]>([]);
+  const [sortedBids, setSortedBids] = useState<Bid[]>([]);
+  const [currentBids, setCurrentBids] = useState<Bid[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [bidName, setBidName] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [bidToDelete, setBidToDelete] = useState<string | null>(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
   const [loading, setLoading] = useState(true);
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -48,45 +85,14 @@ const Bids = () => {
     setViewType(view);
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
   // Sorting bids based on the selected criteria
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: "timestamp",
     direction: "desc"
   } as const);
-
-  interface Bid {
-    _id: string;
-    bid_title: string;
-    status:
-      | "Identification"
-      | "Capture Planning"
-      | "First Review"
-      | "Final Review"
-      | "Submitted";
-    timestamp?: string;
-    submission_deadline?: string;
-    client_name?: string;
-    bid_manager?: string;
-    opportunity_owner?: string;
-    bid_qualification_result?: string;
-    [key: string]: string | undefined; // Index signature for dynamic access
-  }
-
-  interface SortConfig {
-    key: keyof Bid;
-    direction: "asc" | "desc";
-  }
-
-  interface ApiResponse {
-    status: string;
-    data?: {
-      detail?: string;
-    };
-  }
-
-  interface ModalSubmitEvent extends React.FormEvent<HTMLFormElement> {
-    preventDefault(): void;
-  }
 
   const sortData = (data: Bid[], sortConfig: SortConfig): Bid[] => {
     const sortedData = [...data].sort((a: Bid, b: Bid) => {
@@ -156,7 +162,7 @@ const Bids = () => {
     });
   };
 
-  const requestSort = (key: keyof Bid): void => {
+  const requestSort = (key: keyof Bid) => {
     let direction: "asc" | "desc" = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
@@ -164,17 +170,20 @@ const Bids = () => {
     setSortConfig({ key, direction });
   };
 
-  const getSortIcon = (columnKey: keyof Bid): JSX.Element => {
+  const getSortIcon = (columnKey: keyof Bid): React.ReactElement => {
     if (sortConfig.key !== columnKey) {
-      return <FontAwesomeIcon icon={faSort} />;
+      return <></>;
     }
-    return sortConfig.direction === "asc" ? (
-      <FontAwesomeIcon icon={faSortUp} />
-    ) : (
-      <FontAwesomeIcon icon={faSortDown} />
+
+    return (
+      <SortUpIcon
+        className={cn("text-typo-900 transition-all duration-300", {
+          "rotate-180": sortConfig.direction === "desc"
+        })}
+      />
     );
   };
-  // Update the table header to include sorting
+
   const headers = [
     { key: "bid_title", label: "Tender Name" },
     { key: "timestamp", label: "Last edited" },
@@ -182,17 +191,36 @@ const Bids = () => {
     { key: "submission_deadline", label: "Deadline" },
     { key: "status", label: "Status" }
     // { key: "client_name", label: "Client" },
-
-    //{ key: "bid_manager", label: "Bid Manager", width: "15%" },
-    //{ key: "opportunity_owner", label: "Opportunity Owner", width: "15%" },
-    //{ key: "bid_qualification_result", label: "Result" }
+    // { key: "bid_manager", label: "Bid Manager", width: "15%" },
+    // { key: "opportunity_owner", label: "Opportunity Owner", width: "15%" },
+    // { key: "bid_qualification_result", label: "Result" }
   ];
-  // Sort the bids before pagination
-  const filteredBids = filterBids(bids, searchTerm);
-  const sortedBids = sortData(filteredBids, sortConfig);
-  const currentBids = sortedBids;
 
-  const navigateToChatbot = (bid: any) => {
+  useEffect(() => {
+    setFilteredBids(filterBids(bids, searchTerm));
+  }, [bids, searchTerm]);
+
+  useEffect(() => {
+    setSortedBids(sortData(filteredBids, sortConfig));
+  }, [filteredBids, sortConfig]);
+
+  useEffect(() => {
+    if (!Array.isArray(sortedBids)) return; // Safety check
+
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const currentPageBids = sortedBids.slice(startIndex, endIndex);
+
+    // Reset to first page if current page is empty
+    if (currentPageBids.length === 0 && currentPage > 1) {
+      setCurrentPage(1);
+      return;
+    }
+
+    setCurrentBids(currentPageBids);
+  }, [sortedBids, currentPage, pageSize]);
+
+  const navigateToChatbot = (bid: Bid) => {
     localStorage.setItem("navigatedFromBidsTable", "true");
     localStorage.removeItem("bidState");
     navigate("/bid-extractor", { state: { bid: bid, fromBidsTable: true } });
@@ -367,158 +395,147 @@ const Bids = () => {
   };
 
   const SkeletonRow = () => (
-    <tr className="py-4">
-      <td>
+    <TableRow>
+      <TableCell className="px-4">
         <Skeleton variant="text" width="100%" />
-      </td>
-      <td>
+      </TableCell>
+      <TableCell className="px-4">
         <Skeleton variant="text" width="100%" />
-      </td>
-      <td>
+      </TableCell>
+      <TableCell className="px-4">
         <Skeleton variant="text" width="100%" />
-      </td>
-      <td>
+      </TableCell>
+      <TableCell className="px-4">
         <Skeleton variant="text" width="100%" />
-      </td>
-      <td>
+      </TableCell>
+      <TableCell className="px-4">
         <Skeleton variant="text" width="100%" />
-      </td>
-      <td style={{ textAlign: "center" }}>
+      </TableCell>
+      <TableCell className="w-[100px] px-4">
         <Skeleton
           variant="rounded"
           width={20}
           height={20}
-          style={{ marginLeft: "22px" }}
+          className="ml-auto"
         />
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 
-  const parentPages = [
- 
-  ];
-
+  const parentPages = [] as Array<{ name: string; path: string }>;
 
   return (
     <div>
-      <SideBarSmall onCollapseChange={setSidebarCollapsed} />
-      <div
-        className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
-      >
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-4">
         <BreadcrumbNavigation
           currentPage="Tender Dashboard"
           parentPages={parentPages}
           showHome={true}
         />
-
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-          <SearchInput value={searchTerm} onChange={setSearchTerm} />
-        </div>
+        <SearchInput value={searchTerm} onChange={setSearchTerm} />
       </div>
-
-      <div
-        className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
-      >
-        <div>
-          <h1 className="mt-3">Track your tenders</h1>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center"
-            }}
-            className="mt-3"
-          >
-            <p className="mt-3">{filteredBids.length} Results</p>
-            <div>
-              <Button
-                onClick={handleWriteProposalClick}
-                className="upload-button me-3"
-                id="new-bid-button"
-              >
-                <FontAwesomeIcon icon={faPlus} style={{ marginRight: "8px" }} />
-                New Tender
-              </Button>
-              <ViewToggle value={viewType} onChange={handleViewChange} />
-            </div>
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-3">
+            <span className="block text-xl font-semibold">
+              Track your tenders
+            </span>
+            <span className="block text-sm text-typo-950">
+              Monitor all of your tenders through the bid lifecycle.
+            </span>
           </div>
+          <div className="flex flex-col items-end space-y-2">
+            <ViewToggle value={viewType} onChange={handleViewChange} />
+            <Button
+              size="lg"
+              className="px-4"
+              onClick={handleWriteProposalClick}
+              id="new-bid-button"
+            >
+              <PlusIcon className="text-white mr-2" />
+              New Tender
+            </Button>
+          </div>
+        </div>
+        <div className="space-y-6">
           {viewType === "table" ? (
-            <div className="table-wrapper">
-              <table className="bids-table">
-                <thead>
-                  <tr>
+            <div className="border border-typo-200 rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
                     {headers.map((header) => (
-                      <th
+                      <TableHead
                         key={header.key}
+                        className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none"
                         onClick={() => requestSort(header.key)}
-                        className="sortable-header"
                       >
-                        {header.label}
-                        {getSortIcon(header.key)}
-                      </th>
+                        <div className="flex items-center gap-2">
+                          {header.label}
+                          {getSortIcon(header.key)}
+                        </div>
+                      </TableHead>
                     ))}
-                    <th style={{ textAlign: "center", width: "5%" }}></th>
-                  </tr>
-                </thead>
-                <tbody>
+                    <TableHead className="w-[100px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4 select-none">
+                      Action
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {loading ? (
                     Array(14)
                       .fill(0)
                       .map((_, index) => <SkeletonRow key={index} />)
                   ) : currentBids.length > 0 ? (
-                    currentBids.map((bid, index) => (
-                      <tr key={index}>
-                        <td className="bid-title-cell">
-                          <div className="truncate-wrapper">
-                            <Link
-                              to="/bid-extractor"
-                              state={{ bid: bid, fromBidsTable: true }}
-                              onClick={() => navigateToChatbot(bid)}
-                              className="truncate-text"
-                            >
-                              {bid.bid_title}
-                            </Link>
-                          </div>
-                        </td>
-                        <td className="date-cell">
+                    currentBids.map((bid) => (
+                      <TableRow key={bid._id}>
+                        <TableCell className="px-4">
+                          <Link
+                            to="/bid-extractor"
+                            state={{ bid: bid, fromBidsTable: true }}
+                            onClick={() => navigateToChatbot(bid)}
+                            className="block truncate w-full text-black no-underline hover:text-gray-600 transition-colors duration-200"
+                          >
+                            {bid.bid_title}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="px-4">
                           {bid.timestamp
                             ? new Date(bid.timestamp).toLocaleDateString()
                             : ""}
-                        </td>
-                        <td className="value-cell">{bid.value}</td>
-                        <td className="date-cell">
+                        </TableCell>
+                        <TableCell className="px-4">{bid.value}</TableCell>
+                        <TableCell className="px-4">
                           {bid.submission_deadline &&
                           !isNaN(Date.parse(bid.submission_deadline))
                             ? new Date(
                                 bid.submission_deadline
                               ).toLocaleDateString()
                             : ""}
-                        </td>
-                        <td className="status-cell">
+                        </TableCell>
+                        <TableCell className="px-4">
                           <BidStatusMenu
                             value={bid.status}
                             onChange={(value) => {
                               updateBidStatus(bid._id, value);
                             }}
                           />
-                        </td>
-                        <td className="action-cell">
+                        </TableCell>
+                        <TableCell className="w-[100px] text-right px-4">
                           <EllipsisMenuDashboard
                             onClick={() => handleDeleteClick(bid._id)}
                           />
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))
                   ) : (
-                    <tr>
-                      <td colSpan={6} className="text-center py-4">
+                    <TableRow>
+                      <TableCell className="text-center py-4">
                         No matching tenders found
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   )}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           ) : (
             <KanbanView
@@ -527,36 +544,33 @@ const Bids = () => {
               navigateToChatbot={navigateToChatbot}
             />
           )}
+          <PaginationRow
+            currentPage={currentPage}
+            pageSize={pageSize}
+            totalRecords={bids.length}
+            onPageChange={handlePageChange}
+          />
         </div>
         <NewTenderModal
           show={showModal}
           onHide={handleModalClose}
           existingBids={bids}
         />
-
-        <Modal
-          show={showDeleteModal}
-          onHide={() => setShowDeleteModal(false)}
-          className=""
-        >
-          <Modal.Header closeButton className="py-3 px-4">
-            <Modal.Title>Confirm Delete</Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="px-4 py-4" style={{ height: "12vh" }}>
-            Are you sure you want to delete this tender?
-          </Modal.Body>
-          <Modal.Footer>
-            <div className="">
-              <Button
-                className="upload-button"
-                style={{ backgroundColor: "red" }}
-                onClick={confirmDeleteBid}
-              >
+        <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Confirm Delete</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this tender?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="destructive" onClick={confirmDeleteBid}>
                 Delete
               </Button>
-            </div>
-          </Modal.Footer>
-        </Modal>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.css";
+// import "bootstrap/dist/css/bootstrap.css";
 import { useRef, useState } from "react";
 import { useAuthHeader, useAuthUser } from "react-auth-kit";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
