@@ -133,19 +133,6 @@ const SelectTenderLibraryFile = ({
             </table>
           )}
 
-          <div className="pagination-controls">
-            {totalPages > 1 &&
-              [...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => paginate(i + 1)}
-                  disabled={currentPage === i + 1}
-                  className="pagination-button"
-                >
-                  {i + 1}
-                </button>
-              ))}
-          </div>
         </div>
       </Card.Body>
     </Card>

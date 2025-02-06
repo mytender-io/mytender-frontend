@@ -9,10 +9,11 @@
 }
 
 .select-tenderlibrary-card-custom {
-    height: 22.5rem;
+    height: 20rem;
     box-shadow: none !important;
     margin-bottom: 0;
     margin: 0;
+    overflow-y: auto !important;
 }
 
 .select-library-card-custom {
@@ -20,12 +21,12 @@
     box-shadow: none !important;
     margin-bottom: 0;
     margin: 0;
+    overflow-y: auto !important;
 }
 
 .select-library-card-body-content {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
     padding: 0;
     margin-bottom: 0;
 }
