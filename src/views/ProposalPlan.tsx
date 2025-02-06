@@ -205,10 +205,6 @@ const ProposalPlan = () => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [contextMenu]);
 
-  useEffect(() => {
-    fetchOutline();
-  }, []);
-
   const handleAddSection = async () => {
     if (!object_id || selectedRowIndex === null) return;
 
@@ -337,10 +333,14 @@ const ProposalPlan = () => {
   };
 
   useEffect(() => {
-    if (outline.length === 0) {
+    // Only show modal if we have an object_id (meaning shared state is populated)
+    // and outline is empty
+    console.log(outline);
+    console.log(sharedState.outline);
+    if (object_id && outline.length === 0) {
       setShowModal(true);
     }
-  }, [outline.length]);
+  }, [outline.length, object_id]);
 
   const handleRegenerateClick = () => {
     setShowModal(true);
@@ -455,45 +455,6 @@ const ProposalPlan = () => {
 
     if (newIndex >= 0 && newIndex < outline.length) {
       setSelectedSection(newIndex);
-    }
-  };
-  const fetchOutline = async () => {
-    if (!object_id) return;
-    const formData = new FormData();
-    formData.append("bid_id", object_id);
-    setIsLoading(true);
-    try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_bid_outline`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "multipart/form-data"
-          }
-        }
-      );
-
-      const outlineWithStatus = response.data.map((section: any) => ({
-        ...section,
-        status:
-          section.status ||
-          (section.completed
-            ? "Completed"
-            : section.in_progress
-              ? "In Progress"
-              : "Not Started")
-      }));
-
-      setSharedState((prevState) => ({
-        ...prevState,
-        outline: outlineWithStatus
-      }));
-    } catch (err) {
-      console.error("Error fetching outline:", err);
-      displayAlert("Failed to fetch outline", "danger");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -759,7 +720,6 @@ const ProposalPlan = () => {
                 show={showModal}
                 onHide={() => setShowModal(false)}
                 bid_id={object_id}
-                fetchOutline={fetchOutline}
               />
 
               {outline.length === 0 ? (

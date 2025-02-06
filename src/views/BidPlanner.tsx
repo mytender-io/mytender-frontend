@@ -4,7 +4,6 @@ import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import SideBarSmall from "../routes/SidebarSmall.tsx";
-import { useLocation } from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import "./BidPlanner.css";
@@ -16,13 +15,8 @@ import { ChevronDown, Fullscreen, X } from "lucide-react";
 import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 import theme from "@/components/ui/theme.tsx";
 import { ThemeProvider } from "@mui/material/styles";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton
-} from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
+import { useLocation } from "react-router-dom";
 
 const BidPlanner = () => {
   const getAuth = useAuthUser();
@@ -33,26 +27,20 @@ const BidPlanner = () => {
   const { bidInfo, contributors, object_id } = sharedState;
 
   const location = useLocation();
-  const bidData = location.state?.bid || "";
-  const initialBidName = location.state?.bid.bid_title || sharedState.bidInfo;
+  const bidData = location.state?.bid || null;
 
-  console.log(location.state?.bid);
+  const initialBidName = sharedState.bidInfo;
 
   const [loading, setLoading] = useState(false);
   const [existingBidNames, setExistingBidNames] = useState([]);
   const [organizationUsers, setOrganizationUsers] = useState([]);
   const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [isLibraryVisible, setIsLibraryVisible] = useState(false);
 
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
 
   const handleOpenLibrary = () => setIsLibraryOpen(true);
   const handleCloseLibrary = () => setIsLibraryOpen(false);
-
-  const toggleLibrary = () => {
-    setIsLibraryVisible(!isLibraryVisible);
-  };
 
   const currentUserPermission = contributors[auth.email] || "viewer";
   const canUserEdit =
@@ -61,6 +49,47 @@ const BidPlanner = () => {
   const showViewOnlyMessage = () => {
     displayAlert("You only have permission to view this bid.", "danger");
   };
+
+  useEffect(() => {
+    if (bidData) {
+      console.log(bidData);
+      console.log(bidData);
+
+      setSharedState((prevState) => {
+        return {
+          ...prevState,
+          bidInfo: bidData?.bid_title || "",
+          opportunity_information:
+            bidData?.opportunity_information?.trim() || "",
+          compliance_requirements:
+            bidData?.compliance_requirements?.trim() || "",
+          tender_summary: bidData?.tender_summary || "",
+          evaluation_criteria: bidData?.evaluation_criteria || "",
+          derive_insights: bidData?.derive_insights || "",
+          differentiation_opportunities:
+            bidData?.differentiation_opportunities || "",
+          questions: bidData?.questions || "",
+          value: bidData?.value || "",
+          client_name: bidData?.client_name || "",
+          bid_qualification_result: bidData?.bid_qualification_result || "",
+          opportunity_owner: bidData?.opportunity_owner || "",
+          submission_deadline: bidData?.submission_deadline || "",
+          bid_manager: bidData?.bid_manager || "",
+          contributors: bidData?.contributors || "",
+          original_creator: bidData?.original_creator || "",
+          object_id: bidData?._id || "",
+          selectedFolders: bidData?.selectedFolders || [],
+          lastUpdated: bidData?.lastUpdated || 0,
+          outline: bidData?.outline || [],
+          win_themes: bidData?.win_themes || [],
+          customer_pain_points: bidData?.customer_pain_points || [],
+          differentiating_factors: bidData?.differentiating_factors || []
+        };
+      });
+
+      localStorage.setItem("navigatedFromBidsTable", "false");
+    }
+  }, []);
 
   const fetchOrganizationUsers = async () => {
     try {
@@ -123,68 +152,6 @@ const BidPlanner = () => {
       ]);
     };
     fetchInitialData();
-  }, []);
-
-  useEffect(() => {
-    const navigatedFromBidsTable = localStorage.getItem(
-      "navigatedFromBidsTable"
-    );
-
-    if (
-      navigatedFromBidsTable === "true" &&
-      location.state?.fromBidsTable &&
-      bidData
-    ) {
-      setSharedState((prevState) => {
-        const original_creator = bidData?.original_creator || auth.email;
-        let contributors = bidData?.contributors || {};
-
-        if (
-          !bidData?.original_creator ||
-          Object.keys(contributors).length === 0
-        ) {
-          contributors = { [auth.email]: "admin" };
-        }
-
-        return {
-          ...prevState,
-          bidInfo: bidData?.bid_title || "",
-          opportunity_information:
-            bidData?.opportunity_information?.trim() || "",
-          compliance_requirements:
-            bidData?.compliance_requirements?.trim() || "",
-          tender_summary: bidData?.tender_summary?.trim() || "",
-          evaluation_criteria: bidData?.evaluation_criteria?.trim() || "",
-          derive_insights: bidData?.derive_insights?.trim() || "",
-          differentiation_opportunities:
-            bidData?.differentiation_opportunities?.trim() || "",
-          client_name: bidData?.client_name || "",
-          bid_qualification_result: bidData?.bid_qualification_result || "",
-          questions: bidData?.questions || "",
-          opportunity_owner: bidData?.opportunity_owner || "",
-          submission_deadline: bidData?.submission_deadline || "",
-          bid_manager: bidData?.bid_manager || "",
-          contributors: contributors,
-          original_creator: original_creator,
-          object_id: bidData?._id || "",
-          outline: bidData?.outline || [],
-          win_themes: bidData?.win_themes || [],
-          customer_pain_points: bidData?.customer_pain_points || [],
-          differentiating_factors: bidData?.differentiating_factors || []
-        };
-      });
-
-      localStorage.setItem("navigatedFromBidsTable", "false");
-    } else if (initialBidName && initialBidName !== "") {
-      setSharedState((prevState) => ({
-        ...prevState,
-        bidInfo: initialBidName,
-        original_creator: auth.email,
-        contributors: auth.email ? { [auth.email]: "admin" } : {}
-      }));
-    }
-    const updatedBid = { bidData };
-    window.dispatchEvent(new CustomEvent("bidUpdated", { detail: updatedBid }));
   }, []);
 
   const parentPages = [{ name: "Tender Dashboard", path: "/bids" }];

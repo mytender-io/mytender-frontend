@@ -23,32 +23,6 @@ interface NewTenderModalProps {
 
 type Step = "details" | "documents" | "content" | "questions";
 
-// Add this initial state object at the top of the file, after imports
-const initialBidState = {
-  bidInfo: "",
-  opportunity_information: "",
-  compliance_requirements: "",
-  tender_summary: "",
-  evaluation_criteria: "",
-  derive_insights: "",
-  differentiation_opportunities: "",
-  questions: "",
-  value: "",
-  client_name: "",
-  bid_qualification_result: "",
-  opportunity_owner: "",
-  submission_deadline: "",
-  bid_manager: "",
-  contributors: {},
-  original_creator: "",
-  isSaved: false,
-  isLoading: false,
-  saveSuccess: null,
-  object_id: null,
-  selectedFolders: ["default"],
-  outline: []
-};
-
 const NewTenderModal: React.FC<NewTenderModalProps> = ({
   show,
   onHide,
@@ -60,8 +34,9 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
 
   const { sharedState, setSharedState } = useContext(BidContext);
   const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
-  const [bidName, setBidName] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const [deadline, setDeadline] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [contractValue, setContractValue] = useState("");
   const [clientName, setClientName] = useState("");
   const [documents, setDocuments] = useState<File[]>([]);
@@ -78,25 +53,40 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   );
   const progressInterval = useRef(null);
 
+  const initialModalState = {
+    bidInfo: "",
+    opportunity_information: "",
+    compliance_requirements: "",
+    tender_summary: "",
+    evaluation_criteria: "",
+    derive_insights: "",
+    differentiation_opportunities: "",
+    questions: "",
+    value: "",
+    client_name: "",
+    bid_qualification_result: "",
+    opportunity_owner: "",
+    submission_deadline: "",
+    bid_manager: "",
+    contributors: {},
+    original_creator: "",
+    isSaved: false,
+    isLoading: false,
+    saveSuccess: null,
+    object_id: null,
+    selectedFolders: ["default"],
+    outline: [],
+    win_themes: [],
+    customer_pain_points: [],
+    differentiating_factors: []
+  };
+
   useEffect(() => {
     // When documents state changes and there are documents
     if (currentStep === "documents" && documents.length > 0) {
       handleNextStep();
     }
   }, [documents]); // Add other dependencies if needed
-
-  useEffect(() => {
-    if (show) {
-      // Clear localStorage and reset shared state when modal opens
-      localStorage.clear();
-      setSharedState((prevState) => ({
-        ...initialBidState,
-        original_creator: auth.email,
-        contributors: auth.email ? { [auth.email]: "admin" } : {},
-        lastUpdated: Date.now()
-      }));
-    }
-  }, [show, auth.email, setSharedState]);
 
   const loadingMessages = [
     "Looking at the tender docs...",
@@ -193,14 +183,6 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     return documents.length > 0;
   };
 
-  const isContentStepValid = () => {
-    return selectedFolders.length > 0;
-  };
-
-  const isQuestionsStepValid = () => {
-    return selectedQuestions.length > 0;
-  };
-
   const handleNextStep = () => {
     if (currentStep === "details") {
       if (!isDetailsStepValid()) {
@@ -235,20 +217,17 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
 
   const handleFinalSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (currentStep === "questions" && !selectedFolders.length) {
       displayAlert("Please select at least one content folder", "danger");
       return;
     }
-
     try {
       setIsGeneratingOutline(true);
       startProgressBar();
-
-      localStorage.clear();
-
       console.log(selectedFiles);
-      await axios.post(
+
+      // Capture the response from the API call
+      const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_outline`,
         {
           bid_id: sharedState.object_id,
@@ -263,33 +242,16 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         }
       );
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      const bid = {
-        bid_title: bidName,
-        submission_deadline: deadline,
-        value: contractValue,
-        // Initialize other required fields with empty values
-        opportunity_information: "",
-        compliance_requirements: "",
-        differentiation_opportunities: "",
-        derive_insights: "",
-        evaluation_criteria: "",
-        tender_summary: "",
-        client_name: "",
-        bid_qualification_result: "",
-        questions: "",
-        opportunity_owner: "",
-        bid_manager: "",
-        contributors: {},
-        outline: []
-      };
+      console.log("outline final submit");
+      console.log(response.data);
 
-      navigate("/bid-extractor", {
-        state: {
-          bid: bid, // Pass the entire bid object
-          bidName: bidName // Keep bidName for backward compatibility
-        }
-      });
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setSharedState((prevState) => ({
+        ...prevState,
+        outline: response.data
+      }));
+
+      navigate("/bid-extractor");
 
       resetForm();
       onHide();
@@ -301,9 +263,33 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (show) {
+      // Clear localStorage
+      localStorage.clear();
+
+      // Reset all modal-specific state
+      setDeadline(new Date().toISOString().split("T")[0]);
+      setContractValue("");
+      setClientName("");
+      setDocuments([]);
+      setSelectedQuestions([]);
+      setSelectedFiles([]);
+      setSelectedFolders([]);
+      setCurrentStep("details");
+
+      // Reset shared state to initial values while preserving user info
+      setSharedState({
+        ...initialModalState,
+        original_creator: auth?.email || "",
+        contributors: auth?.email ? { [auth?.email]: "admin" } : {},
+        lastUpdated: Date.now()
+      });
+    }
+  }, [show, auth?.email, setSharedState]);
+
   // Separate form reset logic
   const resetForm = () => {
-    setBidName("");
     setDeadline("");
     setContractValue("");
     setClientName("");
@@ -453,7 +439,11 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
             )}
 
             <div className="d-flex justify-content-end mt-3">
-              <Button type="submit" className="upload-button">
+              <Button
+                type="submit"
+                className="upload-button"
+                disabled={isGeneratingOutline}
+              >
                 <FontAwesomeIcon icon={faFileCirclePlus} className="me-2" />
                 Create Tender
               </Button>

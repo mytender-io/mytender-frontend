@@ -45,9 +45,9 @@ const BidIntel = () => {
 
   // Process the shared state data for display
   const items = {
-    painPoints: sharedState.customer_pain_points,
-    winThemes: sharedState.win_themes,
-    factors: sharedState.differentiating_factors
+    painPoints: sharedState.customer_pain_points || [],
+    winThemes: sharedState.win_themes || [],
+    factors: sharedState.differentiating_factors || []
   };
 
   const currentUserPermission = contributors[auth.email] || "viewer";

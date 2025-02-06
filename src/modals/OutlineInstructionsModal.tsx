@@ -22,7 +22,7 @@ import { LinearProgress, Typography, Box } from "@mui/material";
 import "./ModalStyles.css";
 import { Check, Edit, Upload } from "lucide-react";
 
-const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
+const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -166,7 +166,13 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
         }
       );
       setCurrentStep(4);
-      await fetchOutline();
+      
+      setSharedState((prevState) => ({
+        ...prevState,
+        outline: response.data
+      }));
+
+      
     } catch (err) {
       console.error("Full error:", err.response?.data);
       if (err.response?.status === 404) {

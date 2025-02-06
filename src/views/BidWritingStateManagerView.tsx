@@ -159,13 +159,11 @@ const BidManagement: React.FC = () => {
     null
   );
 
-  // Store current user's email for permission checks
-  const [currentUserEmail, setCurrentUserEmail] = useState<string>("");
-
   // Get auth token and store in ref to avoid unnecessary re-renders
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
+  const currentUserEmail = auth?.email; // Safely access email
 
   // Utility function to combine background information
   const getBackgroundInfo = () => {
@@ -174,7 +172,8 @@ const BidManagement: React.FC = () => {
 
   // Check if current user has permission to save changes
   const canUserSave = useCallback((): boolean => {
-    const userPermission = sharedState.contributors[auth.email];
+    if (!currentUserEmail) return false; // If no user email, they can't save
+    const userPermission = sharedState.contributors[currentUserEmail];
     return userPermission === "admin" || userPermission === "editor";
   }, [sharedState.contributors, currentUserEmail]);
 
@@ -345,18 +344,20 @@ const BidManagement: React.FC = () => {
     }
 
     console.log("State change detected:", {
+      bidid: sharedState.object_id,
       bidInfo: sharedState.bidInfo,
       value: sharedState.value,
       submission_deadline: sharedState.submission_deadline,
       lastUpdated: sharedState.lastUpdated,
       isSavingRef: isSavingRef.current,
+      originalCreator: sharedState.original_creator,
+      constributors: sharedState.contributors,
       canSave: canUserSave()
     });
 
     // Immediately save current state to localStorage
     const stateToSave = {
-      ...sharedState,
-      outline: Array.isArray(sharedState.outline) ? sharedState.outline : []
+      ...sharedState
     };
 
     localStorage.setItem("bidState", JSON.stringify(stateToSave));
@@ -413,6 +414,8 @@ const BidManagement: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        console.log("fetch user data");
+
         const response = await axios.get(
           `http${HTTP_PREFIX}://${API_URL}/profile`,
           {
@@ -421,7 +424,8 @@ const BidManagement: React.FC = () => {
             }
           }
         );
-        setCurrentUserEmail(response.data.email);
+
+        console.log(response);
       } catch (err) {
         console.log("Failed to load profile data");
       }

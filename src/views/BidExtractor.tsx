@@ -29,6 +29,7 @@ import {
   StyledSelect,
   StyledMenuItem
 } from "../components/StyledMuiComponents";
+import console from "console";
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
@@ -310,16 +311,10 @@ const BidExtractor = () => {
   };
 
   useEffect(() => {
-    const navigatedFromBidsTable = localStorage.getItem(
-      "navigatedFromBidsTable"
-    );
 
     if (
-      navigatedFromBidsTable === "true" &&
-      location.state?.fromBidsTable &&
       bidData
     ) {
-      console.log("from bids table");
       console.log(bidData);
 
       setSharedState((prevState) => {
@@ -336,6 +331,9 @@ const BidExtractor = () => {
           //had to change to user their login
           contributors = { [auth.email]: "admin" };
         }
+
+        console.log("bid extractor");
+        console.log(bidData?.outline);
 
         return {
           ...prevState,
@@ -358,19 +356,7 @@ const BidExtractor = () => {
       });
 
       localStorage.setItem("navigatedFromBidsTable", "false");
-    } else if (initialBidName && initialBidName !== "") {
-      // Update bidInfo with the initial bid name if it's provided and not empty
-      // USER CREATES A NEW BID
-      console.log("newbid created");
-      setSharedState((prevState) => ({
-        ...prevState,
-        bidInfo: initialBidName,
-        original_creator: auth.email,
-        contributors: auth.email ? { [auth.email]: "admin" } : {}
-      }));
     }
-    const updatedBid = { bidData };
-    window.dispatchEvent(new CustomEvent("bidUpdated", { detail: updatedBid }));
   }, []);
 
   const handleOpportunityInformationChange = (e) => {
