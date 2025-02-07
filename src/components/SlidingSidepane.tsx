@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, Col, Row, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -6,7 +6,9 @@ import {
   faTrash,
   faWandMagicSparkles,
   faChevronLeft,
-  faChevronRight
+  faChevronRight,
+  faChevronDown,
+  faChevronUp
 } from "@fortawesome/free-solid-svg-icons";
 import DebouncedTextArea from "./DeboucedTextArea";
 import "./SlidingSidepane.css";
@@ -43,8 +45,8 @@ interface ProposalSidepaneProps {
     sectionIndex: number,
     subheadingIndex: number
   ) => void;
-  totalSections: number; // Add this
-  onNavigate: (direction: "prev" | "next") => void; // Add this
+  totalSections: number;
+  onNavigate: (direction: "prev" | "next") => void;
 }
 
 const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
@@ -66,6 +68,8 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   totalSections,
   onNavigate
 }) => {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
   if (!section) return null;
 
   return (
@@ -169,7 +173,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 placeholder="What is your management policy?"
                 className="writingplan-text-area"
               />
-
               <div>
                 <button
                   className="orange-button flex items-center mt-2"
@@ -208,7 +211,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   )}
                 </button>
               </div>
-
               {apiChoices.length > 0 && (
                 <div className="sidepane-section">
                   {renderChoices()}
@@ -222,7 +224,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 </div>
               )}
             </div>
-
             {section.subheadings && section.subheadings.length > 0 && (
               <div className="sidepane-section">
                 <div className="">
@@ -270,7 +271,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 </div>
               </div>
             )}
-
             <div className="sidepane-section">
               <div className="proposal-header mb-2">Writing Plan</div>
               <DebouncedTextArea
@@ -283,47 +283,88 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
               />
             </div>
 
-            <div className="sidepane-section">
-              <div className="proposal-header mb-2">
-                Compliance Requirements
-              </div>
-              <DebouncedTextArea
-                value={section.compliance_requirements}
-                onChange={(value) =>
-                  handleSectionChange(index, "compliance_requirements", value)
-                }
-                placeholder="These are the compliance requirments relevant to the section..."
-                className="compliance-text-area"
+            <button
+              className="flex items-center w-full py-2 mt-4 mb-4 rounded-md"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+            >
+              <span className="mr-2">Advanced</span>
+              <FontAwesomeIcon
+                icon={showAdvanced ? faChevronUp : faChevronDown}
               />
-            </div>
+            </button>
 
-            <div className="sidepane-section">
-              <div className="proposal-header mb-2">
-                Relevant Win Themes
-              </div>
-              <DebouncedTextArea
-                value={section.relevant_evaluation_criteria}
-                onChange={(value) =>
-                  handleSectionChange(index, "relevant_evaluation_criteria", value)
-                }
-                placeholder="These are the win themes relevant to the section..."
-                className="compliance-text-area"
-              />
-            </div>
-
-            <div className="sidepane-section">
-              <div className="proposal-header mb-2">
-                Relevant Customer Pain Points
-              </div>
-              <DebouncedTextArea
-                value={section.relevant_derived_insights}
-                onChange={(value) =>
-                  handleSectionChange(index, "relevant_derived_insights", value)
-                }
-                placeholder="These are the customer pain points relevant to the section..."
-                className="compliance-text-area"
-              />
-            </div>
+            {showAdvanced && (
+              <>
+                <div className="sidepane-section">
+                  <div className="proposal-header mb-2">
+                    Compliance Requirements
+                  </div>
+                  <DebouncedTextArea
+                    value={section.compliance_requirements}
+                    onChange={(value) =>
+                      handleSectionChange(
+                        index,
+                        "compliance_requirements",
+                        value
+                      )
+                    }
+                    placeholder="These are the compliance requirments relevant to the section..."
+                    className="compliance-text-area"
+                  />
+                </div>
+                <div className="sidepane-section">
+                  <div className="proposal-header mb-2">
+                    Relevant Win Themes
+                  </div>
+                  <DebouncedTextArea
+                    value={section.relevant_evaluation_criteria}
+                    onChange={(value) =>
+                      handleSectionChange(
+                        index,
+                        "relevant_evaluation_criteria",
+                        value
+                      )
+                    }
+                    placeholder="These are the win themes relevant to the section..."
+                    className="compliance-text-area"
+                  />
+                </div>
+                <div className="sidepane-section">
+                  <div className="proposal-header mb-2">
+                    Relevant Customer Pain Points
+                  </div>
+                  <DebouncedTextArea
+                    value={section.relevant_derived_insights}
+                    onChange={(value) =>
+                      handleSectionChange(
+                        index,
+                        "relevant_derived_insights",
+                        value
+                      )
+                    }
+                    placeholder="These are the customer pain points relevant to the section..."
+                    className="compliance-text-area"
+                  />
+                </div>
+                <div className="sidepane-section">
+                  <div className="proposal-header mb-2">
+                    Competitor Differentiation Factors
+                  </div>
+                  <DebouncedTextArea
+                    value={section.relevant_differentiation_factors}
+                    onChange={(value) =>
+                      handleSectionChange(
+                        index,
+                        "relevant_differentiation_factors",
+                        value
+                      )
+                    }
+                    placeholder="These are the competitor differentiation factors relevant to the section..."
+                    className="compliance-text-area"
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

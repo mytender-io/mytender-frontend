@@ -42,6 +42,7 @@ export interface Section {
   compliance_requirements: string;
   relevant_evaluation_criteria: string;
   relevant_derived_insights: string;
+  relevant_differentiation_factors: string;
 }
 
 export interface Contributor {

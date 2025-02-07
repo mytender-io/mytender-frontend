@@ -248,6 +248,16 @@ const BidIntel = () => {
     <div className="chatpage">
       <SideBarSmall onCollapseChange={setSidebarCollapsed} />
       <div className="bidplanner-container">
+        <div
+          className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+        >
+          <BreadcrumbNavigation
+            currentPage={initialBidName}
+            parentPages={parentPages}
+            showHome={true}
+          />
+        </div>
+
         <div>
           <div
             className={`lib-container mt-1 ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
