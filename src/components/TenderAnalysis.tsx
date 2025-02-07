@@ -286,9 +286,12 @@ const TenderAnalysis = ({ canUserEdit }) => {
       if (result.data.summary && tab.summaryKey) {
         setSharedState((prev) => ({
           ...prev,
-          [tab.summaryKey]: result.data.summary
+          [tab.summaryKey]: result.data.summary,
+          outline: result.data.outline
         }));
       }
+      console.log("updated outline");
+      console.log(result.data.outline);
 
       displayAlert("Generated successfully!", "success");
     } catch (err) {
@@ -347,13 +350,15 @@ const TenderAnalysis = ({ canUserEdit }) => {
           [tab.stateKey]: generatedContent
         }));
 
-        // Only update summary if it exists in response and we have a summaryKey
         if (result.data.summary && tab.summaryKey) {
           setSharedState((prev) => ({
             ...prev,
-            [tab.summaryKey]: result.data.summary
+            [tab.summaryKey]: result.data.summary,
+            outline: result.data.outline
           }));
         }
+        console.log("updated outline");
+        console.log(result.data.outline);
 
         displayAlert("Regenerated successfully!", "success");
       }

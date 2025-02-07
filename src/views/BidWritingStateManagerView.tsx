@@ -40,6 +40,8 @@ export interface Section {
   choice: string;
   writingplan: string;
   compliance_requirements: string;
+  relevant_evaluation_criteria: string;
+  relevant_derived_insights: string;
 }
 
 export interface Contributor {

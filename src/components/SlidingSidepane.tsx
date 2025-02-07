@@ -296,6 +296,34 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 className="compliance-text-area"
               />
             </div>
+
+            <div className="sidepane-section">
+              <div className="proposal-header mb-2">
+                Relevant Win Themes
+              </div>
+              <DebouncedTextArea
+                value={section.relevant_evaluation_criteria}
+                onChange={(value) =>
+                  handleSectionChange(index, "relevant_evaluation_criteria", value)
+                }
+                placeholder="These are the win themes relevant to the section..."
+                className="compliance-text-area"
+              />
+            </div>
+
+            <div className="sidepane-section">
+              <div className="proposal-header mb-2">
+                Relevant Customer Pain Points
+              </div>
+              <DebouncedTextArea
+                value={section.relevant_derived_insights}
+                onChange={(value) =>
+                  handleSectionChange(index, "relevant_derived_insights", value)
+                }
+                placeholder="These are the customer pain points relevant to the section..."
+                className="compliance-text-area"
+              />
+            </div>
           </div>
         </div>
       </div>
