@@ -1,6 +1,8 @@
-Spark-AI Chatbot Frontend
-==========================
-The code is the frontend for Spark-AI Chatbot. It is written in React and uses Vite as the bundler.
+MyTender.io - Your Trusted Bid Writing Solution
+=============================================
+MyTender.io is your comprehensive bid writing solution, trusted by the best to secure contracts across the UK. Our accredited platform helps take away your bid writing frustrations.
+
+Visit us at `www.mytender.io <https://www.mytender.io>`_
 
 
 Installation
