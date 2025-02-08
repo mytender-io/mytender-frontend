@@ -78,7 +78,7 @@ const BidPlanner = () => {
           contributors: bidData?.contributors || "",
           original_creator: bidData?.original_creator || "",
           object_id: bidData?._id || "",
-          selectedFolders: bidData?.selectedFolders || [],
+          selectedFolders: bidData?.selectedFolders || ["default"],
           lastUpdated: bidData?.lastUpdated || 0,
           outline: bidData?.outline || [],
           win_themes: bidData?.win_themes || [],
@@ -86,7 +86,8 @@ const BidPlanner = () => {
           differentiating_factors: bidData?.differentiating_factors || []
         };
       });
-
+      console.log("bid planner");
+      console.log(bidData?.selectedFolders);
       localStorage.setItem("navigatedFromBidsTable", "false");
     }
   }, []);

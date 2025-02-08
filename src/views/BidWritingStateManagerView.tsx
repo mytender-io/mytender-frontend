@@ -270,7 +270,10 @@ const BidManagement: React.FC = () => {
       formData.append("contributors", JSON.stringify(contributors || []));
       appendFormData("submission_deadline", submission_deadline);
       appendFormData("questions", questions);
-      appendFormData("selectedFolders", selectedFolders);
+      formData.append(
+        "selectedFolders",
+        JSON.stringify(selectedFolders || ["default"])
+      );
       appendFormData("original_creator", original_creator);
       formData.append("outline", JSON.stringify(outline || []));
       // Remove these from the appendFormData helper since they are arrays
@@ -355,6 +358,7 @@ const BidManagement: React.FC = () => {
       isSavingRef: isSavingRef.current,
       originalCreator: sharedState.original_creator,
       constributors: sharedState.contributors,
+      selectedFolders: sharedState.selectedFolders,
       canSave: canUserSave()
     });
 

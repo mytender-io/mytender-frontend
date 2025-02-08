@@ -1139,6 +1139,9 @@ const QAGenerator = () => {
       console.log(selectedChoices);
       console.log(word_amounts);
       const compliance_requirements = Array(word_amounts.length).fill("");
+      const evaluation_criteria = Array(word_amounts.length).fill("");
+      const derived_insights = Array(word_amounts.length).fill("");
+      const differentiating_factors = Array(word_amounts.length).fill("");
       console.log(compliance_requirements);
       console.log(selectedBidId);
 
@@ -1153,6 +1156,9 @@ const QAGenerator = () => {
           datasets: selectedFolders,
           word_amounts,
           compliance_requirements: compliance_requirements,
+          evaluation_criteria: evaluation_criteria,
+          derived_insights: derived_insights,
+          differentiating_factors: differentiating_factors,
           bid_id: selectedBidId
         },
         {
