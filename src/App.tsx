@@ -3,7 +3,6 @@ import { BrowserRouter, useLocation } from "react-router-dom";
 import { AuthProvider, useAuthUser } from "react-auth-kit";
 import "./App.css";
 import "./resources/manrope.css";
-import NavBar from "./routes/NavBar";
 import Routing from "./routes/Routing";
 import ReactGA4 from "react-ga4";
 import "./Widget.css";
@@ -24,16 +23,27 @@ posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
 const CHECK_INTERVAL = 60 * 60 * 1000; // 1 hour in milliseconds
 
 const Layout = () => {
-  const location = useLocation();
   const getAuth = useAuthUser();
   const auth = getAuth();
 
   useEffect(() => {
     const checkForUpdates = async () => {
       try {
-        const timestamp = Date.now(); // Add cache-busting parameter
-        // Fetch the manifest with cache-busting query parameter
-        const response = await fetch(`/manifest.json?t=${timestamp}`, {
+        const timestamp = Date.now();
+        // First try to get the current running app's build hash
+        const currentScript = Array.from(document.getElementsByTagName('script'))
+          .find(script => script.src.includes('assets/index.'));
+        
+        if (!currentScript) {
+          console.warn('Could not find main script tag');
+          return;
+        }
+
+        // Extract hash from current script filename
+        const currentHash = currentScript.src.match(/index\.(.+?)\.js/)?.[1];
+        
+        // Fetch the index.html with cache-busting query parameter
+        const response = await fetch(`/index.html?t=${timestamp}`, {
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache'
@@ -41,20 +51,17 @@ const Layout = () => {
         });
         
         if (!response.ok) {
-          throw new Error('Failed to fetch manifest');
+          throw new Error('Failed to fetch index.html');
         }
 
-        const manifest = await response.json();
-        const currentBuildHash = manifest.hash;
-        const storedHash = localStorage.getItem('buildHash');
-        
-        if (storedHash && storedHash !== currentBuildHash) {
+        const html = await response.text();
+        // Find the new script hash in the fetched HTML
+        const newHash = html.match(/assets\/index\.(.+?)\.js/)?.[1];
+
+        if (currentHash && newHash && currentHash !== newHash) {
           if (window.confirm('A new version of the application is available. Would you like to reload to get the latest updates?')) {
-            localStorage.setItem('buildHash', currentBuildHash);
             window.location.reload();
           }
-        } else if (!storedHash) {
-          localStorage.setItem('buildHash', currentBuildHash);
         }
       } catch (error) {
         console.error('Failed to check for updates:', error);
