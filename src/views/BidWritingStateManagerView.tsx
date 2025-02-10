@@ -270,11 +270,12 @@ const BidManagement: React.FC = () => {
       formData.append("contributors", JSON.stringify(contributors || []));
       appendFormData("submission_deadline", submission_deadline);
       appendFormData("questions", questions);
+      
+      appendFormData("original_creator", original_creator);
       formData.append(
         "selectedFolders",
         JSON.stringify(selectedFolders || ["default"])
       );
-      appendFormData("original_creator", original_creator);
       formData.append("outline", JSON.stringify(outline || []));
       // Remove these from the appendFormData helper since they are arrays
       // In saveProposal function, modify how we append the array fields:
