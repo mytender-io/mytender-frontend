@@ -150,13 +150,18 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
     console.log(bid_id);
     console.log(sharedState.selectedFolders);
     console.log(selectedFiles);
+
+    const datasets = Array.isArray(sharedState.selectedFolders)
+      ? sharedState.selectedFolders
+      : ["default"];
+
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_outline`,
         {
           bid_id: bid_id,
           extra_instructions: "",
-          datasets: sharedState.selectedFolders,
+          datasets: datasets,
           file_names: selectedFiles
         },
         {
@@ -166,13 +171,11 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
         }
       );
       setCurrentStep(4);
-      
+
       setSharedState((prevState) => ({
         ...prevState,
         outline: response.data
       }));
-
-      
     } catch (err) {
       console.error("Full error:", err.response?.data);
       if (err.response?.status === 404) {
@@ -242,7 +245,6 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
       onHide();
     }
   };
-
 
   const getHeaderTitle = () => {
     if (currentStep === 1) {
@@ -376,11 +378,15 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
             documents.
           </p>
 
-          <div >
-            <h5 className="text-gray-600 text-xl font-bold mb-4">Next Steps:</h5>
+          <div>
+            <h5 className="text-gray-600 text-xl font-bold mb-4">
+              Next Steps:
+            </h5>
             <ol className="space-y-4 list-decimal list-inside">
               <li>
-                <div className="font-semibold inline text-xl">Review Questions</div>
+                <div className="font-semibold inline text-xl">
+                  Review Questions
+                </div>
                 <p className="text-gray-500 mt-2 ml-6">
                   Check that all questions extracted match your tender
                   questions. You can edit these in the sidepane by clicking on a
@@ -389,7 +395,9 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
                 </p>
               </li>
               <li>
-                <div className="font-semibold inline text-xl">Start Writing</div>
+                <div className="font-semibold inline text-xl">
+                  Start Writing
+                </div>
                 <p className="text-gray-500 mt-2 ml-6">
                   If you want to add more detail to a section, click on the
                   section to show the sidepane. This will let you add talking
@@ -398,7 +406,9 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
                 </p>
               </li>
               <li>
-                <div className="font-semibold inline text-xl">Create Proposal</div>
+                <div className="font-semibold inline text-xl">
+                  Create Proposal
+                </div>
                 <p className="text-gray-500 mt-2 ml-6">
                   Click the Create Proposal button to generate a proposal. Once
                   your proposal has been generated you can go to the Preview

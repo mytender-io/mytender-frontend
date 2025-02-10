@@ -172,11 +172,17 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
       startProgressBar();
       console.log(sharedState.selectedFolders);
 
+      const datasets = Array.isArray(sharedState.selectedFolders)
+        ? sharedState.selectedFolders
+        : ["default"];
+
+      console.log("Using datasets:", datasets);
+
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_proposal`,
         {
           bid_id: bid_id,
-          datasets: sharedState.selectedFolders
+          datasets: datasets
         },
         {
           headers: {
