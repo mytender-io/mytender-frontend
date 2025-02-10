@@ -296,7 +296,7 @@ const BidIntel = () => {
                         ))
                       ) : (
                         <p className="text-gray-500 text-center py-4">
-                          No pain points added yet
+                          Click on the Pain Points button in the Bid Planner page to generate pain points.
                         </p>
                       )}
                     </div>
@@ -319,7 +319,7 @@ const BidIntel = () => {
                         ))
                       ) : (
                         <p className="text-gray-500 text-center py-4">
-                          No win themes added yet
+                            Click on the Win Themes button in the Bid Planner page to generate win themes.
                         </p>
                       )}
                     </div>
@@ -328,7 +328,7 @@ const BidIntel = () => {
                   {/* Differentiating Factors Card */}
                   <div className="bg-white rounded-lg shadow">
                     <h3 className="text-lg font-medium p-4 bg-gray-100 rounded-t-lg border-b">
-                      Differentiating Factors
+                      Differentiation Opportunities
                     </h3>
                     <div className="h-64 overflow-y-auto p-4 space-y-2">
                       {items.factors.length > 0 ? (
@@ -341,8 +341,8 @@ const BidIntel = () => {
                           />
                         ))
                       ) : (
-                        <p className="text-gray-500 text-center py-4">
-                          No differentiating factors added yet
+                        <p className="text-gray-500 text-center py-6">
+                          Click on the Differentation Opportunities button in the Bid Planner page to generate differentation opportunities.
                         </p>
                       )}
                     </div>

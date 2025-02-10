@@ -182,14 +182,14 @@ const TenderAnalysis = ({ canUserEdit }) => {
       stateKey: "tender_summary"
     },
     {
-      name: "Evaluation Criteria",
+      name: "Win Themes",
       Icon: Scale,
       prompt: "generate_evaluation_criteria",
       stateKey: "evaluation_criteria",
       summaryKey: "win_themes"
     },
     {
-      name: "Derive Insights",
+      name: "Pain Points",
       Icon: Lightbulb,
       prompt: "generate_derive_insights",
       stateKey: "derive_insights",
