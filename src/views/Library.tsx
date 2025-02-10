@@ -12,7 +12,7 @@ import {
   Form,
   Spinner
 } from "react-bootstrap";
-import UploadPDF from "./UploadPDF";
+import UploadPDF from "../components/UploadPDF.tsx";
 import UploadText from "./UploadText";
 import "./Library.css";
 import SideBarSmall from "../routes/SidebarSmall.tsx";

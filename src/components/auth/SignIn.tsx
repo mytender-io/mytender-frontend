@@ -119,14 +119,14 @@ const Signin = () => {
                 </h2>
               </div>
               <form onSubmit={onSubmit}>
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <div className="grid w-full items-center gap-3">
                     <Label htmlFor="email">Username</Label>
                     <Input
                       type="text"
                       id="email"
                       placeholder="Username"
-                      className="w-full h-12"
+                      className="w-full"
                       value={formData.email}
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
@@ -162,7 +162,7 @@ const Signin = () => {
                               <Input
                                 id="email"
                                 placeholder="Email"
-                                className="w-full h-12"
+                                className="w-full"
                                 type="password"
                                 value={forgotPasswordEmail}
                                 onChange={(e) =>
@@ -195,7 +195,7 @@ const Signin = () => {
                       type="password"
                       id="password"
                       placeholder="Password"
-                      className="w-full h-12"
+                      className="w-full"
                       value={formData.password}
                       onChange={(e) =>
                         setFormData({
@@ -208,7 +208,7 @@ const Signin = () => {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full h-14 text-lg text-white"
+                    className="w-full h-12 text-lg text-white"
                     size="lg"
                     disabled={isLoading}
                   >

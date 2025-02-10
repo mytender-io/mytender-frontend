@@ -1,19 +1,21 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
-import withAuth from "../routes/withAuth";
+// import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
-import { Button, Card, Form, Spinner } from "react-bootstrap";
-import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "../modals/SelectFolderModal.css";
+import { FileIcon } from "lucide-react";
 import { displayAlert } from "../helper/Alert";
+import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
-const SelectTenderLibraryFile = ({
-  bid_id,
-  onFileSelect,
-  initialSelectedFiles = []
-}) => {
+const SelectTenderLibraryFile: React.FC<{
+  bid_id: string;
+  onFileSelect: (files: string[]) => void;
+  initialSelectedFiles: string[];
+}> = ({ bid_id, onFileSelect, initialSelectedFiles }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -84,57 +86,60 @@ const SelectTenderLibraryFile = ({
     fetchDocuments();
   }, [bid_id, documentListVersion]);
 
-  const renderDocuments = () => {
-    const startIdx = (currentPage - 1) * rowsPerPage;
-    const endIdx = startIdx + rowsPerPage;
-    const documentsToDisplay = documents.slice(startIdx, endIdx);
-
-    return documentsToDisplay.map((doc, index) => (
-      <tr key={index} style={{ cursor: "pointer" }}>
-        <td className="filename-column">
-          <FontAwesomeIcon icon={faFileAlt} className="fa-icon" />{" "}
-          {doc.filename}
-        </td>
-        <td className="checkbox-cell">
-          <Form.Check
-            type="checkbox"
-            checked={selectedFiles.includes(doc.filename)}
-            onChange={() => handleFileSelect(doc.filename)}
-          />
-        </td>
-      </tr>
-    ));
-  };
-
   return (
-    <Card className="select-tenderlibrary-card-custom mt-0 mb-0 p-0">
-      <Card.Body className="select-library-card-body-content">
-        <div className="select-library-card-content-wrapper">
+    <Card className="h-[22.5rem] bg-white rounded-md shadow-sm p-4">
+      <CardContent className="h-full p-0">
+        <>
           {isLoading ? (
-            <div className="spinner-container">
-              <Spinner
-                animation="border"
-                role="status"
-                style={{ color: "#ff7f50" }}
-              >
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
+            <div className="flex justify-center items-center h-full">
+              <Spinner className="text-orange" />
             </div>
           ) : (
-            <table className="library-table mt-0 mb-0">
-              <thead>
-                <tr>
-                  <th className="filename-column">Documents</th>
-             
-                  <th>Select</th>
-                </tr>
-              </thead>
-              <tbody>{renderDocuments()}</tbody>
-            </table>
+            <Table>
+              <TableBody>
+                {documents
+                  .slice(
+                    (currentPage - 1) * rowsPerPage,
+                    currentPage * rowsPerPage
+                  )
+                  .map((doc, index) => (
+                    <TableRow
+                      key={index}
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
+                      <TableCell className="flex items-center gap-4">
+                        <Checkbox
+                          checked={selectedFiles.includes(doc.filename)}
+                          onCheckedChange={() => handleFileSelect(doc.filename)}
+                        />
+                        <div className="flex items-center gap-2">
+                          <FileIcon className="h-4 w-4" />
+                          <span className="text-sm">{doc.filename}</span>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
           )}
 
-        </div>
-      </Card.Body>
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-4">
+              {[...Array(totalPages)].map((_, i) => (
+                <Button
+                  key={i}
+                  variant={currentPage === i + 1 ? "secondary" : "outline"}
+                  size="sm"
+                  onClick={() => paginate(i + 1)}
+                  disabled={currentPage === i + 1}
+                >
+                  {i + 1}
+                </Button>
+              ))}
+            </div>
+          )}
+        </>
+      </CardContent>
     </Card>
   );
 };

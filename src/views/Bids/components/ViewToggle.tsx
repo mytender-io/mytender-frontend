@@ -15,24 +15,22 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ value, onChange }) => {
       <Button
         size="lg"
         className={cn(
-          "text-typo-900 w-[100px] rounded-none hover:bg-button/50",
-          value === "table" ? "bg-button/50" : "bg-white"
+          "text-typo-900 px-4 rounded-none hover:bg-white",
+          value === "table" ? "bg-white" : "bg-button/50"
         )}
         onClick={() => onChange("table")}
       >
         <LayoutTableIcon />
-        Table
       </Button>
       <Button
         size="lg"
         className={cn(
-          "text-typo-900 w-[100px] rounded-none hover:bg-button/50",
-          value === "kanban" ? "bg-button/50" : "bg-white"
+          "text-typo-900 px-4 rounded-none hover:bg-white",
+          value === "kanban" ? "bg-white" : "bg-button/50"
         )}
         onClick={() => onChange("kanban")}
       >
         <LayoutGridIcon />
-        Kanban
       </Button>
     </div>
   );

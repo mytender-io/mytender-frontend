@@ -13,8 +13,6 @@ import UserIcon from "@/components/icons/UserIcon";
 import HowtoIcon from "@/components/icons/HowtoIcon";
 import LogoutIcon from "@/components/icons/LogoutIcon";
 import { cn } from "@/utils";
-// import { Tooltip } from "@mui/material";
-
 interface LastActiveBid {
   _id: string;
   bid_title: string;
@@ -75,22 +73,22 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
     onCollapseChange?.(newState);
   };
 
-  const handleDashboardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    if (lastActiveBid) {
-      const lastActiveTab =
-        localStorage.getItem("lastActiveTab") || "/bid-extractor";
-      navigate(lastActiveTab, {
-        state: { bid: lastActiveBid, fromBidsTable: true }
-      });
-    } else {
-      navigate("/bids");
-    }
-  };
+  // const handleDashboardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  //   e.preventDefault();
+  //   if (lastActiveBid) {
+  //     const lastActiveTab =
+  //       localStorage.getItem("lastActiveTab") || "/bid-extractor";
+  //     navigate(lastActiveTab, {
+  //       state: { bid: lastActiveBid, fromBidsTable: true }
+  //     });
+  //   } else {
+  //     navigate("/bids");
+  //   }
+  // };
 
   return (
     <div
-      className={`fixed top-0 left-0 h-screen bg-transparent border-r border-gray-200 transition-all duration-300 ${
+      className={`fixed top-0 left-0 h-screen bg-transparent transition-all duration-300 ${
         isCollapsed ? "w-20" : "w-56"
       }`}
     >
@@ -118,7 +116,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           leaveDelay={0}
         > */}
         <Button
-          className="absolute -right-4 top-16 p-1 bg-white border border-gray-200 rounded-full shadow-md hover:bg-gray-50 text-black w-9 h-9"
+          className="absolute -right-4 top-[70px] p-1 bg-white border border-gray-200 rounded-full shadow-md hover:bg-gray-50 text-black w-9 h-9"
           onClick={toggleCollapse}
         >
           {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
@@ -134,12 +132,12 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             )}
           >
             <HomeIcon
-              className="text-typo-950 min-w-5 min-h-5"
+              className="text-gray-hint_text min-w-5 min-h-5"
               width={20}
               height={20}
             />
             {!isCollapsed && (
-              <span className="text-sm text-typo-950 font-medium whitespace-nowrap">
+              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
                 Home
               </span>
             )}
@@ -154,12 +152,12 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             )}
           >
             <DashboardIcon
-              className="text-typo-950 min-w-5 min-h-5"
+              className="text-gray-hint_text min-w-5 min-h-5"
               width={20}
               height={20}
             />
             {!isCollapsed && (
-              <span className="text-sm text-typo-950 font-medium whitespace-nowrap">
+              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
                 Tender Dashboard
               </span>
             )}
@@ -172,19 +170,19 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             )}
           >
             <ContentLibraryIcon
-              className="text-typo-950 min-w-5 min-h-5"
+              className="text-gray-hint_text min-w-5 min-h-5"
               width={20}
               height={20}
             />
             {!isCollapsed && (
-              <span className="text-sm text-typo-950 font-medium whitespace-nowrap">
+              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
                 Content Library
               </span>
             )}
           </Link>
           <span
             className={cn(
-              "text-xs font-bold text-typo-950",
+              "text-xs font-bold text-gray-hint_text",
               isCollapsed ? "opacity-0" : "opacity-100"
             )}
           >
@@ -198,12 +196,12 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             )}
           >
             <LibraryChatIcon
-              className="text-typo-950 min-w-5 min-h-5"
+              className="text-gray-hint_text min-w-5 min-h-5"
               width={20}
               height={20}
             />
             {!isCollapsed && (
-              <span className="text-sm text-typo-950 font-medium whitespace-nowrap">
+              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
                 Library Chat
               </span>
             )}
@@ -216,12 +214,12 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             )}
           >
             <QAIcon
-              className="text-typo-950 min-w-5 min-h-5 rotate-[270deg]"
+              className="text-gray-hint_text min-w-5 min-h-5 rotate-[270deg]"
               width={20}
               height={20}
             />
             {!isCollapsed && (
-              <span className="text-sm text-typo-950 font-medium whitespace-nowrap">
+              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
                 Q&A Generator
               </span>
             )}
@@ -234,12 +232,12 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             rel="noopener noreferrer"
           >
             <WordpaneIcon
-              className="text-typo-950 min-w-5 min-h-5"
+              className="text-gray-hint_text min-w-5 min-h-5"
               width={20}
               height={20}
             />
             {!isCollapsed && (
-              <span className="text-sm text-typo-950 font-medium whitespace-nowrap">
+              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
                 Word Pane
               </span>
             )}
@@ -251,12 +249,12 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             rel="noopener noreferrer"
           >
             <HowtoIcon
-              className="text-typo-950 min-w-5 min-h-5"
+              className="text-gray-hint_text min-w-5 min-h-5"
               width={20}
               height={20}
             />
             {!isCollapsed && (
-              <span className="text-sm text-typo-950 font-medium whitespace-nowrap">
+              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
                 How To
               </span>
             )}
@@ -286,9 +284,9 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                 isActive("/bids") ? "bg-blue-50 text-blue-600" : "text-gray-700"
               }`}
             >
-              <DashboardIcon className="text-typo-950 min-w-5 min-h-5" width={20} height={20} />
+              <DashboardIcon className="text-gray-hint_text min-w-5 min-h-5" width={20} height={20} />
               {!isCollapsed && (
-                <span className="ml-3 text-sm text-typo-950">
+                <span className="ml-3 text-sm text-gray-hint_text">
                   Tender Dashboard
                 </span>
               )}
@@ -455,12 +453,12 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             )}
           >
             <UserIcon
-              className="text-typo-950 min-w-5 min-h-5"
+              className="text-gray-hint_text min-w-5 min-h-5"
               width={20}
               height={20}
             />
             {!isCollapsed && (
-              <span className="text-sm text-typo-950 font-medium whitespace-nowrap">
+              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
                 Profile
               </span>
             )}
@@ -473,12 +471,12 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             )}
           >
             <LogoutIcon
-              className="text-typo-950 min-w-5 min-h-5"
+              className="text-gray-hint_text min-w-5 min-h-5"
               width={20}
               height={20}
             />
             {!isCollapsed && (
-              <span className="text-sm text-typo-950 font-medium whitespace-nowrap">
+              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
                 Logout
               </span>
             )}

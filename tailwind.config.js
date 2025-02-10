@@ -9,7 +9,7 @@ export default {
         foreground: "hsl(var(--foreground))",
         orange: {
           DEFAULT: "#FF8019",
-          light: "#FF8F29",
+          light: "#FFA45A",
           ultra_light: "#FFF0E6",
           hover: "#cc6614"
         },
@@ -25,13 +25,18 @@ export default {
           review_light: "#F8E6F8",
           review: "#9D629D"
         },
+        gray: {
+          DEFAULT: "#8B888D",
+          light: "#F3F4F4",
+          line: "#E0E0E0",
+          hint_text: "#575859"
+        },
         typo: {
           50: "#FAFAFA",
           100: "#F5F5F5",
           200: "#E5E5E5",
           700: "#404040",
           900: "#171717",
-          950: "#575859",
           grey: {
             4: "#6C757D",
             6: "#CED4DA",
@@ -84,12 +89,13 @@ export default {
       },
       boxShadow: {
         card: "0 15px 35px 0 rgba( 60,66,87, .08),0 5px 15px 0 rgba(0,0,0, .12)"
+      },
+      keyframes: {
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" }
+        }
       }
-      //   borderRadius: {
-      //     lg: "var(--radius)",
-      //     md: "calc(var(--radius) - 2px)",
-      //     sm: "calc(var(--radius) - 4px)"
-      //   }
     }
   },
   plugins: [

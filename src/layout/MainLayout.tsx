@@ -88,7 +88,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <div
         className={cn(
           "flex h-screen bg-typo-100 pr-4 py-4",
-          sidebarCollapsed ? "pl-24" : "pl-60"
+          sidebarCollapsed ? "pl-20" : "pl-56"
         )}
       >
         <SideBar onCollapseChange={setSidebarCollapsed} />
