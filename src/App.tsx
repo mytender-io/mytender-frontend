@@ -20,7 +20,7 @@ posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
 });
 
 // Check once per hour
-const CHECK_INTERVAL = 60 * 60 * 1000; // 1 hour in milliseconds
+const CHECK_INTERVAL = 5 * 60 * 1000; // 1 hour in milliseconds
 
 const Layout = () => {
   const getAuth = useAuthUser();
