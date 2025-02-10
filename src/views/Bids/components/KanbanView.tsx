@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import DollarIcon from "@/components/icons/DollarIcon";
-import CalendarIcon from "@/components/icons/CalendarIcon";
 import { cn } from "@/utils";
 
 interface KanbanViewProps {
@@ -23,7 +21,7 @@ const KanbanView: React.FC<KanbanViewProps> = ({
   navigateToChatbot
 }) => {
   const [localBids, setLocalBids] = useState(bids);
-  const draggedBidRef = useRef<any>(null);
+  const draggedBidRef = useRef(null);
   const bidsRef = useRef(localBids);
 
   useEffect(() => {
@@ -52,6 +50,7 @@ const KanbanView: React.FC<KanbanViewProps> = ({
     ghost.style.position = "absolute";
     ghost.style.top = "-1000px";
     document.body.appendChild(ghost);
+
     e.dataTransfer.setDragImage(ghost, 0, 0);
     setTimeout(() => document.body.removeChild(ghost), 0);
   };
@@ -112,14 +111,14 @@ const KanbanView: React.FC<KanbanViewProps> = ({
     return new Date(dateString).toLocaleDateString();
   };
 
-  const DraggableCard = ({ bid }: { bid: any }) => {
+  const DraggableCard = ({ bid, index }: { bid: any; index: number }) => {
     const [isDragging, setIsDragging] = useState(false);
 
     return (
       <div
         draggable
         className={cn(
-          "bg-white rounded-lg p-3 shadow-sm cursor-grab select-none border border-typo-200",
+          "bg-white rounded-md p-3 shadow-sm cursor-grab select-none border-[0.5px] border-gray-line",
           "hover:translate-y-[-2px] hover:shadow-md transition-all duration-200",
           isDragging && "opacity-50 shadow-lg"
         )}
@@ -136,87 +135,68 @@ const KanbanView: React.FC<KanbanViewProps> = ({
         }}
         onClick={() => !isDragging && navigateToChatbot(bid)}
       >
-        <h3 className="text-base font-medium mb-2 text-typo-900">
-          {bid.bid_title}
-        </h3>
-        <div className="flex justify-between items-center gap-4 text-sm text-typo-900">
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="text-base font-medium mb-2 text-typo-900">
+            {bid.bid_title}
+          </h3>
           {bid.value && (
-            <div className="flex items-center gap-1.5">
-              <DollarIcon className="h-4 w-4" />
-              <span>{bid.value}</span>
-            </div>
-          )}
-
-          {bid.submission_deadline && (
-            <div className="flex items-center gap-1.5">
-              <CalendarIcon className="h-4 w-4" />
-              <span>{formatDate(bid.submission_deadline)}</span>
-            </div>
+            <span
+              className={cn(
+                "flex items-center rounded-md border h-6 px-2.5 font-semibold text-sm",
+                index === 0 &&
+                  "border-status-planning bg-status-planning_light text-status-planning",
+                index === 1 &&
+                  "border-status-research bg-status-research_light text-status-research",
+                index === 2 &&
+                  "border-status-draft bg-status-draft_light text-status-draft",
+                index === 3 &&
+                  "border-status-review bg-status-review_light text-status-review",
+                index === 4 &&
+                  "border-status-success bg-status-success_light text-status-success"
+              )}
+            >
+              ${bid.value}
+            </span>
           )}
         </div>
+
+        {bid.submission_deadline && (
+          <div className="space-y-1.5 text-gray-hint_text">
+            <span className="text-base font-semibold">
+              Due date: {formatDate(bid.submission_deadline)}
+            </span>
+            <span className="text-xs block">Last edited 5m ago</span>
+          </div>
+        )}
       </div>
     );
   };
 
   return (
-    <div className="flex gap-4 h-[calc(100vh-214px)] overflow-x-auto mt-5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-400 scrollbar-thumb-rounded-full scrollbar-thumb-border-white">
+    <div className="flex h-[calc(100vh-245px)] overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-400 scrollbar-thumb-rounded-full scrollbar-thumb-border-white">
       {statusColumns.map((status, index) => (
         <div
           key={status}
           className={cn(
-            "flex-1 min-w-[260px] rounded-lg flex flex-col max-h-full",
-            "bg-typo-50",
-            // Apply different border colors based on status
-            {
-              "border-t-[3px] border-status-planning": index === 0,
-              "border-t-[3px] border-status-research": index === 1,
-              "border-t-[3px] border-status-draft": index === 2,
-              "border-t-[3px] border-status-review": index === 3,
-              "border-t-[3px] border-status-success": index === 4
-            }
+            "flex-1 min-w-[260px] rounded-lg flex flex-col max-h-full"
           )}
         >
           <div
             className={cn(
-              "flex justify-between items-center py-3 px-4 mb-4 rounded-t-lg",
-              {
-                "bg-status-planning_light": index === 0,
-                "bg-status-research_light": index === 1,
-                "bg-status-draft_light": index === 2,
-                "bg-status-review_light": index === 3,
-                "bg-status-success_light": index === 4
-              }
+              "flex py-3 px-4 mb-4 rounded-t-lg",
+              "border-b-[0.5px] border-gray-line"
             )}
           >
-            <h2
-              className={cn("text-base font-semibold m-0", {
-                "text-status-planning": index === 0,
-                "text-status-research": index === 1,
-                "text-status-draft": index === 2,
-                "text-status-review": index === 3,
-                "text-status-success": index === 4
-              })}
-            >
-              {status}
+            <h2 className={cn("text-lg font-semibold m-0")}>
+              {status}{" "}
+              <span className={cn("text-sm font-semibold text-gray")}>
+                ({getBidsForStatus(status).length})
+              </span>
             </h2>
-            <span
-              className={cn(
-                "flex items-center justify-center w-6 h-6 rounded-md bg-white text-sm font-semibold",
-                {
-                  "text-status-planning": index === 0,
-                  "text-status-research": index === 1,
-                  "text-status-draft": index === 2,
-                  "text-status-review": index === 3,
-                  "text-status-success": index === 4
-                }
-              )}
-            >
-              {getBidsForStatus(status).length}
-            </span>
           </div>
           <div
             className={cn(
-              "min-h-[100px] overflow-y-auto flex-grow px-3 space-y-4",
+              "min-h-[100px] overflow-y-auto flex-grow px-3 space-y-2",
               "transition-colors duration-200"
             )}
             onDragOver={handleDragOver}
@@ -224,7 +204,7 @@ const KanbanView: React.FC<KanbanViewProps> = ({
             onDrop={(e) => handleDrop(e, status)}
           >
             {getBidsForStatus(status).map((bid) => (
-              <DraggableCard key={bid._id} bid={bid} />
+              <DraggableCard key={bid._id} bid={bid} index={index} />
             ))}
           </div>
         </div>

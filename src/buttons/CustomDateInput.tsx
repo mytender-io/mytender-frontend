@@ -1,11 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
-import "./CustomDateInput.css";
+import { Input } from "@/components/ui/input";
 
-const CustomDateInput = ({ 
-  value, 
-  onChange, 
-  disabled = false, 
-  defaultValue = new Date().toISOString().split('T')[0] // Default to current date
+const CustomDateInput = ({
+  value,
+  onChange,
+  disabled = false,
+  defaultValue = new Date().toISOString().split("T")[0] // Default to current date
 }) => {
   const dateInputRef = useRef(null);
   const [displayValue, setDisplayValue] = useState("");
@@ -43,13 +43,13 @@ const CustomDateInput = ({
   };
 
   return (
-    <div className="custom-date-input">
-      <input
+    <div className="relative w-full">
+      <Input
         type="text"
         value={displayValue}
         readOnly
         disabled={disabled}
-        className="form-control date-input date-textarea"
+        className="pr-9"
         onClick={handleIconClick}
       />
       <input
@@ -58,10 +58,14 @@ const CustomDateInput = ({
         value={value || defaultValue || ""}
         onChange={handleDateChange}
         disabled={disabled}
-        className="hidden-date-input"
+        className="invisible fixed z-50 h-10"
       />
       <i
-        className="fas fa-calendar-alt calendar-icon"
+        className={`fas fa-calendar-alt absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer ${
+          disabled
+            ? "text-gray-400 cursor-not-allowed"
+            : "text-gray-600 hover:text-gray-700"
+        }`}
         onClick={handleIconClick}
       ></i>
     </div>

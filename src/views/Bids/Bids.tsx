@@ -70,7 +70,7 @@ const Bids = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [bidToDelete, setBidToDelete] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -321,7 +321,7 @@ const Bids = () => {
 
   const updateBidStatus = async (
     bidId: string,
-    newStatus: "ongoing" | "complete"
+    newStatus: any
   ): Promise<void> => {
     try {
       const formData = new FormData();
@@ -434,13 +434,13 @@ const Bids = () => {
         />
         <SearchInput value={searchTerm} onChange={setSearchTerm} />
       </div>
-      <div className="p-6 space-y-6">
+      <div className="py-4 px-6 space-y-4">
         <div className="flex items-center justify-between">
-          <div className="space-y-3">
-            <span className="block text-xl font-semibold">
+          <div className="space-y-2">
+            <span className="block text-2xl font-semibold">
               Track your tenders
             </span>
-            <span className="block text-sm text-typo-950">
+            <span className="block text-base text-gray-hint_text">
               Monitor all of your tenders through the bid lifecycle.
             </span>
           </div>
@@ -457,8 +457,8 @@ const Bids = () => {
             </Button>
           </div>
         </div>
-        <div className="space-y-6">
-          {viewType === "table" ? (
+        {viewType === "table" ? (
+          <div className="space-y-4">
             <div className="border border-typo-200 rounded-lg overflow-hidden">
               <Table>
                 <TableHeader>
@@ -537,20 +537,20 @@ const Bids = () => {
                 </TableBody>
               </Table>
             </div>
-          ) : (
-            <KanbanView
-              bids={currentBids}
-              updateBidStatus={updateBidStatus}
-              navigateToChatbot={navigateToChatbot}
+            <PaginationRow
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalRecords={bids.length}
+              onPageChange={handlePageChange}
             />
-          )}
-          <PaginationRow
-            currentPage={currentPage}
-            pageSize={pageSize}
-            totalRecords={bids.length}
-            onPageChange={handlePageChange}
+          </div>
+        ) : (
+          <KanbanView
+            bids={sortedBids}
+            updateBidStatus={updateBidStatus}
+            navigateToChatbot={navigateToChatbot}
           />
-        </div>
+        )}
         <NewTenderModal
           show={showModal}
           onHide={handleModalClose}

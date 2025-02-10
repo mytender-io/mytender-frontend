@@ -1,25 +1,29 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Modal, Form, Button } from "react-bootstrap";
-import { displayAlert } from "../../../helper/Alert";
-import "./NewTenderModal.css";
-import UploadPDF from "../../UploadPDF";
+import { useNavigate } from "react-router-dom";
+// import { Modal, Form } from "react-bootstrap";
+import UploadPDF from "../../../components/UploadPDF";
 import { API_URL, HTTP_PREFIX } from "../../../helper/Constants";
 import { useAuthUser } from "react-auth-kit";
 import { BidContext } from "../../BidWritingStateManagerView";
 import SelectTenderLibraryFile from "../../../components/SelectTenderLibraryFile";
 import SelectFolder from "../../../components/SelectFolder";
-import { Box, LinearProgress, Typography } from "@mui/material";
+// import { Box, LinearProgress, Typography } from "@mui/material";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import CustomDateInput from "../../../buttons/CustomDateInput";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileCirclePlus } from "@fortawesome/free-solid-svg-icons";
-import { Button as UiButton } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { cn } from "@/utils";
 interface NewTenderModalProps {
   show: boolean;
   onHide: () => void;
@@ -59,16 +63,18 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   onHide,
   existingBids
 }) => {
+  const { toast } = useToast();
   const getAuth = useAuthUser();
   const auth = useMemo(() => getAuth(), [getAuth]);
   const tokenRef = useRef(auth?.token || "default");
 
   const { sharedState, setSharedState } = useContext(BidContext);
-  const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
-  const [bidName, setBidName] = useState("");
-  const [deadline, setDeadline] = useState("");
-  const [contractValue, setContractValue] = useState("");
-  const [clientName, setClientName] = useState("");
+  const [isGeneratingOutline, setIsGeneratingOutline] =
+    useState<boolean>(false);
+  const [bidName, setBidName] = useState<string>("");
+  const [deadline, setDeadline] = useState<string>("");
+  const [contractValue, setContractValue] = useState<string>("");
+  const [clientName, setClientName] = useState<string>("");
   const [documents, setDocuments] = useState<File[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -111,40 +117,40 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     "Generating outline... Please wait a little bit longer..."
   ];
 
-  function LinearProgressWithLabel(props) {
-    return (
-      <Box
-        sx={{ display: "flex", alignItems: "center", flexDirection: "column" }}
-      >
-        <Box sx={{ width: "100%", mr: 1 }}>
-          <LinearProgress
-            variant="determinate"
-            {...props}
-            sx={{
-              height: 10,
-              borderRadius: 5,
-              backgroundColor: "#ffd699",
-              "& .MuiLinearProgress-bar": {
-                backgroundColor: "#ff9900"
-              }
-            }}
-          />
-        </Box>
-        <Box sx={{ minWidth: 35, mt: 1, textAlign: "center" }}>
-          <Typography variant="body2" color="text.secondary">
-            {`${Math.round(props.value)}%`}
-          </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ fontStyle: "italic" }}
-          >
-            {props.message}
-          </Typography>
-        </Box>
-      </Box>
-    );
-  }
+  // function LinearProgressWithLabel(props) {
+  //   return (
+  //     <Box
+  //       sx={{ display: "flex", alignItems: "center", flexDirection: "column" }}
+  //     >
+  //       <Box sx={{ width: "100%", mr: 1 }}>
+  //         <LinearProgress
+  //           variant="determinate"
+  //           {...props}
+  //           sx={{
+  //             height: 10,
+  //             borderRadius: 5,
+  //             backgroundColor: "#ffd699",
+  //             "& .MuiLinearProgress-bar": {
+  //               backgroundColor: "#ff9900"
+  //             }
+  //           }}
+  //         />
+  //       </Box>
+  //       <Box sx={{ minWidth: 35, mt: 1, textAlign: "center" }}>
+  //         <Typography variant="body2" color="text.secondary">
+  //           {`${Math.round(props.value)}%`}
+  //         </Typography>
+  //         <Typography
+  //           variant="body2"
+  //           color="text.secondary"
+  //           sx={{ fontStyle: "italic" }}
+  //         >
+  //           {props.message}
+  //         </Typography>
+  //       </Box>
+  //     </Box>
+  //   );
+  // }
 
   const startProgressBar = () => {
     const duration = 60000; // 1 minute in ms
@@ -209,7 +215,10 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   const handleNextStep = () => {
     if (currentStep === "details") {
       if (!isDetailsStepValid()) {
-        displayAlert("Please fill in all required fields", "danger");
+        toast({
+          variant: "destructive",
+          description: "Please fill in all required fields"
+        });
         return;
       }
       setSharedState((prevState) => ({
@@ -224,14 +233,19 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       setCurrentStep("documents");
     } else if (currentStep === "documents") {
       if (!isDocumentsStepValid()) {
-        displayAlert("Please upload at least one document", "danger");
+        toast({
+          variant: "destructive",
+          description: "Please upload at least one document"
+        });
         return;
       }
       setCurrentStep("content");
     } else if (currentStep === "content") {
       if (!selectedFiles.length) {
-        // Change this line
-        displayAlert("Please select at least one question document", "danger");
+        toast({
+          variant: "destructive",
+          description: "Please select at least one question document"
+        });
         return;
       }
       setCurrentStep("questions");
@@ -242,7 +256,10 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     e.preventDefault();
 
     if (currentStep === "questions" && !selectedFolders.length) {
-      displayAlert("Please select at least one content folder", "danger");
+      toast({
+        variant: "destructive",
+        description: "Please select at least one content folder"
+      });
       return;
     }
 
@@ -321,9 +338,15 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   // Handle API errors
   const handleError = (err) => {
     if (err.response?.status === 404) {
-      displayAlert("No documents found in the tender library.", "warning");
+      toast({
+        variant: "destructive",
+        description: "No documents found in the tender library."
+      });
     } else {
-      displayAlert("Failed to generate outline", "danger");
+      toast({
+        variant: "destructive",
+        description: "Failed to generate outline"
+      });
     }
   };
 
@@ -340,301 +363,360 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     setContractValue(value);
   };
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case "details":
-        return (
-          <div className="selectfolder-container mt-0 p-0">
-            <div className="white-card p-4 ">
-              <Form.Group className="mb-4">
-                <Form.Label className="card-label">Tender Name:</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  placeholder="Enter tender name"
-                />
-              </Form.Group>
+  // const renderStepContent = () => {
+  //   switch (currentStep) {
+  //     case "details":
+  //       return (
+  //         <div className="selectfolder-container mt-0 p-0">
+  //           <div className="white-card p-4 ">
+  //             <Form.Group className="mb-4">
+  //               <Form.Label className="card-label">Tender Name:</Form.Label>
+  //               <Form.Control
+  //                 type="text"
+  //                 value={clientName}
+  //                 onChange={(e) => setClientName(e.target.value)}
+  //                 placeholder="Enter tender name"
+  //               />
+  //             </Form.Group>
 
-              <Form.Group className="mb-4">
-                <Form.Label className="card-label">Deadline:</Form.Label>
-                <CustomDateInput
-                  value={deadline}
-                  onChange={(value) => setDeadline(value)} // Direct value handling
-                  defaultValue={new Date().toISOString().split("T")[0]}
-                />
-              </Form.Group>
+  //             <Form.Group className="mb-4">
+  //               <Form.Label className="card-label">Deadline:</Form.Label>
+  //               <CustomDateInput
+  //                 value={deadline}
+  //                 onChange={(value) => setDeadline(value)} // Direct value handling
+  //                 defaultValue={new Date().toISOString().split("T")[0]}
+  //               />
+  //             </Form.Group>
 
-              <Form.Group className="mb-4">
-                <Form.Label className="card-label">Contract Value:</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={contractValue}
-                  onChange={handleValueChange}
-                  placeholder="Enter contract value"
-                />
-              </Form.Group>
+  //             <Form.Group className="mb-4">
+  //               <Form.Label className="card-label">Contract Value:</Form.Label>
+  //               <Form.Control
+  //                 type="text"
+  //                 value={contractValue}
+  //                 onChange={handleValueChange}
+  //                 placeholder="Enter contract value"
+  //               />
+  //             </Form.Group>
+  //           </div>
+  //         </div>
+  //       );
 
-              <div className="d-flex justify-content-end mt-4">
-                <Button
-                  type="button"
-                  onClick={handleNextStep}
-                  className="upload-button"
-                >
-                  Next Step →
-                </Button>
-              </div>
-            </div>
-          </div>
-        );
+  //     case "documents":
+  //       return (
+  //         <div className="white-card p-4">
+  //           <UploadPDF
+  //             bid_id={sharedState.object_id}
+  //             apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
+  //             descriptionText="Documents uploaded to the Tender Library will be used as context by
+  //                 our AI to generate compliance requirements and opportunity
+  //                 information for the Tender."
+  //             onUploadComplete={(uploadedFiles) => {
+  //               // Instead of an immediate handleNextStep call, update documents
+  //               // and use a useEffect to handle the transition
+  //               setDocuments(uploadedFiles);
+  //             }}
+  //           />
+  //         </div>
+  //       );
 
-      case "documents":
-        return (
-          <div className="white-card p-4">
-            <UploadPDF
-              bid_id={sharedState.object_id}
-              apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
-              descriptionText="Documents uploaded to the Tender Library will be used as context by
-                  our AI to generate compliance requirements and opportunity
-                  information for the Tender."
-              onUploadComplete={(uploadedFiles) => {
-                // Instead of an immediate handleNextStep call, update documents
-                // and use a useEffect to handle the transition
-                setDocuments(uploadedFiles);
-              }}
-            />
-          </div>
-        );
+  //     case "content":
+  //       return (
+  //         <div className="white-card p-4 ">
+  //           <p className="description-text">
+  //             Select the documents which contain the questions you need to
+  //             answer in your bid. These will be used to generate the outline for
+  //             your proposal.
+  //           </p>
+  //           <div className="selectfolder-container mt-0 p-0">
+  //             <SelectTenderLibraryFile
+  //               bid_id={sharedState.object_id}
+  //               onFileSelect={handleFileSelection}
+  //               initialSelectedFiles={selectedFiles}
+  //               folderView={true}
+  //             />
+  //           </div>
+  //         </div>
+  //       );
 
-      case "content":
-        return (
-          <div className="white-card p-4 ">
-            <p className="description-text">
-              Select the documents which contain the questions you need to
-              answer in your bid. These will be used to generate the outline for
-              your proposal.
-            </p>
-            <div className="selectfolder-container mt-0 p-0">
-              <SelectTenderLibraryFile
-                bid_id={sharedState.object_id}
-                onFileSelect={handleFileSelection}
-                initialSelectedFiles={selectedFiles}
-                folderView={true}
-              />
-            </div>
-            <div className="d-flex justify-content-end mt-4">
-              <Button onClick={handleNextStep} className="upload-button">
-                Next Step →
-              </Button>
-            </div>
-          </div>
-        );
+  //     case "questions":
+  //       return (
+  //         <div>
+  //           <div className="">
+  //             <p>
+  //               Select the folders below from your content library to use as
+  //               context in your final proposal. The AI will be able to use
+  //               information from these when generating an answer.
+  //             </p>
+  //           </div>
 
-      case "questions":
-        return (
-          <div>
-            <div className="">
-              <p>
-                Select the folders below from your content library to use as
-                context in your final proposal. The AI will be able to use
-                information from these when generating an answer.
-              </p>
-            </div>
+  //           <div className="selectfolder-container mt-3">
+  //             <SelectFolder
+  //               onFolderSelect={handleFolderSelection}
+  //               initialSelectedFolders={selectedFolders}
+  //             />
+  //           </div>
 
-            <div className="selectfolder-container mt-3">
-              <SelectFolder
-                onFolderSelect={handleFolderSelection}
-                initialSelectedFolders={selectedFolders}
-              />
-            </div>
-
-            {isGeneratingOutline && (
-              <div className="mt-4">
-                <Progress
-                  value={progress}
-                  className="h-2.5 rounded-full bg-[#ffd699]"
-                />
-                <div className="mt-1 text-center">
-                  <p className="text-gray-600">{`${Math.round(progress)}%`}</p>
-                  <p className="text-gray-600 italic">{loadingMessage}</p>
-                </div>
-              </div>
-            )}
-
-            <div className="d-flex justify-content-end mt-3">
-              <Button type="submit" className="upload-button">
-                <FontAwesomeIcon icon={faFileCirclePlus} className="me-2" />
-                Create Tender
-              </Button>
-            </div>
-          </div>
-        );
-    }
-  };
+  //           {isGeneratingOutline && (
+  //             <div className="mt-4">
+  //               <Progress
+  //                 value={progress}
+  //                 className="h-2.5 rounded-full bg-[#ffd699]"
+  //               />
+  //               <div className="mt-1 text-center">
+  //                 <p className="text-gray-600">{`${Math.round(progress)}%`}</p>
+  //                 <p className="text-gray-600 italic">{loadingMessage}</p>
+  //               </div>
+  //             </div>
+  //           )}
+  //         </div>
+  //       );
+  //   }
+  // };
 
   return (
     <Dialog open={show} onOpenChange={onHide}>
-      <DialogContent className="max-w-[90vw] w-[1000px] p-0">
+      <DialogContent className="w-full max-w-5xl overflow-hidden p-0 bg-gray-light">
+        <DialogTitle className="sr-only">Create New Tender</DialogTitle>
         <div className="bg-white border-b border-gray-200">
           <div className="flex items-stretch w-full h-[60px] overflow-x-auto">
-            {/* Step indicators */}
+            {/* Details Step */}
             <div
-              className={`relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px] text-gray-600 
-              ${currentStep === "details" ? "text-black font-extrabold" : ""}`}
+              className={cn(
+                "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
+                currentStep === "details" ? "text-orange" : "text-gray"
+              )}
             >
               <div className="relative z-[3] flex items-center gap-2 w-full">
                 <span
-                  className={`w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center text-sm font-medium flex-shrink-0
-                  ${currentStep === "details" ? "bg-[#f9a01b] border-[#f9a01b] text-white" : ""}`}
+                  className={cn(
+                    "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
+                    currentStep === "details"
+                      ? "border-orange text-orange"
+                      : "border-gray"
+                  )}
                 >
                   1
                 </span>
-                <span className="text-lg font-bold whitespace-nowrap overflow-hidden text-ellipsis">
+                <span className="text-lg font-bold whitespace-nowrap">
                   Tender Details
                 </span>
               </div>
-              {/* Step connector */}
               <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
               <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
             </div>
-            {/* Repeat similar structure for other steps */}
+
+            {/* Documents Step */}
+            <div
+              className={cn(
+                "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
+                currentStep === "documents" ? "text-orange" : "text-gray"
+              )}
+            >
+              <div className="relative z-[3] flex items-center gap-2 w-full">
+                <span
+                  className={cn(
+                    "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
+                    currentStep === "documents"
+                      ? "border-orange text-orange"
+                      : "border-gray"
+                  )}
+                >
+                  2
+                </span>
+                <span className="text-lg font-bold whitespace-nowrap">
+                  Upload Documents
+                </span>
+              </div>
+              <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
+              <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
+            </div>
+
+            {/* Content Step */}
+            <div
+              className={cn(
+                "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
+                currentStep === "content" ? "text-orange" : "text-gray"
+              )}
+            >
+              <div className="relative z-[3] flex items-center gap-2 w-full">
+                <span
+                  className={cn(
+                    "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
+                    currentStep === "content"
+                      ? "border-orange text-orange"
+                      : "border-gray"
+                  )}
+                >
+                  3
+                </span>
+                <span className="text-lg font-bold whitespace-nowrap">
+                  Select Questions
+                </span>
+              </div>
+              <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
+              <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
+            </div>
+
+            {/* Questions Step */}
+            <div
+              className={cn(
+                "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
+                currentStep === "questions" ? "text-orange" : "text-gray"
+              )}
+            >
+              <div className="relative z-[3] flex items-center gap-2 w-full">
+                <span
+                  className={cn(
+                    "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
+                    currentStep === "questions"
+                      ? "border-orange text-orange"
+                      : "border-gray"
+                  )}
+                >
+                  4
+                </span>
+                <span className="text-lg font-bold whitespace-nowrap">
+                  Select Context
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-
-        <div className="px-5 py-5 bg-gray-100">
-          <h5 className="mb-3 text-2xl font-extrabold">
-            {currentStep === "details"
-              ? "Tender Details"
-              : currentStep === "documents"
-                ? "Upload Documents"
-                : currentStep === "content"
-                  ? "Select Question Document"
-                  : "Select Context"}
-          </h5>
-
-          <form onSubmit={handleFinalSubmit}>
-            {currentStep === "details" && (
-              <div className="bg-white rounded-lg shadow-sm p-4">
-                <div className="mb-4">
-                  <Label className="font-extrabold">Tender Name:</Label>
-                  <Input
-                    type="text"
-                    value={clientName}
-                    onChange={(e) => setClientName(e.target.value)}
-                    placeholder="Enter tender name"
-                    className="mt-1"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <Label className="font-extrabold">Deadline:</Label>
-                  <CustomDateInput
-                    value={deadline}
-                    onChange={(value) => setDeadline(value)}
-                    defaultValue={new Date().toISOString().split("T")[0]}
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <Label className="font-extrabold">Contract Value:</Label>
-                  <Input
-                    type="text"
-                    value={contractValue}
-                    onChange={handleValueChange}
-                    placeholder="Enter contract value"
-                  />
-                </div>
-
-                <div className="flex justify-end mt-4">
-                  <UiButton
-                    type="button"
-                    onClick={handleNextStep}
-                    className="hover:bg-[#e89109]"
-                  >
-                    Next Step →
-                  </UiButton>
-                </div>
+        <form onSubmit={handleFinalSubmit}>
+          <div className="px-8 space-y-2">
+            {!isGeneratingOutline ? (
+              <div className="space-y-2">
+                <h5 className="text-2xl font-bold">
+                  {currentStep === "details"
+                    ? "Tender Details"
+                    : currentStep === "documents"
+                      ? "Upload Documents"
+                      : currentStep === "content"
+                        ? "Select Questions"
+                        : "Select Context"}
+                </h5>
+                <span className="text-sm">
+                  {currentStep === "details"
+                    ? "Please fill in details of the following:"
+                    : currentStep === "documents"
+                      ? "Upload the tender documentation so we can extract all the key information and your outline"
+                      : currentStep === "content"
+                        ? "Select the document which contains the questions to help generate the outline :)"
+                        : " Select the folders below from your content library to use as context in your final proposal. The AI will be able to use information from these when generating an answer."}
+                </span>
               </div>
-            )}
+            ) : null}
+            <>
+              {currentStep === "details" && (
+                <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Label className="font-bold text-nowrap min-w-40">
+                      Tender Name:
+                    </Label>
+                    <Input
+                      type="text"
+                      value={clientName}
+                      onChange={(e) => setClientName(e.target.value)}
+                      placeholder="Enter tender name"
+                    />
+                  </div>
 
-            {currentStep === "documents" && (
-              <div className="white-card p-4">
+                  <div className="flex items-center gap-2">
+                    <Label className="font-bold text-nowrap min-w-40">
+                      Deadline:
+                    </Label>
+                    <CustomDateInput
+                      value={deadline}
+                      onChange={(value) => setDeadline(value)}
+                      defaultValue={new Date().toISOString().split("T")[0]}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Label className="font-bold text-nowrap min-w-40">
+                      Contract Value:
+                    </Label>
+                    <Input
+                      type="text"
+                      value={contractValue}
+                      onChange={handleValueChange}
+                      placeholder="Enter contract value"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {currentStep === "documents" && (
                 <UploadPDF
                   bid_id={sharedState.object_id}
                   apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
-                  descriptionText="Documents uploaded to the Tender Library will be used as context by
-                      our AI to generate compliance requirements and opportunity
-                      information for the Tender."
                   onUploadComplete={(uploadedFiles) => {
                     setDocuments(uploadedFiles);
                   }}
                 />
-              </div>
-            )}
+              )}
 
-            {currentStep === "content" && (
-              <div className="white-card p-4 ">
-                <p className="description-text">
-                  Select the documents which contain the questions you need to
-                  answer in your bid. These will be used to generate the outline
-                  for your proposal.
-                </p>
-                <div className="selectfolder-container mt-0 p-0">
-                  <SelectTenderLibraryFile
-                    bid_id={sharedState.object_id}
-                    onFileSelect={handleFileSelection}
-                    initialSelectedFiles={selectedFiles}
-                    folderView={true}
-                  />
-                </div>
-                <div className="d-flex justify-content-end mt-4">
-                  <UiButton onClick={handleNextStep} className="upload-button">
-                    Next Step →
-                  </UiButton>
-                </div>
-              </div>
-            )}
+              {currentStep === "content" && (
+                <SelectTenderLibraryFile
+                  bid_id={sharedState.object_id || ""}
+                  onFileSelect={handleFileSelection}
+                  initialSelectedFiles={selectedFiles}
+                />
+              )}
 
-            {currentStep === "questions" && (
-              <div>
-                <div className="">
-                  <p>
-                    Select the folders below from your content library to use as
-                    context in your final proposal. The AI will be able to use
-                    information from these when generating an answer.
-                  </p>
-                </div>
-
-                <div className="selectfolder-container mt-3">
-                  <SelectFolder
-                    onFolderSelect={handleFolderSelection}
-                    initialSelectedFolders={selectedFolders}
-                  />
-                </div>
-
-                {isGeneratingOutline && (
-                  <div className="mt-4">
-                    <Progress
-                      value={progress}
-                      className="h-2.5 rounded-full bg-[#ffd699]"
+              {currentStep === "questions" && (
+                <div>
+                  {isGeneratingOutline ? (
+                    <Card className="h-[22.5rem] bg-white rounded-md shadow-sm p-4">
+                      <CardContent className="h-full p-0 flex items-center justify-center">
+                        <div className="w-full space-y-4 text-center px-8">
+                          <span className="text-xl font-semibold max-w-md mx-auto block">
+                            We are analysing the tender documents to extract the
+                            key information and to generate an outline.
+                            <br />
+                            <br />
+                            We'll let you know when its done :)
+                          </span>
+                          <p className="text-gray-600 italic">
+                            {loadingMessage}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Progress value={progress} />
+                            <p className="text-gray-600 text-sm">{`${Math.round(progress)}%`}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <SelectFolder
+                      onFolderSelect={handleFolderSelection}
+                      initialSelectedFolders={selectedFolders}
                     />
-                    <div className="mt-1 text-center">
-                      <p className="text-gray-600">{`${Math.round(progress)}%`}</p>
-                      <p className="text-gray-600 italic">{loadingMessage}</p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="d-flex justify-content-end mt-3">
-                  <UiButton type="submit" className="upload-button">
-                    <FontAwesomeIcon icon={faFileCirclePlus} className="me-2" />
-                    Create Tender
-                  </UiButton>
+                  )}
                 </div>
-              </div>
+              )}
+            </>
+          </div>
+          <DialogFooter className="sm:justify-between px-4 py-4">
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="secondary"
+                className="text-sm py-4"
+              >
+                Exit
+              </Button>
+            </DialogClose>
+            {currentStep === "questions" ? (
+              <Button type="submit" disabled={isGeneratingOutline}>
+                {isGeneratingOutline ? "Creating..." : "Create Tender"}
+              </Button>
+            ) : (
+              <Button type="button" onClick={handleNextStep}>
+                Next Step →
+              </Button>
             )}
-          </form>
-        </div>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

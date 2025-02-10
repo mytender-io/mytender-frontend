@@ -19,7 +19,7 @@ import { Menu, MenuItem } from "@mui/material";
 import { displayAlert } from "../helper/Alert.tsx";
 import InterrogateTenderModal from "../modals/InterrogateTenderModal.tsx";
 import posthog from "posthog-js";
-import UploadPDF from "../views/UploadPDF.tsx";
+import UploadPDF from "./UploadPDF.tsx";
 import "./TenderLibrary.css";
 import { Check, X } from "lucide-react";
 
