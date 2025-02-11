@@ -174,7 +174,16 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
 
       setSharedState((prevState) => ({
         ...prevState,
-        outline: response.data
+        outline: response.data?.outline || [],
+        tender_summary: response.data?.tender_summary || "",
+        evaluation_criteria: response.data?.evaluation_criteria || "",
+        derive_insights: response.data?.pain_points || "",
+        differentiation_opportunities:
+          response.data?.differentiation_opportunities || "",
+        customer_pain_points: response.data?.relevant_pain_points || [],
+        win_themes: response.data?.relevant_win_themes || [],
+        differentiating_factors:
+          response.data?.relevant_differentiation_opportunities || []
       }));
     } catch (err) {
       console.error("Full error:", err.response?.data);

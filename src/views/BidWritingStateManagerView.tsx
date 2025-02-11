@@ -270,7 +270,7 @@ const BidManagement: React.FC = () => {
       formData.append("contributors", JSON.stringify(contributors || []));
       appendFormData("submission_deadline", submission_deadline);
       appendFormData("questions", questions);
-      
+
       appendFormData("original_creator", original_creator);
       formData.append(
         "selectedFolders",
