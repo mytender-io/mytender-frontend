@@ -87,7 +87,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
   }
 
   const startProgressBar = () => {
-    const duration = 60000; // 1 minute in ms
+    const duration = 80000; // 1 minute in ms
     const interval = 100;
     const steps = duration / interval;
     const increment = 98 / steps;
@@ -171,6 +171,13 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
         }
       );
       setCurrentStep(4);
+
+      console.log("outline final submit");
+      console.log(response.data.outline);
+      console.log(response.data.tender_summary);
+      console.log(response.data.evaluation_criteria);
+      console.log(response.data.pain_points);
+      console.log(response.data.differentiation_opportunities);
 
       setSharedState((prevState) => ({
         ...prevState,
