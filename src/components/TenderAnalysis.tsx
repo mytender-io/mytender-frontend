@@ -286,12 +286,9 @@ const TenderAnalysis = ({ canUserEdit }) => {
       if (result.data.summary && tab.summaryKey) {
         setSharedState((prev) => ({
           ...prev,
-          [tab.summaryKey]: result.data.summary,
-          outline: result.data.outline
+          [tab.summaryKey]: result.data.summary
         }));
       }
-      console.log("updated outline");
-      console.log(result.data.outline);
 
       displayAlert("Generated successfully!", "success");
     } catch (err) {
@@ -353,12 +350,9 @@ const TenderAnalysis = ({ canUserEdit }) => {
         if (result.data.summary && tab.summaryKey) {
           setSharedState((prev) => ({
             ...prev,
-            [tab.summaryKey]: result.data.summary,
-            outline: result.data.outline
+            [tab.summaryKey]: result.data.summary
           }));
         }
-        console.log("updated outline");
-        console.log(result.data.outline);
 
         displayAlert("Regenerated successfully!", "success");
       }
