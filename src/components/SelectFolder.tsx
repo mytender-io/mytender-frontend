@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
+import BreadCrumbs from "./BreadCrumbs";
 
 const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const getAuth = useAuthUser();
@@ -47,47 +48,6 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
       if (b === "default") return 1;
       return a.localeCompare(b);
     });
-  };
-
-  const renderBreadcrumbs = () => {
-    if (!activeFolder) {
-      return <span className="text-sm text-gray-600">Content Library</span>;
-    }
-
-    const parts = activeFolder.split("FORWARDSLASH");
-    return (
-      <>
-        <span
-          className="text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
-          onClick={() => setActiveFolder(null)}
-        >
-          Content Library
-        </span>
-        {parts.map((part, index) => (
-          <React.Fragment key={index}>
-            <span className="mx-2 text-gray-400">&gt;</span>
-            <span
-              className={`text-sm ${
-                index === parts.length - 1
-                  ? "text-gray-600"
-                  : "text-gray-600 hover:text-gray-800 cursor-pointer"
-              }`}
-              onClick={() => {
-                if (index < parts.length - 1) {
-                  setActiveFolder(
-                    parts.slice(0, index + 1).join("FORWARDSLASH")
-                  );
-                }
-              }}
-            >
-              {part === "default"
-                ? "Whole Content Library"
-                : formatDisplayName(part)}
-            </span>
-          </React.Fragment>
-        ))}
-      </>
-    );
   };
 
   const fetchFolderStructure = async () => {
@@ -323,7 +283,12 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
       <CardContent className="h-full p-0">
         <div className="flex flex-col overflow-auto">
           <div className="flex justify-between items-center mb-0">
-            <div className="text-left mb-1.5">{renderBreadcrumbs()}</div>
+            <div className="text-left mb-1.5">
+              <BreadCrumbs
+                activeFolder={activeFolder}
+                setActiveFolder={setActiveFolder}
+              />
+            </div>
             {activeFolder && (
               <div
                 className="cursor-pointer px-2.5 py-1.5 rounded-md text-lg hover:bg-gray-100"
@@ -336,7 +301,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
           </div>
           {isLoading ? (
             <div className="flex justify-center items-center h-full">
-              <Spinner className="text-orange" />
+              <Spinner />
             </div>
           ) : (
             <Table>

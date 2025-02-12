@@ -1,14 +1,14 @@
 import axios from "axios";
 import { useRef, useState, useEffect } from "react";
 import { useAuthUser } from "react-auth-kit";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
-import withAuth from "../routes/withAuth";
-import "./Upload.css";
-import { displayAlert } from "../helper/Alert";
-import CustomTextField from "../components/CustomTextField";
-import TextField from "@mui/material/TextField";
-import handleGAEvent from "../utilities/handleGAEvent";
-import { Spinner } from "react-bootstrap"; // Import Spinner component
+import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
+import withAuth from "@/routes/withAuth";
+import handleGAEvent from "@/utilities/handleGAEvent";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Spinner } from "@/components/ui/spinner";
+import { toast } from "react-toastify";
 
 const UploadText = ({ folder, get_collections, onClose }) => {
   const getAuth = useAuthUser();
@@ -44,24 +44,22 @@ const UploadText = ({ folder, get_collections, onClose }) => {
     formData.append("mode", textFormat);
 
     if (!/^[a-zA-Z0-9_-]{3,63}$/.test(formattedProfileName)) {
-      displayAlert(
-        "Folder name should be 3-63 characters long and contain only alphanumeric characters, underscores, or dashes",
-        "warning"
+      toast.warning(
+        "Folder name should be 3-63 characters long and contain only alphanumeric characters, underscores, or dashes"
       );
       setIsUploading(false);
       return;
     }
     if (!/^[a-zA-Z0-9_-]{3,63}$/.test(formattedFileName)) {
-      displayAlert(
-        "File name should be 3-63 characters long and contain only alphanumeric characters, underscores, or dashes",
-        "warning"
+      toast.warning(
+        "File name should be 3-63 characters long and contain only alphanumeric characters, underscores, or dashes"
       );
       setIsUploading(false);
       return;
     }
 
     if (text.length < 30) {
-      displayAlert("Minimum input text is 30 characters", "warning");
+      toast.warning("Minimum input text is 30 characters");
       setIsUploading(false);
       return;
     }
@@ -77,8 +75,7 @@ const UploadText = ({ folder, get_collections, onClose }) => {
           }
         }
       );
-
-      displayAlert("Upload successful", "success");
+      toast.success("Upload successful");
       onClose();
       get_collections();
       handleGAEvent("Library", "Text Upload", "Upload Text Button");
@@ -86,12 +83,9 @@ const UploadText = ({ folder, get_collections, onClose }) => {
       console.error("Error saving strategy:", error);
 
       if (error.response && error.response.status === 409) {
-        displayAlert(
-          "A file with this name already exists in this folder",
-          "danger"
-        );
+        toast.error("A file with this name already exists in this folder");
       } else {
-        displayAlert("Failed to save", "danger");
+        toast.error("Failed to save");
       }
     } finally {
       setIsUploading(false); // Set isUploading to false when the upload ends
@@ -108,56 +102,49 @@ const UploadText = ({ folder, get_collections, onClose }) => {
   };
 
   return (
-    <div className="App" style={{ textAlign: "left" }}>
-      <div className="input-options-container">
-        <CustomTextField
-          fullWidth
-          label="Folder"
-          variant="outlined"
+    <div className="text-left">
+      <div className="flex flex-col gap-6">
+        <Input
+          className="font-manrope"
+          placeholder="Folder"
           value={formatDisplayName(profileName)}
           onChange={(e) =>
             setProfileName(reverseFormatDisplayName(e.target.value))
           }
           disabled={!!folder}
-          inputProps={{ maxLength: 50 }}
-        />
-        <CustomTextField
-          fullWidth
-          label="File name"
-          variant="outlined"
-          value={fileName}
-          onChange={(e) => setFileName(e.target.value)}
-          inputProps={{ maxLength: 50 }} // Set character limit for file name
-        />
-        <TextField
-          fullWidth
-          label="Paste Bid Material Here.."
-          variant="outlined"
-          multiline
-          rows={10} // Adjust the number of rows to increase the height
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              fontFamily: '"Manrope", sans-serif'
-            },
-            "& .MuiInputLabel-root": {
-              fontFamily: '"Manrope", sans-serif'
-            }
-          }}
+          maxLength={50}
         />
 
-        <button
+        <Input
+          className="font-manrope"
+          placeholder="File name"
+          value={fileName}
+          onChange={(e) => setFileName(e.target.value)}
+          maxLength={50}
+        />
+
+        <Textarea
+          className="font-manrope min-h-[250px]"
+          placeholder="Paste Bid Material Here..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+
+        <Button
+          variant="default"
           onClick={handleTextSubmit}
-          disabled={!isFormFilled || isUploading} // Disable button if form is not filled or uploading
-          className="upload-button"
+          disabled={!isFormFilled || isUploading}
+          className="font-bold text-base"
         >
           {isUploading ? (
-            <Spinner animation="border" size="sm" /> // Display spinner while uploading
+            <>
+              <Spinner className="text-white" />
+              Uploading...
+            </>
           ) : (
             "Upload Data"
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

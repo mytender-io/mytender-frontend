@@ -450,7 +450,6 @@ const Bids = () => {
               size="lg"
               className="px-4"
               onClick={handleWriteProposalClick}
-              id="new-bid-button"
             >
               <PlusIcon className="text-white mr-2" />
               New Tender
@@ -488,12 +487,12 @@ const Bids = () => {
                   ) : currentBids.length > 0 ? (
                     currentBids.map((bid) => (
                       <TableRow key={bid._id}>
-                        <TableCell className="px-4">
+                        <TableCell className="px-4 group">
                           <Link
                             to="/bid-extractor"
                             state={{ bid: bid, fromBidsTable: true }}
                             onClick={() => navigateToChatbot(bid)}
-                            className="block truncate w-full text-black no-underline hover:text-gray-600 transition-colors duration-200"
+                            className="block truncate w-full text-gray-hint_text no-underline group-hover:text-orange group-hover:font-bold transition-colors duration-200"
                           >
                             {bid.bid_title}
                           </Link>

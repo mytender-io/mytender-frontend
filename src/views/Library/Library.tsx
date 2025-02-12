@@ -1,42 +1,56 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import axios from "axios";
-import withAuth from "../routes/withAuth";
+import withAuth from "../../routes/withAuth.tsx";
 import { useAuthUser } from "react-auth-kit";
-import {
-  Button,
-  Card,
-  Modal,
-  FormControl,
-  InputGroup,
-  Form,
-  Spinner
-} from "react-bootstrap";
-import UploadPDF from "../components/UploadPDF.tsx";
-import UploadText from "./UploadText";
-import "./Library.css";
-import SideBarSmall from "../routes/SidebarSmall.tsx";
-import handleGAEvent from "../utilities/handleGAEvent.tsx";
-import {
-  faFolder,
-  faFileAlt,
-  faEllipsisVertical,
-  faSearch,
-  faQuestionCircle,
-  faPlus,
-  faReply,
-  faTimes
-} from "@fortawesome/free-solid-svg-icons";
-import "./Chatbot.css";
+import { Button } from "@/components/ui/button";
+import UploadPDF from "@/components/upload/UploadPDF.tsx";
+import handleGAEvent from "@/utilities/handleGAEvent.tsx";
+import { faFolder, faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { UploadButtonWithDropdown } from "./UploadButtonWithDropdown.tsx";
-import { Menu, MenuItem } from "@mui/material";
-import FileContentModal from "../modals/FileContentModal.tsx";
-import { displayAlert } from "../helper/Alert.tsx";
-import LibraryContextMenu from "../modals/LibraryContextMenu.tsx";
-import EllipsisMenu from "@/buttons/EllipsisMenu.tsx";
-import { LibrarySidepane, LibraryLayout } from "../components/LibrarySidepane";
-import BreadcrumbNavigation from "../layout/BreadCrumbNavigation.tsx";
+import { UploadButtonWithDropdown } from "./components/UploadButtonWithDropdown.tsx";
+import FileContentModal from "./components/FileContentModal.tsx";
+// import LibraryContextMenu from "./components/LibraryContextMenu.tsx";
+import EllipsisMenu from "./components/EllipsisMenu.tsx";
+import LibrarySidepane from "./components/LibrarySidepane.tsx";
+import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
+import PlusIcon from "@/components/icons/PlusIcon.tsx";
+import {
+  ArrowLeftIcon,
+  FileIcon,
+  FileTextIcon,
+  FolderIcon,
+  Search,
+  X,
+  HelpCircle
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import UploadText from "./components/UploadText.tsx";
+import { Spinner } from "@/components/ui/spinner.tsx";
+import BreadCrumbs from "@/components/BreadCrumbs.tsx";
+import { toast } from "react-toastify";
 
 const NewFolderModal = React.memo(
   ({ show, onHide, onCreateFolder, title, parentFolder }) => {
@@ -80,40 +94,36 @@ const NewFolderModal = React.memo(
     };
 
     return (
-      <Modal show={show} onHide={onHide} className="custom-modal-newbid">
-        <Modal.Header className="px-4">
-          <Modal.Title>{title || "Create New Folder"}</Modal.Title>
-          <button className="close-button ms-auto" onClick={onHide}>
-            ×
-          </button>
-        </Modal.Header>
-        <Modal.Body className="px-4 py-4">
-          <Form.Group>
-            <Form.Label>
-              {parentFolder ? "Subfolder Name" : "Folder Name"}
-            </Form.Label>
-            <FormControl
-              type="text"
-              placeholder={`Enter ${parentFolder ? "subfolder" : "folder"} name`}
-              value={localNewFolderName}
-              onChange={handleInputChange}
-              isInvalid={!!error}
-            />
-            <Form.Control.Feedback type="invalid">
-              {error}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            className="upload-button"
-            onClick={handleCreate}
-            disabled={!!error || localNewFolderName.length === 0}
-          >
-            Create
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <Dialog open={show} onOpenChange={onHide}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{title || "Create New Folder"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="folderName">
+                {parentFolder ? "Subfolder Name" : "Folder Name"}
+              </Label>
+              <Input
+                id="folderName"
+                placeholder={`Enter ${parentFolder ? "subfolder" : "folder"} name`}
+                value={localNewFolderName}
+                onChange={handleInputChange}
+                className={error ? "border-destructive" : ""}
+              />
+              {error && <p className="text-sm text-destructive">{error}</p>}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              onClick={handleCreate}
+              disabled={!!error || localNewFolderName.length === 0}
+            >
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     );
   }
 );
@@ -140,13 +150,7 @@ const Library = () => {
   const [showDeleteFileModal, setShowDeleteFileModal] = useState(false);
   const [fileToDelete, setFileToDelete] = useState(null);
   const [uploadFolder, setUploadFolder] = useState(null);
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [anchorElFile, setAnchorElFile] = useState(null);
-
   const [currentFile, setCurrentFile] = useState(null);
-
-  const open = Boolean(anchorEl);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [filteredResults, setFilteredResults] = useState([]);
@@ -188,29 +192,12 @@ const Library = () => {
       return a.localeCompare(b);
     });
   };
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
 
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  const handleClick = (event, file) => {
-    setAnchorElFile(event.currentTarget);
-    setCurrentFile(file);
-  };
-
-  const handleClose = () => {
-    setAnchorElFile(null);
-  };
-
   const handleMenuItemClick = (action) => {
-    handleMenuClose();
     if (action === "pdf") handleOpenPDFModal();
     else if (action === "text") handleOpenTextModal();
   };
@@ -355,9 +342,8 @@ const Library = () => {
         );
 
         if (response.data.message === "Folder created successfully") {
-          displayAlert(
-            `${parentFolder ? "Subfolder" : "Folder"} created successfully`,
-            "success"
+          toast.success(
+            `${parentFolder ? "Subfolder" : "Folder"} created successfully`
           );
 
           // Refresh the folder structure
@@ -375,9 +361,8 @@ const Library = () => {
           setUpdateTrigger((prev) => prev + 1);
           setShowNewFolderModal(false);
         } else {
-          displayAlert(
-            `Failed to create ${parentFolder ? "subfolder" : "folder"}`,
-            "danger"
+          toast.error(
+            `Failed to create ${parentFolder ? "subfolder" : "folder"}`
           );
         }
       } catch (error) {
@@ -385,9 +370,8 @@ const Library = () => {
           `Error creating ${parentFolder ? "subfolder" : "folder"}:`,
           error
         );
-        displayAlert(
-          `Error, ${parentFolder ? "subfolder" : "folder"} limit reached. Try using a shorter folder name...`,
-          "danger"
+        toast.error(
+          `Error, ${parentFolder ? "subfolder" : "folder"} limit reached. Try using a shorter folder name...`
         );
       }
     },
@@ -395,6 +379,7 @@ const Library = () => {
   );
 
   const modalRef = useRef();
+
   const closeModal = (e) => {
     if (modalRef.current && !modalRef.current.contains(e.target)) {
       setShowPdfViewerModal(false);
@@ -418,102 +403,87 @@ const Library = () => {
     get_collections,
     onClose
   }) => (
-    <Modal show={show} onHide={onHide} size="lg" centered>
-      <Modal.Header className="px-4">
-        <Modal.Title>Upload Files</Modal.Title>
-        <button className="close-button ms-auto" onClick={onHide}>
-          ×
-        </button>
-      </Modal.Header>
-      <Modal.Body className="px-4 py-4">
-        <UploadPDF
-          folder={folder}
-          get_collections={get_collections}
-          onClose={onClose}
-          apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile/`}
-          descriptionText="Upload previous bids here for the AI to use as context in the Q&A
-        Generator. This might take a while for large documents because we need
-        to convert the documents into a format the AI can understand so sit
-        tight!"
-        />
-      </Modal.Body>
-    </Modal>
+    <Dialog open={show} onOpenChange={onHide}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Upload Files</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <UploadPDF
+            folder={folder}
+            get_collections={get_collections}
+            onClose={onClose}
+            apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile/`}
+            descriptionText="Upload previous bids here for the AI to use as context in the Q&A Generator. This might take a while for large documents because we need to convert the documents into a format the AI can understand so sit tight!"
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 
   const UploadTextModal = ({ show, onHide, folder, get_collections }) => (
-    <Modal
-      show={show}
-      onHide={() => {
-        onHide();
-      }}
-      onClick={(e) => e.stopPropagation()}
-      size="lg"
-    >
-      <Modal.Header className="px-4" onClick={(e) => e.stopPropagation()}>
-        <Modal.Title>Text Uploader</Modal.Title>
-        <button className="close-button ms-auto" onClick={onHide}>
-          ×
-        </button>
-      </Modal.Header>
-      <Modal.Body className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
-        <UploadText
-          folder={folder}
-          get_collections={get_collections}
-          onClose={() => {
-            onHide();
-            setUpdateTrigger((prev) => prev + 1);
-            if (folder) {
-              fetchFolderContents(folder);
-            }
-          }}
-        />
-      </Modal.Body>
-    </Modal>
+    <Dialog open={show} onOpenChange={onHide}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Text Uploader</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <UploadText
+            folder={folder}
+            get_collections={get_collections}
+            onClose={() => {
+              onHide();
+              setUpdateTrigger((prev) => prev + 1);
+              if (folder) {
+                fetchFolderContents(folder);
+              }
+            }}
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 
   const DeleteFolderModal = ({ show, onHide, onDelete, folderTitle }) => {
     const displayFolderName = folderTitle
       .replace(/FORWARDSLASH/g, "/")
       .replace(/_/g, " ");
+
     return (
-      <Modal show={show} onHide={onHide} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Delete Folder</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete the folder "{displayFolderName}"?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            className="upload-button"
-            style={{ backgroundColor: "red" }}
-            onClick={() => onDelete(folderTitle)}
-          >
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <Dialog open={show} onOpenChange={onHide}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Folder</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            Are you sure you want to delete the folder "{displayFolderName}"?
+          </div>
+          <DialogFooter>
+            <Button variant="destructive" onClick={() => onDelete(folderTitle)}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     );
   };
 
   const DeleteFileModal = ({ show, onHide, onDelete, fileName }) => (
-    <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Delete File</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        Are you sure you want to delete the file "{fileName}"?
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          className="upload-button"
-          style={{ backgroundColor: "red" }}
-          onClick={() => onDelete()}
-        >
-          Delete
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <Dialog open={show} onOpenChange={onHide}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete File</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          Are you sure you want to delete the file "{fileName}"?
+        </div>
+        <DialogFooter>
+          <Button variant="destructive" onClick={() => onDelete()}>
+            Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 
   const saveFileContent = async (id, newContent, folderName) => {
@@ -562,7 +532,7 @@ const Library = () => {
       setCurrentFileName(fileName);
     } catch (error) {
       console.error("Error viewing file:", error);
-      displayAlert("Error loading document", "danger");
+      toast.error(`Error loading document`);
     } finally {
       setIsLoading(false);
     }
@@ -595,10 +565,7 @@ const Library = () => {
     } catch (error) {
       console.error("Error viewing PDF file:", error);
       if (error.response && error.response.status === 404) {
-        displayAlert(
-          "PDF file not found, try reuploading the pdf file",
-          "danger"
-        );
+        toast.error(`PDF file not found, try reuploading the pdf file`);
       }
     } finally {
       setIsLoading(false);
@@ -731,7 +698,6 @@ const Library = () => {
 
   const renderFolderStructure = () => {
     const topLevelFolders = getTopLevelFolders();
-    // Filter out the "default" folder
     const foldersToRender = topLevelFolders.filter(
       (folderName) => folderName !== "default"
     );
@@ -739,23 +705,21 @@ const Library = () => {
     return foldersToRender.map((folderName) => {
       const displayName = formatDisplayName(folderName);
       return (
-        <tr
+        <TableRow
           key={folderName}
           onClick={() => handleFolderClick(folderName)}
-          onContextMenu={(e) =>
-            handleContextMenu(e, true, folderName, folderName)
-          }
-          style={{ cursor: "pointer" }}
+          // onContextMenu={(e) =>
+          //   handleContextMenu(e, true, folderName, folderName)
+          // }
+          className="cursor-pointer"
         >
-          <td>
-            <FontAwesomeIcon
-              icon={faFolder}
-              className="fa-icon"
-              style={{ marginRight: "0.625rem" }}
-            />
-            {displayName}
-          </td>
-          <td colSpan={3}>
+          <TableCell className="px-4">
+            <div className="flex items-center">
+              <FontAwesomeIcon icon={faFolder} className="fa-icon mr-2.5" />
+              {displayName}
+            </div>
+          </TableCell>
+          <TableCell className="w-[100px] text-right px-4">
             <UploadButtonWithDropdown
               folder={folderName}
               handleShowPDFModal={handleShowPDFModal}
@@ -764,39 +728,39 @@ const Library = () => {
               setFolderToDelete={setFolderToDelete}
               handleNewFolderClick={handleNewFolderClick}
             />
-          </td>
-        </tr>
+          </TableCell>
+        </TableRow>
       );
     });
   };
-  const [contextMenu, setContextMenu] = useState<{
-    mouseX: number;
-    mouseY: number;
-  } | null>(null);
-  const [contextMenuTarget, setContextMenuTarget] = useState<{
-    isFolder: boolean;
-    id: string;
-    path: string;
-  } | null>(null);
+  // const [contextMenu, setContextMenu] = useState<{
+  //   mouseX: number;
+  //   mouseY: number;
+  // } | null>(null);
+  // const [contextMenuTarget, setContextMenuTarget] = useState<{
+  //   isFolder: boolean;
+  //   id: string;
+  //   path: string;
+  // } | null>(null);
 
-  const handleContextMenu = (
-    event: React.MouseEvent,
-    isFolder: boolean,
-    id: string,
-    path: string
-  ) => {
-    event.preventDefault();
-    setContextMenu({
-      mouseX: event.clientX,
-      mouseY: event.clientY
-    });
-    setContextMenuTarget({ isFolder, id, path });
-  };
+  // const handleContextMenu = (
+  //   event: React.MouseEvent,
+  //   isFolder: boolean,
+  //   id: string,
+  //   path: string
+  // ) => {
+  //   event.preventDefault();
+  //   setContextMenu({
+  //     mouseX: event.clientX,
+  //     mouseY: event.clientY
+  //   });
+  //   setContextMenuTarget({ isFolder, id, path });
+  // };
 
-  const handleContextMenuClose = () => {
-    setContextMenu(null);
-    setContextMenuTarget(null);
-  };
+  // const handleContextMenuClose = () => {
+  //   setContextMenu(null);
+  //   setContextMenuTarget(null);
+  // };
 
   const renderFolderContents = (folderPath) => {
     //console.log("Rendering contents for folder:", folderPath);
@@ -834,28 +798,30 @@ const Library = () => {
       const displayName = formatDisplayName(filename);
 
       return (
-        <tr
+        <TableRow
           key={`${folderPath}-${index}`}
-          style={{ cursor: "pointer" }}
-          onContextMenu={(e) =>
-            handleContextMenu(e, isFolder, unique_id, fullPath)
-          }
+          className="cursor-pointer"
+          // onContextMenu={(e) =>
+          //   handleContextMenu(e, isFolder, unique_id, fullPath)
+          // }
         >
-          <td
+          <TableCell
+            className="px-4"
             onClick={() =>
               isFolder
                 ? handleFolderClick(fullPath)
                 : viewFile(filename, folderPath, unique_id)
             }
           >
-            <FontAwesomeIcon
-              icon={isFolder ? faFolder : faFileAlt}
-              className="fa-icon"
-              style={{ marginRight: "0.625rem" }}
-            />
-            {displayName}
-          </td>
-          <td colSpan={3}>
+            <div className="flex items-center">
+              <FontAwesomeIcon
+                icon={isFolder ? faFolder : faFileAlt}
+                className="fa-icon mr-2.5"
+              />
+              {displayName}
+            </div>
+          </TableCell>
+          <TableCell className="w-[100px] text-right px-4">
             {isFolder ? (
               <UploadButtonWithDropdown
                 folder={fullPath}
@@ -896,60 +862,23 @@ const Library = () => {
                         }
                       }
                     );
-
                     await fetchFolderContents(activeFolder);
-                    displayAlert("File moved successfully", "success");
+                    toast.success("File moved successfully");
                   } catch (error) {
                     console.error("Error moving file:", error);
-                    displayAlert("Error moving file", "danger");
+                    toast.error(`Error moving file`);
                   } finally {
                     setMovingFiles((prev) => ({ ...prev, [unique_id]: false }));
                   }
                 }}
               />
             )}
-          </td>
-        </tr>
+          </TableCell>
+        </TableRow>
       );
     });
   };
 
-  const renderBreadcrumbs = () => {
-    if (!activeFolder) {
-      return <span className="breadcrumb-item">Content Library</span>;
-    }
-
-    const parts = activeFolder.split("FORWARDSLASH");
-    return (
-      <>
-        <span
-          className="breadcrumb-item clickable"
-          onClick={() => setActiveFolder(null)}
-        >
-          Content Library
-        </span>
-        {parts.map((part, index) => (
-          <React.Fragment key={index}>
-            <span className="breadcrumb-separator">&gt;</span>
-            <span
-              className={`breadcrumb-item ${index === parts.length - 1 ? "" : "clickable"}`}
-              onClick={() => {
-                if (index < parts.length - 1) {
-                  setActiveFolder(
-                    parts.slice(0, index + 1).join("FORWARDSLASH")
-                  );
-                }
-              }}
-            >
-              {part === "default"
-                ? "Whole Content Library"
-                : formatDisplayName(part)}
-            </span>
-          </React.Fragment>
-        ))}
-      </>
-    );
-  };
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
@@ -1037,347 +966,296 @@ const Library = () => {
     if (!showSearchResults) return null;
 
     return (
-      <div className="search-results-dropdown">
+      <div className="absolute top-[calc(100%+4px)] left-0 w-full max-h-[14rem] overflow-y-auto rounded-xl border bg-background shadow-lg">
         {filteredResults.length === 0 ? (
-          <div className="search-result-item">
-            <FontAwesomeIcon icon={faQuestionCircle} className="result-icon" />
+          <div className="flex items-center gap-2 px-4 py-3 text-sm text-muted-foreground">
+            <HelpCircle className="h-4 w-4" />
             No results found...
           </div>
         ) : (
           filteredResults.map((result, index) => (
             <div
               key={index}
-              className="search-result-item"
+              className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-muted cursor-pointer"
               onClick={() => handleSearchResultClick(result)}
             >
-              <FontAwesomeIcon
-                icon={result.type === "file" ? faFileAlt : faFolder}
-                className="result-icon"
-              />
-              {result.type === "file"
-                ? `${result.name} (in ${result.path.replace(/FORWARDSLASH/g, "/")})`
-                : result.fullName}
+              {result.type === "file" ? (
+                <FileIcon className="h-4 w-4" />
+              ) : (
+                <FolderIcon className="h-4 w-4" />
+              )}
+              <span>
+                {result.type === "file"
+                  ? `${result.name} (in ${result.path.replace(/FORWARDSLASH/g, "/")})`
+                  : result.fullName}
+              </span>
             </div>
           ))
         )}
       </div>
     );
   };
+
   const parentPages = [];
 
   return (
-    <div className="library-wrapper">
-      <div
-        className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} 
-        ${isSidepaneOpen ? "sidepane-open" : ""}`}
-      >
+    <div className="h-full">
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-4 min-h-[75px]">
         <BreadcrumbNavigation
           currentPage="Content Library"
           parentPages={parentPages}
           showHome={true}
         />
       </div>
-
-      <div
-        className={`lib-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} 
-        ${isSidepaneOpen ? "sidepane-open" : ""}`}
-      >
-        <h1 className="mt-3">Build your knowledge base</h1>
-        <div className="header-row mt-4">
-          <div className="lib-title" id="library-table">
-            Resources
-          </div>
-
-          <div
-            className="search-container"
-            style={{ display: "flex", justifyContent: "center", width: "100%" }}
-          >
-            <InputGroup
-              className={`search-bar-container ${showDropdown ? "dropdown-visible" : ""}`}
-              ref={searchBarRef}
-              style={{ maxWidth: "60rem", width: "100%" }}
-            >
-              <FontAwesomeIcon icon={faSearch} className="search-icon" />
-              <FormControl
-                placeholder="Search folders and files"
-                aria-label="Search"
-                aria-describedby="basic-addon2"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onFocus={() => {
-                  setShowDropdown(true);
-                  setShowSearchResults(true);
-                }}
-                onBlur={() => {
-                  setTimeout(() => {
-                    setShowDropdown(false);
-                    setShowSearchResults(false);
-                  }, 200);
-                }}
-                className={`search-bar-library ${showDropdown ? "dropdown-visible" : ""}`}
-              />
-              {searchQuery && (
-                <div
-                  className="clear-search-icon"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setShowDropdown(false);
-                    setShowSearchResults(false);
-                  }}
-                >
-                  <FontAwesomeIcon icon={faTimes} />
-                </div>
-              )}
-              {renderSearchResults()}
-            </InputGroup>
-          </div>
-
-          <label id="search-bar-container"> </label>
-
-          <div
-            className="button-container"
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              minWidth: "9.375rem",
-              minHeight: "2.5rem"
-            }}
-          >
-            {!activeFolder && (
-              <Button
-                onClick={() => handleNewFolderClick(null)}
-                className="upload-button"
-                id="new-folder"
-                style={{ whiteSpace: "nowrap" }}
-              >
-                <FontAwesomeIcon
-                  icon={faPlus}
-                  style={{ marginRight: "0.5rem" }}
-                />
-                New Folder
-              </Button>
-            )}
-
-            {activeFolder && (
-              <Button
-                aria-controls="simple-menu"
-                aria-haspopup="true"
-                onClick={handleMenuClick}
-                className="upload-button"
-                style={{ fontSize: "1.0625rem" }}
-              >
-                <FontAwesomeIcon
-                  icon={faPlus}
-                  style={{ marginRight: "0.5rem" }}
-                />
-                Upload
-              </Button>
-            )}
-          </div>
-        </div>
-
-        <Menu
-          id="long-menu"
-          anchorEl={anchorEl}
-          keepMounted
-          open={open}
-          onClose={handleMenuClose}
-        >
-          <MenuItem
-            onClick={() => handleMenuItemClick("pdf")}
-            className="styled-menu-item"
-          >
-            <i className="fas fa-file-pdf styled-menu-item-icon"></i>
-            Upload PDF/Word/Excel
-          </MenuItem>
-          <MenuItem
-            onClick={() => handleMenuItemClick("text")}
-            className="styled-menu-item"
-          >
-            <i className="fas fa-file-alt styled-menu-item-icon"></i>
-            Upload Text
-          </MenuItem>
-          <MenuItem
-            onClick={() => handleNewFolderClick(activeFolder)}
-            className="styled-menu-item"
-          >
-            <FontAwesomeIcon
-              icon={faFolder}
-              className="styled-menu-item-icon"
-            />
-            New Subfolder
-          </MenuItem>
-        </Menu>
-
-        <div style={{ width: "100%", marginTop: "2rem" }}>
-          <table className="library-table">
-            <thead>
-              <tr>
-                <th>{renderBreadcrumbs()}</th>
-                <th colSpan={3}>
-                  {activeFolder && (
-                    <div
-                      className="back-button"
-                      onClick={() => handleBackClick()}
-                      style={{ cursor: "pointer", padding: "5px" }}
+      <div className="h-full flex gap-6">
+        <div className="flex-1 space-y-6 pt-4">
+          <div className="pl-6 space-y-4">
+            <div className="space-y-2">
+              <span className="block text-2xl font-semibold">
+                Build your knowledge base
+              </span>
+              <span className="block text-base text-muted-foreground">
+                Upload documents in PDF, word or excel to so responses are
+                grounded in your information.
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="relative w-full max-w-96">
+                <div className="relative flex items-center w-full px-4 py-2 border border-typo-grey-6 rounded-lg bg-white">
+                  <Search className="absolute left-4 h-6 w-6 text-typo-700 z-10" />
+                  <Input
+                    className="w-full pl-9 border-none outline-none focus-visible:ring-0 shadow-none text-base md:text-base py-0 h-6"
+                    placeholder="Search folders and files"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    onFocus={() => {
+                      setShowDropdown(true);
+                      setShowSearchResults(true);
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => {
+                        setShowDropdown(false);
+                        setShowSearchResults(false);
+                      }, 200);
+                    }}
+                  />
+                  {searchQuery && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 h-8 w-8 p-0 hover:bg-transparent"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setShowDropdown(false);
+                        setShowSearchResults(false);
+                      }}
                     >
-                      <FontAwesomeIcon icon={faReply} />
-                      <span style={{ marginLeft: "0.625rem" }}>Back</span>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                {showSearchResults && renderSearchResults()}
+              </div>
+              {!activeFolder ? (
+                <Button
+                  size="lg"
+                  className="px-4"
+                  onClick={() => handleNewFolderClick(null)}
+                >
+                  <PlusIcon className="text-white mr-2" />
+                  New Folder
+                </Button>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="lg" className="px-4">
+                      <PlusIcon className="text-white mr-2" />
+                      Upload
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuItem
+                      onClick={() => handleMenuItemClick("pdf")}
+                    >
+                      <FileIcon className="h-4 w-4 mr-2" />
+                      Upload PDF/Word/Excel
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleMenuItemClick("text")}
+                    >
+                      <FileTextIcon className="h-4 w-4 mr-2" />
+                      Upload Text
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleNewFolderClick(activeFolder)}
+                    >
+                      <FolderIcon className="h-4 w-4 mr-2" />
+                      New Subfolder
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+          </div>
+          <div className="pl-6">
+            <div className="border rounded-lg">
+              <div className="p-4 border-b">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <BreadCrumbs
+                      activeFolder={activeFolder}
+                      setActiveFolder={setActiveFolder}
+                    />
+                  </div>
+                  {activeFolder && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleBackClick()}
+                      className="flex items-center"
+                    >
+                      <ArrowLeftIcon className="h-4 w-4 mr-2" />
+                      Back
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none">
+                      Company Documents
+                    </TableHead>
+                    <TableHead className="w-[100px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4 select-none" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {activeFolder
+                    ? renderFolderContents(activeFolder)
+                    : renderFolderStructure()}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+
+          {/* Modals */}
+          <FileContentModal
+            showModal={showModal}
+            setShowModal={setShowModal}
+            modalContent={modalContent}
+            onSave={(newContent) =>
+              saveFileContent(currentFileId, newContent, activeFolder)
+            }
+            documentId={currentFileId}
+            fileName={currentFileName}
+            folderName={activeFolder}
+            onViewPdf={viewPdfFile}
+            isLoading={isLoading}
+          />
+
+          <DeleteFolderModal
+            show={showDeleteFolderModal}
+            onHide={() => setShowDeleteFolderModal(false)}
+            onDelete={() => handleDelete(folderToDelete)}
+            folderTitle={folderToDelete}
+          />
+
+          <DeleteFileModal
+            show={showDeleteFileModal}
+            onHide={() => setShowDeleteFileModal(false)}
+            onDelete={() => {
+              deleteDocument(fileToDelete.unique_id);
+              setShowDeleteFileModal(false);
+            }}
+            fileName={fileToDelete ? fileToDelete.filename : ""}
+          />
+
+          <UploadPDFModal
+            show={showPDFModal}
+            onHide={() => setShowPDFModal(false)}
+            folder={uploadFolder}
+            get_collections={fetchFolderStructure}
+            onClose={handleOnClose}
+          />
+
+          <UploadTextModal
+            show={showTextModal}
+            onHide={() => setShowTextModal(false)}
+            folder={uploadFolder}
+            get_collections={fetchFolderStructure}
+          />
+
+          <NewFolderModal
+            show={showNewFolderModal}
+            onHide={handleHideNewFolderModal}
+            onCreateFolder={handleCreateFolder}
+            title={
+              newFolderParent ? "Create New Subfolder" : "Create New Folder"
+            }
+            parentFolder={newFolderParent}
+          />
+
+          {/* {contextMenu && contextMenuTarget && (
+            <LibraryContextMenu
+              anchorPosition={{ x: contextMenu.mouseX, y: contextMenu.mouseY }}
+              isOpen={Boolean(contextMenu)}
+              onClose={handleContextMenuClose}
+              onDelete={() => {
+                if (contextMenuTarget.isFolder) {
+                  setFolderToDelete(contextMenuTarget.path);
+                  setShowDeleteFolderModal(true);
+                } else {
+                  setFileToDelete({
+                    unique_id: contextMenuTarget.id,
+                    filename:
+                      folderContents[activeFolder]?.find(
+                        (item) => item.unique_id === contextMenuTarget.id
+                      )?.filename || ""
+                  });
+                  setShowDeleteFileModal(true);
+                }
+                handleContextMenuClose();
+              }}
+              isFolder={contextMenuTarget.isFolder}
+              folderPath={contextMenuTarget.path}
+              onUploadPDF={(event) => {
+                handleShowPDFModal(event, contextMenuTarget.path);
+                handleContextMenuClose();
+              }}
+              onUploadText={(event) => {
+                handleShowTextModal(event, contextMenuTarget.path);
+                handleContextMenuClose();
+              }}
+              onNewSubfolder={() => {
+                handleNewFolderClick(contextMenuTarget.path);
+                handleContextMenuClose();
+              }}
+            />
+          )} */}
+
+          {showPdfViewerModal && (
+            <Dialog
+              open={showPdfViewerModal}
+              onOpenChange={() => setShowPdfViewerModal(false)}
+            >
+              <DialogContent className="max-w-7xl h-[90vh]">
+                <DialogHeader>
+                  <DialogTitle>PDF Viewer</DialogTitle>
+                </DialogHeader>
+                <div className="relative flex-1">
+                  {isLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                      <Spinner />
                     </div>
                   )}
-                </th>
-              </tr>
-            </thead>
-          </table>
-
-          <div
-            style={{
-              overflowY: "auto",
-              maxHeight: "",
-              height: "calc(100vh - 220px)",
-              width: "100%"
-            }}
-          >
-            <table style={{ width: "100%" }} className="library-table">
-              <tbody>
-                {activeFolder
-                  ? renderFolderContents(activeFolder)
-                  : renderFolderStructure()}
-              </tbody>
-            </table>
-          </div>
+                  <iframe src={pdfUrl} className="w-full h-full rounded-md" />
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
+        <LibrarySidepane />
       </div>
-
-      {/* Modals */}
-      <FileContentModal
-        showModal={showModal}
-        setShowModal={setShowModal}
-        modalContent={modalContent}
-        onSave={(newContent) =>
-          saveFileContent(currentFileId, newContent, activeFolder)
-        }
-        documentId={currentFileId}
-        fileName={currentFileName}
-        folderName={activeFolder}
-        onViewPdf={viewPdfFile}
-        isLoading={isLoading}
-      />
-
-      <DeleteFolderModal
-        show={showDeleteFolderModal}
-        onHide={() => setShowDeleteFolderModal(false)}
-        onDelete={() => handleDelete(folderToDelete)}
-        folderTitle={folderToDelete}
-      />
-
-      <DeleteFileModal
-        show={showDeleteFileModal}
-        onHide={() => setShowDeleteFileModal(false)}
-        onDelete={() => {
-          deleteDocument(fileToDelete.unique_id);
-          setShowDeleteFileModal(false);
-        }}
-        fileName={fileToDelete ? fileToDelete.filename : ""}
-      />
-
-      <UploadPDFModal
-        show={showPDFModal}
-        onHide={() => setShowPDFModal(false)}
-        folder={uploadFolder}
-        get_collections={fetchFolderStructure}
-        onClose={handleOnClose}
-      />
-
-      <UploadTextModal
-        show={showTextModal}
-        onHide={() => setShowTextModal(false)}
-        folder={uploadFolder}
-        get_collections={fetchFolderStructure}
-      />
-
-      <NewFolderModal
-        show={showNewFolderModal}
-        onHide={handleHideNewFolderModal}
-        onCreateFolder={handleCreateFolder}
-        title={newFolderParent ? "Create New Subfolder" : "Create New Folder"}
-        parentFolder={newFolderParent}
-      />
-
-      {contextMenu && contextMenuTarget && (
-        <LibraryContextMenu
-          anchorPosition={{ x: contextMenu.mouseX, y: contextMenu.mouseY }}
-          isOpen={Boolean(contextMenu)}
-          onClose={handleContextMenuClose}
-          onDelete={() => {
-            if (contextMenuTarget.isFolder) {
-              setFolderToDelete(contextMenuTarget.path);
-              setShowDeleteFolderModal(true);
-            } else {
-              setFileToDelete({
-                unique_id: contextMenuTarget.id,
-                filename:
-                  folderContents[activeFolder]?.find(
-                    (item) => item.unique_id === contextMenuTarget.id
-                  )?.filename || ""
-              });
-              setShowDeleteFileModal(true);
-            }
-            handleContextMenuClose();
-          }}
-          isFolder={contextMenuTarget.isFolder}
-          folderPath={contextMenuTarget.path}
-          onUploadPDF={(event) => {
-            handleShowPDFModal(event, contextMenuTarget.path);
-            handleContextMenuClose();
-          }}
-          onUploadText={(event) => {
-            handleShowTextModal(event, contextMenuTarget.path);
-            handleContextMenuClose();
-          }}
-          onNewSubfolder={() => {
-            handleNewFolderClick(contextMenuTarget.path);
-            handleContextMenuClose();
-          }}
-        />
-      )}
-
-      {showPdfViewerModal && (
-        <div className="pdf-viewer-modal" onClick={closeModal}>
-          <div className="pdf-viewer-modal-content" ref={modalRef}>
-            {isLoading && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: "rgba(255, 255, 255, 0.8)",
-                  zIndex: 1000
-                }}
-              >
-                <Spinner
-                  animation="border"
-                  style={{
-                    width: "2rem",
-                    height: "2rem",
-                    color: "black"
-                  }}
-                />
-              </div>
-            )}
-            <iframe src={pdfUrl} width="100%" height="42rem"></iframe>
-          </div>
-        </div>
-      )}
-      <LibrarySidepane
-        isOpen={isSidepaneOpen}
-        onToggle={() => setIsSidepaneOpen(!isSidepaneOpen)}
-      />
     </div>
   );
 };

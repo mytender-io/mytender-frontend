@@ -16,7 +16,7 @@ import {
   Search,
   X
 } from "lucide-react";
-import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
+import BreadcrumbNavigation from "../layout/BreadCrumbNavigation.tsx";
 
 const BidIntel = () => {
   const getAuth = useAuthUser();

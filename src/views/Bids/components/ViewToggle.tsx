@@ -20,7 +20,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ value, onChange }) => {
         )}
         onClick={() => onChange("table")}
       >
-        <LayoutTableIcon />
+        <LayoutTableIcon className="text-gray-hint_text" />
       </Button>
       <Button
         size="lg"
@@ -30,7 +30,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ value, onChange }) => {
         )}
         onClick={() => onChange("kanban")}
       >
-        <LayoutGridIcon />
+        <LayoutGridIcon className="text-gray-hint_text" />
       </Button>
     </div>
   );

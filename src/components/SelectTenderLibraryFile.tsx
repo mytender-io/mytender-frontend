@@ -92,7 +92,7 @@ const SelectTenderLibraryFile: React.FC<{
         <>
           {isLoading ? (
             <div className="flex justify-center items-center h-full">
-              <Spinner className="text-orange" />
+              <Spinner />
             </div>
           ) : (
             <Table>

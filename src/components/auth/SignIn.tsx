@@ -12,7 +12,7 @@ import {
   DialogTrigger,
   DialogClose
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
 import useAuthSignIn from "./UseAuthsignIn";
 import AuthState from "./AuthState";
 import axios from "axios";
@@ -21,7 +21,6 @@ import MeshGradient from "../mesh-gradient/MeshGradient";
 import Logo from "@/resources/images/logo.png";
 
 const Signin = () => {
-  const { toast } = useToast();
   const { submitSignIn, isLoading } = useAuthSignIn();
 
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -39,27 +38,19 @@ const Signin = () => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      toast({
-        variant: "destructive",
-        description: "Username and Password are required"
-      });
+      toast.error("Username and Password are required");
       return;
     }
 
     try {
       const { success, message } = await submitSignIn(formData);
       if (isMounted) {
-        toast({
-          variant: success ? "default" : "destructive",
-          description: success ? message : "Incorrect Username or Password"
-        });
+        if (success) toast.success(message);
+        else toast.error("Incorrect Username or Password");
       }
     } catch (error) {
       if (isMounted) {
-        toast({
-          variant: "destructive",
-          description: "Incorrect Username or Password"
-        });
+        toast.error("Incorrect Username or Password");
       }
     }
   };
@@ -81,10 +72,7 @@ const Signin = () => {
       );
 
       if (isMounted) {
-        toast({
-          variant: "default",
-          description: "Password reset email sent successfully"
-        });
+        toast.success("Password reset email sent successfully");
       }
     } catch (err) {
       if (axios.isCancel(err)) {
@@ -92,10 +80,7 @@ const Signin = () => {
       }
 
       if (isMounted) {
-        toast({
-          variant: "destructive",
-          description: "Failed to send password reset email. Please try again."
-        });
+        toast.error("Failed to send password reset email. Please try again.");
       }
     }
 

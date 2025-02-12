@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import SideBar from "./SideBar";
-import { Toaster } from "@/components/ui/toaster";
 import { useAuthUser } from "react-auth-kit";
 import SupportChat from "@/components/SupportChat";
 import AutoLogout from "@/components/auth/AutoLogout";
@@ -31,9 +30,22 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   useEffect(() => {
     const checkForUpdates = async () => {
       try {
-        const timestamp = Date.now(); // Add cache-busting parameter
-        // Fetch the manifest with cache-busting query parameter
-        const response = await fetch(`/manifest.json?t=${timestamp}`, {
+        const timestamp = Date.now();
+        // Find current script tag with version hash
+        const currentScript = Array.from(
+          document.getElementsByTagName("script")
+        ).find((script) => script.src.includes("assets/index."));
+
+        if (!currentScript) {
+          console.warn("Version check: Could not find main script tag");
+          return;
+        }
+
+        // Extract hash from current script filename
+        const currentHash = currentScript.src.match(/index\.(.+?)\.js/)?.[1];
+
+        // Fetch the index.html with cache-busting
+        const response = await fetch(`/index.html?t=${timestamp}`, {
           headers: {
             "Cache-Control": "no-cache",
             Pragma: "no-cache"
@@ -41,34 +53,30 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch manifest");
+          throw new Error(`Failed to fetch index.html: ${response.status}`);
         }
 
-        const manifest = await response.json();
-        const currentBuildHash = manifest.hash;
-        const storedHash = localStorage.getItem("buildHash");
+        const html = await response.text();
+        // Find the new script hash in the fetched HTML
+        const newHash = html.match(/assets\/index\.(.+?)\.js/)?.[1];
 
-        if (storedHash && storedHash !== currentBuildHash) {
+        if (currentHash && newHash && currentHash !== newHash) {
+          console.log("Version check: Update available");
           if (
             window.confirm(
               "A new version of the application is available. Would you like to reload to get the latest updates?"
             )
           ) {
-            localStorage.setItem("buildHash", currentBuildHash);
             window.location.reload();
           }
-        } else if (!storedHash) {
-          localStorage.setItem("buildHash", currentBuildHash);
         }
       } catch (error) {
-        console.error("Failed to check for updates:", error);
+        console.error("Version check failed:", error);
       }
     };
 
-    // Check for updates immediately when component mounts
+    // Check for updates immediately and set interval
     checkForUpdates();
-
-    // Set up periodic checks
     const intervalId = setInterval(checkForUpdates, CHECK_INTERVAL);
 
     if (auth?.token) {
@@ -78,7 +86,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       });
     }
 
-    // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
   }, [auth?.token]);
 
@@ -97,7 +104,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             overflow-hidden rounded-2xl"
         >
           {children}
-          <Toaster />
         </main>
       </div>
       {isAuthenticated && <SupportChat auth={auth} />}

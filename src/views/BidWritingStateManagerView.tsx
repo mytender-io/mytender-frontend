@@ -11,7 +11,7 @@ import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { useAuthUser } from "react-auth-kit";
 // import { displayAlert } from "../helper/Alert";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
 export interface Document {
   name: string;
   editorState: EditorState;
@@ -121,7 +121,6 @@ const defaultState: BidContextType = {
 export const BidContext = createContext<BidContextType>(defaultState);
 
 const BidManagement: React.FC = () => {
-  const { toast } = useToast();
   // Create a separate ref to track if we're currently saving
   const isSavingRef = useRef(false);
 
@@ -235,10 +234,7 @@ const BidManagement: React.FC = () => {
       } = stateCopy;
 
       if (!bidInfo || bidInfo.trim() === "") {
-        toast({
-          variant: "destructive",
-          description: "Please type in a bid name..."
-        });
+        toast.error("Please type in a bid name...");
         return;
       }
 

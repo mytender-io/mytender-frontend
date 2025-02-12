@@ -21,9 +21,9 @@ const EllipsisMenuDashboard: React.FC<EllipsisMenuDashboardProps> = ({
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="h-10 w-10 p-0 rounded-full hover:bg-transparent focus-visible:ring-0"
+          className="h-10 w-10 p-0 rounded-full bg-transparent hover:bg-gray-light focus-visible:ring-0"
         >
-          <ElipsisMenuIcon className="text-typo-900" />
+          <ElipsisMenuIcon className="text-gray-hint_text" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[120px]">

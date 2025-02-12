@@ -12,9 +12,9 @@ import posthog from "posthog-js";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useToast } from "@/hooks/use-toast";
-import UploadIcon from "./icons/UploadIcon";
-import FileIcon from "./icons/FileIcon";
+import { toast } from "react-toastify";
+import UploadIcon from "../icons/UploadIcon";
+import FileIcon from "../icons/FileIcon";
 
 interface UploadResult {
   error?: Error;
@@ -44,7 +44,6 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
   apiUrl,
   descriptionText
 }) => {
-  const { toast } = useToast();
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -146,11 +145,9 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }
 
     if (invalidFiles.length > 0) {
-      toast({
-        variant: "destructive",
-        description:
-          "Some files were not added. Only PDF (.pdf), Word (.docx), and Excel (.xlsx, .xls) files are allowed."
-      });
+      toast.error(
+        "Some files were not added. Only PDF (.pdf), Word (.docx), and Excel (.xlsx, .xls) files are allowed."
+      );
       posthog.capture("pdf_upload_invalid_file_types", {
         fileCount: invalidFiles.length,
         fileTypes: invalidFiles.map((f) => f.type)
@@ -230,10 +227,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
 
   const handleUpload = async () => {
     if (selectedFiles.length === 0) {
-      toast({
-        variant: "destructive",
-        description: "No files selected"
-      });
+      toast.error("No files selected");
       return;
     }
 
@@ -253,10 +247,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       const failCount = results.filter((result) => result.error).length;
 
       if (successCount > 0) {
-        toast({
-          variant: "default",
-          description: `Successfully uploaded ${successCount} file(s)`
-        });
+        toast.success(`Successfully uploaded ${successCount} file(s)`);
         posthog.capture("pdf_upload_batch_completed", {
           successCount,
           failCount,
@@ -270,17 +261,11 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       }
 
       if (failCount > 0) {
-        toast({
-          variant: "destructive",
-          description: `Failed to upload ${failCount} file(s)`
-        });
+        toast.error(`Failed to upload ${failCount} file(s)`);
       }
     } catch (error) {
       console.error("Error in batch upload:", error);
-      toast({
-        variant: "destructive",
-        description: "Error uploading files"
-      });
+      toast.error("Error uploading files");
     } finally {
       setIsUploading(false);
       if (get_collections) {

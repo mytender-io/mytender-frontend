@@ -7,7 +7,7 @@ import FLog from "../components/FLog";
 import UploadTemplateText from "../components/UploadTemplateText.tsx";
 import Pannels from "../views/Pannels";
 import Bids from "@/views/Bids/Bids.tsx";
-import Library from "../views/Library";
+import Library from "@/views/Library/Library.tsx";
 import Proposal from "../views/Proposal.tsx";
 import Dashboard from "../views/Dashboard.tsx";
 import ChatbotResponse from "../views/ChatbotResponse.tsx";

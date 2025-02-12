@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import sidebarIcon from "../resources/images/mytender.io_badge.png";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -30,7 +30,6 @@ interface SideBarProps {
 
 const SideBar = ({ onCollapseChange }: SideBarProps) => {
   const location = useLocation();
-  const navigate = useNavigate();
   const [lastActiveBid, setLastActiveBid] = useState<LastActiveBid | null>(
     null
   );
@@ -92,6 +91,12 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
         isCollapsed ? "w-20" : "w-56"
       }`}
     >
+      <Button
+        className="absolute -right-4 top-[70px] p-1 bg-white border border-gray-200 rounded-full shadow-md hover:bg-gray-50 text-black w-9 h-9"
+        onClick={toggleCollapse}
+      >
+        {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+      </Button>
       <div className="flex flex-col h-full">
         <div
           className={cn(
@@ -114,14 +119,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           placement="right"
           enterDelay={1000}
           leaveDelay={0}
-        > */}
-        <Button
-          className="absolute -right-4 top-[70px] p-1 bg-white border border-gray-200 rounded-full shadow-md hover:bg-gray-50 text-black w-9 h-9"
-          onClick={toggleCollapse}
-        >
-          {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-        </Button>
-        {/* </Tooltip> */}
+         </Tooltip> */}
 
         <div className="flex flex-col flex-1 overflow-y-auto px-4 gap-3">
           <Link

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { Modal, Form } from "react-bootstrap";
-import UploadPDF from "../../../components/UploadPDF";
+import UploadPDF from "../../../components/upload/UploadPDF";
 import { API_URL, HTTP_PREFIX } from "../../../helper/Constants";
 import { useAuthUser } from "react-auth-kit";
 import { BidContext } from "../../BidWritingStateManagerView";
@@ -10,8 +10,7 @@ import SelectFolder from "../../../components/SelectFolder";
 // import { Box, LinearProgress, Typography } from "@mui/material";
 import axios from "axios";
 import CustomDateInput from "../../../buttons/CustomDateInput";
-import { Card, CardContent } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +23,7 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import { cn } from "@/utils";
+
 interface NewTenderModalProps {
   show: boolean;
   onHide: () => void;
@@ -32,12 +32,40 @@ interface NewTenderModalProps {
 
 type Step = "details" | "documents" | "content" | "questions";
 
+// Replace the FinalDialog component with this new version
+const LoadingOverlay = ({
+  isOpen,
+  progress,
+  loadingMessage
+}: {
+  isOpen: boolean;
+  progress: number;
+  loadingMessage: string;
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed bottom-4 right-4 w-80 p-0 bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="bg-gray-bg border-[0.5px] border-gray-line p-3">
+        <h2 className="text-base font-semibold">Thank you for completing</h2>
+      </div>
+      <div className="p-3">
+        <span className="font-semibold">Setting up your bid:</span>
+        <span className="block mt-3 mb-10">{loadingMessage}</span>
+        <div className="flex items-center gap-2">
+          <Progress value={progress} />
+          <p className="text-sm">{`${Math.round(progress)}%`}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const NewTenderModal: React.FC<NewTenderModalProps> = ({
   show,
   onHide,
   existingBids
 }) => {
-  const { toast } = useToast();
   const getAuth = useAuthUser();
   const auth = useMemo(() => getAuth(), [getAuth]);
   const tokenRef = useRef(auth?.token || "default");
@@ -62,6 +90,9 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     "Analyzing tender documents..."
   );
   const progressInterval = useRef(null);
+
+  // Add new state for confirmation dialog
+  const [showConfirmClose, setShowConfirmClose] = useState(false);
 
   const initialModalState = {
     bidInfo: "",
@@ -196,10 +227,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   const handleNextStep = () => {
     if (currentStep === "details") {
       if (!isDetailsStepValid()) {
-        toast({
-          variant: "destructive",
-          description: "Please fill in all required fields"
-        });
+        toast.error("Please fill in all required fields");
         return;
       }
       setSharedState((prevState) => ({
@@ -214,19 +242,13 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       setCurrentStep("documents");
     } else if (currentStep === "documents") {
       if (!isDocumentsStepValid()) {
-        toast({
-          variant: "destructive",
-          description: "Please upload at least one document"
-        });
+        toast.error("Please upload at least one document");
         return;
       }
       setCurrentStep("content");
     } else if (currentStep === "content") {
       if (!selectedFiles.length) {
-        toast({
-          variant: "destructive",
-          description: "Please select at least one question document"
-        });
+        toast.error("Please select at least one question document");
         return;
       }
       setCurrentStep("questions");
@@ -236,10 +258,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   const handleFinalSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (currentStep === "questions" && !selectedFolders.length) {
-      toast({
-        variant: "destructive",
-        description: "Please select at least one content folder"
-      });
+      toast.error("Please select at least one content folder");
       return;
     }
     try {
@@ -323,15 +342,9 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   // Handle API errors
   const handleError = (err) => {
     if (err.response?.status === 404) {
-      toast({
-        variant: "destructive",
-        description: "No documents found in the tender library."
-      });
+      toast.error("No documents found in the tender library.");
     } else {
-      toast({
-        variant: "destructive",
-        description: "Failed to generate outline"
-      });
+      toast.error("Failed to generate outline");
     }
   };
 
@@ -346,6 +359,29 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     if (parts[1] && parts[1].length > 2) return;
 
     setContractValue(value);
+  };
+
+  // Modify the close handler
+  const handleClose = () => {
+    // If we're on the first step or no changes made, close directly
+    if (
+      currentStep === "details" &&
+      !clientName &&
+      !contractValue &&
+      !deadline
+    ) {
+      onHide();
+    } else {
+      // Otherwise show confirmation
+      setShowConfirmClose(true);
+    }
+  };
+
+  // Handle confirmed close
+  const handleConfirmedClose = () => {
+    setShowConfirmClose(false);
+    resetForm();
+    onHide();
   };
 
   // const renderStepContent = () => {
@@ -459,251 +495,261 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   // };
 
   return (
-    <Dialog open={show} onOpenChange={onHide}>
-      <DialogContent className="w-full max-w-5xl overflow-hidden p-0 bg-gray-light">
-        <DialogTitle className="sr-only">Create New Tender</DialogTitle>
-        <div className="bg-white border-b border-gray-200">
-          <div className="flex items-stretch w-full h-[60px] overflow-x-auto">
-            {/* Details Step */}
-            <div
-              className={cn(
-                "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
-                currentStep === "details" ? "text-orange" : "text-gray"
-              )}
-            >
-              <div className="relative z-[3] flex items-center gap-2 w-full">
-                <span
-                  className={cn(
-                    "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
-                    currentStep === "details"
-                      ? "border-orange text-orange"
-                      : "border-gray"
-                  )}
-                >
-                  1
-                </span>
-                <span className="text-lg font-bold whitespace-nowrap">
-                  Tender Details
-                </span>
+    <>
+      <Dialog open={show && !isGeneratingOutline} onOpenChange={handleClose}>
+        <DialogContent className="w-full max-w-5xl overflow-hidden p-0 bg-gray-light">
+          <DialogTitle className="sr-only">Create New Tender</DialogTitle>
+          <div className="bg-white border-b border-gray-200">
+            <div className="flex items-stretch w-full h-[60px] overflow-x-auto">
+              {/* Details Step */}
+              <div
+                className={cn(
+                  "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
+                  currentStep === "details" ? "text-orange" : "text-gray"
+                )}
+              >
+                <div className="relative z-[3] flex items-center gap-2 w-full">
+                  <span
+                    className={cn(
+                      "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
+                      currentStep === "details"
+                        ? "border-orange text-orange"
+                        : "border-gray"
+                    )}
+                  >
+                    1
+                  </span>
+                  <span className="text-lg font-bold whitespace-nowrap">
+                    Tender Details
+                  </span>
+                </div>
+                <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
+                <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
               </div>
-              <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
-              <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
-            </div>
 
-            {/* Documents Step */}
-            <div
-              className={cn(
-                "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
-                currentStep === "documents" ? "text-orange" : "text-gray"
-              )}
-            >
-              <div className="relative z-[3] flex items-center gap-2 w-full">
-                <span
-                  className={cn(
-                    "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
-                    currentStep === "documents"
-                      ? "border-orange text-orange"
-                      : "border-gray"
-                  )}
-                >
-                  2
-                </span>
-                <span className="text-lg font-bold whitespace-nowrap">
-                  Upload Documents
-                </span>
+              {/* Documents Step */}
+              <div
+                className={cn(
+                  "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
+                  currentStep === "documents" ? "text-orange" : "text-gray"
+                )}
+              >
+                <div className="relative z-[3] flex items-center gap-2 w-full">
+                  <span
+                    className={cn(
+                      "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
+                      currentStep === "documents"
+                        ? "border-orange text-orange"
+                        : "border-gray"
+                    )}
+                  >
+                    2
+                  </span>
+                  <span className="text-lg font-bold whitespace-nowrap">
+                    Upload Documents
+                  </span>
+                </div>
+                <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
+                <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
               </div>
-              <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
-              <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
-            </div>
 
-            {/* Content Step */}
-            <div
-              className={cn(
-                "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
-                currentStep === "content" ? "text-orange" : "text-gray"
-              )}
-            >
-              <div className="relative z-[3] flex items-center gap-2 w-full">
-                <span
-                  className={cn(
-                    "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
-                    currentStep === "content"
-                      ? "border-orange text-orange"
-                      : "border-gray"
-                  )}
-                >
-                  3
-                </span>
-                <span className="text-lg font-bold whitespace-nowrap">
-                  Select Questions
-                </span>
+              {/* Content Step */}
+              <div
+                className={cn(
+                  "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
+                  currentStep === "content" ? "text-orange" : "text-gray"
+                )}
+              >
+                <div className="relative z-[3] flex items-center gap-2 w-full">
+                  <span
+                    className={cn(
+                      "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
+                      currentStep === "content"
+                        ? "border-orange text-orange"
+                        : "border-gray"
+                    )}
+                  >
+                    3
+                  </span>
+                  <span className="text-lg font-bold whitespace-nowrap">
+                    Select Questions
+                  </span>
+                </div>
+                <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
+                <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
               </div>
-              <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
-              <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
-            </div>
 
-            {/* Questions Step */}
-            <div
-              className={cn(
-                "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
-                currentStep === "questions" ? "text-orange" : "text-gray"
-              )}
-            >
-              <div className="relative z-[3] flex items-center gap-2 w-full">
-                <span
-                  className={cn(
-                    "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
-                    currentStep === "questions"
-                      ? "border-orange text-orange"
-                      : "border-gray"
-                  )}
-                >
-                  4
-                </span>
-                <span className="text-lg font-bold whitespace-nowrap">
-                  Select Context
-                </span>
+              {/* Questions Step */}
+              <div
+                className={cn(
+                  "relative flex items-center px-8 bg-white flex-1 min-w-[180px] max-w-[250px]",
+                  currentStep === "questions" ? "text-orange" : "text-gray"
+                )}
+              >
+                <div className="relative z-[3] flex items-center gap-2 w-full">
+                  <span
+                    className={cn(
+                      "w-6 h-6 rounded-full border flex items-center justify-center text-sm font-medium flex-shrink-0",
+                      currentStep === "questions"
+                        ? "border-orange text-orange"
+                        : "border-gray"
+                    )}
+                  >
+                    4
+                  </span>
+                  <span className="text-lg font-bold whitespace-nowrap">
+                    Select Context
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <form onSubmit={handleFinalSubmit}>
-          <div className="px-8 space-y-2">
-            {!isGeneratingOutline ? (
-              <div className="space-y-2">
-                <h5 className="text-2xl font-bold">
-                  {currentStep === "details"
-                    ? "Tender Details"
-                    : currentStep === "documents"
-                      ? "Upload Documents"
-                      : currentStep === "content"
-                        ? "Select Questions"
-                        : "Select Context"}
-                </h5>
-                <span className="text-sm">
-                  {currentStep === "details"
-                    ? "Please fill in details of the following:"
-                    : currentStep === "documents"
-                      ? "Upload the tender documentation so we can extract all the key information and your outline"
-                      : currentStep === "content"
-                        ? "Select the document which contains the questions to help generate the outline :)"
-                        : " Select the folders below from your content library to use as context in your final proposal. The AI will be able to use information from these when generating an answer."}
-                </span>
-              </div>
-            ) : null}
-            <>
-              {currentStep === "details" && (
-                <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Label className="font-bold text-nowrap min-w-40">
-                      Tender Name:
-                    </Label>
-                    <Input
-                      type="text"
-                      value={clientName}
-                      onChange={(e) => setClientName(e.target.value)}
-                      placeholder="Enter tender name"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Label className="font-bold text-nowrap min-w-40">
-                      Deadline:
-                    </Label>
-                    <CustomDateInput
-                      value={deadline}
-                      onChange={(value) => setDeadline(value)}
-                      defaultValue={new Date().toISOString().split("T")[0]}
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Label className="font-bold text-nowrap min-w-40">
-                      Contract Value:
-                    </Label>
-                    <Input
-                      type="text"
-                      value={contractValue}
-                      onChange={handleValueChange}
-                      placeholder="Enter contract value"
-                    />
-                  </div>
+          <form onSubmit={handleFinalSubmit}>
+            <div className="px-8 space-y-2">
+              {!isGeneratingOutline ? (
+                <div className="space-y-2">
+                  <h5 className="text-2xl font-bold">
+                    {currentStep === "details"
+                      ? "Tender Details"
+                      : currentStep === "documents"
+                        ? "Upload Documents"
+                        : currentStep === "content"
+                          ? "Select Questions"
+                          : "Select Context"}
+                  </h5>
+                  <span className="text-sm">
+                    {currentStep === "details"
+                      ? "Please fill in details of the following:"
+                      : currentStep === "documents"
+                        ? "Upload the tender documentation so we can extract all the key information and your outline"
+                        : currentStep === "content"
+                          ? "Select the document which contains the questions to help generate the outline :)"
+                          : " Select the folders below from your content library to use as context in your final proposal. The AI will be able to use information from these when generating an answer."}
+                  </span>
                 </div>
-              )}
+              ) : null}
+              <>
+                {currentStep === "details" && (
+                  <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Label className="font-bold text-nowrap min-w-40">
+                        Tender Name:
+                      </Label>
+                      <Input
+                        type="text"
+                        value={clientName}
+                        onChange={(e) => setClientName(e.target.value)}
+                        placeholder="Enter tender name"
+                      />
+                    </div>
 
-              {currentStep === "documents" && (
-                <UploadPDF
-                  bid_id={sharedState.object_id}
-                  apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
-                  onUploadComplete={(uploadedFiles) => {
-                    setDocuments(uploadedFiles);
-                  }}
-                />
-              )}
+                    <div className="flex items-center gap-2">
+                      <Label className="font-bold text-nowrap min-w-40">
+                        Deadline:
+                      </Label>
+                      <CustomDateInput
+                        value={deadline}
+                        onChange={(value) => setDeadline(value)}
+                        defaultValue={new Date().toISOString().split("T")[0]}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label className="font-bold text-nowrap min-w-40">
+                        Contract Value:
+                      </Label>
+                      <Input
+                        type="text"
+                        value={contractValue}
+                        onChange={handleValueChange}
+                        placeholder="Enter contract value"
+                      />
+                    </div>
+                  </div>
+                )}
 
-              {currentStep === "content" && (
-                <SelectTenderLibraryFile
-                  bid_id={sharedState.object_id || ""}
-                  onFileSelect={handleFileSelection}
-                  initialSelectedFiles={selectedFiles}
-                />
-              )}
+                {currentStep === "documents" && (
+                  <UploadPDF
+                    bid_id={sharedState.object_id}
+                    apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
+                    onUploadComplete={(uploadedFiles) => {
+                      setDocuments(uploadedFiles);
+                    }}
+                  />
+                )}
 
-              {currentStep === "questions" && (
-                <div>
-                  {isGeneratingOutline ? (
-                    <Card className="h-[22.5rem] bg-white rounded-md shadow-sm p-4">
-                      <CardContent className="h-full p-0 flex items-center justify-center">
-                        <div className="w-full space-y-4 text-center px-8">
-                          <span className="text-xl font-semibold max-w-md mx-auto block">
-                            We are analysing the tender documents to extract the
-                            key information and to generate an outline.
-                            <br />
-                            <br />
-                            We'll let you know when its done :)
-                          </span>
-                          <p className="text-gray-600 italic">
-                            {loadingMessage}
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <Progress value={progress} />
-                            <p className="text-gray-600 text-sm">{`${Math.round(progress)}%`}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
+                {currentStep === "content" && (
+                  <SelectTenderLibraryFile
+                    bid_id={sharedState.object_id || ""}
+                    onFileSelect={handleFileSelection}
+                    initialSelectedFiles={selectedFiles}
+                  />
+                )}
+
+                {currentStep === "questions" && (
+                  <div>
                     <SelectFolder
                       onFolderSelect={handleFolderSelection}
                       initialSelectedFolders={selectedFolders}
                     />
-                  )}
-                </div>
-              )}
-            </>
-          </div>
-          <DialogFooter className="sm:justify-between px-4 py-4">
-            <DialogClose asChild>
+                  </div>
+                )}
+              </>
+            </div>
+            <DialogFooter className="sm:justify-between px-4 py-4">
               <Button
                 type="button"
                 variant="secondary"
                 className="text-sm py-4"
+                onClick={handleClose}
               >
                 Exit
               </Button>
-            </DialogClose>
-            {currentStep === "questions" ? (
-              <Button type="submit" disabled={isGeneratingOutline}>
-                {isGeneratingOutline ? "Creating..." : "Create Tender"}
-              </Button>
-            ) : (
-              <Button type="button" onClick={handleNextStep}>
-                Next Step →
-              </Button>
-            )}
+              {currentStep === "questions" ? (
+                <Button type="submit" disabled={isGeneratingOutline}>
+                  {isGeneratingOutline ? "Creating..." : "Create Tender"}
+                </Button>
+              ) : (
+                <Button type="button" onClick={handleNextStep}>
+                  Next Step →
+                </Button>
+              )}
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Confirmation Dialog */}
+      <Dialog open={showConfirmClose} onOpenChange={setShowConfirmClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogTitle>Are you sure you want to exit?</DialogTitle>
+          <div className="py-4">
+            <p>All progress will be lost. This action cannot be undone.</p>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setShowConfirmClose(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleConfirmedClose}
+            >
+              Exit
+            </Button>
           </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      <LoadingOverlay
+        isOpen={isGeneratingOutline}
+        progress={progress}
+        loadingMessage={loadingMessage}
+      />
+    </>
   );
 };
 
