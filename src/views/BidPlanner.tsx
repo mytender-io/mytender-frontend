@@ -54,8 +54,12 @@ const BidPlanner = () => {
     if (bidData) {
       console.log(bidData);
       console.log(bidData);
-
       setSharedState((prevState) => {
+        // Filter out single-character entries from selectedFolders
+        const filteredFolders = (
+          bidData?.selectedFolders || ["default"]
+        ).filter((folder) => folder?.length > 1);
+
         return {
           ...prevState,
           bidInfo: bidData?.bid_title || "",
@@ -78,7 +82,7 @@ const BidPlanner = () => {
           contributors: bidData?.contributors || "",
           original_creator: bidData?.original_creator || "",
           object_id: bidData?._id || "",
-          selectedFolders: bidData?.selectedFolders || ["default"],
+          selectedFolders: filteredFolders,
           lastUpdated: bidData?.lastUpdated || 0,
           outline: bidData?.outline || [],
           win_themes: bidData?.win_themes || [],
