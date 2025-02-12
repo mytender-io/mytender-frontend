@@ -250,6 +250,7 @@ const BidManagement: React.FC = () => {
       const appendFormData = (key: string, value: any) => {
         formData.append(key, value?.toString()?.trim() || " ");
       };
+
       appendFormData("bid_title", bidInfo);
       appendFormData("status", "ongoing");
       appendFormData("contract_information", backgroundInfo);
@@ -267,17 +268,16 @@ const BidManagement: React.FC = () => {
       appendFormData("bid_qualification_result", bid_qualification_result);
       appendFormData("opportunity_owner", opportunity_owner);
       appendFormData("bid_manager", bid_manager);
-      formData.append("contributors", JSON.stringify(contributors || []));
       appendFormData("submission_deadline", submission_deadline);
       appendFormData("questions", questions);
+      appendFormData("original_creator", original_creator);
+      
+      formData.append("contributors", JSON.stringify(contributors || []));
       formData.append(
         "selectedFolders",
         JSON.stringify(selectedFolders || ["default"])
       );
-      appendFormData("original_creator", original_creator);
       formData.append("outline", JSON.stringify(outline || []));
-      // Remove these from the appendFormData helper since they are arrays
-      // In saveProposal function, modify how we append the array fields:
       formData.append("win_themes", JSON.stringify(win_themes || []));
       formData.append(
         "customer_pain_points",
@@ -287,7 +287,6 @@ const BidManagement: React.FC = () => {
         "differentiating_factors",
         JSON.stringify(differentiating_factors || [])
       );
-
       if (object_id) {
         appendFormData("object_id", object_id);
       }

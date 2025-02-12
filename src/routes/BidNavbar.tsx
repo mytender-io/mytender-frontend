@@ -15,6 +15,7 @@ import { useAuthUser } from "react-auth-kit";
 import BidTitle from "../components/BidTitle";
 import { displayAlert } from "../helper/Alert";
 import GenerateProposalModal from "../modals/GenerateProposalModal";
+import SaveStatus from "@/components/SaveStatus";
 
 const BidNavbar = ({
   showViewOnlyMessage = () => {},
@@ -168,6 +169,11 @@ const BidNavbar = ({
             >
               Preview Proposal
             </NavLink>
+
+            <SaveStatus
+              isLoading={sharedState.isLoading}
+              saveSuccess={sharedState.saveSuccess}
+            />
           </div>
           {outline.length === 0 ? (
             <div></div>
