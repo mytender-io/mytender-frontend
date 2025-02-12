@@ -644,7 +644,7 @@ button.chat-send-button {
 
 .chat-input,
 .message-bubble-small {
-  font-size: 14px;
+  font-size: 0.75rem;
 }
 
 .chat-input.custom-prompt {

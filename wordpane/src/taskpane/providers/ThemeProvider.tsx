@@ -20,6 +20,9 @@ const ThemeProvider = ({ children }) => {
         color: "#F5861999",
         fontSize: "14px",
       },
+      body1: {
+        fontSize: "14px",
+      },
     },
     components: {
       MuiButton: {
@@ -39,10 +42,10 @@ const ThemeProvider = ({ children }) => {
             },
           },
           sizeSmall: {
-            fontSize: "12px",
+            fontSize: "10px",
           },
           sizeMedium: {
-            fontSize: "15px",
+            fontSize: "13px",
             padding: "3px 8px",
           },
         },
@@ -51,6 +54,7 @@ const ThemeProvider = ({ children }) => {
         styleOverrides: {
           sizeSmall: {
             fontSize: "12px",
+            padding: "3px",
           },
           sizeMedium: {
             fontSize: "15px",
@@ -61,7 +65,7 @@ const ThemeProvider = ({ children }) => {
       MuiSvgIcon: {
         styleOverrides: {
           root: {
-            fontSize: "17px",
+            fontSize: "18px",
           },
         },
       },
@@ -71,6 +75,7 @@ const ThemeProvider = ({ children }) => {
             paddingLeft: "3px",
             paddingRight: "3px",
             minWidth: "60px",
+            fontSize: "0.75rem",
           },
         },
       },
@@ -80,6 +85,13 @@ const ThemeProvider = ({ children }) => {
             "& > MuiAutocomplete-option": {
               minHeight: "20px",
             },
+          },
+        },
+      },
+      MuiInputBase: {
+        styleOverrides: {
+          inputSizeSmall: {
+            fontSize: "10px",
           },
         },
       },
