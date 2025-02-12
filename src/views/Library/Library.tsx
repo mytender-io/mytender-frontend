@@ -713,8 +713,8 @@ const Library = () => {
           // }
           className="cursor-pointer"
         >
-          <TableCell className="px-4">
-            <div className="flex items-center">
+          <TableCell className="px-4 group">
+            <div className="flex items-center group-hover:text-orange">
               <FontAwesomeIcon icon={faFolder} className="fa-icon mr-2.5" />
               {displayName}
             </div>
@@ -1000,7 +1000,7 @@ const Library = () => {
 
   return (
     <div className="h-full">
-      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-4 min-h-[75px]">
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[55px]">
         <BreadcrumbNavigation
           currentPage="Content Library"
           parentPages={parentPages}
@@ -1121,14 +1121,6 @@ const Library = () => {
                 </div>
               </div>
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none">
-                      Company Documents
-                    </TableHead>
-                    <TableHead className="w-[100px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4 select-none" />
-                  </TableRow>
-                </TableHeader>
                 <TableBody>
                   {activeFolder
                     ? renderFolderContents(activeFolder)

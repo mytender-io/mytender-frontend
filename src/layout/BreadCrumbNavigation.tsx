@@ -25,7 +25,7 @@ const BreadcrumbNavigation = ({
         </React.Fragment>
       ))}
       {currentPage && (
-        <span className="text-typo-900 text-xl font-semibold">
+        <span className="text-typo-900 text-lg font-semibold">
           {currentPage}
         </span>
       )}

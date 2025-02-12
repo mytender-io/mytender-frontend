@@ -5,7 +5,6 @@ import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import handleGAEvent from "../../utilities/handleGAEvent.tsx";
-import { displayAlert } from "../../helper/Alert.tsx";
 import { Skeleton } from "@mui/material";
 import SearchInput from "@/components/SearchInput.tsx";
 import withAuth from "../../routes/withAuth.tsx";
@@ -36,7 +35,7 @@ import {
 } from "@/components/ui/table";
 import SortUpIcon from "@/components/icons/SortUpIcon.tsx";
 import { cn } from "@/utils";
-
+import { toast } from "react-toastify";
 interface Bid {
   _id: string;
   bid_title: string;
@@ -276,7 +275,7 @@ const Bids = () => {
           );
           handleGAEvent("Bid Tracker", "Delete Bid", "Delete Bid Button");
         } else {
-          displayAlert("Failed to delete bid", "error");
+          toast.error("Failed to delete bid");
         }
       } catch (err) {
         // Type guard to check if error is AxiosError
@@ -285,28 +284,23 @@ const Bids = () => {
 
           if (err.response) {
             if (err.response.status === 403) {
-              displayAlert(
-                "Only admins can delete bids. You don't have permission to delete this bid",
-                "danger"
+              toast.error(
+                "Only admins can delete bids. You don't have permission to delete this bid"
               );
             } else if (err.response.status === 404) {
-              displayAlert("Bid not found", "danger");
+              toast.error("Bid not found");
             } else {
-              displayAlert(
-                `Error: ${err.response.data.detail || "Failed to delete bid"}`,
-                "danger"
+              toast.error(
+                `Error: ${err.response.data.detail || "Failed to delete bid"}`
               );
             }
           } else if (err.request) {
-            displayAlert(
-              "No response received from server. Please try again.",
-              "danger"
-            );
+            toast.error("No response received from server. Please try again.");
           }
         } else {
           // Handle non-Axios errors
           console.error("Non-Axios error:", err);
-          displayAlert("Error deleting bid. Please try again.", "danger");
+          toast.error("Error deleting bid. Please try again.");
         }
       } finally {
         setShowDeleteModal(false);
@@ -353,7 +347,7 @@ const Bids = () => {
           "Bid Status Dropdown"
         );
       } else {
-        displayAlert("Failed to update bid status", "danger");
+        toast.error("Failed to update bid status");
       }
     } catch (err) {
       console.error("Error updating bid status:", err);
@@ -361,26 +355,21 @@ const Bids = () => {
       if (axios.isAxiosError(err)) {
         if (err.response) {
           if (err.response.status === 403) {
-            displayAlert(
-              "You are a viewer. You don't have permission to update this bid's status",
-              "danger"
+            toast.error(
+              "You are a viewer. You don't have permission to update this bid's status"
             );
           } else if (err.response.status === 404) {
-            displayAlert("Bid not found", "error");
+            toast.error("Bid not found");
           } else {
-            displayAlert(
-              `Error: ${err.response.data?.detail || "Failed to update bid status"}`,
-              "danger"
+            toast.error(
+              `Error: ${err.response.data?.detail || "Failed to update bid status"}`
             );
           }
         } else if (err.request) {
-          displayAlert(
-            "No response received from server. Please try again.",
-            "danger"
-          );
+          toast.error("No response received from server. Please try again.");
         }
       } else {
-        displayAlert("Error updating bid status. Please try again.", "danger");
+        toast.error("Error updating bid status. Please try again.");
       }
     }
   };
@@ -426,7 +415,7 @@ const Bids = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-4">
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2">
         <BreadcrumbNavigation
           currentPage="Tender Dashboard"
           parentPages={parentPages}

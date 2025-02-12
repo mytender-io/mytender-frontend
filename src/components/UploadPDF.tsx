@@ -12,15 +12,9 @@ import posthog from "posthog-js";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-<<<<<<<< HEAD:src/components/upload/UploadPDF.tsx
 import { toast } from "react-toastify";
-import UploadIcon from "../icons/UploadIcon";
-import FileIcon from "../icons/FileIcon";
-========
-import { useToast } from "@/hooks/use-toast";
-import UploadIcon from "./icons/UploadIcon";
-import FileIcon from "./icons/FileIcon";
->>>>>>>> 3517c0ce6e20b7d7c15ebf0e36595c90e9806ff3:src/components/UploadPDF.tsx
+import UploadIcon from "@/components/icons/UploadIcon";
+import FileIcon from "@/components/icons/FileIcon";
 
 interface UploadResult {
   error?: Error;
@@ -50,10 +44,6 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
   apiUrl,
   descriptionText
 }) => {
-<<<<<<<< HEAD:src/components/upload/UploadPDF.tsx
-========
-  const { toast } = useToast();
->>>>>>>> 3517c0ce6e20b7d7c15ebf0e36595c90e9806ff3:src/components/UploadPDF.tsx
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -155,17 +145,9 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }
 
     if (invalidFiles.length > 0) {
-<<<<<<<< HEAD:src/components/upload/UploadPDF.tsx
       toast.error(
         "Some files were not added. Only PDF (.pdf), Word (.docx), and Excel (.xlsx, .xls) files are allowed."
       );
-========
-      toast({
-        variant: "destructive",
-        description:
-          "Some files were not added. Only PDF (.pdf), Word (.docx), and Excel (.xlsx, .xls) files are allowed."
-      });
->>>>>>>> 3517c0ce6e20b7d7c15ebf0e36595c90e9806ff3:src/components/UploadPDF.tsx
       posthog.capture("pdf_upload_invalid_file_types", {
         fileCount: invalidFiles.length,
         fileTypes: invalidFiles.map((f) => f.type)
@@ -245,14 +227,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
 
   const handleUpload = async () => {
     if (selectedFiles.length === 0) {
-<<<<<<<< HEAD:src/components/upload/UploadPDF.tsx
       toast.error("No files selected");
-========
-      toast({
-        variant: "destructive",
-        description: "No files selected"
-      });
->>>>>>>> 3517c0ce6e20b7d7c15ebf0e36595c90e9806ff3:src/components/UploadPDF.tsx
       return;
     }
 
@@ -272,14 +247,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       const failCount = results.filter((result) => result.error).length;
 
       if (successCount > 0) {
-<<<<<<<< HEAD:src/components/upload/UploadPDF.tsx
         toast.success(`Successfully uploaded ${successCount} file(s)`);
-========
-        toast({
-          variant: "default",
-          description: `Successfully uploaded ${successCount} file(s)`
-        });
->>>>>>>> 3517c0ce6e20b7d7c15ebf0e36595c90e9806ff3:src/components/UploadPDF.tsx
         posthog.capture("pdf_upload_batch_completed", {
           successCount,
           failCount,
@@ -293,25 +261,11 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       }
 
       if (failCount > 0) {
-<<<<<<<< HEAD:src/components/upload/UploadPDF.tsx
         toast.error(`Failed to upload ${failCount} file(s)`);
       }
     } catch (error) {
       console.error("Error in batch upload:", error);
       toast.error("Error uploading files");
-========
-        toast({
-          variant: "destructive",
-          description: `Failed to upload ${failCount} file(s)`
-        });
-      }
-    } catch (error) {
-      console.error("Error in batch upload:", error);
-      toast({
-        variant: "destructive",
-        description: "Error uploading files"
-      });
->>>>>>>> 3517c0ce6e20b7d7c15ebf0e36595c90e9806ff3:src/components/UploadPDF.tsx
     } finally {
       setIsUploading(false);
       if (get_collections) {

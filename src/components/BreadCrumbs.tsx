@@ -21,7 +21,7 @@ const BreadCrumbs = ({
   return (
     <>
       <span
-        className="text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
+        className="text-sm text-orange hover:text-orange-hover transition-colors ease-in-out cursor-pointer"
         onClick={() => setActiveFolder(null)}
       >
         Content Library
@@ -30,10 +30,10 @@ const BreadCrumbs = ({
         <React.Fragment key={index}>
           <span className="mx-2 text-gray-400">&gt;</span>
           <span
-            className={`text-sm ${
+            className={`text-sm transition-colors ease-in-out${
               index === parts.length - 1
                 ? "text-gray-600"
-                : "text-gray-600 hover:text-gray-800 cursor-pointer"
+                : "text-orange hover:text-orange-hover cursor-pointer"
             }`}
             onClick={() => {
               if (index < parts.length - 1) {
