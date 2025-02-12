@@ -387,9 +387,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
             <UploadPDF
               bid_id={sharedState.object_id}
               apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
-              descriptionText="Documents uploaded to the Tender Library will be used as context by
-                  our AI to generate compliance requirements and opportunity
-                  information for the Tender."
+              descriptionText="Documents uploaded to the Tender Library will be used as context by our AI in responses, but only the key specification and question docs to optimise the important info."
               onUploadComplete={(uploadedFiles) => {
                 // Instead of an immediate handleNextStep call, update documents
                 // and use a useEffect to handle the transition
@@ -518,7 +516,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
             {currentStep === "details"
               ? "Tender Details"
               : currentStep === "documents"
-                ? "Upload Documents"
+                ? "Upload Relevant Tender Documents"
                 : currentStep === "content"
                   ? "Select Question Document"
                   : "Select Context"}
