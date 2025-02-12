@@ -172,7 +172,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   // }
 
   const startProgressBar = () => {
-    const duration = 60000; // 1 minute in ms
+    const duration = 68000; // 1 minute in ms
     const interval = 100;
     const steps = duration / interval;
     const increment = 98 / steps;
@@ -282,12 +282,25 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       );
 
       console.log("outline final submit");
-      console.log(response.data);
+      console.log(response.data.outline);
+      console.log(response.data.tender_summary);
+      console.log(response.data.evaluation_criteria);
+      console.log(response.data.pain_points);
+      console.log(response.data.differentiation_opportunities);
 
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setSharedState((prevState) => ({
         ...prevState,
-        outline: response.data
+        outline: response.data?.outline || [],
+        tender_summary: response.data?.tender_summary || "",
+        evaluation_criteria: response.data?.evaluation_criteria || "",
+        derive_insights: response.data?.pain_points || "",
+        differentiation_opportunities:
+          response.data?.differentiation_opportunities || "",
+        customer_pain_points: response.data?.relevant_pain_points || [],
+        win_themes: response.data?.relevant_win_themes || [],
+        differentiating_factors:
+          response.data?.relevant_differentiation_opportunities || []
       }));
 
       navigate("/bid-extractor");
