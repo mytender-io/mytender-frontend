@@ -54,3 +54,11 @@ button.MuiButtonBase-root.icon-button {
   flex-direction: column;
   flex-grow: 1;
 }
+
+.tender-search-message-box .MuiAutocomplete-root label.MuiFormLabel-root {
+  margin-top: -3px;
+}
+
+.tender-search-message-box .MuiAutocomplete-root {
+  margin-top: 0 !important;
+}

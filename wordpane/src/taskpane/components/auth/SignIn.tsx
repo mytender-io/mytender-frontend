@@ -84,7 +84,7 @@ const FullScreenTwoCards = () => {
       <div className="card-container">
         <div className="cardmini">
           <div className="cardmini-text">
-            <h2>Login</h2>
+            <h4>Login</h4>
 
             <div className="input-field">
               <TextField

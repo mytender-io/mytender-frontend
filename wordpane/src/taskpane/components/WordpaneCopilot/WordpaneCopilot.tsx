@@ -680,6 +680,7 @@ const WordpaneCopilot = () => {
                   color={isCustomPromptMenuVisible || isCustomPrompt ? "primary" : "info"}
                   disabled={selectedText.length === 0 || isLoading}
                   onClick={toggleCustomPromptMenuVisible}
+                  size="small"
                 >
                   Enhance
                 </Button>
@@ -688,6 +689,7 @@ const WordpaneCopilot = () => {
                 <Button
                   variant="outlined"
                   color="info"
+                  size="small"
                   onClick={() =>
                     handleCustomPromptMessage({
                       highlightedText: selectedText,
@@ -706,7 +708,7 @@ const WordpaneCopilot = () => {
               </Grid>
             </Grid>
             <Grid item>
-              <Button variant="outlined" color="info" onClick={handleClearMessages} disabled={isLoading}>
+              <Button variant="outlined" color="info" onClick={handleClearMessages} disabled={isLoading} size="small">
                 Clear
               </Button>
             </Grid>
