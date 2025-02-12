@@ -23,7 +23,6 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import { cn } from "@/utils";
-
 interface NewTenderModalProps {
   show: boolean;
   onHide: () => void;
