@@ -25,6 +25,13 @@ const ThemeProvider = ({ children }) => {
       },
     },
     components: {
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            fontSize: "13px",
+          },
+        },
+      },
       MuiButton: {
         styleOverrides: {
           root: {
