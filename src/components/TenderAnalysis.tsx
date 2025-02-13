@@ -186,21 +186,24 @@ const TenderAnalysis = ({ canUserEdit }) => {
       Icon: Scale,
       prompt: "generate_evaluation_criteria",
       stateKey: "evaluation_criteria",
-      summaryKey: "win_themes"
+      summaryKey: "win_themes",
+      extract_insights_prompt: "extract_section_evaluation_criteria"
     },
     {
       name: "Pain Points",
       Icon: Lightbulb,
       prompt: "generate_derive_insights",
       stateKey: "derive_insights",
-      summaryKey: "customer_pain_points"
+      summaryKey: "customer_pain_points",
+      extract_insights_prompt: "extract_section_derive_insights"
     },
     {
       name: "Differentiation Opportunities",
       Icon: Star,
       prompt: "generate_differentiation_opportunities",
       stateKey: "differentiation_opportunities",
-      summaryKey: "differentiating_factors"
+      summaryKey: "differentiating_factors",
+      extract_insights_prompt: "extract_differentiation_factors"
     }
   ];
 
@@ -238,11 +241,49 @@ const TenderAnalysis = ({ canUserEdit }) => {
   ]);
 
   const handleTabChange = (_, newValue) => {
+    if (loadingTab !== null) {
+      return;
+    }
     if (!canUserEdit) {
       displayAlert("You only have permission to view this bid.", "danger");
       return;
     }
     setCurrentTabIndex(newValue); // Only handle the tab switch
+  };
+
+  const assign_insights_to_questions = async (bid_intel_type, tab) => {
+    // Return early if no extract_insights_prompt exists on the tab
+    if (!tab.extract_insights_prompt) {
+      return;
+    }
+
+    if (!object_id) {
+      displayAlert("Please save the bid first.", "warning");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("bid_id", object_id);
+    formData.append("bid_intel_type", bid_intel_type);
+    formData.append("extract_insights_prompt", tab.extract_insights_prompt);
+
+    console.log(formData);
+
+    const result = await axios.post(
+      `http${HTTP_PREFIX}://${API_URL}/assign_insights_to_outline_questions`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${auth?.token}`,
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+
+    setSharedState((prev) => ({
+      ...prev,
+      outline: result.data
+    }));
   };
 
   const handleTabClick = async (index) => {
@@ -289,6 +330,9 @@ const TenderAnalysis = ({ canUserEdit }) => {
           [tab.summaryKey]: result.data.summary
         }));
       }
+
+      // Pass the tab object to assign_insights_to_questions
+      await assign_insights_to_questions(tab.summaryKey, tab);
 
       displayAlert("Generated successfully!", "success");
     } catch (err) {
@@ -353,6 +397,9 @@ const TenderAnalysis = ({ canUserEdit }) => {
             [tab.summaryKey]: result.data.summary
           }));
         }
+
+        // Pass the tab object to assign_insights_to_questions
+        await assign_insights_to_questions(tab.summaryKey, tab);
 
         displayAlert("Regenerated successfully!", "success");
       }
@@ -561,6 +608,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
               <Tab
                 key={index}
                 onClick={() => handleTabClick(index)}
+               
                 icon={
                   <Box className="flex items-center space-x-2">
                     <TabIcon
@@ -575,6 +623,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
                       <IconButton
                         size="small"
                         onClick={(e) => handleRegenerateClick(index, e)}
+                        disabled={loadingTab !== null}
                         className={loadingTab === index ? "animate-spin" : ""}
                         sx={{
                           padding: "4px",
@@ -588,6 +637,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
                           }
                         }}
                       >
+                      
                         <RefreshCw size={14} />
                       </IconButton>
                     )}
