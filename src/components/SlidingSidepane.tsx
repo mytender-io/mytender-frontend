@@ -8,7 +8,8 @@ import {
   faChevronLeft,
   faChevronRight,
   faChevronDown,
-  faChevronUp
+  faChevronUp,
+  faPlus
 } from "@fortawesome/free-solid-svg-icons";
 import DebouncedTextArea from "./DeboucedTextArea";
 import "./SlidingSidepane.css";
@@ -16,6 +17,8 @@ import { Contributor, Section } from "../views/BidWritingStateManagerView";
 import StatusMenu from "../buttons/StatusMenu";
 import ReviewerDropdown from "./dropdowns/ReviewerDropdown";
 import QuestionTypeDropdown from "./dropdowns/QuestionTypeDropdown";
+import SubheadingCards from "./SubheadingCards";
+import RegenerateButton from "@/buttons/RegenerateButton";
 
 interface ProposalSidepaneProps {
   section: Section;
@@ -55,15 +58,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   index,
   isOpen,
   onClose,
-  isLoading,
-  isPreviewLoading,
-  handleEditClick,
   handleSectionChange,
-  sendQuestionToChatbot,
-  apiChoices,
-  renderChoices,
-  selectedChoices,
-  submitSelections,
   handleDeleteSubheading,
   totalSections,
   onNavigate
@@ -71,6 +66,8 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   if (!section) return null;
+
+  const hasSubheadings = section.subheadings && section.subheadings.length > 0;
 
   return (
     <>
@@ -173,115 +170,37 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 placeholder="What is your management policy?"
                 className="writingplan-text-area"
               />
-              <div>
-                <button
-                  className="orange-button flex items-center mt-2"
-                  onClick={() =>
-                    sendQuestionToChatbot(
-                      section.question,
-                      section.writingplan || "",
-                      index,
-                      "3a"
-                    )
-                  }
-                  disabled={
-                    section?.question?.trim() === "" ||
-                    !section?.question ||
-                    isPreviewLoading
-                  }
-                >
-                  {isLoading ? (
-                    <>
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        className="me-2"
-                      />
-                      <span>Generating...</span>
-                    </>
-                  ) : (
-                    <>
-                      <FontAwesomeIcon
-                        icon={faWandMagicSparkles}
-                        className="me-2"
-                      />
-                      <span>Generate Talking Points</span>
-                    </>
-                  )}
-                </button>
-              </div>
-              {apiChoices.length > 0 && (
-                <div className="sidepane-section">
-                  {renderChoices()}
-                  <button
-                    className="upload-button mt-3"
-                    onClick={submitSelections}
-                    disabled={selectedChoices.length === 0}
-                  >
-                    Add Choices
-                  </button>
-                </div>
-              )}
             </div>
-            {section.subheadings && section.subheadings.length > 0 && (
+            {hasSubheadings && (
               <div className="sidepane-section">
-                <div className="">
-                  <div style={{ fontWeight: "500", marginBottom: "8px" }}>
-                    Talking Points
+                <div className="proposal-header mb-2">
+                  <div>Writing Plan</div>
+                  <div className="flex items-center">
+                    <button
+                      className="bg-white rounded-lg p-2 me-2 shadow-sm hover:bg-gray-50 transition-colors"
+                      onClick={() => {
+                        /* Add your click handler here */
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faPlus}
+                        className="text-gray-500 h-5 w-5"
+                      />
+                    </button>
+                    <RegenerateButton
+                      section={section}
+                      index={index}
+                    />
                   </div>
                 </div>
-                <div className="subheadings-list">
-                  {section.subheadings.map((subheading, subIndex) => (
-                    <div key={subIndex} className="subheading-item">
-                      <div className="subheading-content">
-                        <FontAwesomeIcon
-                          icon={faArrowRight}
-                          size="sm"
-                          className="text-black me-2"
-                        />
-                        <DebouncedTextArea
-                          value={subheading.title}
-                          onChange={(value) => {
-                            const newSubheadings = [...section.subheadings];
-                            newSubheadings[subIndex] = {
-                              ...newSubheadings[subIndex],
-                              title: value
-                            };
-                            handleSectionChange(
-                              index,
-                              "subheadings",
-                              newSubheadings
-                            );
-                          }}
-                          className="subheading-input"
-                        />
-                        <button
-                          className="delete-subheading-button"
-                          onClick={() =>
-                            handleDeleteSubheading(index, subIndex)
-                          }
-                          title="Delete subheading"
-                        >
-                          <FontAwesomeIcon icon={faTrash} size="sm" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <SubheadingCards
+                  section={section}
+                  index={index}
+                  handleSectionChange={handleSectionChange}
+                  handleDeleteSubheading={handleDeleteSubheading}
+                />
               </div>
             )}
-            <div className="sidepane-section">
-              <div className="proposal-header mb-2">Writing Plan</div>
-              <DebouncedTextArea
-                value={section.writingplan}
-                onChange={(value) =>
-                  handleSectionChange(index, "writingplan", value)
-                }
-                placeholder="Please write in a formative tone where you mention our strategy of how we will manage this project"
-                className="writingplan-text-area"
-              />
-            </div>
 
             <button
               className="flex items-center w-full py-2 mt-4 mb-4 rounded-md"
