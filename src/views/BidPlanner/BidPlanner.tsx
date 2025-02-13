@@ -1,21 +1,18 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
-import axios from "axios";
-import withAuth from "../routes/withAuth";
-import { useAuthUser } from "react-auth-kit";
-import { Col, Row } from "react-bootstrap";
-import BidNavbar from "../routes/BidNavbar.tsx";
-import "./BidPlanner.css";
-import { BidContext } from "./BidWritingStateManagerView.tsx";
-import { displayAlert } from "../helper/Alert";
-import TenderLibrary from "../components/TenderLibrary.tsx";
-import TenderAnalysis from "../components/TenderAnalysis.tsx";
-import { Fullscreen, X } from "lucide-react";
-import BreadcrumbNavigation from "../layout/BreadCrumbNavigation.tsx";
-import theme from "@/components/ui/theme.tsx";
-import { ThemeProvider } from "@mui/material/styles";
-import { Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useAuthUser } from "react-auth-kit";
+import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
+import axios from "axios";
+import withAuth from "../../routes/withAuth.tsx";
+import BidNavbar from "../../routes/BidNavbar.tsx";
+import { BidContext } from "../BidWritingStateManagerView.tsx";
+import TenderLibrary from "../../components/TenderLibrary.tsx";
+import TenderAnalysis from "./components/TenderAnalysis.tsx";
+import BreadcrumbNavigation from "../../layout/BreadCrumbNavigation.tsx";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import ExpandIcon from "@/components/icons/ExpandIcon.tsx";
+import { toast } from "react-toastify";
 
 const BidPlanner = () => {
   const getAuth = useAuthUser();
@@ -34,19 +31,17 @@ const BidPlanner = () => {
   const [existingBidNames, setExistingBidNames] = useState([]);
   const [organizationUsers, setOrganizationUsers] = useState([]);
   const [currentUserEmail, setCurrentUserEmail] = useState("");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
 
   const handleOpenLibrary = () => setIsLibraryOpen(true);
-  const handleCloseLibrary = () => setIsLibraryOpen(false);
 
   const currentUserPermission = contributors[auth.email] || "viewer";
   const canUserEdit =
     currentUserPermission === "admin" || currentUserPermission === "editor";
 
   const showViewOnlyMessage = () => {
-    displayAlert("You only have permission to view this bid.", "danger");
+    toast.error("You only have permission to view this bid.");
   };
 
   useEffect(() => {
@@ -163,85 +158,43 @@ const BidPlanner = () => {
   console.log(initialBidName);
 
   return (
-    <div className="chatpage">
-      <div className="bidplanner-container">
-        <div
-          className={`header-container ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
-        >
-          <BreadcrumbNavigation
-            currentPage={initialBidName}
-            parentPages={parentPages}
-            showHome={true}
+    <div>
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[55px]">
+        <BreadcrumbNavigation
+          currentPage={initialBidName}
+          parentPages={parentPages}
+          showHome={true}
+        />
+      </div>
+      <div className="px-6 py-4">
+        <div className="space-y-4">
+          <BidNavbar
+            showViewOnlyMessage={showViewOnlyMessage}
+            initialBidName={initialBidName}
           />
-        </div>
-
-        <div>
-          <div
-            className={`lib-container mt-1 ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+          <Button
+            onClick={handleOpenLibrary}
+            variant="outline"
+            className="w-full justify-start border-gray-spacer_light"
           >
-            <div>
-              <div>
-                <BidNavbar
-                  showViewOnlyMessage={showViewOnlyMessage}
-                  initialBidName={initialBidName}
-                  sidebarCollapsed={sidebarCollapsed}
-                />
-              </div>
-
-              {/* Library Button */}
-              <button
-                onClick={handleOpenLibrary}
-                className="w-full mt-5 py-3 px-4 flex items-center justify-between bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
-              >
-                <div className="flex items-center space-x-3">
-                  <Fullscreen size={20} className="text-gray-600" />
-                  <span className="text-gray-800 text-lg font-medium">
-                    View Tender Library Documents
-                  </span>
-                </div>
-              </button>
-
-              {/* Library Modal */}
-              <Dialog
-                open={isLibraryOpen}
-                onClose={handleCloseLibrary}
-                maxWidth="lg"
-                fullWidth
-                sx={{
-                  "& .MuiDialog-paper": {
-                    minHeight: "80vh"
-                  }
-                }}
-              >
-                <DialogTitle
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    borderBottom: "1px solid #E5E7EB",
-                    py: 2
-                  }}
-                >
-                  <h1>Tender Upload</h1>
-                  <IconButton onClick={handleCloseLibrary} size="small">
-                    <X size={20} />
-                  </IconButton>
-                </DialogTitle>
-                <DialogContent sx={{ p: 3 }}>
-                  <TenderLibrary key={object_id} object_id={object_id} />
-                </DialogContent>
-              </Dialog>
-
-              <div>
-                <Row>
-                  <Col md={12}>
-                    <ThemeProvider theme={theme}>
-                      <TenderAnalysis canUserEdit={canUserEdit} />
-                    </ThemeProvider>
-                  </Col>
-                </Row>
-              </div>
+            <div className="flex items-center space-x-3">
+              <ExpandIcon className="text-gray" />
+              <span className="text-gray-hint_text font-medium">
+                View Tender Library Documents
+              </span>
             </div>
+          </Button>
+
+          {/* Library Modal */}
+          <Dialog open={isLibraryOpen} onOpenChange={setIsLibraryOpen}>
+            <DialogContent className="max-w-5xl">
+              <DialogTitle>Tender Upload</DialogTitle>
+              <TenderLibrary key={object_id} object_id={object_id} />
+            </DialogContent>
+          </Dialog>
+
+          <div className="max-w-5xl mx-auto">
+            <TenderAnalysis canUserEdit={canUserEdit} />
           </div>
         </div>
       </div>

@@ -1,11 +1,8 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
-import { Box, Tab, Tabs, Paper, Typography, IconButton } from "@mui/material";
+import { useState, useContext, useEffect, useRef } from "react";
 import axios from "axios";
-import { displayAlert } from "../helper/Alert";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
-import { BidContext } from "../views/BidWritingStateManagerView";
+import { API_URL, HTTP_PREFIX } from "../../../helper/Constants";
+import { BidContext } from "../../BidWritingStateManagerView";
 import { useAuthUser } from "react-auth-kit";
-import { useTheme } from "@mui/material/styles";
 import {
   FileText,
   Scale,
@@ -25,10 +22,21 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { toast } from "react-toastify";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell
+} from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/utils";
 
 const LoadingState = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const theme = useTheme(); // Add this to access theme colors
   const steps = [
     { icon: Search, text: "Scanning tender documents..." },
     { icon: Filter, text: "Filtering relevant sections..." },
@@ -52,43 +60,39 @@ const LoadingState = () => {
   }, []);
 
   return (
-    <Box className="w-80 ml-4 mt-4 mb-4">
-      {" "}
-      {/* Added mb-4 for bottom margin */}
-      <Box className="flex flex-col space-y-3">
-        <Box className="max-h-[400px] overflow-y-auto pr-2">
-          {" "}
-          {/* Added scrollable container with padding */}
+    <div className={cn("w-80 ml-4 mt-4 mb-4")}>
+      <div className={cn("flex flex-col space-y-3")}>
+        <div className={cn("max-h-[400px] overflow-y-auto pr-2")}>
           {steps.map((step, index) => {
             const StepIcon = step.icon;
             return (
-              <Box
+              <div
                 key={index}
-                className={`flex items-center space-x-4 p-2 rounded-lg transition-all duration-300 ${
+                className={cn(
+                  "flex items-center space-x-4 p-2 rounded-lg transition-all duration-300",
                   index === activeStep
                     ? "opacity-100 translate-x-2 bg-orange-50"
                     : "opacity-30"
-                }`}
+                )}
               >
                 <StepIcon
-                  className={`w-5 h-5 ${
-                    index === activeStep ? "animate-pulse" : ""
-                  }`}
-                  style={{
-                    color: theme.palette.primary.main // Use theme color for icons
-                  }}
+                  className={cn(
+                    "w-5 h-5 text-orange",
+                    index === activeStep && "animate-pulse"
+                  )}
                 />
-                <Typography className="text-gray-800 font-medium text-sm">
+                <span className={cn("text-gray-800 font-medium text-sm")}>
                   {step.text}
-                </Typography>
-              </Box>
+                </span>
+              </div>
             );
           })}
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };
+
 const CustomTable = ({ content }) => {
   const parseTable = (text) => {
     const lines = text.split("\n").filter((line) => line.trim());
@@ -111,44 +115,28 @@ const CustomTable = ({ content }) => {
   const { headers, rows } = parseTable(content);
 
   return (
-    <Box className="w-full overflow-x-auto my-4 border border-gray-200 rounded-lg">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50">
-          <tr>
+    <div className={cn("w-full my-4 rounded-md border")}>
+      <Table>
+        <TableHeader>
+          <TableRow>
             {headers.map((header, index) => (
-              <th
-                key={index}
-                className="p-3 text-left font-semibold border-b border-gray-200"
-              >
-                {header}
-              </th>
+              <TableHead key={index}>{header}</TableHead>
             ))}
-          </tr>
-        </thead>
-        <tbody>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {rows.map((row, rowIndex) => (
-            <tr
-              key={rowIndex}
-              className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}
-            >
+            <TableRow key={rowIndex}>
               {row.map((cell, cellIndex) => (
-                <td key={cellIndex} className="p-3 border-t border-gray-200">
-                  {cell}
-                </td>
+                <TableCell key={cellIndex}>{cell}</TableCell>
               ))}
-            </tr>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-    </Box>
+        </TableBody>
+      </Table>
+    </div>
   );
 };
-
-const TabPanel = ({ children, value, index }) => (
-  <Box hidden={value !== index} className="w-full">
-    {value === index && children}
-  </Box>
-);
 
 const TenderAnalysis = ({ canUserEdit }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
@@ -157,7 +145,6 @@ const TenderAnalysis = ({ canUserEdit }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const mounted = useRef(false);
-  const theme = useTheme();
 
   const {
     object_id,
@@ -239,7 +226,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
 
   const handleTabChange = (_, newValue) => {
     if (!canUserEdit) {
-      displayAlert("You only have permission to view this bid.", "danger");
+      toast.error("You only have permission to view this bid.");
       return;
     }
     setCurrentTabIndex(newValue); // Only handle the tab switch
@@ -250,7 +237,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
     console.log("tab click");
     if (tabContent[index]?.trim()) return; // Only return if there's actual content
     if (!object_id) {
-      displayAlert("Please save the bid first.", "warning");
+      toast.warning("Please save the bid first.");
       return;
     }
 
@@ -290,17 +277,15 @@ const TenderAnalysis = ({ canUserEdit }) => {
         }));
       }
 
-      displayAlert("Generated successfully!", "success");
+      toast.success("Generated successfully!");
     } catch (err) {
       console.log(err);
       const errorMsg =
         err.response?.status === 404
           ? "No documents found in the tender library. Please upload documents before generating"
           : "An error occurred while generating. Please try again.";
-      displayAlert(
-        errorMsg,
-        err.response?.status === 404 ? "warning" : "danger"
-      );
+      if (err.response?.status === 404) toast.warning(errorMsg);
+      else toast.error(errorMsg);
     } finally {
       setLoadingTab(null);
     }
@@ -310,7 +295,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
     event.stopPropagation();
     if (!canUserEdit || !mounted.current) return;
     if (!object_id) {
-      displayAlert("Please save the bid first.", "warning");
+      toast.warning("Please save the bid first.");
       return;
     }
 
@@ -354,7 +339,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
           }));
         }
 
-        displayAlert("Regenerated successfully!", "success");
+        toast.success("Regenerated successfully!");
       }
     } catch (err) {
       if (mounted.current) {
@@ -362,10 +347,8 @@ const TenderAnalysis = ({ canUserEdit }) => {
           err.response?.status === 404
             ? "No documents found in the tender library. Please upload documents before generating"
             : "An error occurred while regenerating. Please try again.";
-        displayAlert(
-          errorMsg,
-          err.response?.status === 404 ? "warning" : "danger"
-        );
+        if (err.response?.status === 404) toast.warning(errorMsg);
+        else toast.error(errorMsg);
       }
     } finally {
       if (mounted.current) {
@@ -388,24 +371,16 @@ const TenderAnalysis = ({ canUserEdit }) => {
             return <CustomTable key={`${index}-${partIndex}`} content={part} />;
           }
           return (
-            <Box key={`${index}-${partIndex}`} className="mb-8">
-              {" "}
+            <div key={`${index}-${partIndex}`}>
               {/* Increased margin bottom */}
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
-                  p: ({ node, ...props }) => (
-                    <p
-                      style={{ lineHeight: "2", marginBottom: "1.5rem" }}
-                      {...props}
-                    />
-                  ),
+                  p: ({ node, ...props }) => <p {...props} />,
                   h1: ({ node, ...props }) => (
                     <h1
                       style={{
-                        lineHeight: "1.6",
-                        marginTop: "2.5rem",
-                        marginBottom: "1.5rem"
+                        lineHeight: "2"
                       }}
                       {...props}
                     />
@@ -413,61 +388,38 @@ const TenderAnalysis = ({ canUserEdit }) => {
                   h2: ({ node, ...props }) => (
                     <h2
                       style={{
-                        lineHeight: "1.6",
-                        marginTop: "2rem",
-                        marginBottom: "1.5rem"
+                        lineHeight: "2"
                       }}
                       {...props}
                     />
                   ),
                   // Add more spacing between list items
                   li: ({ node, ...props }) => (
-                    <li
-                      style={{ marginBottom: "1rem", lineHeight: "2" }}
-                      {...props}
-                    />
+                    <li style={{ lineHeight: "2" }} {...props} />
                   ),
                   // Add spacing around lists
-                  ul: ({ node, ...props }) => (
-                    <ul
-                      style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}
-                      {...props}
-                    />
-                  ),
-                  ol: ({ node, ...props }) => (
-                    <ol
-                      style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}
-                      {...props}
-                    />
-                  )
+                  ul: ({ node, ...props }) => <ul {...props} />,
+                  ol: ({ node, ...props }) => <ol {...props} />
                 }}
               >
                 {part}
               </ReactMarkdown>
-            </Box>
+            </div>
           );
         });
       }
 
       return (
-        <Box key={index} className="mb-8">
-          {" "}
+        <div key={index}>
           {/* Increased margin bottom */}
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
-              p: ({ node, ...props }) => (
-                <p
-                  style={{ lineHeight: "2", marginBottom: "1.5rem" }}
-                  {...props}
-                />
-              ),
+              p: ({ node, ...props }) => <p {...props} />,
               h1: ({ node, ...props }) => (
                 <h1
                   style={{
-                    lineHeight: "1.6",
-                    marginTop: "2.5rem",
-                    marginBottom: "1.5rem"
+                    lineHeight: "2"
                   }}
                   {...props}
                 />
@@ -475,190 +427,103 @@ const TenderAnalysis = ({ canUserEdit }) => {
               h2: ({ node, ...props }) => (
                 <h2
                   style={{
-                    lineHeight: "1.6",
-                    marginTop: "2rem",
-                    marginBottom: "1.5rem"
+                    lineHeight: "2"
                   }}
                   {...props}
                 />
               ),
               li: ({ node, ...props }) => (
-                <li
-                  style={{ marginBottom: "1rem", lineHeight: "2" }}
-                  {...props}
-                />
+                <li style={{ lineHeight: "2" }} {...props} />
               ),
-              ul: ({ node, ...props }) => (
-                <ul
-                  style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}
-                  {...props}
-                />
-              ),
-              ol: ({ node, ...props }) => (
-                <ol
-                  style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}
-                  {...props}
-                />
-              )
+              ul: ({ node, ...props }) => <ul {...props} />,
+              ol: ({ node, ...props }) => <ol {...props} />
             }}
           >
             {section}
           </ReactMarkdown>
-        </Box>
+        </div>
       );
     });
   };
 
   return (
-    <Box className="mt-5">
-      <Paper
-        elevation={0}
-        className="border border-gray-200"
-        sx={{
-          "& .MuiTabs-flexContainer": {
-            borderBottom: "1px solid #E5E7EB"
-          }
-        }}
-      >
+    <div>
+      <div className={cn("border border-gray-line rounded-md")}>
         <Tabs
-          ref={tabsRef}
-          value={currentTabIndex}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-          aria-label="tender analysis tabs"
-          sx={{
-            "& .MuiTabs-indicator": {
-              backgroundColor: `${theme.palette.primary.main} !important`
-            },
-            "& .MuiTab-root": {
-              textTransform: "none",
-              minHeight: "48px",
-              padding: "12px 24px",
-              color: "#6B7280",
-              "&.Mui-selected": {
-                color: "#000000"
-              },
-              "&:hover": {
-                color: theme.palette.primary.main,
-                backgroundColor: "#FFF0E6", // Using the orange_ultra_light color directly
-                ".lucide": {
-                  color: theme.palette.primary.main
-                }
-              },
-              "&:active": {
-                backgroundColor: theme.palette.action.hover
-              },
-              "& .MuiTouchRipple-root": {
-                color: `${theme.palette.primary.main} !important`
-              }
-            }
-          }}
+          value={currentTabIndex.toString()}
+          onValueChange={(value) => handleTabChange(null, parseInt(value))}
+          className={cn("w-full")}
         >
-          {tabs.map((tab, index) => {
-            const TabIcon = tab.Icon;
-            return (
-              <Tab
-                key={index}
-                onClick={() => handleTabClick(index)}
-                icon={
-                  <Box className="flex items-center space-x-2">
-                    <TabIcon
-                      size={16}
-                      className={`transition-colors ${
-                        currentTabIndex === index
-                          ? "text-gray-900"
-                          : "text-gray-600 hover:text-orange-400"
-                      }`}
-                    />
-                    {tabContent[index] && (
-                      <IconButton
-                        size="small"
-                        onClick={(e) => handleRegenerateClick(index, e)}
-                        className={loadingTab === index ? "animate-spin" : ""}
-                        sx={{
-                          padding: "4px",
-                          color: "#6B7280",
-                          "&:hover": {
-                            backgroundColor: `${theme.palette.custom.lighter} !important`,
-                            color: theme.palette.custom.lighter
-                          },
-                          "&:active": {
-                            backgroundColor: theme.palette.custom.lighter
-                          }
-                        }}
-                      >
-                        <RefreshCw size={14} />
-                      </IconButton>
-                    )}
-                  </Box>
-                }
-                label={
-                  <span
-                    className={`font-medium transition-colors ${
+          <TabsList
+            className={cn(
+              "w-full justify-start border-b border-gray-line h-auto py-0 px-0 rounded-none"
+            )}
+          >
+            {tabs.map((tab, index) => {
+              const TabIcon = tab.Icon;
+              return (
+                <TabsTrigger
+                  key={index}
+                  value={index.toString()}
+                  onClick={() => handleTabClick(index)}
+                  className={cn(
+                    "flex items-center gap-2 px-6 py-3 data-[state=active]:text-orange bg-transparent"
+                  )}
+                >
+                  <TabIcon
+                    size={16}
+                    className={cn(
+                      "transition-colors",
                       currentTabIndex === index
-                        ? "text-gray-900"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {tab.name}
-                  </span>
-                }
-                sx={{
-                  minHeight: "56px",
-                  opacity: 1
-                }}
-              />
-            );
-          })}
-        </Tabs>
+                        ? "text-orange"
+                        : "text-gray-600 hover:text-orange"
+                    )}
+                  />
+                  <span className={cn("font-medium")}>{tab.name}</span>
+                  {tabContent[index as keyof typeof tabContent] && (
+                    <Button
+                      onClick={(e) => handleRegenerateClick(index, e)}
+                      variant="ghost"
+                      size="icon"
+                      className={cn(
+                        "bg-transparent hover:bg-transparent hover:text-orange h-6 w-6",
+                        loadingTab === index && "animate-spin"
+                      )}
+                    >
+                      <RefreshCw size={14} />
+                    </Button>
+                  )}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
 
-        <Box
-          className="min-h-[70vh] border-t border-gray-200"
-          sx={{
-            "& .markdown-content": {
-              "& h1, & h2, & h3, & h4": {
-                color: "#111827",
-                fontWeight: 600,
-                marginBottom: "0.75rem"
-              },
-              "& p": {
-                color: "#374151",
-                marginBottom: "1rem"
-              },
-              "& ul, & ol": {
-                paddingLeft: "1.5rem",
-                marginBottom: "1rem"
-              },
-              "& li": {
-                marginBottom: "0.5rem"
-              }
-            }
-          }}
-        >
-          {tabs.map((tab, index) => (
-            <TabPanel key={index} value={currentTabIndex} index={index}>
-              <Box className="relative p-8">
-                {/* Show loading state overlay if this tab is loading */}
-                {loadingTab === index && tabRects[index] && (
-                  <Box
-                    className="absolute z-10 bg-white rounded-lg shadow-lg"
-                    sx={{
-                      left: `${tabRects[index].left - tabRects[0].left}px`,
-                      top: "-1px"
-                    }}
-                  >
-                    <LoadingState />
-                  </Box>
-                )}
-                {/* Always render content, regardless of loading state */}
-                {renderContent(tabContent[index] || "")}
-              </Box>
-            </TabPanel>
-          ))}
-        </Box>
-      </Paper>
-    </Box>
+          <div className={cn("h-[calc(100vh-345px)] overflow-y-auto")}>
+            {tabs.map((tab, index) => (
+              <TabsContent key={index} value={index.toString()}>
+                <div className={cn("relative px-8 py-4")}>
+                  {loadingTab === index && (
+                    <div
+                      className={cn(
+                        "absolute -top-[1px] left-0 z-10 bg-white rounded-lg shadow-lg"
+                      )}
+                      style={{
+                        left: `${tabRects[index]?.left - tabRects[0]?.left}px`
+                      }}
+                    >
+                      <LoadingState />
+                    </div>
+                  )}
+                  {renderContent(
+                    tabContent[index as keyof typeof tabContent] || ""
+                  )}
+                </div>
+              </TabsContent>
+            ))}
+          </div>
+        </Tabs>
+      </div>
+    </div>
   );
 };
 

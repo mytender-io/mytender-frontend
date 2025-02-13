@@ -1,15 +1,15 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme } from "@mui/material/styles";
 
-declare module '@mui/material/styles' {
+declare module "@mui/material/styles" {
   interface Palette {
     custom: {
       lighter: string;
-    }
+    };
   }
   interface PaletteOptions {
     custom?: {
       lighter: string;
-    }
+    };
   }
 }
 
@@ -29,11 +29,11 @@ const theme = createTheme({
       main: orangeColors.main,
       light: orangeColors.light,
       dark: orangeColors.dark,
-      contrastText: orangeColors.contrastText,
+      contrastText: orangeColors.contrastText
     },
     action: {
       hover: orangeColors.hover,
-      selected: orangeColors.light,
+      selected: orangeColors.light
     },
     custom: {
       lighter: orangeColors.lighter
@@ -43,39 +43,39 @@ const theme = createTheme({
     MuiTabs: {
       styleOverrides: {
         root: {
-          '& .MuiTabs-indicator': {
-            backgroundColor: `${orangeColors.main} !important`,
+          "& .MuiTabs-indicator": {
+            backgroundColor: `${orangeColors.main} !important`
           },
-          '& .MuiTab-root': {
-            textTransform: 'none',
-            minHeight: '48px',
-            padding: '12px 24px',
-            color: '#6B7280',
+          "& .MuiTab-root": {
+            textTransform: "none",
+            minHeight: "48px",
+            padding: "12px 24px",
+            color: "#6B7280",
             opacity: 1,
-            '&.Mui-selected': {
-              color: '#000000'
+            "&.Mui-selected": {
+              color: "#000000"
             },
-            '&:hover': {
+            "&:hover": {
               color: `${orangeColors.main} !important`,
               backgroundColor: `${orangeColors.lighter} !important`, // Changed from light to lighter
-              '.lucide': {
+              ".lucide": {
                 color: `${orangeColors.main} !important`
               }
             },
-            '&:active': {
+            "&:active": {
               backgroundColor: orangeColors.hover
             },
-            '& .MuiTouchRipple-root': {
+            "& .MuiTouchRipple-root": {
               color: `${orangeColors.main} !important`
             }
           }
         },
         indicator: {
-          backgroundColor: `${orangeColors.main} !important`,
+          backgroundColor: `${orangeColors.main} !important`
         },
         flexContainer: {
-          '& .MuiButtonBase-root': {
-            '&:hover .lucide': {
+          "& .MuiButtonBase-root": {
+            "&:hover .lucide": {
               color: `${orangeColors.main} !important`
             }
           }
@@ -85,13 +85,13 @@ const theme = createTheme({
     MuiTab: {
       styleOverrides: {
         root: {
-          '&.MuiButtonBase-root': {
+          "&.MuiButtonBase-root": {
             opacity: 1,
-            minHeight: '56px',
-            '&.Mui-selected': {
-              color: '#000000'
+            minHeight: "56px",
+            "&.Mui-selected": {
+              color: "#000000"
             },
-            '&:hover': {
+            "&:hover": {
               color: `${orangeColors.main} !important`,
               backgroundColor: `${orangeColors.lighter} !important` // Changed from light to lighter
             }
@@ -102,16 +102,16 @@ const theme = createTheme({
     MuiIconButton: {
       styleOverrides: {
         root: {
-          padding: '4px',
-          color: '#6B7280',
-          '&:hover': {
+          padding: "4px",
+          color: "#6B7280",
+          "&:hover": {
             backgroundColor: `${orangeColors.light} !important`,
             color: `${orangeColors.main} !important`,
-            '& .MuiSvgIcon-root': {
-              color: `${orangeColors.main} !important`,
+            "& .MuiSvgIcon-root": {
+              color: `${orangeColors.main} !important`
             }
           },
-          '&:active': {
+          "&:active": {
             backgroundColor: orangeColors.hover
           }
         }
@@ -120,31 +120,32 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          '&:hover': {
-            backgroundColor: orangeColors.light,
+          fontFamily: "Manrope",
+          "&:hover": {
+            backgroundColor: orangeColors.light
           },
-          '&.Mui-selected': {
-            backgroundColor: orangeColors.light,
+          "&.Mui-selected": {
+            backgroundColor: orangeColors.light
           }
         },
         contained: {
           backgroundColor: orangeColors.main,
-          '&:hover': {
-            backgroundColor: orangeColors.dark,
+          "&:hover": {
+            backgroundColor: orangeColors.dark
           }
         },
         outlined: {
           borderColor: orangeColors.main,
           color: orangeColors.main,
-          '&:hover': {
+          "&:hover": {
             borderColor: orangeColors.dark,
-            backgroundColor: orangeColors.lighter,
+            backgroundColor: orangeColors.lighter
           }
         },
         text: {
           color: orangeColors.main,
-          '&:hover': {
-            backgroundColor: orangeColors.lighter,
+          "&:hover": {
+            backgroundColor: orangeColors.lighter
           }
         }
       }
@@ -153,8 +154,8 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           color: orangeColors.main,
-          '&.Mui-checked': {
-            color: orangeColors.main,
+          "&.Mui-checked": {
+            color: orangeColors.main
           }
         }
       }
@@ -163,8 +164,8 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           color: orangeColors.main,
-          '&.Mui-checked': {
-            color: orangeColors.main,
+          "&.Mui-checked": {
+            color: orangeColors.main
           }
         }
       }
@@ -172,10 +173,10 @@ const theme = createTheme({
     MuiSwitch: {
       styleOverrides: {
         switchBase: {
-          '&.Mui-checked': {
+          "&.Mui-checked": {
             color: orangeColors.main,
-            '& + .MuiSwitch-track': {
-              backgroundColor: orangeColors.main,
+            "& + .MuiSwitch-track": {
+              backgroundColor: orangeColors.main
             }
           }
         }
@@ -184,17 +185,17 @@ const theme = createTheme({
     MuiCircularProgress: {
       styleOverrides: {
         root: {
-          color: orangeColors.main,
+          color: orangeColors.main
         }
       }
     },
     MuiLinearProgress: {
       styleOverrides: {
         root: {
-          backgroundColor: orangeColors.light,
+          backgroundColor: orangeColors.light
         },
         bar: {
-          backgroundColor: orangeColors.main,
+          backgroundColor: orangeColors.main
         }
       }
     }

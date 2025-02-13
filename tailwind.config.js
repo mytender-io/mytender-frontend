@@ -30,7 +30,9 @@ export default {
           light: "#F3F4F4",
           line: "#E0E0E0",
           hint_text: "#575859",
-          bg: "#F3F3F3"
+          bg: "#F3F3F3",
+          black: "#1D252C",
+          spacer_light: "#EBECEF"
         },
         typo: {
           50: "#FAFAFA",

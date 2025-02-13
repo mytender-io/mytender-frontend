@@ -1,11 +1,15 @@
 import React from "react";
-import { Loader2, Check, X } from "lucide-react";
+import { Check, X } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
-const SaveStatus = ({ isLoading, saveSuccess }) => {
+const SaveStatus: React.FC<{
+  isLoading: boolean;
+  saveSuccess: boolean | null;
+}> = ({ isLoading, saveSuccess }) => {
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center text-orange">
-        <Loader2 className="h-6 w-6 animate-spin" />
+      <div className="flex items-center justify-center">
+        <Spinner />
       </div>
     );
   }

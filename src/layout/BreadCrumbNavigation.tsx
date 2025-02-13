@@ -12,12 +12,12 @@ const BreadcrumbNavigation = ({
   showHome?: boolean;
 }) => {
   return (
-    <nav className="flex items-center gap-2 rounded-lg text-lg font-extrabold">
+    <nav className="flex items-center gap-2 rounded-lg">
       {parentPages.map((page) => (
         <React.Fragment key={page.path}>
           <Link
             to={page.path}
-            className="text-orange hover:text-orange-hover transition-colors ease-in-out"
+            className="font-medium text-orange hover:text-orange-hover transition-colors ease-in-out"
           >
             {page.name}
           </Link>
@@ -25,9 +25,7 @@ const BreadcrumbNavigation = ({
         </React.Fragment>
       ))}
       {currentPage && (
-        <span className="text-typo-900 text-lg font-semibold">
-          {currentPage}
-        </span>
+        <span className="text-gray-black font-semibold">{currentPage}</span>
       )}
     </nav>
   );

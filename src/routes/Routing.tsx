@@ -24,7 +24,7 @@ import ProposalPlan from "../views/ProposalPlan.tsx";
 import QAGenerator from "../views/Q&AGenerator.tsx";
 import ProposalPreview from "../views/ProposalPreview.tsx";
 import ComplianceMatrix from "../views/ComplianceMatrix.tsx";
-import BidPlanner from "../views/BidPlanner.tsx";
+import BidPlanner from "../views/BidPlanner/BidPlanner.tsx";
 import BidIntel from "@/views/BidIntel.tsx";
 import MainLayout from "@/layout/MainLayout.tsx";
 import posthog from "posthog-js";

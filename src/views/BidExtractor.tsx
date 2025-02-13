@@ -310,10 +310,7 @@ const BidExtractor = () => {
   };
 
   useEffect(() => {
-
-    if (
-      bidData
-    ) {
+    if (bidData) {
       console.log(bidData);
 
       setSharedState((prevState) => {
