@@ -289,6 +289,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
   const handleTabClick = async (index) => {
     setCurrentTabIndex(index);
     console.log("tab click");
+
     if (tabContent[index]?.trim()) return; // Only return if there's actual content
     if (!object_id) {
       displayAlert("Please save the bid first.", "warning");
@@ -360,6 +361,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
 
     const tab = tabs[index];
     setLoadingTab(index);
+    setCurrentTabIndex(index);
 
     try {
       const formData = new FormData();
@@ -608,7 +610,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
               <Tab
                 key={index}
                 onClick={() => handleTabClick(index)}
-               
+                disabled={loadingTab !== null}
                 icon={
                   <Box className="flex items-center space-x-2">
                     <TabIcon
@@ -637,7 +639,6 @@ const TenderAnalysis = ({ canUserEdit }) => {
                           }
                         }}
                       >
-                      
                         <RefreshCw size={14} />
                       </IconButton>
                     )}
