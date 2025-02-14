@@ -142,27 +142,25 @@ const BulkControls = ({
 
   return (
     <>
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg py-4 px-6 z-40 border border-gray-100">
+      <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-lg z-40 border border-gray-line">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <div className="flex items-center bg-[#FF8019] text-white rounded-full min-w-10 w-10 h-10 justify-center text-base">
+            <div className="rounded-l-xl flex items-center bg-orange text-white h-12 w-12 min-w-12 justify-center text-base">
               {selectedCount}
             </div>
-            <span className="text-base text-gray-600">Items Selected</span>
+            <span className="text-md text-nowrap">Items Selected</span>
           </div>
-
-          <div className="h-8 w-px bg-gray-200" />
-
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center gap-2">
               <Input
                 type="number"
                 value={wordCount}
                 onChange={handleWordCountChange}
-                className="w-28 h-12 text-center"
+                className="w-28 h-4 text-center border-none"
                 min="0"
                 step="50"
               />
+              <span className="text-xs font-medium">Word Count</span>
             </div>
 
             <div className="relative">
@@ -174,10 +172,11 @@ const BulkControls = ({
                     openMenu === "questionType" ? null : "questionType"
                   )
                 }
-                className="text-gray-500 hover:text-[#FF8019]"
+                className="bg-transparent flex-col w-full p-1 h-auto"
                 title="Question Type"
               >
-                <HelpCircle size={22} />
+                <HelpCircle />
+                <span className="text-xs font-medium">Question Type</span>
               </Button>
               <Dropdown
                 items={questionTypeOptions}
@@ -193,9 +192,10 @@ const BulkControls = ({
                 onClick={() =>
                   setOpenMenu(openMenu === "reviewer" ? null : "reviewer")
                 }
-                className="text-gray-500 hover:text-[#FF8019]"
+                className="bg-transparent flex-col w-full p-1 h-auto"
               >
-                <Users2 size={22} />
+                <Users2 />
+                <span className="text-xs font-medium">Assign to</span>
               </Button>
               <Dropdown
                 items={Object.entries(contributors || {}).map(
@@ -217,9 +217,10 @@ const BulkControls = ({
                 onClick={() =>
                   setOpenMenu(openMenu === "status" ? null : "status")
                 }
-                className="text-gray-500 hover:text-[#FF8019]"
+                className="bg-transparent flex-col w-full p-1 h-auto"
               >
-                <Clock size={22} />
+                <Clock />
+                <span className="text-xs font-medium">Select Status</span>
               </Button>
               <Dropdown
                 items={statusOptions}
@@ -232,10 +233,11 @@ const BulkControls = ({
               variant="ghost"
               size="icon"
               onClick={handleDelete}
-              className="text-gray-500 hover:text-red-600"
+              className="bg-transparent flex-col w-full p-1 h-auto"
               title="Delete Selected"
             >
-              <Trash2 size={22} />
+              <Trash2 />
+              <span className="text-xs font-medium">Delete</span>
             </Button>
 
             <TooltipProvider>
@@ -246,13 +248,12 @@ const BulkControls = ({
                     size="icon"
                     onClick={onRevert}
                     disabled={!canRevert}
-                    className={`text-gray-500 ${
-                      canRevert
-                        ? "hover:text-[#FF8019]"
-                        : "opacity-50 cursor-not-allowed"
+                    className={`bg-transparent flex-col w-full p-1 h-auto ${
+                      canRevert ? "" : "opacity-50 cursor-not-allowed"
                     }`}
                   >
-                    <Undo2 size={22} />
+                    <Undo2 />
+                    <span className="text-xs font-medium">Revert</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -265,9 +266,9 @@ const BulkControls = ({
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="ml-2 text-gray-400 hover:text-gray-600"
+              className="bg-transparent w-12 h-12 min-w-12 rounded-r-xl rounded-l-none border-l border-gray-line"
             >
-              <X size={22} />
+              <X />
             </Button>
           </div>
         </div>
