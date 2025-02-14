@@ -50,6 +50,7 @@ import {
 import UploadText from "./components/UploadText.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import BreadCrumbs from "@/components/BreadCrumbs.tsx";
+import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationModal.tsx";
 import { toast } from "react-toastify";
 
 const NewFolderModal = React.memo(
@@ -450,40 +451,24 @@ const Library = () => {
       .replace(/_/g, " ");
 
     return (
-      <Dialog open={show} onOpenChange={onHide}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Folder</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            Are you sure you want to delete the folder "{displayFolderName}"?
-          </div>
-          <DialogFooter>
-            <Button variant="destructive" onClick={() => onDelete(folderTitle)}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmationDialog
+        isOpen={show}
+        onClose={onHide}
+        onConfirm={() => onDelete(folderTitle)}
+        title="Delete Folder"
+        message={`Are you sure you want to delete the folder "${displayFolderName}"?`}
+      />
     );
   };
 
   const DeleteFileModal = ({ show, onHide, onDelete, fileName }) => (
-    <Dialog open={show} onOpenChange={onHide}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Delete File</DialogTitle>
-        </DialogHeader>
-        <div className="py-4">
-          Are you sure you want to delete the file "{fileName}"?
-        </div>
-        <DialogFooter>
-          <Button variant="destructive" onClick={() => onDelete()}>
-            Delete
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <DeleteConfirmationDialog
+      isOpen={show}
+      onClose={onHide}
+      onConfirm={() => onDelete()}
+      title="Delete File"
+      message={`Are you sure you want to delete the file "${fileName}"?`}
+    />
   );
 
   const saveFileContent = async (id, newContent, folderName) => {

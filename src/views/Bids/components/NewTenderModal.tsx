@@ -23,6 +23,8 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import { cn } from "@/utils";
+import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationModal.tsx";
+
 interface NewTenderModalProps {
   show: boolean;
   onHide: () => void;
@@ -731,30 +733,14 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       </Dialog>
 
       {/* Add Confirmation Dialog */}
-      <Dialog open={showConfirmClose} onOpenChange={setShowConfirmClose}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogTitle>Are you sure you want to exit?</DialogTitle>
-          <div className="py-4">
-            <p>All progress will be lost. This action cannot be undone.</p>
-          </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setShowConfirmClose(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleConfirmedClose}
-            >
-              Exit
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmationDialog
+        isOpen={showConfirmClose}
+        onClose={() => setShowConfirmClose(false)}
+        onConfirm={handleConfirmedClose}
+        title="Are you sure you want to exit?"
+        message="All progress will be lost. This action cannot be undone."
+        confirmTitle="Exit"
+      />
 
       <LoadingOverlay
         isOpen={isGeneratingOutline}

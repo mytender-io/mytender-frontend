@@ -36,6 +36,7 @@ import {
 import SortUpIcon from "@/components/icons/SortUpIcon.tsx";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
+import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationModal.tsx";
 interface Bid {
   _id: string;
   bid_title: string;
@@ -544,21 +545,14 @@ const Bids = () => {
           onHide={handleModalClose}
           existingBids={bids}
         />
-        <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Confirm Delete</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete this tender?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button variant="destructive" onClick={confirmDeleteBid}>
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+
+        <DeleteConfirmationDialog
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={confirmDeleteBid}
+          title="Confirm Delete"
+          message="Are you sure you want to delete this tender?"
+        />
       </div>
     </div>
   );

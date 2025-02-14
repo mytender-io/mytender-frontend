@@ -11,7 +11,7 @@ import {
   Subheading
 } from "../BidWritingStateManagerView.tsx";
 import StatusMenu from "../../buttons/StatusMenu.tsx";
-import OutlineInstructionsModal from "../../modals/OutlineInstructionsModal.tsx";
+import OutlineInstructionsModal from "./components/OutlineInstructionsModal.tsx";
 import SectionMenu from "../../buttons/SectionMenu.tsx";
 import posthog from "posthog-js";
 import { Form } from "react-bootstrap";
@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox.tsx";
+import { DeleteConfirmationDialog } from "../../components/DeleteConfirmationModal.tsx";
 
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
@@ -71,6 +72,12 @@ const ProposalPlan = () => {
   const [selectedSections, setSelectedSections] = useState(new Set());
 
   const [isSidepaneOpen, setIsSidepaneOpen] = useState(false);
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [sectionToDelete, setSectionToDelete] = useState<{
+    section: Section;
+    index: number;
+  } | null>(null);
 
   // Bulk Update functions
   const handleSelectSection = (index) => {
@@ -369,12 +376,15 @@ const ProposalPlan = () => {
   };
 
   const handleDeleteClick = (section: Section, index: number) => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete this section? This action cannot be undone."
-      )
-    ) {
-      deleteSection(section.section_id, index);
+    setSectionToDelete({ section, index });
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (sectionToDelete) {
+      deleteSection(sectionToDelete.section.section_id, sectionToDelete.index);
+      setShowDeleteDialog(false);
+      setSectionToDelete(null);
     }
   };
 
@@ -721,7 +731,6 @@ const ProposalPlan = () => {
               onHide={() => setShowModal(false)}
               bid_id={object_id}
             />
-
             {outline.length === 0 ? null : (
               <div>
                 <div className="rounded-md border">
@@ -843,6 +852,17 @@ const ProposalPlan = () => {
                     </TableBody>
                   </Table>
                 </div>
+
+                <DeleteConfirmationDialog
+                  isOpen={showDeleteDialog}
+                  onClose={() => {
+                    setShowDeleteDialog(false);
+                    setSectionToDelete(null);
+                  }}
+                  onConfirm={handleConfirmDelete}
+                  title="Delete Section"
+                  message="Are you sure you want to delete this section? This action cannot be undone."
+                />
 
                 {contextMenu && (
                   <SectionMenu

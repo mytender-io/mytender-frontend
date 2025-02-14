@@ -1,10 +1,6 @@
 import React, { useState } from "react";
-import { Card, Col, Row, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faArrowRight,
-  faTrash,
-  faWandMagicSparkles,
   faChevronLeft,
   faChevronRight,
   faChevronDown,
@@ -186,10 +182,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         className="text-gray-500 h-5 w-5"
                       />
                     </button>
-                    <RegenerateButton
-                      section={section}
-                      index={index}
-                    />
+                    <RegenerateButton section={section} index={index} />
                   </div>
                 </div>
                 <SubheadingCards
