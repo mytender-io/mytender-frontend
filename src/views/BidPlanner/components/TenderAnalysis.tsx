@@ -173,21 +173,24 @@ const TenderAnalysis = ({ canUserEdit }) => {
       Icon: Scale,
       prompt: "generate_evaluation_criteria",
       stateKey: "evaluation_criteria",
-      summaryKey: "win_themes"
+      summaryKey: "win_themes",
+      extract_insights_prompt: "extract_section_evaluation_criteria"
     },
     {
       name: "Pain Points",
       Icon: Lightbulb,
       prompt: "generate_derive_insights",
       stateKey: "derive_insights",
-      summaryKey: "customer_pain_points"
+      summaryKey: "customer_pain_points",
+      extract_insights_prompt: "extract_section_derive_insights"
     },
     {
       name: "Differentiation Opportunities",
       Icon: Star,
       prompt: "generate_differentiation_opportunities",
       stateKey: "differentiation_opportunities",
-      summaryKey: "differentiating_factors"
+      summaryKey: "differentiating_factors",
+      extract_insights_prompt: "extract_differentiation_factors"
     }
   ];
 
@@ -225,6 +228,9 @@ const TenderAnalysis = ({ canUserEdit }) => {
   ]);
 
   const handleTabChange = (_, newValue) => {
+    if (loadingTab !== null) {
+      return;
+    }
     if (!canUserEdit) {
       toast.error("You only have permission to view this bid.");
       return;
@@ -232,9 +238,45 @@ const TenderAnalysis = ({ canUserEdit }) => {
     setCurrentTabIndex(newValue); // Only handle the tab switch
   };
 
+  const assign_insights_to_questions = async (bid_intel_type, tab) => {
+    // Return early if no extract_insights_prompt exists on the tab
+    if (!tab.extract_insights_prompt) {
+      return;
+    }
+
+    if (!object_id) {
+      displayAlert("Please save the bid first.", "warning");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("bid_id", object_id);
+    formData.append("bid_intel_type", bid_intel_type);
+    formData.append("extract_insights_prompt", tab.extract_insights_prompt);
+
+    console.log(formData);
+
+    const result = await axios.post(
+      `http${HTTP_PREFIX}://${API_URL}/assign_insights_to_outline_questions`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${auth?.token}`,
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+
+    setSharedState((prev) => ({
+      ...prev,
+      outline: result.data
+    }));
+  };
+
   const handleTabClick = async (index) => {
     setCurrentTabIndex(index);
     console.log("tab click");
+
     if (tabContent[index]?.trim()) return; // Only return if there's actual content
     if (!object_id) {
       toast.warning("Please save the bid first.");
@@ -277,6 +319,8 @@ const TenderAnalysis = ({ canUserEdit }) => {
         }));
       }
 
+      // Pass the tab object to assign_insights_to_questions
+      await assign_insights_to_questions(tab.summaryKey, tab);
       toast.success("Generated successfully!");
     } catch (err) {
       console.log(err);
@@ -301,6 +345,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
 
     const tab = tabs[index];
     setLoadingTab(index);
+    setCurrentTabIndex(index);
 
     try {
       const formData = new FormData();
@@ -339,6 +384,8 @@ const TenderAnalysis = ({ canUserEdit }) => {
           }));
         }
 
+        // Pass the tab object to assign_insights_to_questions
+        await assign_insights_to_questions(tab.summaryKey, tab);
         toast.success("Regenerated successfully!");
       }
     } catch (err) {
@@ -475,9 +522,6 @@ const TenderAnalysis = ({ canUserEdit }) => {
                       className={cn(
                         "absolute top-14 left-0 z-10 bg-white rounded-lg shadow-2xl"
                       )}
-                      style={{
-                        left: `${tabRects[index]?.left - tabRects[0]?.left}px`
-                      }}
                     >
                       <LoadingState />
                     </div>
