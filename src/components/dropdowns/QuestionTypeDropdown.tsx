@@ -15,7 +15,7 @@ const QuestionTypeDropdown = ({
 }) => {
   return (
     <Select value={value || "3b"} onValueChange={onChange}>
-      <SelectTrigger className="w-[220px] bg-white text-md">
+      <SelectTrigger className="w-[220px] bg-white text-sm">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

@@ -1,22 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Users2, HelpCircle, Trash2, X, Clock, Undo2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
-  PenLine,
-  Users2,
-  HelpCircle,
-  Trash2,
-  X,
-  Clock,
-  Undo2
-} from "lucide-react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-  Tooltip
-} from "@mui/material";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
+import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal";
+import { Button } from "@/components/ui/button";
 
 const BulkControls = ({
   selectedCount,
@@ -100,9 +92,10 @@ const BulkControls = ({
         </div>
         <div className="max-h-[240px] overflow-y-auto">
           {items.map((item, index) => (
-            <button
+            <Button
               key={index}
-              className="w-full px-4 py-2.5 text-left hover:bg-gray-50 flex items-center gap-2 group border-b border-gray-100 last:border-0"
+              variant="ghost"
+              className="w-full px-4 py-2.5 text-left hover:bg-gray-50 flex items-center gap-2 group border-b border-gray-100 last:border-0 justify-start h-auto"
               onClick={() =>
                 handleUpdate(
                   type === "reviewer"
@@ -126,7 +119,7 @@ const BulkControls = ({
                   <span className="text-xs text-gray-400">{item.role}</span>
                 )}
               </div>
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -152,40 +145,40 @@ const BulkControls = ({
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg py-4 px-6 z-40 border border-gray-100">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <div className="flex items-center bg-[#FF8019] text-white rounded-full w-10 h-10 justify-center text-base text-xl">
+            <div className="flex items-center bg-[#FF8019] text-white rounded-full min-w-10 w-10 h-10 justify-center text-base">
               {selectedCount}
             </div>
-            <span className="text-base text-gray-600 text-xl">
-              Items Selected
-            </span>
+            <span className="text-base text-gray-600">Items Selected</span>
           </div>
 
           <div className="h-8 w-px bg-gray-200" />
 
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2">
-              <input
+              <Input
                 type="number"
                 value={wordCount}
                 onChange={handleWordCountChange}
-                className="w-28 h-12 px-2 text-center text-base border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:border-[#FF8019]"
+                className="w-28 h-12 text-center"
                 min="0"
                 step="50"
               />
             </div>
 
             <div className="relative">
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() =>
                   setOpenMenu(
                     openMenu === "questionType" ? null : "questionType"
                   )
                 }
-                className="text-gray-500 hover:text-[#FF8019] transition-colors"
+                className="text-gray-500 hover:text-[#FF8019]"
                 title="Question Type"
               >
                 <HelpCircle size={22} />
-              </button>
+              </Button>
               <Dropdown
                 items={questionTypeOptions}
                 type="questionType"
@@ -194,14 +187,16 @@ const BulkControls = ({
             </div>
 
             <div className="relative">
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() =>
                   setOpenMenu(openMenu === "reviewer" ? null : "reviewer")
                 }
-                className="text-gray-500 hover:text-[#FF8019] transition-colors"
+                className="text-gray-500 hover:text-[#FF8019]"
               >
                 <Users2 size={22} />
-              </button>
+              </Button>
               <Dropdown
                 items={Object.entries(contributors || {}).map(
                   ([email, role]) => ({
@@ -216,14 +211,16 @@ const BulkControls = ({
             </div>
 
             <div className="relative">
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() =>
                   setOpenMenu(openMenu === "status" ? null : "status")
                 }
-                className="text-gray-500 hover:text-[#FF8019] transition-colors"
+                className="text-gray-500 hover:text-[#FF8019]"
               >
                 <Clock size={22} />
-              </button>
+              </Button>
               <Dropdown
                 items={statusOptions}
                 type="status"
@@ -231,72 +228,58 @@ const BulkControls = ({
               />
             </div>
 
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={handleDelete}
-              className="text-gray-500 hover:text-red-600 transition-colors"
+              className="text-gray-500 hover:text-red-600"
               title="Delete Selected"
             >
               <Trash2 size={22} />
-            </button>
+            </Button>
 
-            <Tooltip
-              title={canRevert ? "Undo last change" : "No changes to undo"}
-            >
-              <span>
-                <button
-                  onClick={onRevert}
-                  disabled={!canRevert}
-                  className={`text-gray-500 transition-colors ${
-                    canRevert
-                      ? "hover:text-[#FF8019]"
-                      : "opacity-50 cursor-not-allowed"
-                  }`}
-                  title="Undo last change"
-                >
-                  <Undo2 size={22} />
-                </button>
-              </span>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onRevert}
+                    disabled={!canRevert}
+                    className={`text-gray-500 ${
+                      canRevert
+                        ? "hover:text-[#FF8019]"
+                        : "opacity-50 cursor-not-allowed"
+                    }`}
+                  >
+                    <Undo2 size={22} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {canRevert ? "Undo last change" : "No changes to undo"}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={onClose}
-              className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="ml-2 text-gray-400 hover:text-gray-600"
             >
               <X size={22} />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
-      <Dialog
-        open={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          Delete Selected Sections
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete {selectedCount} selected sections?
-            This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowDeleteDialog(false)} color="primary">
-            Cancel
-          </Button>
-          <Button
-            onClick={confirmDelete}
-            color="error"
-            variant="contained"
-            autoFocus
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DeleteConfirmationDialog
+        isOpen={showDeleteDialog}
+        onClose={setShowDeleteDialog}
+        onConfirm={confirmDelete}
+        title="Delete Selected Sections"
+        message={`Are you sure you want to delete ${selectedCount} selected sections? This action cannot be undone.`}
+      />
     </>
   );
 };

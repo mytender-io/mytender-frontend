@@ -23,7 +23,7 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import { cn } from "@/utils";
-import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationModal.tsx";
+import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal";
 
 interface NewTenderModalProps {
   show: boolean;

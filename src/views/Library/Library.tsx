@@ -50,7 +50,7 @@ import {
 import UploadText from "./components/UploadText.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import BreadCrumbs from "@/components/BreadCrumbs.tsx";
-import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationModal.tsx";
+import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
 import { toast } from "react-toastify";
 
 const NewFolderModal = React.memo(

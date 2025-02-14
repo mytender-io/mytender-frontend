@@ -1,21 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/utils";
 
 interface DebouncedTextAreaProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  className?: string;  // Add className prop
-  disabled?: boolean;  // Optional disabled prop for more flexibility
-  style?: React.CSSProperties;  // Optional inline styles
+  className?: string;
+  disabled?: boolean;
 }
 
 const DebouncedTextArea: React.FC<DebouncedTextAreaProps> = ({
   value,
   onChange,
   placeholder,
-  className = '',  // Default to empty string if not provided
-  disabled = false,
-  style
+  className,
+  disabled = false
 }) => {
   const [localValue, setLocalValue] = useState(value || "");
   const debouncedCallback = useRef<NodeJS.Timeout | null>(null);
@@ -27,7 +27,7 @@ const DebouncedTextArea: React.FC<DebouncedTextAreaProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setLocalValue(newValue);
-    
+
     if (debouncedCallback.current) {
       clearTimeout(debouncedCallback.current);
     }
@@ -38,13 +38,12 @@ const DebouncedTextArea: React.FC<DebouncedTextAreaProps> = ({
   };
 
   return (
-    <textarea
+    <Textarea
       value={localValue}
       onChange={handleChange}
       placeholder={placeholder}
-      className={className}
       disabled={disabled}
-      style={style}
+      className={cn("min-h-[80px] resize-none", className)}
     />
   );
 };

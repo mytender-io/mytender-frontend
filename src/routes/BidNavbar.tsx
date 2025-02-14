@@ -1,18 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { BidContext } from "../views/BidWritingStateManagerView";
-import {
-  faEdit,
-  faEye,
-  faPlus,
-  faUsers
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faEye, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { useAuthUser } from "react-auth-kit";
 import BidTitle from "../components/BidTitle";
 import GenerateProposalModal from "../modals/GenerateProposalModal";
 import SaveStatus from "@/components/SaveStatus";
 import { cn } from "@/utils";
+import { Button } from "@/components/ui/button";
+import PlusIcon from "@/components/icons/PlusIcon";
 
 const BidNavbar: React.FC<{
   showViewOnlyMessage: () => void;
@@ -182,14 +178,11 @@ const BidNavbar: React.FC<{
             />
           </div>
           {outline && outline.length > 0 ? (
-            <div className="flex items-center flex-shrink-0 mb-4">
-              <button
-                onClick={handleRegenerateClick}
-                className="upload-button me-2 min-w-fit"
-              >
-                <FontAwesomeIcon icon={faPlus} className="pr-2" />
+            <div className="flex items-center flex-shrink-0 gap-2">
+              <Button variant="outline" onClick={handleRegenerateClick}>
+                <PlusIcon />
                 New Outline
-              </button>
+              </Button>
               <GenerateProposalModal bid_id={object_id} outline={outline} />
             </div>
           ) : null}

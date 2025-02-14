@@ -11,15 +11,14 @@ import {
   Subheading
 } from "../BidWritingStateManagerView.tsx";
 import StatusMenu from "../../buttons/StatusMenu.tsx";
-import OutlineInstructionsModal from "./components/OutlineInstructionsModal.tsx";
 import SectionMenu from "../../buttons/SectionMenu.tsx";
 import posthog from "posthog-js";
-import { Form } from "react-bootstrap";
-import ProposalSidepane from "../../components/SlidingSidepane.tsx";
+import OutlineInstructionsModal from "./components/OutlineInstructionsModal.tsx";
+import ProposalSidepane from "./components/SlidingSidepane.tsx";
 import ReviewerDropdown from "../../components/dropdowns/ReviewerDropdown.tsx";
 import QuestionTypeDropdown from "../../components/dropdowns/QuestionTypeDropdown.tsx";
-import SectionControls from "../../buttons/SectionControls.tsx";
-import BulkControls from "@/components/BulkControls.tsx";
+import SectionControls from "./components/SectionControls.tsx";
+import BulkControls from "./components/BulkControls.tsx";
 import BreadcrumbNavigation from "../../layout/BreadCrumbNavigation.tsx";
 import { toast } from "react-toastify";
 import {
@@ -32,7 +31,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox.tsx";
-import { DeleteConfirmationDialog } from "../../components/DeleteConfirmationModal.tsx";
+import { DeleteConfirmationDialog } from "../../modals/DeleteConfirmationModal.tsx";
 
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
@@ -58,16 +57,12 @@ const ProposalPlan = () => {
 
   const { object_id, contributors, outline } = sharedState;
 
-  const currentUserPermission = contributors[auth.email] || "viewer";
+  // const currentUserPermission = contributors[auth.email] || "viewer";
+
   const [showModal, setShowModal] = useState(false);
 
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
-
-  const [expandedSections, setExpandedSections] = useState<Set<number>>(
-    new Set()
-  );
-
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedSections, setSelectedSections] = useState(new Set());
 
@@ -101,6 +96,7 @@ const ProposalPlan = () => {
       setSelectedSections(new Set());
     }
   };
+
   const handleBulkUpdate = (updates) => {
     // Store current state before making changes
     setLastOutlineState([...sharedState.outline]);
@@ -592,59 +588,59 @@ const ProposalPlan = () => {
     }
   };
 
-  const renderChoices = () => {
-    return (
-      <div className="choices-container ms-2">
-        {apiChoices
-          .filter((choice) => choice && choice.trim() !== "") // Filter out empty or whitespace-only choices
-          .map((choice, index) => (
-            <div key={index} className="choice-item d-flex align-items-center">
-              <Form.Check
-                type="checkbox"
-                checked={selectedChoices.includes(choice)}
-                onChange={() => handleChoiceSelection(choice)}
-              />
-              {selectedChoices.includes(choice) ? (
-                <Form.Control
-                  type="text"
-                  value={choice}
-                  onChange={(e) => handleChoiceEdit(index, e.target.value)}
-                  className="ml-2"
-                />
-              ) : (
-                <span
-                  onClick={() => handleChoiceSelection(choice)}
-                  style={{ cursor: "pointer" }}
-                >
-                  {choice}
-                </span>
-              )}
-            </div>
-          ))}
-      </div>
-    );
-  };
+  // const renderChoices = () => {
+  //   return (
+  //     <div className="choices-container ms-2">
+  //       {apiChoices
+  //         .filter((choice) => choice && choice.trim() !== "") // Filter out empty or whitespace-only choices
+  //         .map((choice, index) => (
+  //           <div key={index} className="choice-item d-flex align-items-center">
+  //             <Form.Check
+  //               type="checkbox"
+  //               checked={selectedChoices.includes(choice)}
+  //               onChange={() => handleChoiceSelection(choice)}
+  //             />
+  //             {selectedChoices.includes(choice) ? (
+  //               <Form.Control
+  //                 type="text"
+  //                 value={choice}
+  //                 onChange={(e) => handleChoiceEdit(index, e.target.value)}
+  //                 className="ml-2"
+  //               />
+  //             ) : (
+  //               <span
+  //                 onClick={() => handleChoiceSelection(choice)}
+  //                 style={{ cursor: "pointer" }}
+  //               >
+  //                 {choice}
+  //               </span>
+  //             )}
+  //           </div>
+  //         ))}
+  //     </div>
+  //   );
+  // };
 
-  const handleChoiceEdit = (index, newValue) => {
-    const updatedChoices = [...apiChoices];
-    updatedChoices[index] = newValue;
-    setApiChoices(updatedChoices);
+  // const handleChoiceEdit = (index, newValue) => {
+  //   const updatedChoices = [...apiChoices];
+  //   updatedChoices[index] = newValue;
+  //   setApiChoices(updatedChoices);
 
-    // Update selectedChoices and wordAmounts if the edited choice was selected
-    if (selectedChoices.includes(apiChoices[index])) {
-      const updatedSelectedChoices = selectedChoices.map((choice) =>
-        choice === apiChoices[index] ? newValue : choice
-      );
-      setSelectedChoices(updatedSelectedChoices);
+  //   // Update selectedChoices and wordAmounts if the edited choice was selected
+  //   if (selectedChoices.includes(apiChoices[index])) {
+  //     const updatedSelectedChoices = selectedChoices.map((choice) =>
+  //       choice === apiChoices[index] ? newValue : choice
+  //     );
+  //     setSelectedChoices(updatedSelectedChoices);
 
-      const updatedWordAmounts = { ...wordAmounts };
-      if (updatedWordAmounts[apiChoices[index]]) {
-        updatedWordAmounts[newValue] = updatedWordAmounts[apiChoices[index]];
-        delete updatedWordAmounts[apiChoices[index]];
-      }
-      setWordAmounts(updatedWordAmounts);
-    }
-  };
+  //     const updatedWordAmounts = { ...wordAmounts };
+  //     if (updatedWordAmounts[apiChoices[index]]) {
+  //       updatedWordAmounts[newValue] = updatedWordAmounts[apiChoices[index]];
+  //       delete updatedWordAmounts[apiChoices[index]];
+  //     }
+  //     setWordAmounts(updatedWordAmounts);
+  //   }
+  // };
 
   const submitSelections = async () => {
     setIsLoading(true);
@@ -724,6 +720,9 @@ const ProposalPlan = () => {
             showViewOnlyMessage={showViewOnlyMessage}
             initialBidName="Bid Outline"
             description="Enrich the generated structure by injecting specific instructions to each question to assemble your first draft response."
+            outline={outline}
+            object_id={object_id}
+            handleRegenerateClick={handleRegenerateClick}
           />
           <div>
             <OutlineInstructionsModal
@@ -890,7 +889,6 @@ const ProposalPlan = () => {
                     handleSectionChange={handleSectionChange}
                     sendQuestionToChatbot={sendQuestionToChatbot}
                     apiChoices={apiChoices}
-                    renderChoices={renderChoices}
                     selectedChoices={selectedChoices}
                     submitSelections={submitSelections}
                     handleDeleteSubheading={handleDeleteSubheading}

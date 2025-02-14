@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState, useContext } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
+import { WandIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import axios from "axios";
 import { Section } from "@/views/BidWritingStateManagerView";
@@ -9,10 +9,13 @@ import { BidContext } from "@/views/BidWritingStateManagerView";
 
 interface RegenerateButtonProps {
   section: Section;
-  index: number;  // Add index prop to know which section to update
+  index: number; // Add index prop to know which section to update
 }
 
-const RegenerateButton: React.FC<RegenerateButtonProps> = ({ section, index }) => {
+const RegenerateButton: React.FC<RegenerateButtonProps> = ({
+  section,
+  index
+}) => {
   const getAuth = useAuthUser();
   const auth = useMemo(() => getAuth(), [getAuth]);
   const tokenRef = useRef(auth?.token || "default");
@@ -24,7 +27,7 @@ const RegenerateButton: React.FC<RegenerateButtonProps> = ({ section, index }) =
     try {
       const formData = new FormData();
       formData.append("section", JSON.stringify(section));
-      
+
       const response = await axios({
         method: "post",
         url: `http${HTTP_PREFIX}://${API_URL}/generate_writing_plans_for_section`,
@@ -36,9 +39,9 @@ const RegenerateButton: React.FC<RegenerateButtonProps> = ({ section, index }) =
       });
 
       const updatedSection = response.data;
-      
+
       // Update the shared state with the new section data
-      setSharedState(prevState => {
+      setSharedState((prevState) => {
         const newOutline = [...prevState.outline];
         newOutline[index] = updatedSection;
         return {
@@ -46,7 +49,6 @@ const RegenerateButton: React.FC<RegenerateButtonProps> = ({ section, index }) =
           outline: newOutline
         };
       });
-
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Axios error:", error.response?.data || error.message);
@@ -60,14 +62,10 @@ const RegenerateButton: React.FC<RegenerateButtonProps> = ({ section, index }) =
 
   return (
     <div className="flex items-center">
-      <button
-        className="orange-button flex items-center"
-        onClick={handleRegenerate}
-        disabled={isLoading}
-      >
-        <FontAwesomeIcon icon={faWandMagicSparkles} className="me-2" />
-        <span>{isLoading ? "Regenerating..." : "Regenerate"}</span>
-      </button>
+      <Button variant="default" onClick={handleRegenerate} disabled={isLoading}>
+        <WandIcon className="mr-2 h-4 w-4" />
+        {isLoading ? "Regenerating..." : "Regenerate"}
+      </Button>
     </div>
   );
 };

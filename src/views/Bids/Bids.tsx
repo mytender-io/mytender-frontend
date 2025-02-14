@@ -36,7 +36,7 @@ import {
 import SortUpIcon from "@/components/icons/SortUpIcon.tsx";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
-import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationModal.tsx";
+import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
 interface Bid {
   _id: string;
   bid_title: string;
