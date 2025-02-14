@@ -68,7 +68,7 @@ const BidTitle: React.FC<{
             ref={bidNameRef}
             spellCheck="false"
           >
-            {bidInfo} Insights
+            {bidInfo}
           </span>
         </div>
       </h1>

@@ -17,12 +17,14 @@ import { cn } from "@/utils";
 const BidNavbar: React.FC<{
   showViewOnlyMessage: () => void;
   initialBidName: string;
+  description?: string;
   outline?: string[];
   object_id?: string | null;
   handleRegenerateClick?: () => void;
 }> = ({
   showViewOnlyMessage,
   initialBidName,
+  description,
   outline,
   object_id,
   handleRegenerateClick
@@ -127,8 +129,7 @@ const BidNavbar: React.FC<{
           initialBidName={initialBidName}
         />
         <span className="block text-base text-gray-hint_text">
-          Explore insights and retrieve info from the tender docs uploaded to
-          peel back the layers of what the customer is asking for.
+          {description}
         </span>
       </div>
 
@@ -164,7 +165,7 @@ const BidNavbar: React.FC<{
               }
               onClick={() => handleTabClick("/proposal-planner")}
             >
-              Bit Outline
+              Bid Outline
             </NavLink>
             <NavLink
               to="/proposal-preview"

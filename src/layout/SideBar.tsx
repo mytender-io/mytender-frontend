@@ -144,7 +144,11 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             to="/bids"
             className={cn(
               "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-              isActive("/bids") || isActive("/bid-extractor")
+              isActive("/bids") ||
+                isActive("/bid-extractor") ||
+                isActive("/bid-intel") ||
+                isActive("/proposal-planner") ||
+                isActive("/proposal-review")
                 ? "bg-typo-200"
                 : "bg-transparent"
             )}

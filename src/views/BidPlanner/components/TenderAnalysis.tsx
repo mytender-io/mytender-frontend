@@ -60,9 +60,9 @@ const LoadingState = () => {
   }, []);
 
   return (
-    <div className={cn("w-80 ml-4 mt-4 mb-4")}>
+    <div className={cn("w-80")}>
       <div className={cn("flex flex-col space-y-3")}>
-        <div className={cn("max-h-[400px] overflow-y-auto pr-2")}>
+        <div className="p-2">
           {steps.map((step, index) => {
             const StepIcon = step.icon;
             return (
@@ -71,7 +71,7 @@ const LoadingState = () => {
                 className={cn(
                   "flex items-center space-x-4 p-2 rounded-lg transition-all duration-300",
                   index === activeStep
-                    ? "opacity-100 translate-x-2 bg-orange-50"
+                    ? "opacity-100 bg-orange-50"
                     : "opacity-30"
                 )}
               >
@@ -467,9 +467,21 @@ const TenderAnalysis = ({ canUserEdit }) => {
                   value={index.toString()}
                   onClick={() => handleTabClick(index)}
                   className={cn(
-                    "flex items-center gap-2 px-6 py-3 data-[state=active]:text-orange bg-transparent"
+                    "relative flex items-center gap-2 px-6 py-3 data-[state=active]:text-orange bg-transparent"
                   )}
                 >
+                  {loadingTab === index && (
+                    <div
+                      className={cn(
+                        "absolute top-14 left-0 z-10 bg-white rounded-lg shadow-2xl"
+                      )}
+                      style={{
+                        left: `${tabRects[index]?.left - tabRects[0]?.left}px`
+                      }}
+                    >
+                      <LoadingState />
+                    </div>
+                  )}
                   <TabIcon
                     size={16}
                     className={cn(
@@ -486,7 +498,11 @@ const TenderAnalysis = ({ canUserEdit }) => {
                       variant="ghost"
                       size="icon"
                       className={cn(
-                        "bg-transparent hover:bg-transparent hover:text-orange h-6 w-6",
+                        "bg-gray-line hover:bg-orange-100 hover:text-orange h-6 w-6",
+                        currentTabIndex === index &&
+                          (loadingTab !== index
+                            ? "bg-orange-100"
+                            : "bg-transparent"),
                         loadingTab === index && "animate-spin"
                       )}
                     >
@@ -497,23 +513,10 @@ const TenderAnalysis = ({ canUserEdit }) => {
               );
             })}
           </TabsList>
-
           <div className={cn("h-[calc(100vh-345px)] overflow-y-auto")}>
             {tabs.map((tab, index) => (
               <TabsContent key={index} value={index.toString()}>
                 <div className={cn("relative px-8 py-4")}>
-                  {loadingTab === index && (
-                    <div
-                      className={cn(
-                        "absolute -top-[1px] left-0 z-10 bg-white rounded-lg shadow-lg"
-                      )}
-                      style={{
-                        left: `${tabRects[index]?.left - tabRects[0]?.left}px`
-                      }}
-                    >
-                      <LoadingState />
-                    </div>
-                  )}
                   {renderContent(
                     tabContent[index as keyof typeof tabContent] || ""
                   )}

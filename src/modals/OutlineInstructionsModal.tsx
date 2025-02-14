@@ -1,15 +1,6 @@
-import {
-  faFileUpload,
-  faListUl,
-  faEdit,
-  faCloudUploadAlt,
-  faSpinner,
-  faCheck,
-  faTimes
-} from "@fortawesome/free-solid-svg-icons";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useRef, useState } from "react";
-import { Button, Modal, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { displayAlert } from "../helper/Alert";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
@@ -18,9 +9,17 @@ import { useAuthUser } from "react-auth-kit";
 import SelectFolder from "../components/SelectFolder";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import SelectTenderLibraryFile from "../components/SelectTenderLibraryFile";
-import { LinearProgress, Typography, Box } from "@mui/material";
-import "./ModalStyles.css";
 import { Check, Edit, Upload } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { X } from "lucide-react";
 
 const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
   const getAuth = useAuthUser();
@@ -49,40 +48,17 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
     "Generating outline... Please wait a little bit longer..."
   ];
 
-  function LinearProgressWithLabel(props) {
+  function ProgressWithLabel({ value, message }) {
     return (
-      <Box
-        sx={{ display: "flex", alignItems: "center", flexDirection: "column" }}
-      >
-        <Box sx={{ width: "100%", mr: 1 }}>
-          <LinearProgress
-            variant="determinate"
-            {...props}
-            sx={{
-              height: "0.625rem", // 10px
-              borderRadius: "0.3125rem", // 5px
-              backgroundColor: "#ffd699",
-              "& .MuiLinearProgress-bar": {
-                backgroundColor: "#ff9900"
-              }
-            }}
-          />
-        </Box>
-        <Box sx={{ minWidth: "2.1875rem", mt: 1, textAlign: "center" }}>
-          {" "}
-          {/* 35px */}
-          <Typography variant="body2" color="text.secondary">
-            {`${Math.round(props.value)}%`}
-          </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ fontStyle: "italic" }}
-          >
-            {props.message}
-          </Typography>
-        </Box>
-      </Box>
+      <div className="flex flex-col items-center">
+        <div className="w-full">
+          <Progress value={value} className="h-2.5" />
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">{`${Math.round(value)}%`}</p>
+          <p className="text-sm text-gray-600 italic">{message}</p>
+        </div>
+      </div>
     );
   }
 
@@ -275,17 +251,17 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
         <div className="px-4 py-2">
           <div className="mb-4 space-y-8">
             {/* Step 1 */}
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
               <div className="flex-shrink-0">
                 <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange text-white text-2xl font-bold shadow-sm">
                   1
                 </div>
               </div>
-              <div className="ml-4">
-                <h6 className="text-xl font-bold">
+              <div>
+                <h6 className="text-lg font-bold">
                   Select Tender Questions Document
                 </h6>
-                <p className="text-gray-500 mt-1">
+                <p className="text-base text-gray-500">
                   First, select the tender question document as the outline will
                   extract the questions from here
                   <Upload className="inline-block ml-2" size={16} />
@@ -294,17 +270,17 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
             </div>
 
             {/* Step 2 */}
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
               <div className="flex-shrink-0">
                 <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange text-white text-2xl font-bold shadow-sm">
                   2
                 </div>
               </div>
-              <div className="ml-4">
-                <h6 className="text-xl font-bold">
+              <div>
+                <h6 className="text-lg font-bold">
                   Select Company Library Docs
                 </h6>
-                <p className="text-gray-500 mt-1">
+                <p className="text-base text-gray-500">
                   Select previous bids from your company library to use as
                   context.
                 </p>
@@ -312,15 +288,15 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
             </div>
 
             {/* Step 3 */}
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
               <div className="flex-shrink-0">
                 <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange text-white text-2xl font-bold shadow-sm">
                   3
                 </div>
               </div>
-              <div className="ml-4">
-                <h6 className="text-xl font-bold">Generate Outline</h6>
-                <p className="text-gray-500 mt-1">
+              <div>
+                <h6 className="text-lg font-bold">Generate Outline</h6>
+                <p className="text-base text-gray-500">
                   Click the button below to automatically generate your proposal
                   outline based on the tender questions.
                   <Edit className="inline-block ml-2" size={16} />
@@ -370,10 +346,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
           </div>
           {isGeneratingOutline && (
             <div className="mt-4">
-              <LinearProgressWithLabel
-                value={progress}
-                message={loadingMessage}
-              />
+              <ProgressWithLabel value={progress} message={loadingMessage} />
             </div>
           )}
         </div>
@@ -439,34 +412,34 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
   };
 
   return (
-    <Modal show={show} onHide={onCancel} size="lg" centered>
-      <Modal.Header className="px-4 d-flex justify-content-between align-items-center">
-        <Modal.Title>{getHeaderTitle()}</Modal.Title>
-        <button className="close-button ms-auto" onClick={onCancel}>
-          ×
+    <Dialog open={show} onOpenChange={() => onCancel()}>
+      <DialogHeader>
+        <DialogTitle>{getHeaderTitle()}</DialogTitle>
+        <button
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100"
+          onClick={onCancel}
+        >
+          <X className="h-4 w-4" />
         </button>
-      </Modal.Header>
-      <Modal.Body className="px-0 py-4">{renderStepContent()}</Modal.Body>
-      <Modal.Footer>
-        <Button
-          variant="secondary"
-          className="upload-button"
-          onClick={handleBack}
-        >
-          {currentStep === 1 ? "Cancel" : "Back"}
-        </Button>
-        <Button
-          className="upload-button"
-          onClick={handleNext}
-          disabled={
-            (currentStep === 2 && selectedFiles.length === 0) ||
-            isGeneratingOutline
-          }
-        >
-          {getButtonLabel()}
-        </Button>
-      </Modal.Footer>
-    </Modal>
+      </DialogHeader>
+      <DialogContent>
+        {renderStepContent()}
+        <DialogFooter>
+          <Button variant="outline" onClick={handleBack}>
+            {currentStep === 1 ? "Cancel" : "Back"}
+          </Button>
+          <Button
+            onClick={handleNext}
+            disabled={
+              (currentStep === 2 && selectedFiles.length === 0) ||
+              isGeneratingOutline
+            }
+          >
+            {getButtonLabel()}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

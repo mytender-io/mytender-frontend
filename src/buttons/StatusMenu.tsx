@@ -1,7 +1,13 @@
-import { Menu, MenuItem, Button } from "@mui/material";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { CheckCircle, Clock, TriangleAlert } from "lucide-react";
 import { Section } from "../views/BidWritingStateManagerView";
-import { Circle, Clock, CheckCircle, Minus, TriangleAlert } from "lucide-react";
+import { cn } from "@/utils";
 
 type ValidStatus = "Not Started" | "In Progress" | "Completed";
 
@@ -12,91 +18,35 @@ const StatusMenu = ({
   value: Section["status"];
   onChange: (value: Section["status"]) => void;
 }) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const normalizeStatus = (status: any): ValidStatus => {
-    const validStatuses: ValidStatus[] = ["Not Started", "In Progress", "Completed"];
-    return validStatuses.includes(status) ? status : "Not Started";
+  const normalizeStatus = (status: string): ValidStatus => {
+    const validStatuses: ValidStatus[] = [
+      "Not Started",
+      "In Progress",
+      "Completed"
+    ];
+    return validStatuses.includes(status as ValidStatus)
+      ? (status as ValidStatus)
+      : "Not Started";
   };
 
   const currentStatus = normalizeStatus(value);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleSelect = (status: ValidStatus) => {
-    onChange(status);
-    handleClose();
-  };
-
-  const getStatusStyles = (status: ValidStatus): { sx: any } => {
-    const baseStyles = {
-      fontWeight: 700,
-      fontSize: '1.125rem',
-      whiteSpace: 'nowrap',
-      textTransform: 'none',
-      '&:hover': {
-        opacity: 0.9,
-      }
-    };
-
+  const getStatusStyles = (status: ValidStatus): string => {
     switch (status) {
       case "Completed":
-        return {
-          sx: {
-            ...baseStyles,
-            backgroundColor: '#e0f5e9',
-            color: '#2a7f4f',
-            '&:hover': {
-              backgroundColor: '#e0f5e9',
-            }
-          }
-        };
+        return "bg-status-success_light text-status-success hover:text-status-success hover:bg-status-success_light/90 border-status-success";
       case "In Progress":
-        return {
-          sx: {
-            ...baseStyles,
-            backgroundColor: 'rgba(255, 140, 0, 0.1)',
-            color: '#ff8c00',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 140, 0, 0.1)',
-            }
-          }
-        };
+        return "bg-status-review_light text-status-review hover:text-status-review hover:bg-status-review_light/90 border-status-review";
       case "Not Started":
-        return {
-          sx: {
-            ...baseStyles,
-            backgroundColor: '#ffe4dc',
-            color: '#d14d1f',
-            '&:hover': {
-              backgroundColor: '#ffe4dc',
-            }
-          }
-        };
+        return "bg-status-planning_light text-status-planning hover:text-status-planning hover:bg-status-planning_light/90 border-status-planning";
       default:
-        return {
-          sx: {
-            ...baseStyles,
-            backgroundColor: '#ffe4dc',
-            color: '#d14d1f',
-            '&:hover': {
-              backgroundColor: '#ffe4dc',
-            }
-          }
-        };
+        return "bg-status-planning_light text-status-planning hover:text-status-planning hover:bg-status-planning_light/90 border-status-planning";
     }
   };
 
   const getStatusIcon = (status: ValidStatus) => {
     const iconProps = {
-      className: "ml-2 inline-block align-middle",
-      size: 16
+      className: "ml-2 h-4 w-4 inline-block align-middle"
     };
 
     switch (status) {
@@ -112,53 +62,40 @@ const StatusMenu = ({
   };
 
   return (
-    <div>
-      <Button
-        onClick={handleClick}
-        {...getStatusStyles(currentStatus)}
-        disableElevation
-        disableRipple
-        variant="contained"
-        aria-controls="simple-menu"
-        aria-haspopup="true"
-      >
-        {currentStatus}
-        {getStatusIcon(currentStatus)}
-      </Button>
-      <Menu
-        id="simple-menu"
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        keepMounted
-        PaperProps={{
-          elevation: 1,
-          sx: {
-            width: '120px',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-          }
-        }}
-      >
-        <MenuItem
-          onClick={() => handleSelect("Not Started")}
-          sx={{ '&:hover': { backgroundColor: '#f3f4f6' } }}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className={cn(
+            "font-semibold text-sm rounded-md py-1 px-3 whitespace-nowrap border-[0.5px]",
+            getStatusStyles(currentStatus)
+          )}
+        >
+          {currentStatus}
+          {getStatusIcon(currentStatus)}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-32">
+        <DropdownMenuItem
+          onClick={() => onChange("Not Started")}
+          className={cn("hover:bg-gray-100")}
         >
           Not Started
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleSelect("In Progress")}
-          sx={{ '&:hover': { backgroundColor: '#f3f4f6' } }}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => onChange("In Progress")}
+          className={cn("hover:bg-gray-100")}
         >
           In Progress
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleSelect("Completed")}
-          sx={{ '&:hover': { backgroundColor: '#f3f4f6' } }}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => onChange("Completed")}
+          className={cn("hover:bg-gray-100")}
         >
           Completed
-        </MenuItem>
-      </Menu>
-    </div>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

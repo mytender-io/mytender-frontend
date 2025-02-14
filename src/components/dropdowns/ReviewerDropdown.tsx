@@ -1,84 +1,47 @@
-import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { UserCircle } from "lucide-react";
 
 interface ReviewerDropdownProps {
   value: string;
   onChange: (value: string) => void;
   contributors: Record<string, string>;
-  className?: string;
 }
-
-const selectStyle = {
-  fontFamily: '"Manrope", sans-serif',
-  fontSize: "1.143rem",
-  minWidth: "13.75rem",
-  backgroundColor: "white",
-  "& MuiOutlinedInputNotchedOutline": {
-    borderColor: "#ced4da"
-  },
-  "&:hover MuiOutlinedInputNotchedOutline": {
-    borderColor: "#86b7fe"
-  },
-  "&.MuiFocused MuiOutlinedInputNotchedOutline": {
-    borderColor: "#86b7fe",
-    borderWidth: "0.0625rem"
-  }
-};
-
-const menuStyle = {
-  fontSize: "1.1rem",
-  fontFamily: '"Manrope", sans-serif'
-};
-
-const menuItemStyle = {
-  ...menuStyle,
-  display: "flex",
-  alignItems: "center",
-  gap: "0.5rem"
-};
 
 const ReviewerDropdown: React.FC<ReviewerDropdownProps> = ({
   value,
   onChange,
-  contributors,
-  className
+  contributors
 }) => {
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    onChange(event.target.value as string);
-  };
-
   return (
-    <Select
-      value={value || ""}
-      onChange={handleChange}
-      size="small"
-      style={selectStyle}
-      className={className}
-      displayEmpty
-      MenuProps={{
-        PaperProps: {
-          style: menuStyle
-        }
-      }}
-    >
-      <MenuItem value="" style={menuItemStyle}>
-        <FontAwesomeIcon icon={faUserCircle} size="sm" className="me-2" />
-        <em>Select Reviewer</em>
-      </MenuItem>
-      {Object.entries(contributors).length > 0 ? (
-        Object.entries(contributors).map(([email, role], index) => (
-          <MenuItem key={index} value={email} style={menuItemStyle}>
-            <FontAwesomeIcon icon={faUserCircle} size="sm" className="me-2" />
-            {email} ({role})
-          </MenuItem>
-        ))
-      ) : (
-        <MenuItem disabled value="" style={menuItemStyle}>
-          <FontAwesomeIcon icon={faUserCircle} size="sm" className="me-2" />
-          No Contributors Available
-        </MenuItem>
-      )}
+    <Select value={value || ""} onValueChange={onChange}>
+      <SelectTrigger className="w-[220px] bg-white text-md">
+        <SelectValue placeholder="Select Reviewer" />
+      </SelectTrigger>
+      <SelectContent>
+        {Object.entries(contributors).length > 0 ? (
+          Object.entries(contributors).map(([email, role], index) => (
+            <SelectItem key={index} value={email}>
+              <div className="flex items-center gap-2">
+                <UserCircle className="h-4 w-4" />
+                <span>
+                  {email} ({role})
+                </span>
+              </div>
+            </SelectItem>
+          ))
+        ) : (
+          <SelectItem value="" disabled className="flex items-center gap-2">
+            <UserCircle className="h-4 w-4" />
+            <span>No Contributors Available</span>
+          </SelectItem>
+        )}
+      </SelectContent>
     </Select>
   );
 };

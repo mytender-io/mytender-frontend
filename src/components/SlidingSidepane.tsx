@@ -133,7 +133,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                       handleSectionChange(index, "reviewer", value)
                     }
                     contributors={contributors}
-                    className="me-2"
                   />
                   <QuestionTypeDropdown
                     value={section.choice}

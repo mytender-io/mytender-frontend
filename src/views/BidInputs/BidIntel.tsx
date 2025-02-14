@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
+import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import axios from "axios";
-import withAuth from "../routes/withAuth.tsx";
+import withAuth from "../../routes/withAuth.tsx";
 import { useAuthUser } from "react-auth-kit";
 import { useLocation } from "react-router-dom";
-import BidNavbar from "../routes/BidNavbar.tsx";
-import { BidContext } from "./BidWritingStateManagerView.tsx";
+import BidNavbar from "../../routes/BidNavbar.tsx";
+import { BidContext } from "../BidWritingStateManagerView.tsx";
 import { Check, Pencil, Search, X } from "lucide-react";
-import BreadcrumbNavigation from "../layout/BreadCrumbNavigation.tsx";
+import BreadcrumbNavigation from "../../layout/BreadCrumbNavigation.tsx";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +28,6 @@ const BidIntel = () => {
   const [existingBidNames, setExistingBidNames] = useState([]);
   const [organizationUsers, setOrganizationUsers] = useState([]);
   const [currentUserEmail, setCurrentUserEmail] = useState("");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // State for inline editing
   const [editingState, setEditingState] = useState({
@@ -124,7 +123,7 @@ const BidIntel = () => {
       editingState.type === type && editingState.index === index;
 
     return (
-      <div className="flex items-center justify-between p-3 border-b border-gray-200">
+      <div className="flex items-center justify-between border-b py-2 px-4 border-gray-200 last:border-b-0">
         {isEditing ? (
           <div className="flex-1 flex items-center gap-2">
             <Input
@@ -138,7 +137,7 @@ const BidIntel = () => {
             <Button
               size="icon"
               variant="ghost"
-              className="hover:bg-green-50 hover:text-green-600"
+              className="hover:bg-green-100 hover:text-green-600 w-6 h-6"
               onClick={handleSaveEdit}
             >
               <Check className="w-4 h-4" />
@@ -146,7 +145,7 @@ const BidIntel = () => {
             <Button
               size="icon"
               variant="ghost"
-              className="hover:bg-red-50 hover:text-red-600"
+              className="hover:bg-red-100 hover:text-red-600 w-6 h-6"
               onClick={handleCancelEdit}
             >
               <X className="w-4 h-4" />
@@ -154,14 +153,14 @@ const BidIntel = () => {
           </div>
         ) : (
           <>
-            <span className="text-base text-gray-700">
+            <span className="text-sm text-gray-hint_text">
               {index + 1}. {text}
             </span>
             <div className="flex gap-2">
               <Button
                 size="icon"
                 variant="ghost"
-                className="hover:bg-gray-100"
+                className="hover:bg-orange-100 hover:text-orange w-6 h-6"
                 onClick={() => handleEditStart(text, type, index)}
               >
                 <Pencil className="w-4 h-4" />
@@ -169,7 +168,7 @@ const BidIntel = () => {
               <Button
                 size="icon"
                 variant="ghost"
-                className="hover:bg-gray-100"
+                className="hover:bg-red-100 hover:text-red-600 w-6 h-6"
                 onClick={() => handleDelete(type, index)}
               >
                 <X className="w-4 h-4" />
@@ -255,115 +254,109 @@ const BidIntel = () => {
           showHome={true}
         />
       </div>
-      <div className="px-6 py-4">
+      <div className="px-6 py-4 overflow-y-auto h-[calc(100vh-89px)]">
         <div className="space-y-4">
           <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}
-            initialBidName={initialBidName}
+            initialBidName="Bid Inputs"
+            description="Review and refine the AI-suggested inputs from the tender documents to configure your response strategy."
           />
-          <div className="cards mt-4">
-            <h2 className="text-2xl font-semibold mb-4">Create Components</h2>
-            <p className="text-base text-gray-600 mb-6">
-              Build the foundations that gets generated in the core response
-            </p>
-
-            <div className="grid grid-cols-2 gap-6">
-              {/* Customer Pain Points Card */}
-              <div className="bg-white rounded-lg shadow">
-                <h3 className="text-lg font-medium p-4 bg-gray-100 rounded-t-lg border-b">
-                  Customer Pain Points
-                </h3>
-                <div className="h-64 overflow-y-auto p-4 space-y-2">
-                  {items.painPoints.length > 0 ? (
-                    items.painPoints.map((item, index) => (
-                      <CardItem
-                        key={`pain-${index}`}
-                        text={item}
-                        index={index}
-                        type="painPoints"
-                      />
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-center py-4">
-                      Click on the Pain Points button in the Bid Planner page to
-                      generate pain points.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Win Themes Card */}
-              <div className="bg-white rounded-lg shadow">
-                <h3 className="text-lg font-medium p-4 bg-gray-100 rounded-t-lg border-b">
-                  Win themes:
-                </h3>
-                <div className="h-64 overflow-y-auto p-4 space-y-2">
-                  {items.winThemes.length > 0 ? (
-                    items.winThemes.map((item, index) => (
-                      <CardItem
-                        key={`win-${index}`}
-                        text={item}
-                        index={index}
-                        type="winThemes"
-                      />
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-center py-4">
-                      Click on the Win Themes button in the Bid Planner page to
-                      generate win themes.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Differentiating Factors Card */}
-              <div className="bg-white rounded-lg shadow">
-                <h3 className="text-lg font-medium p-4 bg-gray-100 rounded-t-lg border-b">
-                  Differentiation Opportunities
-                </h3>
-                <div className="h-64 overflow-y-auto p-4 space-y-2">
-                  {items.factors.length > 0 ? (
-                    items.factors.map((item, index) => (
-                      <CardItem
-                        key={`factor-${index}`}
-                        text={item}
-                        index={index}
-                        type="factors"
-                      />
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-center py-6">
-                      Click on the Differentation Opportunities button in the
-                      Bid Planner page to generate differentation opportunities.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Keep existing Case Study Card */}
-              <div className="bg-white rounded-lg shadow">
-                <h3 className="text-lg font-medium p-4 bg-gray-100 rounded-t-lg border-b">
-                  Add Relevant Case Study
-                </h3>
-                <div className="p-4">
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <Input
-                      type="text"
-                      placeholder="Search for case study..."
-                      className="pl-10"
-                      disabled
+          <div className="grid grid-cols-2 gap-6">
+            {/* Customer Pain Points Card */}
+            <div className="bg-white rounded-lg shadow w-full h-full">
+              <span className="font-medium px-4 py-3 bg-gray-100 rounded-t-lg border-b w-full block text-gray-hint_text">
+                Customer Pain Points
+              </span>
+              <div className="h-64 overflow-y-auto space-y-2">
+                {items.painPoints.length > 0 ? (
+                  items.painPoints.map((item, index) => (
+                    <CardItem
+                      key={`pain-${index}`}
+                      text={item}
+                      index={index}
+                      type="painPoints"
                     />
-                  </div>
-                  <div className="flex flex-col items-center justify-center h-48 text-center">
-                    <p className="text-lg text-gray-400 font-medium">
-                      Coming Soon
-                    </p>
-                    <p className="text-sm text-gray-400 mt-2">
-                      Case study search functionality will be available in
-                      future updates
-                    </p>
-                  </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">
+                    Click on the Pain Points button in the Bid Planner page to
+                    generate pain points.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Win Themes Card */}
+            <div className="bg-white rounded-lg shadow w-full h-full">
+              <span className="font-medium px-4 py-3 bg-gray-100 rounded-t-lg border-b w-full block text-gray-hint_text">
+                Win themes:
+              </span>
+              <div className="h-64 overflow-y-auto space-y-2">
+                {items.winThemes.length > 0 ? (
+                  items.winThemes.map((item, index) => (
+                    <CardItem
+                      key={`win-${index}`}
+                      text={item}
+                      index={index}
+                      type="winThemes"
+                    />
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">
+                    Click on the Win Themes button in the Bid Planner page to
+                    generate win themes.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Differentiating Factors Card */}
+            <div className="bg-white rounded-lg shadow w-full h-full">
+              <span className="font-medium px-4 py-3 bg-gray-100 rounded-t-lg border-b w-full block text-gray-hint_text">
+                Differentiating Factors
+              </span>
+              <div className="h-64 overflow-y-auto space-y-2">
+                {items.factors.length > 0 ? (
+                  items.factors.map((item, index) => (
+                    <CardItem
+                      key={`factor-${index}`}
+                      text={item}
+                      index={index}
+                      type="factors"
+                    />
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-6">
+                    Click on the Differentation Opportunities button in the Bid
+                    Planner page to generate differentation opportunities.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Keep existing Case Study Card */}
+            <div className="bg-white rounded-lg shadow w-full h-full">
+              <span className="font-medium px-4 py-3 bg-gray-100 rounded-t-lg border-b w-full block text-gray-hint_text">
+                Add Relevant Case Study
+              </span>
+              <div className="p-4">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Search for case study..."
+                    className="pl-10"
+                    disabled
+                  />
+                </div>
+                <div className="flex flex-col items-center justify-center h-48 text-center">
+                  <p className="text-lg text-gray-400 font-medium">
+                    Coming Soon
+                  </p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    Case study search functionality will be available in future
+                    updates
+                  </p>
                 </div>
               </div>
             </div>

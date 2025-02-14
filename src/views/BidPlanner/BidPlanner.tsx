@@ -171,6 +171,8 @@ const BidPlanner = () => {
           <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}
             initialBidName={initialBidName}
+            description="Explore insights and retrieve info from the tender docs uploaded to
+          peel back the layers of what the customer is asking for."
           />
           <Button
             onClick={handleOpenLibrary}
