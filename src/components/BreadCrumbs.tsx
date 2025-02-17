@@ -1,5 +1,5 @@
 import React from "react";
-
+import { FolderIcon } from "lucide-react";
 const BreadCrumbs = ({
   activeFolder,
   setActiveFolder
@@ -13,13 +13,19 @@ const BreadCrumbs = ({
   };
 
   if (!activeFolder) {
-    return <span className="text-sm text-gray-600">Content Library</span>;
+    return (
+      <span className="text-sm text-gray-600 flex items-center gap-2">
+        <FolderIcon className="h-4 w-4" />
+        Content Library
+      </span>
+    );
   }
 
   const parts = activeFolder.split("FORWARDSLASH");
 
   return (
-    <>
+    <div className="flex items-center gap-2">
+      <FolderIcon className="h-4 w-4" />
       <span
         className="text-sm text-orange hover:text-orange-hover transition-colors ease-in-out cursor-pointer"
         onClick={() => setActiveFolder(null)}
@@ -47,7 +53,7 @@ const BreadCrumbs = ({
           </span>
         </React.Fragment>
       ))}
-    </>
+    </div>
   );
 };
 

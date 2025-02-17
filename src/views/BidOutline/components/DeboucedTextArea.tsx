@@ -43,7 +43,7 @@ const DebouncedTextArea: React.FC<DebouncedTextAreaProps> = ({
       onChange={handleChange}
       placeholder={placeholder}
       disabled={disabled}
-      className={cn("min-h-[80px] resize-none", className)}
+      className={cn("min-h-[120px] resize-none", className)}
     />
   );
 };

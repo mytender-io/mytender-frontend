@@ -3,12 +3,7 @@ import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 // import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
-import {
-  faFolder,
-  faFileAlt,
-  faReply
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FolderIcon, FileIcon, ReplyIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
@@ -208,7 +203,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
               className="flex items-center gap-2"
               onClick={() => handleFolderClick(folderName)}
             >
-              <FontAwesomeIcon icon={faFolder} className="h-4 w-4" />
+              {/* <FolderIcon className="h-4 w-4" /> */}
               <span className="text-sm">{displayName}</span>
             </div>
           </TableCell>
@@ -266,10 +261,11 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
               className="flex items-center gap-2"
               onClick={() => isFolder && handleFolderClick(fullPath)}
             >
-              <FontAwesomeIcon
-                icon={isFolder ? faFolder : faFileAlt}
-                className="h-4 w-4"
-              />
+              {isFolder ? (
+                <FolderIcon className="h-4 w-4" />
+              ) : (
+                <FileIcon className="h-4 w-4" />
+              )}
               <span className="text-sm">{displayName}</span>
             </div>
           </TableCell>
@@ -282,19 +278,17 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
     <Card className="h-[22.5rem] bg-white rounded-md shadow-sm p-4">
       <CardContent className="h-full p-0">
         <div className="flex flex-col overflow-auto">
-          <div className="flex justify-between items-center mb-0">
-            <div className="text-left mb-1.5">
-              <BreadCrumbs
-                activeFolder={activeFolder}
-                setActiveFolder={setActiveFolder}
-              />
-            </div>
+          <div className="flex justify-between items-center mb-0 min-h-10">
+            <BreadCrumbs
+              activeFolder={activeFolder}
+              setActiveFolder={setActiveFolder}
+            />
             {activeFolder && (
               <div
                 className="cursor-pointer px-2.5 py-1.5 rounded-md text-lg hover:bg-gray-100"
                 onClick={() => handleBackClick()}
               >
-                <FontAwesomeIcon icon={faReply} fontSize="16" />
+                <ReplyIcon className="inline h-4 w-4" />
                 <span className="text-sm ml-2.5">Back</span>
               </div>
             )}

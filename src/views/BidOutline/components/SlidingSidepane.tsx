@@ -10,8 +10,8 @@ import SubheadingCards from "./SubheadingCards";
 import RegenerateButton from "./RegenerateButton";
 import { Contributor, Section } from "../../BidWritingStateManagerView";
 import StatusMenu from "@/buttons/StatusMenu";
-import ReviewerDropdown from "@/components/dropdowns/ReviewerDropdown";
-import QuestionTypeDropdown from "@/components/dropdowns/QuestionTypeDropdown";
+import ReviewerDropdown from "@/views/BidOutline/components/ReviewerDropdown";
+import QuestionTypeDropdown from "@/views/BidOutline/components/QuestionTypeDropdown";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -61,6 +61,20 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   totalSections,
   onNavigate
 }) => {
+  const [openSections, setOpenSections] = React.useState({
+    compliance: false,
+    winThemes: false,
+    painPoints: false,
+    differentiation: false
+  });
+
+  const toggleSection = (section: keyof typeof openSections) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   if (!section) return null;
 
   const hasSubheadings = section.subheadings && section.subheadings.length > 0;
@@ -95,7 +109,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                className="text-2xl"
+                className="text-2xl bg-transparent"
               >
                 ×
               </Button>
@@ -108,7 +122,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     size="icon"
                     onClick={() => onNavigate("prev")}
                     disabled={index === 0}
-                    className="text-gray-600 hover:text-gray-800 disabled:text-gray-300"
+                    className="text-gray-600 hover:text-gray-800 disabled:text-gray-300 bg-transparent"
                   >
                     <FontAwesomeIcon icon={faChevronLeft} />
                   </Button>
@@ -120,7 +134,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     size="icon"
                     onClick={() => onNavigate("next")}
                     disabled={index === totalSections - 1}
-                    className="text-gray-600 hover:text-gray-800 disabled:text-gray-300"
+                    className="text-gray-600 hover:text-gray-800 disabled:text-gray-300 bg-transparent"
                   >
                     <FontAwesomeIcon icon={faChevronRight} />
                   </Button>
@@ -155,7 +169,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     value={section.word_count || 0}
                     min={0}
                     step={50}
-                    className="w-28 text-center"
+                    className="w-20 text-center"
                     onChange={(e) => {
                       const value = parseInt(e.target.value);
                       if (!isNaN(value) && value >= 0) {
@@ -202,73 +216,113 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 </div>
               )}
               <div className="space-y-6">
-                <div className="space-y-2">
-                  <span className="font-medium flex items-center gap-1">
-                    <ChevronRight className="w-5 h-5" />
+                <div className="space-y-2 min-h-10">
+                  <span
+                    className="font-medium flex items-center gap-1 cursor-pointer select-none"
+                    onClick={() => toggleSection("compliance")}
+                  >
+                    <ChevronRight
+                      className={cn(
+                        "w-5 h-5 transition-transform duration-200",
+                        openSections.compliance && "rotate-90"
+                      )}
+                    />
                     Compliance Requirements
                   </span>
-                  <Textarea
-                    value={section.compliance_requirements}
-                    onChange={(e) =>
-                      handleSectionChange(
-                        index,
-                        "compliance_requirements",
-                        e.target.value
-                      )
-                    }
-                    placeholder="These are the compliance requirements relevant to the section..."
-                  />
+                  {openSections.compliance && (
+                    <Textarea
+                      value={section.compliance_requirements}
+                      onChange={(e) =>
+                        handleSectionChange(
+                          index,
+                          "compliance_requirements",
+                          e.target.value
+                        )
+                      }
+                      placeholder="These are the compliance requirements relevant to the section..."
+                    />
+                  )}
                 </div>
-                <div className="space-y-2">
-                  <span className="font-medium flex items-center gap-1">
-                    <ChevronRight className="w-5 h-5" />
+                <div className="space-y-2 min-h-10">
+                  <span
+                    className="font-medium flex items-center gap-1 cursor-pointer select-none"
+                    onClick={() => toggleSection("winThemes")}
+                  >
+                    <ChevronRight
+                      className={cn(
+                        "w-5 h-5 transition-transform duration-200",
+                        openSections.winThemes && "rotate-90"
+                      )}
+                    />
                     Relevant Win Themes
                   </span>
-                  <Textarea
-                    value={section.relevant_evaluation_criteria}
-                    onChange={(e) =>
-                      handleSectionChange(
-                        index,
-                        "relevant_evaluation_criteria",
-                        e.target.value
-                      )
-                    }
-                    placeholder="These are the win themes relevant to the section..."
-                  />
+                  {openSections.winThemes && (
+                    <Textarea
+                      value={section.relevant_evaluation_criteria}
+                      onChange={(e) =>
+                        handleSectionChange(
+                          index,
+                          "relevant_evaluation_criteria",
+                          e.target.value
+                        )
+                      }
+                      placeholder="These are the win themes relevant to the section..."
+                    />
+                  )}
                 </div>
-                <div className="space-y-2">
-                  <span className="font-medium flex items-center gap-1">
-                    <ChevronRight className="w-5 h-5" />
+                <div className="space-y-2 min-h-10">
+                  <span
+                    className="font-medium flex items-center gap-1 cursor-pointer select-none"
+                    onClick={() => toggleSection("painPoints")}
+                  >
+                    <ChevronRight
+                      className={cn(
+                        "w-5 h-5 transition-transform duration-200",
+                        openSections.painPoints && "rotate-90"
+                      )}
+                    />
                     Relevant Customer Pain Points
                   </span>
-                  <Textarea
-                    value={section.relevant_derived_insights}
-                    onChange={(e) =>
-                      handleSectionChange(
-                        index,
-                        "relevant_derived_insights",
-                        e.target.value
-                      )
-                    }
-                    placeholder="These are the customer pain points relevant to the section..."
-                  />
+                  {openSections.painPoints && (
+                    <Textarea
+                      value={section.relevant_derived_insights}
+                      onChange={(e) =>
+                        handleSectionChange(
+                          index,
+                          "relevant_derived_insights",
+                          e.target.value
+                        )
+                      }
+                      placeholder="These are the customer pain points relevant to the section..."
+                    />
+                  )}
                 </div>
-                <div className="space-y-2">
-                  <span className="font-medium flex items-center gap-1">
-                    <ChevronRight className="w-5 h-5" />
+                <div className="space-y-2 min-h-10">
+                  <span
+                    className="font-medium flex items-center gap-1 cursor-pointer select-none"
+                    onClick={() => toggleSection("differentiation")}
+                  >
+                    <ChevronRight
+                      className={cn(
+                        "w-5 h-5 transition-transform duration-200",
+                        openSections.differentiation && "rotate-90"
+                      )}
+                    />
                     Competitor Differentiation Factors
                   </span>
-                  <Textarea
-                    value={section.relevant_differentiation_factors}
-                    onChange={(e) =>
-                      handleSectionChange(
-                        index,
-                        "relevant_differentiation_factors",
-                        e.target.value
-                      )
-                    }
-                    placeholder="These are the competitor differentiation factors relevant to the section..."
-                  />
+                  {openSections.differentiation && (
+                    <Textarea
+                      value={section.relevant_differentiation_factors}
+                      onChange={(e) =>
+                        handleSectionChange(
+                          index,
+                          "relevant_differentiation_factors",
+                          e.target.value
+                        )
+                      }
+                      placeholder="These are the competitor differentiation factors relevant to the section..."
+                    />
+                  )}
                 </div>
               </div>
             </div>

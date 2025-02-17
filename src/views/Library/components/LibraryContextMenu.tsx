@@ -1,5 +1,4 @@
-import { faFolder } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { File, FileText, Folder, Trash2 } from "lucide-react";
 import { Menu, MenuItem } from "@mui/material";
 
 interface Position {
@@ -98,28 +97,25 @@ const LibraryContextMenu: React.FC<LibraryContextMenuProps> = ({
       {isFolder ? (
         <>
           <MenuItem onClick={handleUploadPDF} className="styled-menu-item">
-            <i className="fas fa-file-pdf styled-menu-item-icon"></i>
+            <File className="styled-menu-item-icon" />
             Upload PDF/Word/Excel
           </MenuItem>
           <MenuItem onClick={handleUploadText} className="styled-menu-item">
-            <i className="fas fa-file-alt styled-menu-item-icon"></i>
+            <FileText className="styled-menu-item-icon" />
             Upload Text
           </MenuItem>
           <MenuItem onClick={handleNewSubfolder} className="styled-menu-item">
-            <FontAwesomeIcon
-              icon={faFolder}
-              className="styled-menu-item-icon"
-            />
+            <Folder className="styled-menu-item-icon" />
             New Subfolder
           </MenuItem>
           <MenuItem onClick={handleDelete} className="styled-menu-item">
-            <i className="fas fa-trash-alt styled-menu-item-icon"></i>
+            <Trash2 className="styled-menu-item-icon" />
             Delete Folder
           </MenuItem>
         </>
       ) : (
         <MenuItem onClick={handleDelete} className="styled-menu-item">
-          <i className="fas fa-trash-alt styled-menu-item-icon"></i>
+          <Trash2 className="styled-menu-item-icon" />
           Delete File
         </MenuItem>
       )}

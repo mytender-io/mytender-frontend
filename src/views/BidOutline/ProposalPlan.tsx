@@ -15,8 +15,8 @@ import SectionMenu from "../../buttons/SectionMenu.tsx";
 import posthog from "posthog-js";
 import OutlineInstructionsModal from "./components/OutlineInstructionsModal.tsx";
 import ProposalSidepane from "./components/SlidingSidepane.tsx";
-import ReviewerDropdown from "../../components/dropdowns/ReviewerDropdown.tsx";
-import QuestionTypeDropdown from "../../components/dropdowns/QuestionTypeDropdown.tsx";
+import ReviewerDropdown from "./components/ReviewerDropdown.tsx";
+import QuestionTypeDropdown from "./components/QuestionTypeDropdown.tsx";
 import SectionControls from "./components/SectionControls.tsx";
 import BulkControls from "./components/BulkControls.tsx";
 import BreadcrumbNavigation from "../../layout/BreadCrumbNavigation.tsx";
@@ -748,19 +748,19 @@ const ProposalPlan = () => {
                         <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
                           Section
                         </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                           Reviewer
                         </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                           Question Type
                         </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                           Completed
                         </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                           Subsections
                         </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                           Words
                         </TableHead>
                         <TableHead className="w-[60px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4">
@@ -789,51 +789,59 @@ const ProposalPlan = () => {
                             </div>
                           </TableCell>
                           <TableCell className="px-4">
-                            <ReviewerDropdown
-                              value={section.reviewer}
-                              onChange={(value) =>
-                                handleSectionChange(index, "reviewer", value)
-                              }
-                              contributors={contributors}
-                            />
+                            <div className="flex items-center justify-center">
+                              <ReviewerDropdown
+                                value={section.reviewer}
+                                onChange={(value) =>
+                                  handleSectionChange(index, "reviewer", value)
+                                }
+                                contributors={contributors}
+                              />
+                            </div>
                           </TableCell>
                           <TableCell className="px-4">
-                            <QuestionTypeDropdown
-                              value={section.choice}
-                              onChange={(value) =>
-                                handleSectionChange(index, "choice", value)
-                              }
-                            />
+                            <div className="flex items-center justify-center">
+                              <QuestionTypeDropdown
+                                value={section.choice}
+                                onChange={(value) =>
+                                  handleSectionChange(index, "choice", value)
+                                }
+                              />
+                            </div>
                           </TableCell>
                           <TableCell className="px-4">
-                            <StatusMenu
-                              value={section.status}
-                              onChange={(value) => {
-                                handleSectionChange(index, "status", value);
-                              }}
-                            />
+                            <div className="flex items-center justify-center">
+                              <StatusMenu
+                                value={section.status}
+                                onChange={(value) => {
+                                  handleSectionChange(index, "status", value);
+                                }}
+                              />
+                            </div>
                           </TableCell>
-                          <TableCell className="px-4">
+                          <TableCell className="px-4 text-center">
                             {section.subsections}
                           </TableCell>
                           <TableCell className="px-4">
-                            <Input
-                              type="number"
-                              value={section.word_count || 0}
-                              min={0}
-                              step={50}
-                              className="w-28 text-center"
-                              onChange={(e) => {
-                                const value = parseInt(e.target.value);
-                                if (!isNaN(value) && value >= 0) {
-                                  handleSectionChange(
-                                    index,
-                                    "word_count",
-                                    value
-                                  );
-                                }
-                              }}
-                            />
+                            <div className="flex items-center justify-center">
+                              <Input
+                                type="number"
+                                value={section.word_count || 0}
+                                min={0}
+                                step={50}
+                                className="w-20 text-center"
+                                onChange={(e) => {
+                                  const value = parseInt(e.target.value);
+                                  if (!isNaN(value) && value >= 0) {
+                                    handleSectionChange(
+                                      index,
+                                      "word_count",
+                                      value
+                                    );
+                                  }
+                                }}
+                              />
+                            </div>
                           </TableCell>
                           <TableCell className="w-[60px] text-right px-4">
                             <SectionControls

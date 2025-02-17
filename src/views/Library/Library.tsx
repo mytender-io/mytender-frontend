@@ -6,8 +6,6 @@ import { useAuthUser } from "react-auth-kit";
 import { Button } from "@/components/ui/button";
 import UploadPDF from "@/components/upload/UploadPDF.tsx";
 import handleGAEvent from "@/utilities/handleGAEvent.tsx";
-import { faFolder, faFileAlt } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { UploadButtonWithDropdown } from "./components/UploadButtonWithDropdown.tsx";
 import FileContentModal from "./components/FileContentModal.tsx";
 // import LibraryContextMenu from "./components/LibraryContextMenu.tsx";
@@ -700,7 +698,7 @@ const Library = () => {
         >
           <TableCell className="px-4 group">
             <div className="flex items-center group-hover:text-orange">
-              <FontAwesomeIcon icon={faFolder} className="fa-icon mr-2.5" />
+              <FolderIcon className="h-4 w-4 mr-2.5" />
               {displayName}
             </div>
           </TableCell>
@@ -799,10 +797,11 @@ const Library = () => {
             }
           >
             <div className="flex items-center">
-              <FontAwesomeIcon
-                icon={isFolder ? faFolder : faFileAlt}
-                className="fa-icon mr-2.5"
-              />
+              {isFolder ? (
+                <FolderIcon className="h-4 w-4 mr-2.5" />
+              ) : (
+                <FileIcon className="h-4 w-4 mr-2.5" />
+              )}
               {displayName}
             </div>
           </TableCell>
