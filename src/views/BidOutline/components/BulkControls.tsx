@@ -150,20 +150,20 @@ const BulkControls = ({
             </div>
             <span className="text-md text-nowrap">Items Selected</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center">
+            <div className="flex flex-col items-center gap-2 w-[100px]">
               <Input
                 type="number"
                 value={wordCount}
                 onChange={handleWordCountChange}
-                className="w-28 h-4 text-center border-none"
+                className="w-full h-4 text-center border-none outline-none shadow-none"
                 min="0"
                 step="50"
               />
               <span className="text-xs font-medium">Word Count</span>
             </div>
 
-            <div className="relative">
+            <div className="relative w-[100px]">
               <Button
                 variant="ghost"
                 size="icon"
@@ -185,7 +185,7 @@ const BulkControls = ({
               />
             </div>
 
-            <div className="relative">
+            <div className="relative w-[100px]">
               <Button
                 variant="ghost"
                 size="icon"
@@ -210,7 +210,7 @@ const BulkControls = ({
               />
             </div>
 
-            <div className="relative">
+            <div className="relative w-[100px]">
               <Button
                 variant="ghost"
                 size="icon"
@@ -229,38 +229,42 @@ const BulkControls = ({
               />
             </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleDelete}
-              className="bg-transparent flex-col w-full p-1 h-auto"
-              title="Delete Selected"
-            >
-              <Trash2 />
-              <span className="text-xs font-medium">Delete</span>
-            </Button>
+            <div className="w-[100px]">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleDelete}
+                className="bg-transparent flex-col w-full p-1 h-auto"
+                title="Delete Selected"
+              >
+                <Trash2 />
+                <span className="text-xs font-medium">Delete</span>
+              </Button>
+            </div>
 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onRevert}
-                    disabled={!canRevert}
-                    className={`bg-transparent flex-col w-full p-1 h-auto ${
-                      canRevert ? "" : "opacity-50 cursor-not-allowed"
-                    }`}
-                  >
-                    <Undo2 />
-                    <span className="text-xs font-medium">Revert</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {canRevert ? "Undo last change" : "No changes to undo"}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className="w-[100px]">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={onRevert}
+                      disabled={!canRevert}
+                      className={`bg-transparent flex-col w-full p-1 h-auto ${
+                        canRevert ? "" : "opacity-50 cursor-not-allowed"
+                      }`}
+                    >
+                      <Undo2 />
+                      <span className="text-xs font-medium">Revert</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {canRevert ? "Undo last change" : "No changes to undo"}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
 
             <Button
               variant="ghost"

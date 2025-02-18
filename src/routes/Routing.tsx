@@ -10,7 +10,7 @@ import Bids from "@/views/Bids/Bids.tsx";
 import Library from "@/views/Library/Library.tsx";
 import Proposal from "../views/Proposal.tsx";
 import Dashboard from "../views/Dashboard.tsx";
-import ChatbotResponse from "../views/ChatbotResponse.tsx";
+import ChatbotResponse from "../views/Chat/ChatbotResponse.tsx";
 
 // import BidExtractor from "../views/BidExtractor.tsx";
 import QuestionCrafter from "../views/QuestionCrafter.tsx";
@@ -47,7 +47,7 @@ function Routing() {
         <Route path="/login" element={<SignInComponent />} />
         <Route path="/logout" element={<SignOut />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/reset_password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ForgotPassword />} />
         <Route
           element={
             <MainLayout>
@@ -58,9 +58,9 @@ function Routing() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/" element={<Bids />} />
           <Route path="/calculator" element={<Calculator />} />
-          <Route path="/chatResponse" element={<ChatbotResponse />} />
-          <Route path="/adminpannel" element={<Pannels />} />
-          <Route path="/uploadtemplatetext" element={<UploadTemplateText />} />
+          <Route path="/chat" element={<ChatbotResponse />} />
+          <Route path="/admin-pannel" element={<Pannels />} />
+          <Route path="/upload-templatetext" element={<UploadTemplateText />} />
           <Route path="/qlog" element={<Log />} />
           <Route path="/flog" element={<FLog />} />
           <Route path="/library" element={<Library />} />

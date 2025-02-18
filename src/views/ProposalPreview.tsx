@@ -109,113 +109,110 @@ const ProposalPreview = () => {
     displayAlert("You only have permission to view this bid.", "danger");
   };
   return (
-    <div className="chatpage">
-      <SideBarSmall />
-      <div className="bidplanner-container ">
-        <div className="header-container">
-          <BreadcrumbNavigation
-            currentPage={initialBidName}
-            parentPages={parentPages}
-            showHome={true}
+    <div>
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[55px]">
+        <BreadcrumbNavigation
+          currentPage={initialBidName}
+          parentPages={parentPages}
+          showHome={true}
+        />
+      </div>
+      <div className="px-6 py-4 overflow-y-auto h-[calc(100vh-89px)]">
+        <div className="space-y-4">
+          <BidNavbar
+            showViewOnlyMessage={showViewOnlyMessage}
+            initialBidName="Bid Outline"
+            description="Enrich the generated structure by injecting specific instructions to each question to assemble your first draft response."
           />
-        </div>
-
-        <div className="lib-container mt-1">
-          <div>
-            <BidNavbar
-              showViewOnlyMessage={showViewOnlyMessage}
-              initialBidName={initialBidName}
-            />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              height: "calc(100vh - 120px)",
+              overflow: "hidden"
+            }}
+          >
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
-                height: "calc(100vh - 120px)",
-                overflow: "hidden"
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "1rem"
               }}
             >
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "1rem"
+                  alignItems: "center"
                 }}
+                className="mt-5 mb-4"
               >
+                <DescriptionIcon />
+                <h3
+                  style={{ fontSize: "1.2rem", fontWeight: 600, margin: 0 }}
+                  className="ms-2"
+                >
+                  Proposal Preview
+                </h3>
+              </div>
+              <Button
+                variant="outlined"
+                onClick={handleWordDownload}
+                startIcon={<ArticleIcon />}
+              >
+                Download Word
+              </Button>
+            </div>
+
+            <div
+              style={{
+                flex: 1,
+                border: "1px solid #e0e0e0",
+                borderRadius: "4px",
+                overflow: "auto",
+                backgroundColor: "#ffffff",
+                padding: "2rem 3rem",
+                height: "100%"
+              }}
+            >
+              {isLoading ? (
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "center"
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                    backgroundColor: "#f5f5f5"
                   }}
-                  className="mt-5 mb-4"
                 >
-                  <DescriptionIcon />
-                  <h3
-                    style={{ fontSize: "1.2rem", fontWeight: 600, margin: 0 }}
-                    className="ms-2"
-                  >
-                    Proposal Preview
-                  </h3>
+                  <CircularProgress />
                 </div>
-                <Button
-                  variant="outlined"
-                  onClick={handleWordDownload}
-                  startIcon={<ArticleIcon />}
+              ) : htmlContent ? (
+                <div
+                  dangerouslySetInnerHTML={{ __html: htmlContent }}
+                  style={{
+                    fontFamily: "Calibri, sans-serif",
+                    fontSize: "11pt",
+                    lineHeight: "1.5",
+                    width: "100%",
+                    margin: "0"
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                    backgroundColor: "#f5f5f5",
+                    padding: "20px",
+                    textAlign: "center"
+                  }}
                 >
-                  Download Word
-                </Button>
-              </div>
-
-              <div
-                style={{
-                  flex: 1,
-                  border: "1px solid #e0e0e0",
-                  borderRadius: "4px",
-                  overflow: "auto",
-                  backgroundColor: "#ffffff",
-                  padding: "2rem 3rem",
-                  height: "100%"
-                }}
-              >
-                {isLoading ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "100%",
-                      backgroundColor: "#f5f5f5"
-                    }}
-                  >
-                    <CircularProgress />
-                  </div>
-                ) : htmlContent ? (
-                  <div
-                    dangerouslySetInnerHTML={{ __html: htmlContent }}
-                    style={{
-                      fontFamily: "Calibri, sans-serif",
-                      fontSize: "11pt",
-                      lineHeight: "1.5",
-                      width: "100%",
-                      margin: "0"
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "100%",
-                      backgroundColor: "#f5f5f5",
-                      padding: "20px",
-                      textAlign: "center"
-                    }}
-                  >
-                    <p>Generate a Proposal to preview it here.</p>
-                  </div>
-                )}
-              </div>
+                  <p>Generate a Proposal to preview it here.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

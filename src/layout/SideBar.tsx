@@ -191,10 +191,10 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             Tools
           </span>
           <Link
-            to="/chatResponse"
+            to="/chat"
             className={cn(
               "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-              isActive("/chatResponse") ? "bg-typo-200" : "bg-transparent"
+              isActive("/chat") ? "bg-typo-200" : "bg-transparent"
             )}
           >
             <LibraryChatIcon
