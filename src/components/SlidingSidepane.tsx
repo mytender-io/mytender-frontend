@@ -167,7 +167,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 onChange={(value) =>
                   handleSectionChange(index, "question", value)
                 }
-                placeholder="What is your management policy?"
+                placeholder="Add in the question here"
                 className="writingplan-text-area"
               />
             </div>

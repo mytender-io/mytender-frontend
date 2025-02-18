@@ -69,7 +69,7 @@ const SubheadingCards = ({
                 handleSectionChange(index, "subheadings", newSubheadings);
               }}
               className="w-full bg-transparent focus:outline-none text-gray-600 overflow-y-auto h-32"
-              placeholder="Add extra instructions..."
+              placeholder="Please write any extra guidance to help improve the responses"
             />
           </div>
         </div>
