@@ -210,6 +210,9 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         [file.name]: 100
       }));
 
+      // Wait for 2 seconds before removing the file
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       // Remove the completed file from selectedFiles
       setSelectedFiles((prev) => prev.filter((f) => f.name !== file.name));
 

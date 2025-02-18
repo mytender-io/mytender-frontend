@@ -140,6 +140,7 @@ const TenderLibrary = ({ object_id }) => {
           }
         );
         setDocuments(response.data.filenames);
+        console.log(response.data);
         const pages = Math.ceil(response.data.filenames.length / rowsPerPage);
         setTotalPages(pages);
       }
@@ -189,6 +190,22 @@ const TenderLibrary = ({ object_id }) => {
     fetchDocuments();
   }, [object_id, documentListVersion]);
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "N/A";
+
+    // Split the date string into parts
+    const [day, month, year] = dateStr.split("/");
+
+    // Create a new date object (month is 0-based, so subtract 1)
+    const date = new Date(year, month - 1, day);
+
+    // Check if the date is valid
+    if (isNaN(date.getTime())) return "N/A";
+
+    // Return formatted date
+    return date.toLocaleDateString("en-GB");
+  };
+
   const renderDocuments = () => {
     return documents.map((doc, index) => (
       <tr key={index} style={{ cursor: "pointer" }}>
@@ -196,11 +213,7 @@ const TenderLibrary = ({ object_id }) => {
           <FontAwesomeIcon icon={faFileAlt} className="fa-icon" />{" "}
           {doc.filename || doc}
         </td>
-        <td className="timestamp-column">
-          {doc.upload_date
-            ? new Date(doc.upload_date).toLocaleDateString("en-GB")
-            : "N/A"}
-        </td>
+        <td className="timestamp-column">{formatDate(doc.upload_date)}</td>
         <td className="actions-column">
           {deleteConfirmationState.showFor === (doc.filename || doc) ? (
             <DeleteConfirmation
