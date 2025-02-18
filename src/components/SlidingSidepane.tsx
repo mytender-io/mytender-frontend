@@ -184,7 +184,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     >
                       <FontAwesomeIcon
                         icon={faPlus}
-                        className="text-gray-500 h-5 w-5"
+                        className="text-gray-500 h-5 w-7"
                       />
                     </button>
                     <RegenerateButton

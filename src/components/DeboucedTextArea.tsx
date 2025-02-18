@@ -4,18 +4,20 @@ interface DebouncedTextAreaProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  className?: string;  // Add className prop
-  disabled?: boolean;  // Optional disabled prop for more flexibility
-  style?: React.CSSProperties;  // Optional inline styles
+  className?: string;
+  disabled?: boolean;
+  style?: React.CSSProperties;
+  rows?: number;  // Added rows parameter
 }
 
 const DebouncedTextArea: React.FC<DebouncedTextAreaProps> = ({
   value,
   onChange,
   placeholder,
-  className = '',  // Default to empty string if not provided
+  className = '',
   disabled = false,
-  style
+  style,
+  rows
 }) => {
   const [localValue, setLocalValue] = useState(value || "");
   const debouncedCallback = useRef<NodeJS.Timeout | null>(null);
@@ -27,11 +29,10 @@ const DebouncedTextArea: React.FC<DebouncedTextAreaProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setLocalValue(newValue);
-    
+   
     if (debouncedCallback.current) {
       clearTimeout(debouncedCallback.current);
     }
-
     debouncedCallback.current = setTimeout(() => {
       onChange(newValue);
     }, 300);
@@ -45,6 +46,7 @@ const DebouncedTextArea: React.FC<DebouncedTextAreaProps> = ({
       className={className}
       disabled={disabled}
       style={style}
+      rows={rows}
     />
   );
 };
