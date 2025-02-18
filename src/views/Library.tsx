@@ -38,6 +38,7 @@ import EllipsisMenu from "../buttons/EllipsisMenu.tsx";
 import { LibrarySidepane, LibraryLayout } from "../components/LibrarySidepane";
 import BreadcrumbNavigation from "../routes/BreadCrumbNavigation.tsx";
 import SearchInput from "../components/inputbars/SearchInput.tsx";
+import PDFViewer from "@/modals/PDFViewer.tsx";
 
 const NewFolderModal = React.memo(
   ({ show, onHide, onCreateFolder, title, parentFolder }) => {
@@ -1346,36 +1347,11 @@ const Library = () => {
       )}
 
       {showPdfViewerModal && (
-        <div className="pdf-viewer-modal" onClick={closeModal}>
-          <div className="pdf-viewer-modal-content" ref={modalRef}>
-            {isLoading && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: "rgba(255, 255, 255, 0.8)",
-                  zIndex: 1000
-                }}
-              >
-                <Spinner
-                  animation="border"
-                  style={{
-                    width: "2rem",
-                    height: "2rem",
-                    color: "black"
-                  }}
-                />
-              </div>
-            )}
-            <iframe src={pdfUrl} width="100%" height="42rem"></iframe>
-          </div>
-        </div>
+        <PDFViewer
+          pdfUrl={pdfUrl}
+          isLoading={isLoading}
+          onClose={() => setShowPdfViewerModal(false)}
+        />
       )}
       <LibrarySidepane
         isOpen={isSidepaneOpen}
