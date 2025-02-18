@@ -153,7 +153,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }
   };
 
-  const uploadFile = async (file: File) => {
+  const uploadFile = async (file: File): Promise<UploadResult> => {
     posthog.capture("pdf_upload_started", {
       fileName: file.name,
       fileType: file.type
@@ -172,21 +172,16 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       formData.append("profile_name", encodeURIComponent(folder));
     }
 
-    console.log(bid_id);
-
     if (bid_id) {
       formData.append("bid_id", bid_id);
     }
 
-    console.log(formData);
-
-    // Calculate duration based on file size
     const fileSizeInMB = file.size / (1024 * 1024);
-    const durationPerMB = 30000; // 30 seconds in milliseconds
+    const durationPerMB = 30000;
     const duration = Math.max(
       10000,
       Math.min(300000, Math.round(fileSizeInMB * durationPerMB))
-    ); // Min 10s, max 5min
+    );
 
     const startTime = Date.now();
     const progressInterval = setInterval(() => {
@@ -214,8 +209,11 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         ...prev,
         [file.name]: 100
       }));
-      setUploadedFiles((prev) => ({ ...prev, [file.name]: true }));
-      return response.data;
+
+      // Remove the completed file from selectedFiles
+      setSelectedFiles((prev) => prev.filter((f) => f.name !== file.name));
+
+      return { data: response.data, fileName: file.name };
     } catch (error) {
       clearInterval(progressInterval);
       console.error("Error uploading file:", error);
@@ -236,7 +234,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       const results: UploadResult[] = await Promise.all(
         uploadPromises.map((p) =>
           p
-            .then((data) => ({ data }))
+            .then((data) => ({ data, fileName: data.fileName }))
             .catch((error) => ({ error: error as Error }))
         )
       );
@@ -255,15 +253,23 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
           totalFiles: selectedFiles.length
         });
 
-        // Call onUploadComplete immediately if there were no failures
-        if (failCount === 0 && onUploadComplete) {
-          onUploadComplete(selectedFiles);
+        // Call onUploadComplete with successfully uploaded files
+        if (onUploadComplete) {
+          const successfulFiles = selectedFiles.filter((file) =>
+            results.some(
+              (result) => !result.error && result.fileName === file.name
+            )
+          );
+          onUploadComplete(successfulFiles);
         }
       }
 
       if (failCount > 0) {
         displayAlert(`Failed to upload ${failCount} file(s)`, "danger");
       }
+
+      // Clear progress for completed uploads
+      setUploadProgress({});
     } catch (error) {
       console.error("Error in batch upload:", error);
       displayAlert("Error uploading files", "danger");
@@ -388,5 +394,4 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     </div>
   );
 };
-
 export default UploadPDF;
