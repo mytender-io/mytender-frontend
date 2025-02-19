@@ -171,37 +171,15 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 className="writingplan-text-area"
               />
             </div>
-            {hasSubheadings && (
-              <div className="sidepane-section">
-                <div className="proposal-header mb-2">
-                  <div>Writing Plan</div>
-                  <div className="flex items-center">
-                    <button
-                      className="bg-white rounded-lg p-2 me-2 shadow-sm hover:bg-gray-50 transition-colors"
-                      onClick={() => {
-                        /* Add your click handler here */
-                      }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faPlus}
-                        className="text-gray-500 h-5 w-7"
-                      />
-                    </button>
-                    <RegenerateButton
-                      section={section}
-                      index={index}
-                    />
-                  </div>
-                </div>
-                <SubheadingCards
-                  section={section}
-                  index={index}
-                  handleSectionChange={handleSectionChange}
-                  handleDeleteSubheading={handleDeleteSubheading}
-                />
-              </div>
-            )}
-
+        
+              <SubheadingCards
+                section={section}
+                index={index}
+                handleSectionChange={handleSectionChange}
+                handleDeleteSubheading={handleDeleteSubheading}
+                RegenerateButton={RegenerateButton}
+              />
+            
             <button
               className="flex items-center w-full py-2 mt-4 mb-4 rounded-md"
               onClick={() => setShowAdvanced(!showAdvanced)}
