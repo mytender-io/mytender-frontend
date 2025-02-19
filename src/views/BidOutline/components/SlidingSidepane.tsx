@@ -186,35 +186,16 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   onChange={(value) =>
                     handleSectionChange(index, "question", value)
                   }
-                  placeholder="What is your management policy?"
+                  placeholder="Add in the question here"
                 />
               </div>
-              {hasSubheadings && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold">Writing Plan</span>
-                    <div className="flex items-center">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="me-2"
-                        onClick={() => {
-                          /* Add your click handler here */
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
-                      </Button>
-                      <RegenerateButton section={section} index={index} />
-                    </div>
-                  </div>
-                  <SubheadingCards
-                    section={section}
-                    index={index}
-                    handleSectionChange={handleSectionChange}
-                    handleDeleteSubheading={handleDeleteSubheading}
-                  />
-                </div>
-              )}
+              <SubheadingCards
+                section={section}
+                index={index}
+                handleSectionChange={handleSectionChange}
+                handleDeleteSubheading={handleDeleteSubheading}
+                RegenerateButton={RegenerateButton}
+              />
               <div className="space-y-6">
                 <div className="space-y-2 min-h-10">
                   <span
@@ -230,7 +211,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     Compliance Requirements
                   </span>
                   {openSections.compliance && (
-                    <Textarea
+                    <DebouncedTextArea
                       value={section.compliance_requirements}
                       onChange={(e) =>
                         handleSectionChange(
@@ -257,7 +238,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     Relevant Win Themes
                   </span>
                   {openSections.winThemes && (
-                    <Textarea
+                    <DebouncedTextArea
                       value={section.relevant_evaluation_criteria}
                       onChange={(e) =>
                         handleSectionChange(
@@ -284,7 +265,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     Relevant Customer Pain Points
                   </span>
                   {openSections.painPoints && (
-                    <Textarea
+                    <DebouncedTextArea
                       value={section.relevant_derived_insights}
                       onChange={(e) =>
                         handleSectionChange(
@@ -311,7 +292,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     Competitor Differentiation Factors
                   </span>
                   {openSections.differentiation && (
-                    <Textarea
+                    <DebouncedTextArea
                       value={section.relevant_differentiation_factors}
                       onChange={(e) =>
                         handleSectionChange(

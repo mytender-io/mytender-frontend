@@ -43,6 +43,10 @@ describe("QA Generator Component", () => {
         datasets: ["default"],
         word_amounts: ["250", "250"],
         compliance_requirements: ["", ""],
+        evaluation_criteria: ["", ""],
+        derived_insights: ["", ""],
+        differentiating_factors: ["", ""],
+        writingplans: ["", ""],
         bid_id: ""
       },
       {

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { Modal, Form } from "react-bootstrap";
-import UploadPDF from "../../../components/upload/UploadPDF";
+import UploadPDF from "@/components/UploadPDF";
 import { API_URL, HTTP_PREFIX } from "../../../helper/Constants";
 import { useAuthUser } from "react-auth-kit";
 import { BidContext } from "../../BidWritingStateManagerView";

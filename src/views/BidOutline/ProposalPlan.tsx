@@ -218,7 +218,7 @@ const ProposalPlan = () => {
 
     const newSection = {
       heading: "New Section",
-      word_count: 0,
+      word_count: 250,
       reviewer: "",
       status: "Not Started" as const,
       subsections: 0,

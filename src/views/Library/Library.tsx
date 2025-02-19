@@ -4,7 +4,7 @@ import axios from "axios";
 import withAuth from "../../routes/withAuth.tsx";
 import { useAuthUser } from "react-auth-kit";
 import { Button } from "@/components/ui/button";
-import UploadPDF from "@/components/upload/UploadPDF.tsx";
+import UploadPDF from "@/components/UploadPDF.tsx";
 import handleGAEvent from "@/utilities/handleGAEvent.tsx";
 import { UploadButtonWithDropdown } from "./components/UploadButtonWithDropdown.tsx";
 import FileContentModal from "./components/FileContentModal.tsx";
@@ -46,10 +46,10 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import UploadText from "./components/UploadText.tsx";
-import { Spinner } from "@/components/ui/spinner.tsx";
 import BreadCrumbs from "@/components/BreadCrumbs.tsx";
 import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
 import { toast } from "react-toastify";
+import PDFViewer from "@/modals/PDFViewer.tsx";
 
 const NewFolderModal = React.memo(
   ({ show, onHide, onCreateFolder, title, parentFolder }) => {
@@ -1210,24 +1210,11 @@ const Library = () => {
           )} */}
 
           {showPdfViewerModal && (
-            <Dialog
-              open={showPdfViewerModal}
-              onOpenChange={() => setShowPdfViewerModal(false)}
-            >
-              <DialogContent className="max-w-7xl h-[90vh]">
-                <DialogHeader>
-                  <DialogTitle>PDF Viewer</DialogTitle>
-                </DialogHeader>
-                <div className="relative flex-1">
-                  {isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-                      <Spinner />
-                    </div>
-                  )}
-                  <iframe src={pdfUrl} className="w-full h-full rounded-md" />
-                </div>
-              </DialogContent>
-            </Dialog>
+            <PDFViewer
+              pdfUrl={pdfUrl}
+              isLoading={isLoading}
+              onClose={() => setShowPdfViewerModal(false)}
+            />
           )}
         </div>
         <LibrarySidepane />

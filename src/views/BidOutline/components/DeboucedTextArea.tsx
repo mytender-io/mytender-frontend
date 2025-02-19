@@ -8,14 +8,18 @@ interface DebouncedTextAreaProps {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  style?: React.CSSProperties;
+  rows?: number; // Added rows parameter
 }
 
 const DebouncedTextArea: React.FC<DebouncedTextAreaProps> = ({
   value,
   onChange,
   placeholder,
-  className,
-  disabled = false
+  className = "",
+  disabled = false,
+  style,
+  rows
 }) => {
   const [localValue, setLocalValue] = useState(value || "");
   const debouncedCallback = useRef<NodeJS.Timeout | null>(null);
@@ -31,7 +35,6 @@ const DebouncedTextArea: React.FC<DebouncedTextAreaProps> = ({
     if (debouncedCallback.current) {
       clearTimeout(debouncedCallback.current);
     }
-
     debouncedCallback.current = setTimeout(() => {
       onChange(newValue);
     }, 300);
@@ -44,6 +47,8 @@ const DebouncedTextArea: React.FC<DebouncedTextAreaProps> = ({
       placeholder={placeholder}
       disabled={disabled}
       className={cn("min-h-[120px] resize-none", className)}
+      style={style}
+      rows={rows}
     />
   );
 };

@@ -1141,6 +1141,7 @@ const QAGenerator = () => {
       const evaluation_criteria = Array(word_amounts.length).fill("");
       const derived_insights = Array(word_amounts.length).fill("");
       const differentiating_factors = Array(word_amounts.length).fill("");
+      const writingplans = Array(word_amounts.length).fill("");
       console.log(compliance_requirements);
       console.log(selectedBidId);
 
@@ -1158,6 +1159,7 @@ const QAGenerator = () => {
           evaluation_criteria: evaluation_criteria,
           derived_insights: derived_insights,
           differentiating_factors: differentiating_factors,
+          writingplans: writingplans,
           bid_id: selectedBidId
         },
         {
