@@ -4,13 +4,14 @@ import withAuth from "../../routes/withAuth";
 import handleGAEvent from "../../utilities/handleGAEvent";
 import { HTTP_PREFIX, API_URL } from "../../helper/Constants";
 import axios from "axios";
-import { Copy, ThumbsDown, ThumbsUp, User, Send, Trash } from "lucide-react";
+import { Copy, ThumbsDown, ThumbsUp, Send } from "lucide-react";
 import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Logo from "../../resources/images/mytender.io_badge.png";
-import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal";
 import { cn } from "@/utils";
+import ThumbupIcon from "@/components/icons/ThumbupIcon";
+import ThumbdownIcon from "@/components/icons/ThumbdownIcon";
+import CopyIcon from "@/components/icons/CopyIcon";
 
 const ChatbotResponse = () => {
   const getAuth = useAuthUser();
@@ -27,13 +28,13 @@ const ChatbotResponse = () => {
         return parsedMessages;
       }
     }
-
-    return [
-      {
-        type: "bot",
-        text: "Welcome to Quick Question! You can ask questions here about your Content Library data."
-      }
-    ];
+    return [];
+    // return [
+    //   {
+    //     type: "bot",
+    //     text: "Welcome to Quick Question! You can ask questions here about your Content Library data."
+    //   }
+    // ];
   });
 
   useEffect(() => {
@@ -49,7 +50,12 @@ const ChatbotResponse = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
   const [startTime, setStartTime] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+
+  const [typingText, setTypingText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  // Add this ref for the messages container
+  const messagesContainerRef = useRef(null);
 
   const handleSendMessage = () => {
     if (inputValue.trim() !== "") {
@@ -63,19 +69,6 @@ const ChatbotResponse = () => {
     if (e.key === "Enter" && !isLoading) {
       handleSendMessage();
     }
-  };
-
-  const handleCloseModal = () => setShowModal(false);
-
-  const handleClearMessages = () => {
-    setMessages([
-      {
-        type: "bot",
-        text: "Welcome to Quick Question! You can ask questions here about your Content Library data."
-      }
-    ]);
-    localStorage.removeItem("chatResponseMessages");
-    handleCloseModal();
   };
 
   const formatResponse = (response) => {
@@ -97,11 +90,49 @@ const ChatbotResponse = () => {
     // Handle italic text
     response = response.replace(/\*(.*?)\*/g, "<em>$1</em>");
 
-    // Handle newlines for better readability
+    // Replace any newlines with a single <br>
     response = response.replace(/\n/g, "<br>");
 
+    console.log("Original Response:", response);
+    response = response.replace(/(<br>)\s*(<br>)/g, "<br><br>");
+    response = response.replace(/(<\/li>)(<br>)+/g, "</li><br>");
+
+    console.log("Formatted Response:", response);
     return response;
   };
+
+  // Add this function to handle scrolling
+  const scrollToBottom = () => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
+  };
+
+  // Modify the typeMessage function to scroll while typing
+  const typeMessage = (message) => {
+    setIsTyping(true);
+    setTypingText("");
+    let index = 0;
+
+    const typeChar = () => {
+      if (index < message.length) {
+        setTypingText((prev) => prev + message[index]);
+        index++;
+        scrollToBottom(); // Add scroll after each character
+        setTimeout(typeChar, 10);
+      } else {
+        setIsTyping(false);
+      }
+    };
+
+    typeChar();
+  };
+
+  // Add useEffect to scroll on new messages
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const sendQuestion = async (question) => {
     handleGAEvent("Chatbot", "Submit Question", "Submit Button");
@@ -144,6 +175,7 @@ const ChatbotResponse = () => {
         ...prevMessages.slice(0, -1),
         { type: "bot", text: formattedResponse }
       ]);
+      typeMessage(formattedResponse); // Start typing animation
     } catch (error) {
       console.error("Error sending question:", error);
 
@@ -197,117 +229,152 @@ const ChatbotResponse = () => {
         />
       </div>
       <div className="px-6 py-4 h-[calc(100vh-89px)]">
-        <div className="relative flex flex-col justify-between space-y-4 h-full">
-          <div className="flex flex-col flex-1 max-w-3xl mx-auto overflow-y-auto">
-            {messages.map((message, index: number) => (
-              <div
-                key={index}
-                className={cn(
-                  "flex min-w-[50px] p-4 rounded-xl mb-4 items-start gap-3",
-                  message.type === "user"
-                    ? "bg-gray-black text-white self-end max-w-xl"
-                    : "bg-gray-light text-gray-hint_text self-end"
-                )}
-              >
-                <>
-                  {message.type === "user" ? (
-                    <User className="text-white" />
-                  ) : (
-                    <img src={Logo} alt="logo" className="w-6 h-6" />
+        {messages.length > 0 ? (
+          <div className="relative flex flex-col justify-between space-y-4 h-full">
+            <div
+              ref={messagesContainerRef}
+              className="flex flex-col flex-1 w-full max-w-3xl mx-auto overflow-y-auto scrollbar-none"
+            >
+              {messages.map((message, index: number) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "group flex min-w-[50px] px-4 py-2 rounded-xl items-start gap-3 text-black",
+                    message.type === "user"
+                      ? "bg-gray-light self-end max-w-xl mb-4"
+                      : "bg-transparent"
                   )}
-                </>
-                <div className="flex-1 flex flex-col">
-                  {message.text === "loading" ? (
-                    <div className="flex justify-center items-center h-full text-2xl tracking-wider leading-none font-semibold">
-                      <span className="animate-[blink_1.4s_infinite] text-black">
-                        .
-                      </span>
-                      <span className="animate-[blink_1.4s_infinite_0.2s] text-black">
-                        .
-                      </span>
-                      <span className="animate-[blink_1.4s_infinite_0.4s] text-black">
-                        .
-                      </span>
-                    </div>
-                  ) : (
-                    <>
-                      <div dangerouslySetInnerHTML={{ __html: message.text }} />
-                      {message.type === "bot" && (
-                        <div className="flex gap-1 mt-3">
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                >
+                  {/* <>
+                    {message.type === "user" ? (
+                      <User />
+                    ) : (
+                      <img src={Logo} alt="logo" className="w-6 h-6" />
+                    )}
+                  </> */}
+                  <div className="flex-1 flex flex-col">
+                    {message.text === "loading" ? (
+                      <div className="flex justify-start items-center h-full text-2xl tracking-wider leading-none font-semibold">
+                        <span className="animate-[blink_1.4s_infinite] text-black">
+                          .
+                        </span>
+                        <span className="animate-[blink_1.4s_infinite_0.2s] text-black">
+                          .
+                        </span>
+                        <span className="animate-[blink_1.4s_infinite_0.4s] text-black">
+                          .
+                        </span>
+                      </div>
+                    ) : (
+                      <>
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html:
+                              isTyping && index === messages.length - 1
+                                ? typingText
+                                : message.text
+                          }}
+                        />
+                        {message.type === "bot" && (
+                          <div
                             className={cn(
-                              "rounded-full",
-                              messageFeedback[index] === "positive" &&
-                                "bg-accent"
+                              "flex gap-1 mt-3",
+                              index === messages.length - 1
+                                ? isTyping
+                                  ? "opacity-0"
+                                  : "relative"
+                                : "opacity-0 group-hover:opacity-100 transition-opacity"
                             )}
-                            onClick={() => handleFeedback(index, "positive")}
                           >
-                            <ThumbsUp className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className={cn(
-                              "rounded-full",
-                              messageFeedback[index] === "negative" &&
-                                "bg-accent"
-                            )}
-                            onClick={() => handleFeedback(index, "negative")}
-                          >
-                            <ThumbsDown className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onClick={() => handleCopyText(message.text)}
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </>
-                  )}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full border border-gray-border"
+                              onClick={() => handleCopyText(message.text)}
+                            >
+                              <CopyIcon className="text-gray-hint_text" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={cn(
+                                "rounded-full border border-gray-border hover:text-gray-hint_text",
+                                messageFeedback[index] === "positive"
+                                  ? "bg-gray-hint_text text-white"
+                                  : "text-gray-hint_text"
+                              )}
+                              onClick={() => handleFeedback(index, "positive")}
+                            >
+                              <ThumbupIcon />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={cn(
+                                "rounded-full border border-gray-border hover:text-gray-hint_text",
+                                messageFeedback[index] === "negative"
+                                  ? "bg-gray-hint_text text-white"
+                                  : "text-gray-hint_text"
+                              )}
+                              onClick={() => handleFeedback(index, "negative")}
+                            >
+                              <ThumbdownIcon />
+                            </Button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
+              ))}
+            </div>
+            <div className="w-full max-w-3xl mx-auto flex items-center bg-white shadow-xl rounded-lg p-2 gap-2 border border-gray-line">
+              <Input
+                type="text"
+                placeholder="Please type your question in here..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="flex-1 border-none outline-none pr-0 bg-transparent placeholder:text-muted-foreground focus-visible:ring-0 shadow-none"
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={isLoading}
+                size="icon"
+                className="h-6 w-6 rounded-full"
+              >
+                <Send className="h-6 w-6" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <div className="space-y-6">
+              <h1 className="text-center">
+                Welcome to Quick Question! <br />
+                You can ask questions here about your Content Library data.
+              </h1>
+              <div className="w-full max-w-3xl mx-auto flex items-center bg-white shadow-xl rounded-lg p-2 gap-2 border border-gray-line">
+                <Input
+                  type="text"
+                  placeholder="Please type your question in here..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="flex-1 border-none outline-none pr-0 bg-transparent placeholder:text-muted-foreground focus-visible:ring-0 shadow-none"
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={isLoading}
+                  size="icon"
+                  className="h-6 w-6 rounded-full"
+                >
+                  <Send className="h-6 w-6" />
+                </Button>
               </div>
-            ))}
+            </div>
           </div>
-          <div className="w-full max-w-3xl mx-auto flex items-center bg-gray-bg shadow-xl rounded-lg p-2 gap-2">
-            <Input
-              type="text"
-              placeholder="Please type your question in here..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="flex-1 border-none outline-none pr-0 bg-transparent placeholder:text-muted-foreground focus-visible:ring-0 shadow-none"
-            />
-            {/* <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleShowModal}
-              className="h-6 w-6 rounded-full"
-            >
-              <Trash className="h-6 w-6" />
-            </Button> */}
-            <Button
-              onClick={handleSendMessage}
-              disabled={isLoading}
-              size="icon"
-              className="h-6 w-6 rounded-full"
-            >
-              <Send className="h-6 w-6" />
-            </Button>
-          </div>
-        </div>
-        <DeleteConfirmationDialog
-          isOpen={showModal}
-          onClose={handleCloseModal}
-          onConfirm={handleClearMessages}
-          title="Clear Conversation"
-          message="Are you sure you want to clear the entire conversation?"
-        />
+        )}
       </div>
     </div>
   );

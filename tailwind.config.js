@@ -32,7 +32,8 @@ export default {
           hint_text: "#575859",
           bg: "#F3F3F3",
           black: "#1D252C",
-          spacer_light: "#EBECEF"
+          spacer_light: "#EBECEF",
+          border: "#D5DADC"
         },
         typo: {
           50: "#FAFAFA",
