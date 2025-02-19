@@ -177,7 +177,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 index={index}
                 handleSectionChange={handleSectionChange}
                 handleDeleteSubheading={handleDeleteSubheading}
-                RegenerateButton={RegenerateButton}
               />
             
             <button
