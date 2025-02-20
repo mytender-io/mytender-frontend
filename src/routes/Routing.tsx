@@ -17,7 +17,7 @@ import QuestionCrafter from "../views/QuestionCrafter.tsx";
 import Calculator from "../views/Calculator.tsx";
 import BidManagement from "../views/BidWritingStateManagerView.tsx";
 import HowTo from "../views/HowTo.tsx";
-import ProfilePage from "../views/Profile.tsx";
+import ProfilePage from "../views/Profile/Profile.tsx";
 import Signup from "../views/Signup.tsx";
 import ForgotPassword from "../views/ForgotPassword.tsx";
 import ProposalPlan from "../views/BidOutline/ProposalPlan.tsx";

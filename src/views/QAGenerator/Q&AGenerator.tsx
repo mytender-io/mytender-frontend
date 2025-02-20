@@ -1364,16 +1364,14 @@ const QAGenerator = () => {
         />
       </div>
       <div className="py-4 px-6 space-y-4 h-[calc(100vh-89px)] overflow-y-auto">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <span className="block text-2xl font-semibold">
-              Complete Questions One-by-One
-            </span>
-            <span className="block text-base text-gray-hint_text">
-              For when your tender questions are on a portal or want to
-              individually respond to questions.
-            </span>
-          </div>
+        <div className="space-y-2">
+          <span className="block text-2xl font-semibold">
+            Complete Questions One-by-One
+          </span>
+          <span className="block text-base text-gray-hint_text">
+            For when your tender questions are on a portal or want to
+            individually respond to questions.
+          </span>
         </div>
         <div className="w-full">
           <div className="hidden">

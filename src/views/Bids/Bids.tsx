@@ -18,14 +18,6 @@ import { Button } from "@/components/ui/button";
 import PlusIcon from "@/components/icons/PlusIcon.tsx";
 import ViewToggle from "@/views/Bids/components/ViewToggle.tsx";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
-import {
   Table,
   TableBody,
   TableCell,
