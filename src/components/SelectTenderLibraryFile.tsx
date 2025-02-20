@@ -20,18 +20,11 @@ const SelectTenderLibraryFile = ({
 
   const [documents, setDocuments] = useState([]);
   const [documentListVersion, setDocumentListVersion] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 6;
-  const [totalPages, setTotalPages] = useState(0);
   const [selectedFiles, setSelectedFiles] = useState(() => {
     const initialSelection = new Set([...initialSelectedFiles]);
     return Array.from(initialSelection);
   });
   const [isLoading, setIsLoading] = useState(true);
-
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
 
   const fetchDocuments = async () => {
     try {
@@ -48,8 +41,6 @@ const SelectTenderLibraryFile = ({
         );
         console.log("tender library docs", response);
         setDocuments(response.data.filenames);
-        const pages = Math.ceil(response.data.filenames.length / rowsPerPage);
-        setTotalPages(pages);
         setIsLoading(false);
       }
     } catch (error) {
@@ -85,9 +76,7 @@ const SelectTenderLibraryFile = ({
   }, [bid_id, documentListVersion]);
 
   const renderDocuments = () => {
-    const startIdx = (currentPage - 1) * rowsPerPage;
-    const endIdx = startIdx + rowsPerPage;
-    const documentsToDisplay = documents.slice(startIdx, endIdx);
+    const documentsToDisplay = documents;
 
     return documentsToDisplay.map((doc, index) => (
       <tr key={index} style={{ cursor: "pointer" }}>
@@ -125,14 +114,13 @@ const SelectTenderLibraryFile = ({
               <thead>
                 <tr>
                   <th className="filename-column">Documents</th>
-             
+
                   <th>Select</th>
                 </tr>
               </thead>
               <tbody>{renderDocuments()}</tbody>
             </table>
           )}
-
         </div>
       </Card.Body>
     </Card>
