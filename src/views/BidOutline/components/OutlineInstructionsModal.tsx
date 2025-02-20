@@ -5,9 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { API_URL, HTTP_PREFIX } from "../../../helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
-import SelectFolder from "../../../components/SelectFolder";
+import SelectFolder from "@/components/SelectFolder";
 import { BidContext } from "../../BidWritingStateManagerView";
-import SelectTenderLibraryFile from "../../../components/SelectTenderLibraryFile";
+import SelectTenderLibraryFile from "@/components/SelectTenderLibraryFile";
 import { Check, Edit, Upload } from "lucide-react";
 import {
   Dialog,

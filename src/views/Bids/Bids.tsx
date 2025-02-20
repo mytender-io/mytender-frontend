@@ -9,7 +9,7 @@ import { Skeleton } from "@mui/material";
 import SearchInput from "@/components/SearchInput.tsx";
 import withAuth from "../../routes/withAuth.tsx";
 import NewTenderModal from "./components/NewTenderModal.tsx";
-import BreadcrumbNavigation from "../../layout/BreadCrumbNavigation.tsx";
+import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
 import PaginationRow from "@/components/PaginationRow.tsx";
 import EllipsisMenuDashboard from "./components/EllipsisMenuDashboard.tsx";
 import BidStatusMenu from "./components/BidStatusMenu.tsx";

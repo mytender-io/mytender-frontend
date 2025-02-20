@@ -4,7 +4,7 @@ import withAuth from "../../routes/withAuth";
 import handleGAEvent from "../../utilities/handleGAEvent";
 import { HTTP_PREFIX, API_URL } from "../../helper/Constants";
 import axios from "axios";
-import { Copy, ThumbsDown, ThumbsUp, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -93,11 +93,9 @@ const ChatbotResponse = () => {
     // Replace any newlines with a single <br>
     response = response.replace(/\n/g, "<br>");
 
-    console.log("Original Response:", response);
     response = response.replace(/(<br>)\s*(<br>)/g, "<br><br>");
     response = response.replace(/(<\/li>)(<br>)+/g, "</li><br>");
 
-    console.log("Formatted Response:", response);
     return response;
   };
 

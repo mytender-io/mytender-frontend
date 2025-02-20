@@ -1,8 +1,14 @@
-import React from "react";
-import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
-import Tooltip from "@mui/material/Tooltip";
+import React, { useEffect } from "react";
+import { FolderPlus } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 import axios from "axios";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
+import { Button } from "@/components/ui/button";
 
 const FolderLogic = ({
   tokenRef,
@@ -30,7 +36,7 @@ const FolderLogic = ({
       });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     get_collections();
   }, []);
 
@@ -73,29 +79,35 @@ const FolderLogic = ({
   };
 
   return (
-    <div className="dataset-folders">
+    <div className="grid grid-cols-3 gap-4 p-4">
       {availableCollections.map((collection, index) => (
-        <Tooltip
-          key={index}
-          title={
-            Array.isArray(folderContents[collection])
-              ? folderContents[collection].join("\n")
-              : ""
-          }
-          onOpen={() => fetchFolderFilenames(collection)}
-        >
-          <div className="dataset-folder">
-            <CreateNewFolderIcon />
-            <span>{collection}</span>
-          </div>
-        </Tooltip>
+        <TooltipProvider key={index}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full flex items-center gap-2 p-4 hover:bg-accent"
+                onClick={() => fetchFolderFilenames(collection)}
+              >
+                <FolderPlus className="h-4 w-4" />
+                <span>{collection}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {Array.isArray(folderContents[collection])
+                ? folderContents[collection].join("\n")
+                : ""}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       ))}
-      <div
-        className="dataset-folder add-new-folder"
+      <Button
+        variant="outline"
+        className="w-full flex items-center gap-2 p-4"
         onClick={handleAddNewFolderClick}
       >
         <span>Add Folder</span>
-      </div>
+      </Button>
     </div>
   );
 };

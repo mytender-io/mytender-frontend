@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { Modal, Form } from "react-bootstrap";
 import UploadPDF from "@/components/UploadPDF";
-import { API_URL, HTTP_PREFIX } from "../../../helper/Constants";
+import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import { useAuthUser } from "react-auth-kit";
 import { BidContext } from "../../BidWritingStateManagerView";
-import SelectTenderLibraryFile from "../../../components/SelectTenderLibraryFile";
-import SelectFolder from "../../../components/SelectFolder";
+import SelectTenderLibraryFile from "@/components/SelectTenderLibraryFile";
+import SelectFolder from "@/components/SelectFolder";
 // import { Box, LinearProgress, Typography } from "@mui/material";
 import axios from "axios";
 import CustomDateInput from "../../../buttons/CustomDateInput";
@@ -17,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogTitle

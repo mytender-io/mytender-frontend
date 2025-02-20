@@ -21,7 +21,7 @@ import ProfilePage from "../views/Profile.tsx";
 import Signup from "../views/Signup.tsx";
 import ForgotPassword from "../views/ForgotPassword.tsx";
 import ProposalPlan from "../views/BidOutline/ProposalPlan.tsx";
-import QAGenerator from "../views/Q&AGenerator.tsx";
+import QAGenerator from "../views/QAGenerator/Q&AGenerator.tsx";
 import ProposalPreview from "../views/ProposalPreview/ProposalPreview.tsx";
 import ComplianceMatrix from "../views/ComplianceMatrix.tsx";
 import BidPlanner from "../views/BidPlanner/BidPlanner.tsx";

@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import axios from "axios";
-import withAuth from "../routes/withAuth";
+import withAuth from "../../routes/withAuth.tsx";
 import { useAuthUser } from "react-auth-kit";
-import SideBarSmall from "../routes/SidebarSmall.tsx";
-import handleGAEvent from "../utilities/handleGAEvent";
-import { Button, Col, Dropdown, Form, Row, Spinner } from "react-bootstrap";
-import "./QuestionsCrafter.css";
+// import SideBarSmall from "../routes/SidebarSmall.tsx";
+import handleGAEvent from "../../utilities/handleGAEvent.tsx";
+import { Form } from "react-bootstrap";
+// import "./QuestionsCrafter.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import FolderLogic from "../components/Folders.tsx";
 import {
   Editor,
   EditorState,
@@ -19,9 +18,23 @@ import {
   ContentState
 } from "draft-js";
 import "draft-js/dist/Draft.css";
-import SelectFolderModal from "../modals/SelectFolderModal.tsx";
-import BidDropdown from "@/components/dropdowns/BidDropdown.tsx";
-import BreadcrumbNavigation from "../layout/BreadCrumbNavigation.tsx";
+import SelectFolderModal from "./components/SelectFolderModal.tsx";
+import BidDropdown from "./components/BidDropdown.tsx";
+import FolderLogic from "./components/Folders.tsx";
+import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectItem,
+  SelectContent,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Spinner } from "@/components/ui/spinner";
+import PlusIcon from "@/components/icons/PlusIcon";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const QAGenerator = () => {
   const getAuth = useAuthUser();
@@ -753,6 +766,45 @@ const QAGenerator = () => {
   const [apiChoices, setApiChoices] = useState([]);
   const [wordAmounts, setWordAmounts] = useState({});
 
+  const [typingText, setTypingText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  // Add this ref for the messages container
+  const messagesContainerRef = useRef(null);
+
+  // Add this function to handle scrolling
+  const scrollToBottom = () => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
+  };
+
+  // Modify the typeMessage function to scroll while typing
+  const typeMessage = (message) => {
+    setIsTyping(true);
+    setTypingText("");
+    let index = 0;
+
+    const typeChar = () => {
+      if (index < message.length) {
+        setTypingText((prev) => prev + message[index]);
+        index++;
+        scrollToBottom(); // Add scroll after each character
+        setTimeout(typeChar, 1);
+      } else {
+        setIsTyping(false);
+      }
+    };
+
+    typeChar();
+  };
+
+  // Add useEffect to scroll on new messages
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   useEffect(() => {
     localStorage.setItem("inputText", inputText);
   }, [inputText]);
@@ -827,10 +879,12 @@ const QAGenerator = () => {
       );
 
       // Replace the temporary loading message with the actual response
+      const formattedResponse = formatResponse(result.data);
       setMessages((prevMessages) => [
         ...prevMessages.slice(0, -1),
-        { type: "bot", text: result.data }
+        { type: "bot", text: formattedResponse }
       ]);
+      typeMessage(formattedResponse); // Start typing animation
     } catch (error) {
       console.error("Error sending question:", error);
       // Replace the temporary loading message with the error message
@@ -896,8 +950,11 @@ const QAGenerator = () => {
     // Handle italic text
     response = response.replace(/\*(.*?)\*/g, "<em>$1</em>");
 
-    // Handle newlines for better readability
+    // Replace any newlines with a single <br>
     response = response.replace(/\n/g, "<br>");
+
+    response = response.replace(/(<br>)\s*(<br>)/g, "<br><br>");
+    response = response.replace(/(<\/li>)(<br>)+/g, "</li><br>");
 
     return response;
   };
@@ -942,11 +999,11 @@ const QAGenerator = () => {
 
       // Replace the temporary loading message with the actual response
       const formattedResponse = formatResponse(result.data);
-
       setMessages((prevMessages) => [
         ...prevMessages.slice(0, -1),
         { type: "bot", text: formattedResponse }
       ]);
+      typeMessage(formattedResponse); // Start typing animation
     } catch (error) {
       console.error("Error sending question:", error);
       // Replace the temporary loading message with the error message
@@ -1057,34 +1114,32 @@ const QAGenerator = () => {
 
   const renderChoices = () => {
     return (
-      <div className="choices-container">
+      <div className="space-y-1">
         {apiChoices
-          .filter((choice) => choice && choice.trim() !== "") // Filter out empty or whitespace-only choices
+          .filter((choice) => choice && choice.trim() !== "")
           .map((choice, index) => (
-            <div key={index} className="choice-item d-flex align-items-center">
-              <Form.Check
-                type="checkbox"
+            <div key={index} className="flex items-center gap-3">
+              <Checkbox
                 checked={selectedChoices.includes(choice)}
-                onChange={() => handleChoiceSelection(choice)}
+                onCheckedChange={() => handleChoiceSelection(choice)}
               />
               {selectedChoices.includes(choice) ? (
-                <Form.Control
+                <Input
                   type="text"
                   value={choice}
                   onChange={(e) => handleChoiceEdit(index, e.target.value)}
-                  className="ml-2 editable-choice"
-                  style={{ width: "70%", marginLeft: "10px" }}
+                  className="flex-1"
                 />
               ) : (
                 <span
                   onClick={() => handleChoiceSelection(choice)}
-                  style={{ cursor: "pointer" }}
+                  className="flex-1 flex items-center cursor-pointer text-sm h-10 py-1 px-3 border border-transparent"
                 >
                   {choice}
                 </span>
               )}
               {selectedChoices.includes(choice) && (
-                <Form.Control
+                <Input
                   type="number"
                   value={wordAmounts[choice] || 250}
                   onChange={(e) =>
@@ -1094,9 +1149,8 @@ const QAGenerator = () => {
                     })
                   }
                   min={1}
-                  className="ml-2"
                   placeholder="250"
-                  style={{ width: "120px", marginLeft: "10px" }}
+                  className="w-20"
                 />
               )}
             </div>
@@ -1298,395 +1352,322 @@ const QAGenerator = () => {
     setResponseEditorState(newEditorState);
   };
 
-  const parentPages = [];
+  const parentPages = [] as Array<{ name: string; path: string }>;
+
   return (
     <div>
-      <SideBarSmall />
-      <div className="bidplanner-container ">
-        <div className="header-container">
-          <BreadcrumbNavigation
-            currentPage="Q&A Generator"
-            parentPages={parentPages}
-            showHome={true}
-          />
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[55px]">
+        <BreadcrumbNavigation
+          currentPage="Q&A Generator"
+          parentPages={parentPages}
+          showHome={true}
+        />
+      </div>
+      <div className="py-4 px-6 space-y-4 h-[calc(100vh-89px)] overflow-y-auto">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <span className="block text-2xl font-semibold">
+              Complete Questions One-by-One
+            </span>
+            <span className="block text-base text-gray-hint_text">
+              For when your tender questions are on a portal or want to
+              individually respond to questions.
+            </span>
+          </div>
+        </div>
+        <div className="w-full">
+          <div className="hidden">
+            <FolderLogic
+              tokenRef={tokenRef}
+              setAvailableCollections={setAvailableCollections}
+              setFolderContents={setFolderContents}
+              availableCollections={availableCollections}
+              folderContents={folderContents}
+            />
+          </div>
+          <div className="space-y-3">
+            <div className="flex flex-col space-y-2">
+              <div className="flex justify-between items-center">
+                <h1 className="text-lg font-semibold" id="question-section">
+                  Question:
+                </h1>
+                <div className="flex items-center space-x-2">
+                  <BidDropdown
+                    onBidSelect={setSelectedBidId}
+                    token={tokenRef.current}
+                  />
+                  <SelectFolderModal
+                    onSaveSelectedFolders={handleSaveSelectedFolders}
+                    initialSelectedFolders={selectedFolders}
+                  />
+                  <Button
+                    onClick={sendQuestionToChatbot}
+                    disabled={inputText.trim() === ""}
+                  >
+                    <PlusIcon />
+                    Generate Ideas
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Textarea
+                placeholder="Enter question here..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+              />
+              <div className="flex items-center justify-between h-6">
+                <span className="block text-gray-hint_text text-sm">
+                  Word Count: {inputText.split(/\s+/).filter(Boolean).length}
+                </span>
+                {isLoading && (
+                  <div className="flex items-center space-x-3">
+                    <Spinner />
+                    <span className="text-sm">
+                      Elapsed Time: {elapsedTime.toFixed(1)}s
+                    </span>
+                  </div>
+                )}
+              </div>
+              {choice === "3a" && apiChoices.length > 0 && (
+                <div className="space-y-4">
+                  {renderChoices()}
+                  <Button
+                    onClick={submitSelections}
+                    disabled={selectedChoices.length === 0}
+                  >
+                    Generate answers for selected subsections
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="lib-container">
-          <div>
-            <h1 className="mt-3">Respond to single-questions</h1>
-            <div>
-              <Row
-                className="justify-content-md-center"
-                style={{ visibility: "hidden", height: 0, overflow: "hidden" }}
+        <div className="flex flex-row gap-4">
+          <div className="w-full space-y-3">
+            <div className="flex justify-between items-center">
+              <h1 id="answer-section" className="text-lg font-semibold">
+                Answer:
+              </h1>
+              <Button onClick={removeReferences}>Remove References</Button>
+            </div>
+            <div className="flex flex-col space-y-2 h-[calc(100vh-425px)]">
+              <div
+                className="flex-1 border rounded-lg px-4 bg-white text-sm h-[calc(100vh-453px)] overflow-y-auto"
+                ref={responseBoxRef}
               >
-                <FolderLogic
-                  tokenRef={tokenRef}
-                  setAvailableCollections={setAvailableCollections}
-                  setFolderContents={setFolderContents}
-                  availableCollections={availableCollections}
-                  folderContents={folderContents}
-                />
-              </Row>
-
-              <Col md={12}>
-                <div className="proposal-header mt-3 mb-2">
-                  <h1 className="lib-title" id="question-section">
-                    Question
-                  </h1>
-                  <div className="dropdown-container">
-                    <BidDropdown
-                      onBidSelect={setSelectedBidId}
-                      token={tokenRef.current}
-                      className="me-2"
-                    />
-                    <SelectFolderModal
-                      onSaveSelectedFolders={handleSaveSelectedFolders}
-                      initialSelectedFolders={selectedFolders}
-                    />
-                  </div>
+                <div ref={editorRef}>
+                  <Editor
+                    editorState={responseEditorState}
+                    placeholder="Your response will be generated here..."
+                    onChange={handleEditorChange}
+                    customStyleMap={{
+                      ...styleMap,
+                      BOLD: { fontWeight: "bold" }
+                    }}
+                  />
                 </div>
+              </div>
+              <span className="block text-gray-hint_text text-sm">
+                Word Count:{" "}
+                {
+                  convertToRaw(responseEditorState.getCurrentContent())
+                    .blocks.map((block) => block.text)
+                    .join("\n")
+                    .split(/\s+/)
+                    .filter(Boolean).length
+                }
+              </span>
+            </div>
+          </div>
 
-                <div className="question-answer-box">
-                  <textarea
-                    className="card-textarea"
-                    placeholder="Enter question here..."
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                  ></textarea>
-                </div>
-                <div className="text-muted word-count mt-2">
-                  Word Count: {inputText.split(/\s+/).filter(Boolean).length}
-                </div>
-                <Button
-                  className="upload-button mt-2"
-                  onClick={sendQuestionToChatbot}
-                  disabled={inputText.trim() === ""}
-                >
-                  Submit
-                </Button>
-
-                <Row>
-                  <div className="" style={{ textAlign: "left" }}>
-                    {isLoading && (
-                      <div className="my-3">
-                        <Spinner animation="border" />
-                        <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
-                      </div>
-                    )}
-                    {choice === "3a" && apiChoices.length > 0 && (
-                      <div>
-                        {renderChoices()}
-                        <Button
-                          variant="primary"
-                          onClick={submitSelections}
-                          className="upload-button mt-3"
-                          disabled={selectedChoices.length === 0}
-                        >
-                          Generate answers for selected subsections
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </Row>
-              </Col>
-
-              <Row className="mt-2">
-                <Col lg={7} md={12}>
-                  <div className="proposal-header">
-                    <h1 id="answer-section" className="lib-title mt-4 mb-3">
-                      Answer
-                    </h1>
-                    <Button
-                      className="upload-button"
-                      onClick={removeReferences}
-                    >
-                      Remove References
-                    </Button>
-                  </div>
-
-                  <div
-                    className="response-box draft-editor"
-                    ref={responseBoxRef}
-                  >
-                    <div className="editor-container" ref={editorRef}>
-                      <Editor
-                        editorState={responseEditorState}
-                        placeholder="Your response will be generated here..."
-                        onChange={handleEditorChange}
-                        customStyleMap={{
-                          ...styleMap,
-                          BOLD: { fontWeight: "bold" }
-                        }}
-                      />
+          <div className="w-full space-y-3">
+            <h1 id="bid-pilot-section" className="text-lg font-semibold h-9">
+              Bid Pilot
+            </h1>
+            <div className="flex flex-col bg-white rounded-lg p-4 border border-gray-line h-[calc(100vh-425px)] gap-4">
+              {showOptions ? (
+                <div ref={optionsContainerRef} className="flex-1">
+                  {copilotLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Spinner />
+                      <span className="text-sm">Generating Options...</span>
                     </div>
-                  </div>
-
-                  <div className="text-muted word-count mt-2">
-                    Word Count:{" "}
-                    {
-                      convertToRaw(responseEditorState.getCurrentContent())
-                        .blocks.map((block) => block.text)
-                        .join("\n")
-                        .split(/\s+/)
-                        .filter(Boolean).length
-                    }
-                  </div>
-                </Col>
-                <Col lg={5} md={12}>
-                  <div className="input-header">
-                    <div className="proposal-header mb-2">
-                      <h1
-                        className="lib-title"
-                        style={{ color: "white" }}
-                        id="bid-pilot-section"
-                      >
-                        Bid Pilot
-                      </h1>
-                      <div className="dropdown-container"></div>
-                    </div>
-                  </div>
-
-                  <div className="bid-pilot-container">
-                    {showOptions ? (
-                      <div
-                        className="options-container"
-                        ref={optionsContainerRef}
-                      >
-                        {copilotLoading ? (
-                          <div className="spinner-container">
-                            <Spinner animation="border" />
-                            <p>Generating Options...</p>
-                          </div>
-                        ) : (
-                          copilotOptions.map((option, index) => (
-                            <div key={index} className="option">
-                              <div className="option-content">
-                                <Button
-                                  onClick={() =>
-                                    handleOptionSelect(option, index)
-                                  }
-                                  className={`upload-button ${selectedOptionIndex === index ? "selected" : ""}`}
-                                  style={{
-                                    backgroundColor:
-                                      selectedOptionIndex === index
-                                        ? "orange"
-                                        : "#262626",
-                                    color:
-                                      selectedOptionIndex === index
-                                        ? "black"
-                                        : "#fff",
-                                    fontSize: "16px"
-                                  }}
-                                >
-                                  <span>Option {index + 1}</span>
-                                </Button>
-                                {selectedOptionIndex === index && (
-                                  <Button
-                                    onClick={handleTick}
-                                    className="tick-button"
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faCheck}
-                                      className="tick-icon"
-                                    />
-                                  </Button>
-                                )}
-                              </div>
-                              <div className="option-item mt-2">
-                                <p>{option}</p>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    ) : isCopilotVisible ? (
-                      <div
-                        className={`prompts-container ${!isCopilotVisible ? "fade-out" : ""}`}
-                        ref={promptsContainerRef}
-                      >
-                        <div className="prompts">
+                  ) : (
+                    copilotOptions.map((option, index) => (
+                      <div key={index} className="mb-4">
+                        <div className="flex items-center gap-2">
                           <Button
-                            className="prompt-button"
-                            style={{ borderTop: "2px solid #555555" }}
-                            onClick={handleLinkClick("Summarise")}
+                            onClick={() => handleOptionSelect(option, index)}
                           >
-                            Summarise
+                            <span>Option {index + 1}</span>
                           </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Expand")}
-                          >
-                            Expand
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Rephrase")}
-                          >
-                            Rephrase
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Inject Company Voice")}
-                          >
-                            Inject Company Voice
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Inject Tender Context")}
-                          >
-                            Inject Tender Context
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Improve Grammar")}
-                          >
-                            Improve Grammar
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Add Statistics")}
-                          >
-                            Add Statistic
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("For Example")}
-                          >
-                            For Example
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("Translate to English")}
-                          >
-                            Translate to English
-                          </Button>
-                          <Button
-                            className="prompt-button"
-                            onClick={handleLinkClick("We will Active Voice")}
-                          >
-                            We will
-                          </Button>
+                          {selectedOptionIndex === index && (
+                            <Button onClick={handleTick}>
+                              <FontAwesomeIcon
+                                icon={faCheck}
+                                className="text-white"
+                              />
+                            </Button>
+                          )}
+                        </div>
+                        <div className="mt-2 text-white">
+                          <p>{option}</p>
                         </div>
                       </div>
-                    ) : (
-                      <div className="mini-messages">
-                        {messages.map((message, index) => (
-                          <div
-                            key={index}
-                            className={`message-bubble-small ${message.type}`}
-                          >
-                            {message.text === "loading" ? (
-                              <div className="loading-dots">
-                                <span>. </span>
-                                <span>. </span>
-                                <span>. </span>
-                              </div>
-                            ) : (
-                              <div
-                                dangerouslySetInnerHTML={{
-                                  __html: message.text
-                                }}
-                              />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="input-console">
-                      <div className="dropdown-clear-container mb-3">
-                        <Dropdown
-                          onSelect={(key) => setSelectedDropdownOption(key)}
-                          className="chat-dropdown"
-                          id="bid-pilot-options"
-                        >
-                          <Dropdown.Toggle
-                            className="option-button"
-                            style={{
-                              backgroundColor:
-                                selectedDropdownOption === "custom-prompt"
-                                  ? "orange"
-                                  : "#383838",
-                              color:
-                                selectedDropdownOption === "custom-prompt"
-                                  ? "black"
-                                  : "white"
-                            }}
-                          >
-                            {selectedDropdownOption === "internet-search"
-                              ? "Internet Search"
-                              : selectedDropdownOption === "custom-prompt"
-                                ? "Custom Prompt"
-                                : "Library Chat"}
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            <Dropdown.Item eventKey="internet-search">
-                              Internet Search
-                            </Dropdown.Item>
-                            <Dropdown.Item eventKey="library-chat">
-                              Library Chat
-                            </Dropdown.Item>
-                            {/* Removed the Custom Prompt option */}
-                          </Dropdown.Menu>
-                        </Dropdown>
-                        <Button
-                          className="option-button"
-                          onClick={handleClearMessages}
-                        >
-                          Clear
-                        </Button>
-                      </div>
-                      <div className="bid-input-bar" ref={bidPilotRef}>
-                        <input
-                          type="text"
-                          placeholder={
-                            selectedDropdownOption === "internet-search"
-                              ? "Please type your question in here..."
-                              : selectedDropdownOption === "custom-prompt"
-                                ? "Type in a custom prompt here..."
-                                : "Please type your question in here..."
-                          }
-                          value={inputValue}
-                          onFocus={
-                            selectedDropdownOption === "custom-prompt"
-                              ? handleCustomPromptFocus
-                              : null
-                          }
-                          onBlur={handleCustomPromptBlur}
-                          onChange={(e) => setInputValue(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                          style={{
-                            color:
-                              selectedDropdownOption === "custom-prompt"
-                                ? "white"
-                                : "lightgray"
+                    ))
+                  )}
+                </div>
+              ) : isCopilotVisible ? (
+                <div
+                  className={`${!isCopilotVisible ? "opacity-0" : "opacity-100"} flex-1 transition-all duration-300`}
+                  ref={promptsContainerRef}
+                >
+                  <div className="grid grid-cols-1">
+                    {[
+                      "Summarise",
+                      "Expand",
+                      "Rephrase",
+                      "Inject Company Voice",
+                      "Inject Tender Context",
+                      "Improve Grammar",
+                      "Add Statistics",
+                      "For Example",
+                      "Translate to English",
+                      "We will"
+                    ].map((text, index) => (
+                      <Button
+                        variant="outline"
+                        key={index}
+                        onClick={handleLinkClick(text)}
+                        className="border-b-0 last:border-b text-xs h-fit"
+                      >
+                        {text}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div
+                  ref={messagesContainerRef}
+                  className="flex-1 space-y-2 overflow-y-auto scrollbar-none"
+                >
+                  {messages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 rounded-lg text-black items-start ${
+                        message.type === "bot"
+                          ? "bg-transparent"
+                          : "bg-gray-light"
+                      }`}
+                    >
+                      {message.text === "loading" ? (
+                        <div className="flex justify-start items-center h-full text-2xl tracking-wider leading-none font-semibold">
+                          <span className="animate-[blink_1.4s_infinite] text-black">
+                            .
+                          </span>
+                          <span className="animate-[blink_1.4s_infinite_0.2s] text-black">
+                            .
+                          </span>
+                          <span className="animate-[blink_1.4s_infinite_0.4s] text-black">
+                            .
+                          </span>
+                        </div>
+                      ) : (
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html:
+                              isTyping && index === messages.length - 1
+                                ? typingText
+                                : message.text
                           }}
                         />
-                        <button
-                          onMouseDown={handleMouseDownOnSubmit}
-                          onClick={
-                            !isBidPilotLoading
-                              ? selectedDropdownOption === "internet-search"
-                                ? handleInternetSearch
-                                : selectedDropdownOption === "custom-prompt" &&
-                                    isCopilotVisible
-                                  ? handleCustomPromptSubmit
-                                  : handleSendMessage
-                              : null
-                          }
-                          disabled={isBidPilotLoading}
-                        >
-                          <FontAwesomeIcon icon={faPaperPlane} />
-                        </button>
-                      </div>
+                      )}
                     </div>
-                  </div>
-                </Col>
-              </Row>
+                  ))}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  {selectedDropdownOption === "custom-prompt" ? (
+                    <Select value={selectedDropdownOption}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="custom-prompt">
+                          Custom Prompt
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Select
+                      onValueChange={(value) =>
+                        setSelectedDropdownOption(value)
+                      }
+                      value={selectedDropdownOption}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="internet-search">
+                          Internet Search
+                        </SelectItem>
+                        <SelectItem value="library-chat">
+                          Library Chat
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <Button value="outline" onClick={handleClearMessages}>
+                    Clear
+                  </Button>
+                </div>
+                <div className="flex gap-2" ref={bidPilotRef}>
+                  <Input
+                    type="text"
+                    placeholder={
+                      selectedDropdownOption === "internet-search"
+                        ? "Please type your question in here..."
+                        : selectedDropdownOption === "custom-prompt"
+                          ? "Type in a custom prompt here..."
+                          : "Please type your question in here..."
+                    }
+                    value={inputValue}
+                    onFocus={
+                      selectedDropdownOption === "custom-prompt"
+                        ? handleCustomPromptFocus
+                        : undefined
+                    }
+                    onBlur={handleCustomPromptBlur}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                  <Button
+                    onMouseDown={handleMouseDownOnSubmit}
+                    onClick={
+                      !isBidPilotLoading
+                        ? selectedDropdownOption === "internet-search"
+                          ? handleInternetSearch
+                          : selectedDropdownOption === "custom-prompt" &&
+                              isCopilotVisible
+                            ? handleCustomPromptSubmit
+                            : handleSendMessage
+                        : null
+                    }
+                    disabled={isBidPilotLoading}
+                  >
+                    <FontAwesomeIcon icon={faPaperPlane} />
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      {/* <QuestionCrafterWizard /> */}
     </div>
   );
 };

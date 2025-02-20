@@ -19,7 +19,7 @@ import ReviewerDropdown from "./components/ReviewerDropdown.tsx";
 import QuestionTypeDropdown from "./components/QuestionTypeDropdown.tsx";
 import SectionControls from "./components/SectionControls.tsx";
 import BulkControls from "./components/BulkControls.tsx";
-import BreadcrumbNavigation from "../../layout/BreadCrumbNavigation.tsx";
+import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
 import { toast } from "react-toastify";
 import {
   Table,

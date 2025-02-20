@@ -7,7 +7,7 @@ import { useLocation } from "react-router-dom";
 import BidNavbar from "../../routes/BidNavbar.tsx";
 import { BidContext } from "../BidWritingStateManagerView.tsx";
 import { Check, Pencil, Search, X } from "lucide-react";
-import BreadcrumbNavigation from "../../layout/BreadCrumbNavigation.tsx";
+import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

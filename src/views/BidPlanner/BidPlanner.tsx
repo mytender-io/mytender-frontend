@@ -8,7 +8,7 @@ import BidNavbar from "../../routes/BidNavbar.tsx";
 import { BidContext } from "../BidWritingStateManagerView.tsx";
 import TenderLibrary from "../../components/TenderLibrary.tsx";
 import TenderAnalysis from "./components/TenderAnalysis.tsx";
-import BreadcrumbNavigation from "../../layout/BreadCrumbNavigation.tsx";
+import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ExpandIcon from "@/components/icons/ExpandIcon.tsx";

@@ -12,10 +12,9 @@ import posthog from "posthog-js";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { toast } from "react-toastify";
 import UploadIcon from "@/components/icons/UploadIcon";
 import FileIcon from "@/components/icons/FileIcon";
-
+import { toast } from "react-toastify";
 interface UploadResult {
   error?: Error;
   data?: any;
@@ -216,6 +215,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
 
       // Remove the completed file from selectedFiles
       setSelectedFiles((prev) => prev.filter((f) => f.name !== file.name));
+
       return { data: response.data, fileName: file.name };
     } catch (error) {
       clearInterval(progressInterval);
@@ -283,6 +283,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       }
     }
   };
+
   const renderSelectedFiles = () => {
     if (selectedFiles.length === 0) return null;
 
