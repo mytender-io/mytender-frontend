@@ -27,7 +27,7 @@ const SelectFolderModal = ({
   return (
     <>
       <Button
-        variant="default"
+        variant="outline"
         id="select-folder"
         onClick={() => setOpen(true)}
       >

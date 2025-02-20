@@ -118,7 +118,7 @@ const ChatbotResponse = () => {
         setTypingText((prev) => prev + message[index]);
         index++;
         scrollToBottom(); // Add scroll after each character
-        setTimeout(typeChar, 10);
+        setTimeout(typeChar, 1);
       } else {
         setIsTyping(false);
       }

@@ -684,7 +684,7 @@ const QAGenerator = () => {
         console.log("Calling askCopilot");
         askCopilot(selectedText, instructions, "4" + copilot_mode);
         setShowOptions(true);
-        setSelectedDropdownOption("internet-search");
+        setSelectedDropdownOption("library-chat");
       }, 0);
 
       setInputValue("");
@@ -904,7 +904,7 @@ const QAGenerator = () => {
 
   useEffect(() => {
     if (showOptions) {
-      setSelectedDropdownOption("internet-search");
+      setSelectedDropdownOption("library-chat");
     }
   }, [selectedDropdownOption]);
 
@@ -927,7 +927,7 @@ const QAGenerator = () => {
     if (isCopilotVisible) {
       setSelectedDropdownOption("custom-prompt");
     } else {
-      setSelectedDropdownOption("internet-search");
+      setSelectedDropdownOption("library-chat");
     }
   }, [isCopilotVisible]);
 
@@ -1450,7 +1450,19 @@ const QAGenerator = () => {
               <h1 id="answer-section" className="text-lg font-semibold">
                 Answer:
               </h1>
-              <Button onClick={removeReferences}>Remove References</Button>
+              <div className="flex items-center gap-4">
+                <span className="block text-gray-hint_text text-sm">
+                  Word Count:{" "}
+                  {
+                    convertToRaw(responseEditorState.getCurrentContent())
+                      .blocks.map((block) => block.text)
+                      .join("\n")
+                      .split(/\s+/)
+                      .filter(Boolean).length
+                  }
+                </span>
+                <Button onClick={removeReferences}>Remove References</Button>
+              </div>
             </div>
             <div className="flex flex-col space-y-2 h-[calc(100vh-425px)]">
               <div
@@ -1469,16 +1481,6 @@ const QAGenerator = () => {
                   />
                 </div>
               </div>
-              <span className="block text-gray-hint_text text-sm">
-                Word Count:{" "}
-                {
-                  convertToRaw(responseEditorState.getCurrentContent())
-                    .blocks.map((block) => block.text)
-                    .join("\n")
-                    .split(/\s+/)
-                    .filter(Boolean).length
-                }
-              </span>
             </div>
           </div>
 
@@ -1556,10 +1558,10 @@ const QAGenerator = () => {
                   {messages.map((message, index) => (
                     <div
                       key={index}
-                      className={`p-3 rounded-lg text-black items-start ${
+                      className={`py-3 rounded-lg text-black items-start ${
                         message.type === "bot"
                           ? "bg-transparent"
-                          : "bg-gray-light"
+                          : "bg-gray-light px-2"
                       }`}
                     >
                       {message.text === "loading" ? (
@@ -1622,7 +1624,7 @@ const QAGenerator = () => {
                       </SelectContent>
                     </Select>
                   )}
-                  <Button value="outline" onClick={handleClearMessages}>
+                  <Button variant="outline" onClick={handleClearMessages}>
                     Clear
                   </Button>
                 </div>
