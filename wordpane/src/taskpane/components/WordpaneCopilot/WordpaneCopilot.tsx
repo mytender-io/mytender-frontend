@@ -716,7 +716,7 @@ const WordpaneCopilot = () => {
         </div>
       </Box>
       <Box marginTop="2px">
-        <div className="border-box" style={{ padding: "5px 10px", position: "relative" }}>
+        <div className="border-box chat-input-box">
           <textarea
             placeholder={
               isRefine
@@ -732,7 +732,7 @@ const WordpaneCopilot = () => {
             onKeyDown={handleKeyDown}
             disabled={isLoading}
             className={"chat-input" + (isCustomPrompt ? " custom-prompt" : "")}
-            rows={3}
+            rows={2}
             ref={textInputRef}
           />
           <Button

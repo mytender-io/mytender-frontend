@@ -611,14 +611,17 @@ textarea.chat-input {
   padding: 5px 10px;
   width: 100%;
   resize: none;
-  border-color: #0000001f;
-  border-radius: 6px;
+  border: none;
+}
+
+textarea.chat-input:focus {
+  outline: none;
 }
 
 button.chat-send-button {
   position: absolute;
   right: 15px;
-  bottom: 18px;
+  bottom: 11px;
 }
 
 .border-box {
@@ -696,4 +699,11 @@ button.fab {
 
 .Typewriter__cursor {
   display: none;
+}
+
+.chat-input-box {
+  border-width: 1px;
+  border-radius: 6px;
+  border-color: #0000001f;
+  padding: 5px 5px 35px 5px;
 }
