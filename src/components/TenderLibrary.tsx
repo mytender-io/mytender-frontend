@@ -1,55 +1,45 @@
 import React, { useEffect, useRef, useState } from "react";
+import {
+  Loader,
+  FileText,
+  Trash2,
+  ChevronUp,
+  ChevronDown,
+  ArrowLeft,
+  Check,
+  X
+} from "lucide-react";
+import UploadPDF from "../views/UploadPDF.tsx";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
+import { displayAlert } from "@/helper/Alert.tsx";
 import { useAuthUser } from "react-auth-kit";
-import { Col, Row, Spinner } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faTrash,
-  faFileAlt,
-  faSort,
-  faSortUp,
-  faSortDown,
-  faCheck,
-  faXmark,
-  faArrowLeft
-} from "@fortawesome/free-solid-svg-icons";
-import { displayAlert } from "../helper/Alert.tsx";
-import posthog from "posthog-js";
-import UploadPDF from "../views/UploadPDF.tsx";
-import "./TenderLibrary.css";
 
 const DeleteConfirmation = ({ onConfirm, onCancel, isDeleting }) => {
   if (isDeleting) {
-    return <Spinner animation="border" size="md" />;
+    return (
+      <div className="flex justify-center">
+        <Loader className="w-6 h-6 animate-spin" />
+      </div>
+    );
   }
 
   return (
-    <div>
-      <FontAwesomeIcon
-        icon={faCheck}
-        style={{
-          width: "20px",
-          height: "20px",
-          color: "#16a34a",
-          cursor: "pointer"
-        }}
+    <div className="flex justify-center space-x-2">
+      <Check
+        className="w-6 h-6 text-green-600 cursor-pointer"
         onClick={onConfirm}
-        className="me-2"
       />
-      <FontAwesomeIcon
-        icon={faXmark}
-        style={{
-          width: "20px",
-          height: "20px",
-          color: "black",
-          cursor: "pointer"
-        }}
-        onClick={onCancel}
-      />
+      <X className="w-6 h-6 text-black cursor-pointer" onClick={onCancel} />
     </div>
   );
 };
+const PDFErrorView = () => (
+  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50">
+    <div className="text-2xl text-gray-600 mb-4">No PDF Found</div>
+    <div className="text-gray-500">Please try uploading the file again</div>
+  </div>
+);
 
 const TenderLibrary = ({ object_id }) => {
   const getAuth = useAuthUser();
@@ -65,9 +55,12 @@ const TenderLibrary = ({ object_id }) => {
   const [isDeletingFile, setIsDeletingFile] = useState(false);
   const [deleteConfirmationState, setDeleteConfirmationState] = useState({
     showFor: null,
-    filename: null
+    filename: null,
+    index: null  // Add index to track specific file
   });
+  
   const [documentListVersion, setDocumentListVersion] = useState(0);
+  const [hasPDFError, setHasPDFError] = useState(false);
 
   const handleSort = () => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
@@ -86,19 +79,23 @@ const TenderLibrary = ({ object_id }) => {
   };
 
   const getSortIcon = () => {
-    if (!isSorted) return faSort;
-    return sortOrder === "asc" ? faSortUp : faSortDown;
+    if (!isSorted) return null;
+    return sortOrder === "asc" ? (
+      <ChevronUp className="w-4 h-4" />
+    ) : (
+      <ChevronDown className="w-4 h-4" />
+    );
   };
 
-  const handleDeleteInitiate = (event, filename) => {
+  const handleDeleteInitiate = (event, filename, index) => {
     event.stopPropagation();
-    posthog.capture("tender_library_delete_file_clicked", { filename });
     setDeleteConfirmationState({
-      showFor: filename,
-      filename: filename
+      showFor: `${filename}-${index}`,  // Create unique identifier
+      filename: filename,
+      index: index
     });
   };
-
+  
   const handleDeleteConfirm = async (event, filename) => {
     event.stopPropagation();
     setIsDeletingFile(true);
@@ -116,6 +113,7 @@ const TenderLibrary = ({ object_id }) => {
     const formData = new FormData();
     formData.append("bid_id", bidId);
     formData.append("filename", filename);
+
     try {
       await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/delete_file_tenderlibrary`,
@@ -127,29 +125,15 @@ const TenderLibrary = ({ object_id }) => {
           }
         }
       );
+
       fetchDocuments();
       setDocumentListVersion((prev) => prev + 1);
-      displayAlert("Document deleted successfully", "success");
 
-      // If the deleted file was being viewed, return to the library view
       if (selectedFile === filename) {
         handleBackToLibrary();
       }
     } catch (error) {
       console.error("Error deleting document:", error);
-      if (error.response) {
-        displayAlert(
-          `Error deleting document: ${error.response.data.detail}`,
-          "danger"
-        );
-      } else if (error.request) {
-        displayAlert(
-          "Error deleting document: No response from server",
-          "danger"
-        );
-      } else {
-        displayAlert("Error deleting document: Request setup failed", "danger");
-      }
     }
   };
 
@@ -157,6 +141,7 @@ const TenderLibrary = ({ object_id }) => {
     try {
       setIsLoading(true);
       setSelectedFile(fileName);
+      setHasPDFError(false);
 
       const formData = new FormData();
       formData.append("bid_id", object_id);
@@ -165,21 +150,27 @@ const TenderLibrary = ({ object_id }) => {
       const fileExtension = fileName.split(".").pop().toLowerCase();
 
       if (fileExtension === "pdf") {
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_pdf_format`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-              "Content-Type": "multipart/form-data"
-            },
-            responseType: "blob"
-          }
-        );
-        const fileURL = URL.createObjectURL(
-          new Blob([response.data], { type: "application/pdf" })
-        );
-        setFileContent(fileURL);
+        try {
+          const response = await axios.post(
+            `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_pdf_format`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${tokenRef.current}`,
+                "Content-Type": "multipart/form-data"
+              },
+              responseType: "blob"
+            }
+          );
+
+          const fileURL = URL.createObjectURL(
+            new Blob([response.data], { type: "application/pdf" })
+          );
+          setFileContent(fileURL);
+        } catch (error) {
+          console.error("Error loading PDF:", error);
+          setHasPDFError(true);
+        }
       } else if (["doc", "docx"].includes(fileExtension)) {
         const response = await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_word_format`,
@@ -191,16 +182,16 @@ const TenderLibrary = ({ object_id }) => {
             }
           }
         );
+
         setFileContent(response.data.content);
       } else if (["xls", "xlsx"].includes(fileExtension)) {
-        displayAlert("Excel files viewing not supported yet", "warning");
+        // Handle Excel files
         setSelectedFile(null);
       } else {
         throw new Error("Unsupported file type");
       }
     } catch (error) {
       console.error("Error viewing file:", error);
-      displayAlert("Error viewing file", "danger");
       setSelectedFile(null);
     } finally {
       setIsLoading(false);
@@ -210,6 +201,7 @@ const TenderLibrary = ({ object_id }) => {
   const handleBackToLibrary = () => {
     setSelectedFile(null);
     setFileContent(null);
+    setHasPDFError(false);
   };
 
   const formatDate = (dateStr) => {
@@ -232,11 +224,17 @@ const TenderLibrary = ({ object_id }) => {
             }
           }
         );
-        setDocuments(response.data.filenames);
+
+        if (response.data && response.data.filenames) {
+          setDocuments(response.data.filenames);
+        } else {
+          setDocuments([]);
+        }
       }
     } catch (error) {
       console.error("Error fetching tender library filenames:", error);
       displayAlert("Error fetching documents", "danger");
+      setDocuments([]);
     }
   };
 
@@ -247,43 +245,31 @@ const TenderLibrary = ({ object_id }) => {
   const renderFileContent = () => {
     if (isLoading) {
       return (
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{ height: "400px" }}
-        >
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
+        <div className="flex justify-center items-center h-[400px]">
+          <Loader className="animate-spin h-8 w-8 text-black" />
         </div>
       );
     }
 
-    const fileExtension = selectedFile.split(".").pop().toLowerCase();
+    const fileExtension = selectedFile?.split(".").pop().toLowerCase();
 
     if (fileExtension === "pdf") {
+      if (hasPDFError) {
+        return (
+          <div className="relative h-[600px] border border-gray-300 rounded">
+            <PDFErrorView />
+          </div>
+        );
+      }
       return (
         <iframe
           src={fileContent}
-          width="100%"
-          height="600px"
-          style={{ border: "1px solid #ccc", borderRadius: "4px" }}
+          className="w-full h-[600px] border border-gray-300 rounded"
         />
       );
     } else if (["doc", "docx"].includes(fileExtension)) {
       return (
-        <pre
-          style={{
-            width: "100%",
-            height: "600px",
-            padding: "20px",
-            whiteSpace: "pre-wrap",
-            wordWrap: "break-word",
-            overflowX: "hidden",
-            borderRadius: "4px",
-            border: "1px solid #ccc",
-            fontSize: "14px"
-          }}
-        >
+        <pre className="w-full h-[600px] p-5 whitespace-pre-wrap break-words overflow-x-hidden rounded border border-gray-300 text-lg">
           {fileContent}
         </pre>
       );
@@ -296,17 +282,14 @@ const TenderLibrary = ({ object_id }) => {
     if (selectedFile) {
       return (
         <div>
-          <div className="d-flex align-items-center mb-4 mt-4">
-            <FontAwesomeIcon
-              icon={faArrowLeft}
-              className="me-3"
-              style={{
-                cursor: "pointer",
-                fontSize: "18px"
-              }}
+          <div className="flex items-center mb-4 mt-4">
+            <button
               onClick={handleBackToLibrary}
-            />
-            <span className="text-2xl font-bold">Back to Tender Upload</span>
+              className="flex items-center text-gray-600 hover:text-gray-800"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              <span className="text-2xl font-bold">Back to Tender Upload</span>
+            </button>
           </div>
           {renderFileContent()}
         </div>
@@ -321,76 +304,70 @@ const TenderLibrary = ({ object_id }) => {
           apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
           descriptionText="Upload documents and attachments that are part of the tender"
         />
-        {/* Replace the table section in renderLibraryView with this */}
-        <div style={{ width: "100%", marginTop: "30px" }}>
-          <div className="tender-library-scroll-container">
-            <table className="tender-library-table">
+
+        <div className="w-full mt-8">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
               <thead>
-                <tr>
-                  <th className="filename-column">
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        cursor: "pointer"
-                      }}
+                <tr className="bg-gray-50 text-xl">
+                  <th className="px-4 py-3 text-left">
+                    <button
+                      className="flex items-center space-x-2 text-gray-700"
                       onClick={handleSort}
                     >
-                      Filename
-                      <FontAwesomeIcon
-                        icon={getSortIcon()}
-                        style={{
-                          fontSize: "14px",
-                          color: isSorted ? "#000" : "#999"
-                        }}
-                      />
-                    </div>
+                      <span>Filename</span>
+                      {getSortIcon()}
+                    </button>
                   </th>
-                  <th className="timestamp-column">Upload Date</th>
-                  <th className="actions-column">Actions</th>
+                  <th className="px-4 py-2 text-left">Upload Date</th>
+                  <th className="px-4 py-2 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {documents.map((doc, index) => (
-                  <tr
-                    key={index}
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleFileSelect(doc.filename || doc)}
-                  >
-                    <td className="filename-column">
-                      <FontAwesomeIcon icon={faFileAlt} className="fa-icon" />{" "}
-                      {doc.filename || doc}
-                    </td>
-                    <td className="timestamp-column">
-                      {formatDate(doc.upload_date)}
-                    </td>
-                    <td
-                      className="actions-column"
-                      onClick={(e) => e.stopPropagation()}
+                {documents &&
+                  documents.map((doc, index) => (
+                    <tr
+                      key={index}
+                      className="border-t border-gray-200 hover:bg-gray-50 cursor-pointer text-xl"
+                      onClick={() => handleFileSelect(doc.filename || doc)}
                     >
-                      {deleteConfirmationState.showFor ===
-                      (doc.filename || doc) ? (
-                        <DeleteConfirmation
-                          onConfirm={(e) =>
-                            handleDeleteConfirm(e, doc.filename || doc)
-                          }
-                          onCancel={handleDeleteCancel}
-                          isDeleting={isDeletingFile}
-                        />
-                      ) : (
-                        <FontAwesomeIcon
-                          icon={faTrash}
-                          className="action-icon delete-icon"
-                          onClick={(e) =>
-                            handleDeleteInitiate(e, doc.filename || doc)
-                          }
-                          style={{ cursor: "pointer" }}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                      <td className="px-4 py-3 flex items-center">
+                        <FileText className="w-6 h-6 mr-3 text-gray-500" />
+                        {doc.filename || doc}
+                      </td>
+                      <td className="px-4 py-3">
+                        {formatDate(doc.upload_date)}
+                      </td>
+                      <td
+                        className="px-4 py-3 text-center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {deleteConfirmationState.showFor ===
+                        `${doc.filename || doc}-${index}` ? (
+                          <DeleteConfirmation
+                            onConfirm={(e) =>
+                              handleDeleteConfirm(e, doc.filename || doc)
+                            }
+                            onCancel={handleDeleteCancel}
+                            isDeleting={isDeletingFile}
+                          />
+                        ) : (
+                          <button
+                            onClick={(e) =>
+                              handleDeleteInitiate(
+                                e,
+                                doc.filename || doc,
+                                index
+                              )
+                            }
+                            className="text-gray-500 hover:text-red-500"
+                          >
+                            <Trash2 className="w-6 h-6" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -400,14 +377,10 @@ const TenderLibrary = ({ object_id }) => {
   };
 
   return (
-    <Row>
-      <Col md={12}>
-        <div>
-          <div id="tender-library"></div>
-          {renderLibraryView()}
-        </div>
-      </Col>
-    </Row>
+    <div className="w-full">
+      <div id="tender-library"></div>
+      {renderLibraryView()}
+    </div>
   );
 };
 

@@ -198,15 +198,6 @@ const Library = () => {
     setAnchorEl(null);
   };
 
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const handleClick = (event, file) => {
-    setAnchorElFile(event.currentTarget);
-    setCurrentFile(file);
-  };
-
   const handleClose = () => {
     setAnchorElFile(null);
   };
