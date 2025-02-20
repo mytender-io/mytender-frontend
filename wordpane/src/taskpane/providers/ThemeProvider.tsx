@@ -29,6 +29,7 @@ const ThemeProvider = ({ children }) => {
         styleOverrides: {
           root: {
             fontSize: "13px",
+            minHeight: "36px",
           },
         },
       },
