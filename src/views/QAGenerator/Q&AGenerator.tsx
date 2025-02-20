@@ -1622,7 +1622,11 @@ const QAGenerator = () => {
                       </SelectContent>
                     </Select>
                   )}
-                  <Button variant="outline" onClick={handleClearMessages}>
+                  <Button
+                    variant="outline"
+                    className="w-16"
+                    onClick={handleClearMessages}
+                  >
                     Clear
                   </Button>
                 </div>
@@ -1647,6 +1651,7 @@ const QAGenerator = () => {
                     onKeyDown={handleKeyDown}
                   />
                   <Button
+                    className="w-16 min-w-16"
                     onMouseDown={handleMouseDownOnSubmit}
                     onClick={
                       !isBidPilotLoading
