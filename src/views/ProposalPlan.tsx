@@ -715,6 +715,8 @@ const ProposalPlan = () => {
               handleRegenerateClick={handleRegenerateClick}
             />
 
+            
+
             <div>
               <OutlineInstructionsModal
                 show={showModal}

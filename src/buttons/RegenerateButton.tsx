@@ -1,4 +1,3 @@
-// RegenerateButton.tsx
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
@@ -7,22 +6,23 @@ import { Section } from "@/views/BidWritingStateManagerView";
 interface RegenerateButtonProps {
   section: Section;
   index: number;
-  isExpanded: boolean;
-  setIsExpanded: (value: boolean) => void;
+  onRegenerate: (e: React.MouseEvent) => Promise<void>;
+  isLoading?: boolean;
 }
 
 const RegenerateButton: React.FC<RegenerateButtonProps> = ({
-  isExpanded,
-  setIsExpanded
+  onRegenerate,
+  isLoading = false
 }) => {
   return (
     <button
       className="orange-button flex items-center"
-      onClick={() => setIsExpanded(!isExpanded)}
+      onClick={onRegenerate}
       type="button"
+      disabled={isLoading}
     >
       <FontAwesomeIcon icon={faWandMagicSparkles} className="me-2" />
-      <span>Regenerate</span>
+      <span>{isLoading ? "Regenerating..." : "Regenerate"}</span>
     </button>
   );
 };
