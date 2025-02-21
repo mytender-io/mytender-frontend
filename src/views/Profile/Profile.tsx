@@ -25,6 +25,20 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import UserProfileIcon from "@/components/icons/UserProfileIcon.tsx";
+import JobResponseIcon from "@/components/icons/JobResponseIcon.tsx";
+import CompanyIcon from "@/components/icons/CompanyIcon.tsx";
+import LocationIcon from "@/components/icons/LocationIcon.tsx";
+import EmailIcon from "@/components/icons/EmailIcon.tsx";
+import DownloadIcon from "@/components/icons/DownloadIcon.tsx";
+import SubscriptionIcon from "@/components/icons/SubscriptionIcon.tsx";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
+import { Spinner } from "@/components/ui/spinner";
 
 const ProfilePage = () => {
   const getAuth = useAuthUser();
@@ -52,7 +66,26 @@ const ProfilePage = () => {
   const [inviteSuccess, setInviteSuccess] = useState(null);
   const [organizationUsers, setOrganizationUsers] = useState([]);
 
-  const [saveButtonState, setSaveButtonState] = useState("normal"); // 'normal', 'loading', 'success'
+  const [companyObjectivesSaveState, setCompanyObjectivesSaveState] =
+    useState("normal");
+  const [toneOfVoiceSaveState, setToneOfVoiceSaveState] = useState("normal");
+  const [profileSaveState, setProfileSaveState] = useState("normal");
+
+  const [editableFields, setEditableFields] = useState({
+    productName: false,
+    username: false,
+    email: false,
+    region: false,
+    company: false,
+    jobRole: false
+  });
+
+  const toggleEditable = (field: keyof typeof editableFields) => {
+    setEditableFields((prev) => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -89,17 +122,41 @@ const ProfilePage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    console.log(name, value);
     setFormData((prevData) => ({
       ...prevData,
       [name]: value
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+    formType: string
+  ) => {
     e.preventDefault();
-    setSaveButtonState("loading");
+
+    let setSaveState;
+    if (formType === "companyObjectives") {
+      setSaveState = setCompanyObjectivesSaveState;
+    } else if (formType === "toneOfVoice") {
+      setSaveState = setToneOfVoiceSaveState;
+    } else {
+      setSaveState = setProfileSaveState;
+    }
+
+    setSaveState("loading");
+
     try {
       const dataToSend = {
+        username: formData.username,
+        email: formData.email,
+        region: formData.region,
+        company: formData.company,
+        jobRole: formData.jobRole,
+        userType: formData.userType,
+        licences: formData.licences,
+        productName: formData.productName,
         company_objectives: formData.companyObjectives,
         tone_of_voice: formData.toneOfVoice
       };
@@ -113,11 +170,11 @@ const ProfilePage = () => {
           }
         }
       );
-      setSaveButtonState("success");
-      setTimeout(() => setSaveButtonState("normal"), 2000); // Reset after 2 seconds
+      setSaveState("success");
+      setTimeout(() => setSaveState("normal"), 2000); // Reset after 2 seconds
     } catch (err) {
-      console.error("Error updating profile:", err);
-      setSaveButtonState("normal");
+      console.error(`Error updating ${formType}:`, err);
+      setSaveState("normal");
       // Handle error (e.g., show an error message)
     }
   };
@@ -218,115 +275,271 @@ const ProfilePage = () => {
           showHome={true}
         />
       </div>
-
-      <div className="py-4 px-6 space-y-4">
+      <div className="h-[calc(100vh-89px)] overflow-y-auto py-4 px-6 space-y-8">
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold">Profile Section</h1>
           <p className="text-base text-muted-foreground">
             To manage all of your company information
           </p>
         </div>
-        <div className="h-[calc(100vh-202px)] overflow-y-auto space-y-4">
-          <div className="flex gap-4 h-full">
-            <Card className="w-full">
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
-                    <Input
-                      id="username"
-                      value={formData.username}
-                      readOnly
-                      className="bg-muted"
-                    />
+        <div className="max-w-5xl mx-auto space-y-12">
+          <div className="relative w-full h-32 bg-orange-gradient">
+            <div className="absolute left-8 top-8 flex items-center justify-center bg-orange-lighter rounded-full w-32 h-32 border border-white">
+              <h1 className="text-2xl font-semibold">JH</h1>
+            </div>
+          </div>
+          <div className="flex gap-4 w-full">
+            <Card className="w-[30%] h-fit mt-11">
+              <CardContent>
+                <form
+                  onSubmit={(e) => handleSubmit(e, "profile")}
+                  className="pt-6 space-y-10"
+                >
+                  <div className="space-y-3">
+                    <h3 className="text-base font-bold">About</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
+                              >
+                                <UserProfileIcon className="text-gray-hint_text" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Select this field to add your name
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <Input
+                          id="username"
+                          name="username"
+                          value={formData.username}
+                          placeholder="Jamie Horsnell"
+                          readOnly={!editableFields.username}
+                          onClick={() => toggleEditable("username")}
+                          onChange={handleInputChange}
+                          onBlur={() => toggleEditable("username")}
+                          className={
+                            editableFields.username
+                              ? ""
+                              : "border-none outline-none shadow-none text-gray-hint_text"
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
+                              >
+                                <JobResponseIcon className="text-gray-hint_text" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Select this feild to add your job title
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <Input
+                          id="jobRole"
+                          name="jobRole"
+                          value={formData.jobRole}
+                          placeholder="Job Role"
+                          readOnly={!editableFields.jobRole}
+                          onClick={() => toggleEditable("jobRole")}
+                          onBlur={() => toggleEditable("jobRole")}
+                          onChange={handleInputChange}
+                          className={
+                            editableFields.jobRole
+                              ? ""
+                              : "border-none outline-none shadow-none text-gray-hint_text"
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
+                              >
+                                <CompanyIcon className="text-gray-hint_text" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Select this feild to add your company
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <Input
+                          id="company"
+                          name="company"
+                          value={formData.company}
+                          placeholder="Company Name"
+                          readOnly={!editableFields.company}
+                          onClick={() => toggleEditable("company")}
+                          onBlur={() => toggleEditable("company")}
+                          onChange={handleInputChange}
+                          className={
+                            editableFields.company
+                              ? ""
+                              : "border-none outline-none shadow-none text-gray-hint_text"
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
+                              >
+                                <LocationIcon className="text-gray-hint_text" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Select this field to add your country
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <Input
+                          id="region"
+                          name="region"
+                          value={formData.region}
+                          placeholder="Location"
+                          readOnly={!editableFields.region}
+                          onClick={() => toggleEditable("region")}
+                          onBlur={() => toggleEditable("region")}
+                          onChange={handleInputChange}
+                          className={
+                            editableFields.region
+                              ? ""
+                              : "border-none outline-none shadow-none text-gray-hint_text"
+                          }
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      value={formData.email}
-                      readOnly
-                      className="bg-muted"
-                    />
+                  <div className="space-y-3">
+                    <h3 className="text-base font-bold">Contact</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
+                              >
+                                <EmailIcon className="text-gray-hint_text" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Select this field to add your email
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <Input
+                          id="email"
+                          name="email"
+                          value={formData.email}
+                          placeholder="jamie@mytender.io"
+                          readOnly={!editableFields.email}
+                          onClick={() => toggleEditable("email")}
+                          onBlur={() => toggleEditable("email")}
+                          onChange={handleInputChange}
+                          className={
+                            editableFields.email
+                              ? ""
+                              : "border-none outline-none shadow-none text-gray-hint_text"
+                          }
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="company">Company</Label>
-                    <Input
-                      id="company"
-                      value={formData.company}
-                      readOnly
-                      className="bg-muted"
-                    />
+                  <div className="space-y-3">
+                    <h3 className="text-base font-bold">Subscription Type</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
+                              >
+                                <SubscriptionIcon className="text-gray-hint_text" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Here is your current subscription
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <Input
+                          id="productName"
+                          value={formData.productName}
+                          placeholder="Enter Product Name"
+                          readOnly={!editableFields.productName}
+                          onClick={() => toggleEditable("productName")}
+                          onChange={handleInputChange}
+                          onBlur={() => toggleEditable("productName")}
+                          name="productName"
+                          className={
+                            editableFields.productName
+                              ? ""
+                              : "border-none outline-none shadow-none text-gray-hint_text"
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-4 cursor-pointer">
+                      <div className="flex items-center gap-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
+                              >
+                                <DownloadIcon className="text-gray-hint_text" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Download you invoices here
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <span className="text-sm select-none px-3 text-gray-hint_text">
+                          Download Invoices
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="jobRole">Job Role</Label>
-                    <Input
-                      id="jobRole"
-                      value={formData.jobRole}
-                      readOnly
-                      className="bg-muted"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="region">Region</Label>
-                    <Input
-                      id="region"
-                      value={formData.region}
-                      readOnly
-                      className="bg-muted"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="productName">Subscription Type</Label>
-                    <Input
-                      id="productName"
-                      value={formData.productName}
-                      readOnly
-                      className="bg-muted"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="w-full">
-              <CardContent className="p-6">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="companyObjectives">
-                      Company Objectives
-                    </Label>
-                    <Textarea
-                      id="companyObjectives"
-                      name="companyObjectives"
-                      value={formData.companyObjectives}
-                      onChange={handleInputChange}
-                      placeholder="Outline your company's overall mission..."
-                      className="min-h-[150px]"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="toneOfVoice">Tone of Voice</Label>
-                    <Textarea
-                      id="toneOfVoice"
-                      name="toneOfVoice"
-                      value={formData.toneOfVoice}
-                      onChange={handleInputChange}
-                      placeholder="Define the preferred tone..."
-                      className="min-h-[100px]"
-                    />
-                  </div>
-
                   <div className="text-right">
                     <Button
                       type="submit"
-                      disabled={saveButtonState === "loading"}
+                      disabled={profileSaveState === "loading"}
                     >
-                      {saveButtonState === "loading" && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {profileSaveState === "loading" && (
+                        <Spinner className="text-white" />
                       )}
-                      {saveButtonState === "success" ? (
+                      {profileSaveState === "success" ? (
                         <>
                           Saved <CheckCircle className="ml-2 h-4 w-4" />
                         </>
@@ -338,54 +551,125 @@ const ProfilePage = () => {
                 </form>
               </CardContent>
             </Card>
-          </div>
-          {formData.userType === "owner" && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <h3 className="text-lg font-semibold">Admin Panel</h3>
-                <div className="space-x-2">
-                  <Button onClick={() => setShowModal(true)}>
-                    Add New User
-                  </Button>
+            <div className="w-[70%] space-y-6">
+              {formData.userType !== "owner" && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-end space-x-2">
+                    <Button onClick={() => setShowModal(true)}>
+                      Add New User
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() =>
+                        window.open(
+                          "https://billing.stripe.com/p/login/00g6p52WPfRG22I8ww",
+                          "_blank"
+                        )
+                      }
+                    >
+                      Stripe Invoices
+                    </Button>
+                  </div>
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-base font-bold">Admin Panel</h3>
+                        <span>Licenses available: {formData.licences}</span>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Username</TableHead>
+                            <TableHead>Role</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {organizationUsers.map((user, index) => (
+                            <TableRow key={index}>
+                              <TableCell>{user.email}</TableCell>
+                              <TableCell>
+                                {user.username || "Request Pending"}
+                              </TableCell>
+                              <TableCell>{user.role}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+              <form
+                id="companyObjectivesForm"
+                onSubmit={(e) => handleSubmit(e, "companyObjectives")}
+                className="space-y-2"
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-bold">Company Objectives</h3>
                   <Button
-                    variant="secondary"
-                    onClick={() =>
-                      window.open(
-                        "https://billing.stripe.com/p/login/00g6p52WPfRG22I8ww",
-                        "_blank"
-                      )
-                    }
+                    type="submit"
+                    disabled={companyObjectivesSaveState === "loading"}
+                    form="companyObjectivesForm"
                   >
-                    Stripe Invoices
+                    {companyObjectivesSaveState === "loading" && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    {companyObjectivesSaveState === "success" ? (
+                      <>
+                        Saved <CheckCircle className="ml-2 h-4 w-4" />
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4">Licenses available: {formData.licences}</p>
-
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Username</TableHead>
-                      <TableHead>Role</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {organizationUsers.map((user, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>
-                          {user.username || "Request Pending"}
-                        </TableCell>
-                        <TableCell>{user.role}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          )}
+                <Textarea
+                  id="companyObjectives"
+                  name="companyObjectives"
+                  value={formData.companyObjectives}
+                  onChange={handleInputChange}
+                  placeholder="Outline your company's overall mission..."
+                  className="min-h-[150px]"
+                />
+              </form>
+              <form
+                id="toneOfVoiceForm"
+                onSubmit={(e) => handleSubmit(e, "toneOfVoice")}
+                className="space-y-2"
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-bold">Tone of Voice Library</h3>
+                  <Button
+                    type="submit"
+                    disabled={toneOfVoiceSaveState === "loading"}
+                    form="toneOfVoiceForm"
+                  >
+                    {toneOfVoiceSaveState === "loading" && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    {toneOfVoiceSaveState === "success" ? (
+                      <>
+                        Saved <CheckCircle className="ml-2 h-4 w-4" />
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </Button>
+                </div>
+                <Textarea
+                  id="toneOfVoice"
+                  name="toneOfVoice"
+                  value={formData.toneOfVoice}
+                  onChange={handleInputChange}
+                  placeholder="Define the preferred tone..."
+                  className="min-h-[100px]"
+                />
+              </form>
+            </div>
+          </div>
         </div>
         <Dialog open={showModal} onOpenChange={setShowModal}>
           <DialogContent>

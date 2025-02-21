@@ -4,12 +4,16 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      backgroundImage: {
+        "orange-gradient": "linear-gradient(90deg, #FF8019 0%, #FFAB65 100%)"
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         orange: {
           DEFAULT: "#FF8019",
           light: "#FFA45A",
+          lighter: "#FFE5CC",
           ultra_light: "#FFF0E6",
           hover: "#cc6614"
         },

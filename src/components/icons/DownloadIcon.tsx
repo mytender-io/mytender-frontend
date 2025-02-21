@@ -1,7 +1,7 @@
 import React from "react";
 import IconProps from ".";
 
-const ThumbupIcon: React.FC<IconProps> = ({
+const DownloadIcon: React.FC<IconProps> = ({
   className,
   width = 16,
   height = 16
@@ -15,72 +15,72 @@ const ThumbupIcon: React.FC<IconProps> = ({
       fill="none"
       className={className}
     >
-      <g clipPath="url(#clip0_4203_1161)">
+      <g clipPath="url(#clip0_4235_2184)">
         <path
-          d="M0.654297 8.31955H1.9318C3.23374 8.24593 4.45745 7.67421 5.34933 6.72288C6.24121 5.77154 6.73287 4.51353 6.72242 3.20955C6.72242 2.19968 8.63867 2.07193 8.63867 3.98818C8.54075 5.2362 8.32691 6.4724 7.99992 7.6808H13.1099C13.364 7.6808 13.6077 7.78174 13.7874 7.96143C13.9671 8.14111 14.068 8.38481 14.068 8.63892C14.068 8.89303 13.9671 9.13674 13.7874 9.31642C13.6077 9.4961 13.364 9.59705 13.1099 9.59705H12.4712C12.7253 9.59705 12.969 9.69799 13.1487 9.87768C13.3284 10.0574 13.4293 10.3011 13.4293 10.5552C13.4293 10.8093 13.3284 11.053 13.1487 11.2327C12.969 11.4124 12.7253 11.5133 12.4712 11.5133H11.8324"
+          d="M3.20947 5.76465H9.2776"
           stroke="currentColor"
           strokeWidth="0.67"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
-          d="M11.8324 11.5132C12.0865 11.5132 12.3302 11.6141 12.5099 11.7938C12.6896 11.9735 12.7905 12.2172 12.7905 12.4713C12.7905 12.7254 12.6896 12.9691 12.5099 13.1488C12.3302 13.3285 12.0865 13.4294 11.8324 13.4294H11.1937C11.4478 13.4294 11.6915 13.5304 11.8712 13.7101C12.0509 13.8897 12.1518 14.1334 12.1518 14.3876C12.1518 14.6417 12.0509 14.8854 11.8712 15.0651C11.6915 15.2447 11.4478 15.3457 11.1937 15.3457H7.0418C4.4868 15.3457 5.7643 14.0682 0.654297 14.0682"
+          d="M3.20947 7.68066H7.04197"
           stroke="currentColor"
           strokeWidth="0.67"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
-          d="M2.5708 5.12564V3.84814"
+          d="M3.20947 3.84766H7.68072"
           stroke="currentColor"
           strokeWidth="0.67"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
-          d="M1.93164 4.48682H3.20914"
+          d="M3.20947 9.59668H5.76447"
           stroke="currentColor"
           strokeWidth="0.67"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
-          d="M5.12549 1.9318V0.654297"
+          d="M3.20947 11.5127H5.76447"
           stroke="currentColor"
           strokeWidth="0.67"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
-          d="M4.48682 1.29297H5.76432"
+          d="M7.0418 15.3455H1.29305C1.12364 15.3455 0.961171 15.2783 0.841382 15.1585C0.721594 15.0387 0.654297 14.8762 0.654297 14.7068V1.29305C0.654297 1.12364 0.721594 0.961171 0.841382 0.841382C0.961171 0.721594 1.12364 0.654297 1.29305 0.654297H9.78395C9.95334 0.654333 10.1158 0.721653 10.2355 0.841451L12.6034 3.2093C12.7232 3.32906 12.7905 3.4915 12.7905 3.66089V5.7643"
           stroke="currentColor"
           strokeWidth="0.67"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
-          d="M11.5132 3.20914V1.93164"
+          d="M7.68066 11.5132C7.68066 12.0165 7.77979 12.5148 7.9724 12.9798C8.165 13.4448 8.4473 13.8673 8.80318 14.2232C9.15906 14.579 9.58155 14.8613 10.0465 15.0539C10.5115 15.2465 11.0099 15.3457 11.5132 15.3457C12.0165 15.3457 12.5148 15.2465 12.9798 15.0539C13.4448 14.8613 13.8673 14.579 14.2232 14.2232C14.579 13.8673 14.8613 13.4448 15.0539 12.9798C15.2465 12.5148 15.3457 12.0165 15.3457 11.5132C15.3457 10.4967 14.9419 9.52191 14.2232 8.80318C13.5044 8.08444 12.5296 7.68066 11.5132 7.68066C10.4967 7.68066 9.52191 8.08444 8.80318 8.80318C8.08444 9.52191 7.68066 10.4967 7.68066 11.5132Z"
           stroke="currentColor"
           strokeWidth="0.67"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
-          d="M10.8745 2.5708H12.152"
+          d="M11.5132 9.59668V13.4292"
           stroke="currentColor"
           strokeWidth="0.67"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
-          d="M14.707 6.40299V5.12549"
+          d="M11.5134 13.4294L10.0762 11.9922"
           stroke="currentColor"
           strokeWidth="0.67"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
-          d="M14.0684 5.76416H15.3459"
+          d="M11.5132 13.4294L12.9504 11.9922"
           stroke="currentColor"
           strokeWidth="0.67"
           strokeLinecap="round"
@@ -88,7 +88,7 @@ const ThumbupIcon: React.FC<IconProps> = ({
         />
       </g>
       <defs>
-        <clipPath id="clip0_4203_1161">
+        <clipPath id="clip0_4235_2184">
           <rect width="16" height="16" fill="white" />
         </clipPath>
       </defs>
@@ -96,4 +96,4 @@ const ThumbupIcon: React.FC<IconProps> = ({
   );
 };
 
-export default ThumbupIcon;
+export default DownloadIcon;
