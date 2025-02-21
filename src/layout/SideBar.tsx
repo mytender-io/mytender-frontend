@@ -122,7 +122,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
          </Tooltip> */}
 
         <div className="flex flex-col flex-1 overflow-y-auto px-4 gap-3">
-          <Link
+          {/* <Link
             to="/home"
             className={cn(
               "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
@@ -139,7 +139,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                 Home
               </span>
             )}
-          </Link>
+          </Link> */}
           <Link
             to="/bids"
             className={cn(
