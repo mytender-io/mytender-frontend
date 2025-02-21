@@ -10,8 +10,8 @@ import { Outlet } from "react-router-dom";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { useAuthUser } from "react-auth-kit";
-import { displayAlert } from "../helper/Alert";
-
+// import { displayAlert } from "../helper/Alert";
+import { toast } from "react-toastify";
 export interface Document {
   name: string;
   editorState: EditorState;
@@ -234,7 +234,7 @@ const BidManagement: React.FC = () => {
       } = stateCopy;
 
       if (!bidInfo || bidInfo.trim() === "") {
-        displayAlert("Please type in a bid name...", "warning");
+        toast.error("Please type in a bid name...");
         return;
       }
 

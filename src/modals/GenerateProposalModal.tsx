@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { Modal, Button } from "react-bootstrap";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
@@ -11,11 +10,17 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BidContext } from "../views/BidWritingStateManagerView";
-import { LinearProgress, Typography, Box } from "@mui/material";
-import { fetchOutline } from "../utilityfunctions/updateSection";
+import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import wordpaneImage from "../resources/images/wordpanescreenshot.png";
 import Confetti from "react-confetti";
-import "./GenerateProposalModal.css";
+import FastIcon from "@/components/icons/FastIcon";
 
 const GenerateProposalModal = ({ bid_id, outline }) => {
   const getAuth = useAuthUser();
@@ -97,40 +102,19 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
   const [progress, setProgress] = useState(0);
   const progressInterval = useRef(null);
 
-  function LinearProgressWithLabel(props) {
+  const LinearProgressWithLabel = ({ value, message }) => {
     return (
-      <Box
-        sx={{ display: "flex", alignItems: "center", flexDirection: "column" }}
-      >
-        <Box sx={{ width: "100%", mr: 1 }}>
-          <LinearProgress
-            variant="determinate"
-            {...props}
-            sx={{
-              height: 10,
-              borderRadius: 5,
-              backgroundColor: "#ffd699",
-              "& .MuiLinearProgress-bar": {
-                backgroundColor: "#ff9900"
-              }
-            }}
-          />
-        </Box>
-        <Box sx={{ minWidth: 35, mt: 1, textAlign: "center" }}>
-          <Typography variant="body2" color="text.secondary">
-            {`${Math.round(props.value)}%`}
-          </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ fontStyle: "italic" }}
-          >
-            {props.message}
-          </Typography>
-        </Box>
-      </Box>
+      <div className="flex flex-col items-center w-full">
+        <div className="w-full">
+          <Progress value={value} className="h-2.5" />
+        </div>
+        <div className="mt-2 text-center">
+          <p className="text-sm text-muted-foreground">{`${Math.round(value)}%`}</p>
+          <p className="text-sm text-muted-foreground italic">{message}</p>
+        </div>
+      </div>
     );
-  }
+  };
 
   const startProgressBar = () => {
     const duration = 180000; // 3:00 minutes in ms
@@ -237,22 +221,6 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
     }
   };
 
-  const getButtonLabel = () => {
-    if (isGeneratingProposal) {
-      return (
-        <>
-          <FontAwesomeIcon icon={faSpinner} spin className="me-2" />
-          Processing...
-        </>
-      );
-    }
-    return "Generate Proposal";
-  };
-
-  const getHeaderTitle = () => {
-    return "Generate Proposal";
-  };
-
   const renderStepContent = () => {
     if (currentStep === 1) {
       return (
@@ -276,7 +244,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
             <img
               src={wordpaneImage}
               alt="Wordpane Preview"
-              className="wordpane-image"
+              className="w-full max-h-[350px] object-cover object-top rounded-lg shadow-md"
             />
             {isGeneratingProposal && (
               <div className="mt-4">
@@ -291,7 +259,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
       );
     } else if (currentStep === 2) {
       return (
-        <div className="success-content px-4 py-5 text-center">
+        <div className="px-4 py-5 text-center bg-gradient-to-br from-white to-gray-50 rounded-xl relative overflow-hidden">
           {showConfetti && (
             <Confetti
               width={windowDimensions.width}
@@ -301,26 +269,24 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
               gravity={0.3}
             />
           )}
-          <div className="success-animation mb-4 mt-4">
-            <div className="success-icon">
-              <FontAwesomeIcon
-                icon={faCheckCircle}
-                size="3x"
-                className="text-success animate-bounce"
-              />
-            </div>
+          <div className="mb-4 mt-4 animate-[scaleIn_0.5s_ease-out]">
+            <FontAwesomeIcon
+              icon={faCheckCircle}
+              size="3x"
+              className="text-green-500 animate-bounce"
+            />
           </div>
-          <h4 className="text-3xl font-bold  mb-6">
+          <h4 className="text-3xl font-bold mb-6 animate-[slideIn_0.5s_ease-out]">
             Fantastic. Your proposal is ready! 🚀
           </h4>
-          <p className="text-xl text-gray-600 mb-6">
+          <p className="text-xl text-gray-600 mb-6 animate-[fadeIn_0.5s_ease-out]">
             Your proposal has been generated & is ready for editing. Time to
             review and make it shine! ✨
           </p>
           <Button
-            className="upload-button  mt-2 mb-4"
+            className="animate-[slideUp_0.5s_ease-out]"
             onClick={() => {
-              handleClose();
+              setShow(false);
               navigate(`/proposal-preview`);
             }}
           >
@@ -333,41 +299,37 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
 
   return (
     <>
-      <button className="orange-button" onClick={handleShow}>
-        <FontAwesomeIcon icon={faRocket} className="pr-2" />
-        <span className="">Generate Proposal</span>
-      </button>
-      <Modal
-        show={show}
-        onHide={handleClose}
-        centered
-        dialogClassName={
-          currentStep === 1 ? "custom-modal-width" : "success-modal-width"
-        }
-      >
-        {currentStep === 1 ? (
-          <>
-            <Modal.Header className="px-4 d-flex justify-content-between align-items-center">
-              <Modal.Title>{getHeaderTitle()}</Modal.Title>
-              <button className="close-button ms-auto" onClick={handleClose}>
-                ×
-              </button>
-            </Modal.Header>
-            <Modal.Body className="p-0">{renderStepContent()}</Modal.Body>
-            <Modal.Footer>
-              <Button
-                className="upload-button"
-                onClick={handleNext}
-                disabled={isGeneratingProposal}
-              >
-                {getButtonLabel()}
-              </Button>
-            </Modal.Footer>
-          </>
-        ) : (
-          <Modal.Body className="p-0">{renderStepContent()}</Modal.Body>
-        )}
-      </Modal>
+      <Button variant="default" onClick={() => setShow(true)}>
+        <FastIcon />
+        Generate Proposal
+      </Button>
+
+      <Dialog open={show} onOpenChange={setShow}>
+        <DialogContent className="max-w-5xl">
+          {currentStep === 1 ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>Generate Proposal</DialogTitle>
+              </DialogHeader>
+              {renderStepContent()}
+              <div className="flex justify-end">
+                <Button onClick={handleNext} disabled={isGeneratingProposal}>
+                  {isGeneratingProposal ? (
+                    <>
+                      <FontAwesomeIcon icon={faSpinner} spin className="mr-2" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Generate Proposal"
+                  )}
+                </Button>
+              </div>
+            </>
+          ) : (
+            renderStepContent()
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

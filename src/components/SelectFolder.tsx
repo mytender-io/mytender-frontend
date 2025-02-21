@@ -1,16 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
-import withAuth from "../routes/withAuth";
+// import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
-import { Button, Card, Form, Spinner } from "react-bootstrap";
-import {
-  faFolder,
-  faFileAlt,
-  faReply
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "../modals/SelectFolderModal.css";
+import { FolderIcon, FileIcon, ReplyIcon } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
+import BreadCrumbs from "./BreadCrumbs";
 
 const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const getAuth = useAuthUser();
@@ -45,43 +43,6 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
       if (b === "default") return 1;
       return a.localeCompare(b);
     });
-  };
-
-  const renderBreadcrumbs = () => {
-    if (!activeFolder) {
-      return <span className="breadcrumb-item">Content Library</span>;
-    }
-
-    const parts = activeFolder.split("FORWARDSLASH");
-    return (
-      <>
-        <span
-          className="breadcrumb-item clickable"
-          onClick={() => setActiveFolder(null)}
-        >
-          Content Library
-        </span>
-        {parts.map((part, index) => (
-          <React.Fragment key={index}>
-            <span className="breadcrumb-separator">&gt;</span>
-            <span
-              className={`breadcrumb-item ${index === parts.length - 1 ? "" : "clickable"}`}
-              onClick={() => {
-                if (index < parts.length - 1) {
-                  setActiveFolder(
-                    parts.slice(0, index + 1).join("FORWARDSLASH")
-                  );
-                }
-              }}
-            >
-              {part === "default"
-                ? "Whole Content Library"
-                : formatDisplayName(part)}
-            </span>
-          </React.Fragment>
-        ))}
-      </>
-    );
   };
 
   const fetchFolderStructure = async () => {
@@ -232,26 +193,21 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
           ? "Whole Content Library"
           : formatDisplayName(folderName);
       return (
-        <tr key={folderName}>
-          <td
-            className="folder-name"
-            onClick={() => handleFolderClick(folderName)}
-          >
-            <FontAwesomeIcon
-              icon={faFolder}
-              className="fa-icon"
-              style={{ marginRight: "0.625rem" }}
-            />
-            {displayName}
-          </td>
-          <td className="checkbox-cell">
-            <Form.Check
-              type="checkbox"
+        <TableRow key={folderName}>
+          <TableCell className="flex items-center gap-4">
+            <Checkbox
               checked={selectedFolders.includes(folderName)}
-              onChange={() => handleFolderSelect(folderName)}
+              onCheckedChange={() => handleFolderSelect(folderName)}
             />
-          </td>
-        </tr>
+            <div
+              className="flex items-center gap-2"
+              onClick={() => handleFolderClick(folderName)}
+            >
+              {/* <FolderIcon className="h-4 w-4" /> */}
+              <span className="text-sm">{displayName}</span>
+            </div>
+          </TableCell>
+        </TableRow>
       );
     });
   };
@@ -290,70 +246,68 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
         : folderPath;
       const displayName = formatDisplayName(filename);
       return (
-        <tr key={`${folderPath}-${index}`} style={{ cursor: "pointer" }}>
-          <td
-            className="folder-name"
-            onClick={() => isFolder && handleFolderClick(fullPath)}
-          >
-            <FontAwesomeIcon
-              icon={isFolder ? faFolder : faFileAlt}
-              className="fa-icon"
-              style={{ marginRight: "10px" }}
-            />
-            {displayName}
-          </td>
-          {isFolder && (
-            <td className="checkbox-cell">
-              <Form.Check
-                type="checkbox"
+        <TableRow
+          key={`${folderPath}-${index}`}
+          className="cursor-pointer hover:bg-gray-100"
+        >
+          <TableCell className="flex items-center gap-4">
+            {isFolder && (
+              <Checkbox
                 checked={selectedFolders.includes(fullPath)}
-                onChange={() => handleFolderSelect(fullPath)}
+                onCheckedChange={() => handleFolderSelect(fullPath)}
               />
-            </td>
-          )}
-          {!isFolder && <td></td>}
-        </tr>
+            )}
+            <div
+              className="flex items-center gap-2"
+              onClick={() => isFolder && handleFolderClick(fullPath)}
+            >
+              {isFolder ? (
+                <FolderIcon className="h-4 w-4" />
+              ) : (
+                <FileIcon className="h-4 w-4" />
+              )}
+              <span className="text-sm">{displayName}</span>
+            </div>
+          </TableCell>
+        </TableRow>
       );
     });
   };
 
   return (
-    <Card className="select-library-card-custom mt-0 mb-0">
-      <Card.Body className="select-library-card-body-content">
-        <div
-          className="select-library-card-content-wrapper p-4"
-          style={{ overflowY: "auto" }}
-        >
-          <div className="breadcrumb-and-back-container">
-            <div className="breadcrumb-container">{renderBreadcrumbs()}</div>
+    <Card className="h-[22.5rem] bg-white rounded-md shadow-sm p-4">
+      <CardContent className="h-full p-0">
+        <div className="flex flex-col overflow-auto">
+          <div className="flex justify-between items-center mb-0 min-h-10">
+            <BreadCrumbs
+              activeFolder={activeFolder}
+              setActiveFolder={setActiveFolder}
+            />
             {activeFolder && (
-              <div className="back-button" onClick={() => handleBackClick()}>
-                <FontAwesomeIcon icon={faReply} />
-                <span style={{ marginLeft: "10px" }}>Back</span>
+              <div
+                className="cursor-pointer px-2.5 py-1.5 rounded-md text-lg hover:bg-gray-100"
+                onClick={() => handleBackClick()}
+              >
+                <ReplyIcon className="inline h-4 w-4" />
+                <span className="text-sm ml-2.5">Back</span>
               </div>
             )}
           </div>
           {isLoading ? (
-            <div className="spinner-container">
-              <Spinner
-                animation="border"
-                role="status"
-                style={{ color: "#ff7f50" }}
-              >
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
+            <div className="flex justify-center items-center h-full">
+              <Spinner />
             </div>
           ) : (
-            <table className="library-table mt-0">
-              <tbody>
+            <Table>
+              <TableBody>
                 {activeFolder
                   ? renderFolderContents(activeFolder)
                   : renderFolderStructure(folderStructure)}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           )}
         </div>
-      </Card.Body>
+      </CardContent>
     </Card>
   );
 };

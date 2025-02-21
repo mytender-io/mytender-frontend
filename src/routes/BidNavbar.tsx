@@ -1,29 +1,29 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Button, Spinner } from "react-bootstrap";
 import { BidContext } from "../views/BidWritingStateManagerView";
-import {
-  faArrowLeft,
-  faEdit,
-  faEye,
-  faPlus,
-  faUsers
-} from "@fortawesome/free-solid-svg-icons";
-import "./BidNavbar.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faEye, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { useAuthUser } from "react-auth-kit";
 import BidTitle from "../components/BidTitle";
-import { displayAlert } from "../helper/Alert";
 import GenerateProposalModal from "../modals/GenerateProposalModal";
 import SaveStatus from "@/components/SaveStatus";
+import { cn } from "@/utils";
+import { Button } from "@/components/ui/button";
+import PlusIcon from "@/components/icons/PlusIcon";
 
-const BidNavbar = ({
-  showViewOnlyMessage = () => {},
-  initialBidName = "",
-  outline = [], // default value
-  sidebarCollapse = false,
-  object_id = null,
-  handleRegenerateClick = () => {}
+const BidNavbar: React.FC<{
+  showViewOnlyMessage: () => void;
+  initialBidName: string;
+  description?: string;
+  outline?: string[];
+  object_id?: string | null;
+  handleRegenerateClick?: () => void;
+}> = ({
+  showViewOnlyMessage,
+  initialBidName,
+  description,
+  outline,
+  object_id,
+  handleRegenerateClick
 }) => {
   const { sharedState, setSharedState } = useContext(BidContext);
   const { isLoading, saveSuccess, bidInfo } = sharedState;
@@ -111,85 +111,81 @@ const BidNavbar = ({
   };
 
   console.log(initialBidName);
+
+  const baseNavLinkStyles =
+    "mr-6 text-base font-semibold text-gray-hint_text px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative hover:text-orange-500 after:content-[''] after:absolute after:bottom-[-0.3rem] after:left-0 after:w-0 after:h-[0.143rem] after:bg-orange-500 after:transition-[width] after:duration-300 after:ease-in-out hover:after:w-full";
+  const activeNavLinkStyles = "text-orange-500 after:w-full";
+
   return (
     <div>
-      <div>
+      <div className="space-y-2">
         <BidTitle
           canUserEdit={true}
-          displayAlert={displayAlert}
-          setSharedState={setSharedState}
-          sharedState={sharedState}
           showViewOnlyMessage={showViewOnlyMessage}
           initialBidName={initialBidName}
         />
+        <span className="block text-base text-gray-hint_text">
+          {description}
+        </span>
       </div>
 
       <div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderBottom: "0.143rem solid #ebecef"
-          }}
-        >
-          <div className="bidnav-section mt-3 mb-1">
+        <div className="flex justify-between items-center border-b border-gray-line">
+          <div className="flex items-center mt-3 mb-1">
             <NavLink
               to="/bid-extractor"
-              className={`bidnav-item ${activeTab === "/bid-extractor" ? "active" : ""}`}
+              className={({ isActive }) =>
+                cn(baseNavLinkStyles, isActive && activeNavLinkStyles)
+              }
               onClick={() => handleTabClick("/bid-extractor")}
             >
-              Bid Planner
+              Tender Insights
             </NavLink>
             <NavLink
               to="/bid-intel"
-              className={`bidnav-item ${activeTab === "/bid-intek" ? "active" : ""}`}
+              className={({ isActive }) =>
+                cn(baseNavLinkStyles, isActive && activeNavLinkStyles)
+              }
               onClick={() => handleTabClick("/bid-intel")}
             >
-              Bid Intel
+              Bid Inputs
             </NavLink>
             <NavLink
               to="/proposal-planner"
-              className={`bidnav-item ${activeTab === "/proposal-planner" || activeTab === "/question-crafter" ? "active" : ""}`}
+              className={({ isActive }) =>
+                cn(
+                  baseNavLinkStyles,
+                  (isActive || activeTab === "/question-crafter") &&
+                    activeNavLinkStyles
+                )
+              }
               onClick={() => handleTabClick("/proposal-planner")}
             >
-              Proposal Outline
+              Bid Outline
             </NavLink>
-            {/* <NavLink
-            to="/compliance-matrix"
-            className={`bidnav-item ${activeTab === "/compliance-matrix" ? "active" : ""}`}
-            onClick={() => handleTabClick("/compliance-matrix")}
-          >
-            Compliance Matrix
-          </NavLink> */}
             <NavLink
               to="/proposal-preview"
-              className={`bidnav-item ${activeTab === "/proposal-preview" ? "active" : ""}`}
+              className={({ isActive }) =>
+                cn(baseNavLinkStyles, isActive && activeNavLinkStyles)
+              }
               onClick={() => handleTabClick("/proposal-preview")}
             >
-              Preview Proposal
+              Bid Review
             </NavLink>
-
             <SaveStatus
               isLoading={sharedState.isLoading}
               saveSuccess={sharedState.saveSuccess}
             />
           </div>
-          {outline.length === 0 ? (
-            <div></div>
-          ) : (
-            <div className="buttons-container">
-              <button
-                onClick={handleRegenerateClick}
-                className="upload-button me-2"
-                style={{ minWidth: "fit-content" }}
-              >
-                <FontAwesomeIcon icon={faPlus} className="pr-2" />
+          {outline && outline.length > 0 ? (
+            <div className="flex items-center flex-shrink-0 gap-2">
+              <Button variant="outline" onClick={handleRegenerateClick}>
+                <PlusIcon />
                 New Outline
-              </button>
+              </Button>
               <GenerateProposalModal bid_id={object_id} outline={outline} />
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

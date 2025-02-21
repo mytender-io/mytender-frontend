@@ -120,19 +120,14 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div>
-        <SideBarSmall />
-        <div className="loading-container">
-          <Spinner animation="border" variant="primary" className="spinner" />
-        </div>
+      <div className="loading-container">
+        <Spinner animation="border" variant="primary" className="spinner" />
       </div>
     );
   }
 
   return (
     <div>
-      <SideBarSmall />
-
       <div className="lib-container">
         <div className="mb-3">
           <h1 className="heavy">Dashboard</h1>
