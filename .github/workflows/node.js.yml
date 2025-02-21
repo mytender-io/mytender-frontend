@@ -1,7 +1,7 @@
 name: App or Dev Build and Deploy
 on:
   push:
-    branches: [main, dev]
+    branches: [main, dev, experimental]
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -31,7 +31,7 @@ jobs:
         run: npm install
       - name: Build
         run: |
-          if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+          if [ "${{ github.ref }}" == "refs/heads/dev" ] || [ "${{ github.ref }}" == "refs/heads/experimental" ]; then
             npm run build:dev
           else
             npm run build:prod
@@ -40,6 +40,8 @@ jobs:
         run: |
           if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
             echo "TARGET_DIR=/home/ec2-user/www-dev" >> $GITHUB_ENV
+          elif [ "${{ github.ref }}" == "refs/heads/experimental" ]; then
+            echo "TARGET_DIR=/home/ec2-user/www-exp" >> $GITHUB_ENV
           else
             echo "TARGET_DIR=/home/ec2-user/www" >> $GITHUB_ENV
           fi
