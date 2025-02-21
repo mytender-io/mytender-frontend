@@ -240,7 +240,7 @@ const SubheadingCards = ({
                 onChange={(value) => handleInstructionsChange(subIndex, value)}
                 className="w-full bg-transparent focus:outline-none text-gray-600 overflow-y-auto"
                 placeholder="Please write any extra guidance..."
-                rows={5}
+                rows={4}
               />
             </div>
           </div>
