@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,7 +17,7 @@ const RegeneratePopover = ({
   isLoading = false
 }) => {
   const [instructions, setInstructions] = useState("");
-
+ 
   const handleSubmit = (e) => {
     e.preventDefault();
     onRegenerateSubheading(e, subIndex, instructions);
@@ -48,25 +48,31 @@ const RegeneratePopover = ({
               placeholder="Type your prompt in here..."
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
-              className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-lg h-12 px-4 placeholder:text-lg"
-            />
-            <Button
-              type="submit"
-              size="lg"
-              variant="ghost"
-              className="px-4 h-12"
+              className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-lg !text-lg md:!text-lg h-12 px-4 placeholder:text-lg"
               disabled={isLoading}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="h-6 w-6 rotate-90"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
+            />
+            {isLoading ? (
+              <div className="px-4 h-12 flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
+              </div>
+            ) : (
+              <Button
+                type="submit"
+                size="lg"
+                variant="ghost"
+                className="px-4 h-12"
               >
-                <path d="M12 5v14M19 12l-7 7-7-7" />
-              </svg>
-            </Button>
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-6 w-6 rotate-90"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M12 5v14M19 12l-7 7-7-7" />
+                </svg>
+              </Button>
+            )}
           </form>
         </PopoverContent>
       </Popover>

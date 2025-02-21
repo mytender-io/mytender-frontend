@@ -81,13 +81,13 @@ const SubheadingCards = ({
   const handleRegenerateSubheading = async (e, subIndex, instructions) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
       const formData = new FormData();
       formData.append("section", JSON.stringify(section));
-      formData.append("regenerate_instructions", instructions);
-      formData.append("subheading_index", subIndex.toString());
-
+      formData.append("user_instructions", instructions); // Changed from regenerate_instructions
+      formData.append("index", subIndex.toString());     // Changed from subheading_index
+  
       const response = await axios({
         method: "post",
         url: `http${HTTP_PREFIX}://${API_URL}/regenerate_single_subheading`,
@@ -97,12 +97,20 @@ const SubheadingCards = ({
           "Content-Type": "multipart/form-data"
         }
       });
-
-      const updatedSubheading = response.data;
-      const newSubheadings = [...section.subheadings];
-      newSubheadings[subIndex] = updatedSubheading;
-
-      handleSectionChange(index, "subheadings", newSubheadings);
+  
+      // The endpoint returns the entire updated section
+      const updatedSection = response.data;
+      
+      // Update the entire section in the parent component
+      setSharedState((prevState) => {
+        const newOutline = [...prevState.outline];
+        newOutline[index] = updatedSection;
+        return {
+          ...prevState,
+          outline: newOutline
+        };
+      });
+  
       setOpenPopoverIndex(null);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -114,7 +122,6 @@ const SubheadingCards = ({
       setIsLoading(false);
     }
   };
-
   const handleRegenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
