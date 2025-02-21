@@ -154,12 +154,10 @@ const Library = () => {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [filteredResults, setFilteredResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("");
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
   const [newFolderParent, setNewFolderParent] = useState(null);
 
   const [folderStructure, setFolderStructure] = useState({});
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const [movingFiles, setMovingFiles] = useState<{ [key: string]: boolean }>(
     {}
@@ -168,14 +166,9 @@ const Library = () => {
   const [showPdfViewerModal, setShowPdfViewerModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState("");
 
-  const searchBarRef = useRef(null);
-
   const [updateTrigger, setUpdateTrigger] = useState(0);
 
   const [isLoading, setIsLoading] = useState(false);
-
-  // Add this with your other state declarations
-  const [isSidepaneOpen, setIsSidepaneOpen] = useState(true);
 
   const getTopLevelFolders = () => {
     const folders = availableCollections.filter(
@@ -190,10 +183,6 @@ const Library = () => {
       if (b === "default") return 1;
       return a.localeCompare(b);
     });
-  };
-
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
   };
 
   const handleMenuItemClick = (action) => {
@@ -219,16 +208,15 @@ const Library = () => {
     setNewFolderParent(null);
   }, []);
 
-  const handleDeleteClick = () => {
-    if (currentFile) {
-      setFileToDelete({
-        unique_id: currentFile.unique_id,
-        filename: currentFile.filename
-      });
-      setShowDeleteFileModal(true);
-    }
-    handleClose();
-  };
+  // const handleDeleteClick = () => {
+  //   if (currentFile) {
+  //     setFileToDelete({
+  //       unique_id: currentFile.unique_id,
+  //       filename: currentFile.filename
+  //     });
+  //     setShowDeleteFileModal(true);
+  //   }
+  // };
 
   const handleShowPDFModal = (event, folder) => {
     event.stopPropagation();

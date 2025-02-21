@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronUp, ChevronDown } from "lucide-react";
+import UploadPDF from "./UploadPDF";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
@@ -6,15 +8,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTrash,
   faFileAlt,
-  faSort,
-  faSortUp,
-  faSortDown,
   faCheck,
   faXmark,
   faArrowLeft
 } from "@fortawesome/free-solid-svg-icons";
-import posthog from "posthog-js";
-import UploadPDF from "./UploadPDF.tsx";
 import { toast } from "react-toastify";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
@@ -53,6 +50,12 @@ const DeleteConfirmation = ({ onConfirm, onCancel, isDeleting }) => {
     </div>
   );
 };
+const PDFErrorView = () => (
+  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50">
+    <div className="text-2xl text-gray-600 mb-4">No PDF Found</div>
+    <div className="text-gray-500">Please try uploading the file again</div>
+  </div>
+);
 
 const TenderLibrary = ({ object_id }) => {
   const getAuth = useAuthUser();
@@ -68,9 +71,12 @@ const TenderLibrary = ({ object_id }) => {
   const [isDeletingFile, setIsDeletingFile] = useState(false);
   const [deleteConfirmationState, setDeleteConfirmationState] = useState({
     showFor: null,
-    filename: null
+    filename: null,
+    index: null // Add index to track specific file
   });
+
   const [documentListVersion, setDocumentListVersion] = useState(0);
+  const [hasPDFError, setHasPDFError] = useState(false);
 
   const handleSort = () => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
@@ -89,16 +95,20 @@ const TenderLibrary = ({ object_id }) => {
   };
 
   const getSortIcon = () => {
-    if (!isSorted) return faSort;
-    return sortOrder === "asc" ? faSortUp : faSortDown;
+    if (!isSorted) return null;
+    return sortOrder === "asc" ? (
+      <ChevronUp className="w-4 h-4" />
+    ) : (
+      <ChevronDown className="w-4 h-4" />
+    );
   };
 
-  const handleDeleteInitiate = (event, filename) => {
+  const handleDeleteInitiate = (event, filename, index) => {
     event.stopPropagation();
-    posthog.capture("tender_library_delete_file_clicked", { filename });
     setDeleteConfirmationState({
-      showFor: filename,
-      filename: filename
+      showFor: `${filename}-${index}`, // Create unique identifier
+      filename: filename,
+      index: index
     });
   };
 
@@ -119,6 +129,7 @@ const TenderLibrary = ({ object_id }) => {
     const formData = new FormData();
     formData.append("bid_id", bidId);
     formData.append("filename", filename);
+
     try {
       await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/delete_file_tenderlibrary`,
@@ -130,11 +141,11 @@ const TenderLibrary = ({ object_id }) => {
           }
         }
       );
+
       fetchDocuments();
       setDocumentListVersion((prev) => prev + 1);
       toast.success("Document deleted successfully");
 
-      // If the deleted file was being viewed, return to the library view
       if (selectedFile === filename) {
         handleBackToLibrary();
       }
@@ -154,6 +165,7 @@ const TenderLibrary = ({ object_id }) => {
     try {
       setIsLoading(true);
       setSelectedFile(fileName);
+      setHasPDFError(false);
 
       const formData = new FormData();
       formData.append("bid_id", object_id);
@@ -162,21 +174,27 @@ const TenderLibrary = ({ object_id }) => {
       const fileExtension = fileName.split(".").pop().toLowerCase();
 
       if (fileExtension === "pdf") {
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_pdf_format`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-              "Content-Type": "multipart/form-data"
-            },
-            responseType: "blob"
-          }
-        );
-        const fileURL = URL.createObjectURL(
-          new Blob([response.data], { type: "application/pdf" })
-        );
-        setFileContent(fileURL);
+        try {
+          const response = await axios.post(
+            `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_pdf_format`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${tokenRef.current}`,
+                "Content-Type": "multipart/form-data"
+              },
+              responseType: "blob"
+            }
+          );
+
+          const fileURL = URL.createObjectURL(
+            new Blob([response.data], { type: "application/pdf" })
+          );
+          setFileContent(fileURL);
+        } catch (error) {
+          console.error("Error loading PDF:", error);
+          setHasPDFError(true);
+        }
       } else if (["doc", "docx"].includes(fileExtension)) {
         const response = await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_word_format`,
@@ -188,6 +206,7 @@ const TenderLibrary = ({ object_id }) => {
             }
           }
         );
+
         setFileContent(response.data.content);
       } else if (["xls", "xlsx"].includes(fileExtension)) {
         toast.warning("Excel files viewing not supported yet");
@@ -207,6 +226,7 @@ const TenderLibrary = ({ object_id }) => {
   const handleBackToLibrary = () => {
     setSelectedFile(null);
     setFileContent(null);
+    setHasPDFError(false);
   };
 
   const formatDate = (dateStr) => {
@@ -229,11 +249,17 @@ const TenderLibrary = ({ object_id }) => {
             }
           }
         );
-        setDocuments(response.data.filenames);
+
+        if (response.data && response.data.filenames) {
+          setDocuments(response.data.filenames);
+        } else {
+          setDocuments([]);
+        }
       }
     } catch (error) {
       console.error("Error fetching tender library filenames:", error);
       toast.error("Error fetching documents");
+      setDocuments([]);
     }
   };
 
@@ -250,9 +276,16 @@ const TenderLibrary = ({ object_id }) => {
       );
     }
 
-    const fileExtension = selectedFile.split(".").pop().toLowerCase();
+    const fileExtension = selectedFile?.split(".").pop().toLowerCase();
 
     if (fileExtension === "pdf") {
+      if (hasPDFError) {
+        return (
+          <div className="relative h-[600px] border border-gray-300 rounded">
+            <PDFErrorView />
+          </div>
+        );
+      }
       return (
         <iframe
           src={fileContent}

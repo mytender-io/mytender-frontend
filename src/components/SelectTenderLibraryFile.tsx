@@ -22,18 +22,11 @@ const SelectTenderLibraryFile: React.FC<{
 
   const [documents, setDocuments] = useState([]);
   const [documentListVersion, setDocumentListVersion] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 6;
-  const [totalPages, setTotalPages] = useState(0);
   const [selectedFiles, setSelectedFiles] = useState(() => {
     const initialSelection = new Set([...initialSelectedFiles]);
     return Array.from(initialSelection);
   });
   const [isLoading, setIsLoading] = useState(true);
-
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
 
   const fetchDocuments = async () => {
     try {
@@ -50,8 +43,6 @@ const SelectTenderLibraryFile: React.FC<{
         );
         console.log("tender library docs", response);
         setDocuments(response.data.filenames);
-        const pages = Math.ceil(response.data.filenames.length / rowsPerPage);
-        setTotalPages(pages);
         setIsLoading(false);
       }
     } catch (error) {
