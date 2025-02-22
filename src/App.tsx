@@ -7,7 +7,6 @@ import ReactGA4 from "react-ga4";
 import "./Widget.css";
 import { ToastContainer } from "react-toastify";
 import posthog from "posthog-js";
-import { useEffect } from "react";
 import { UpdateChecker } from "./components/UpdateChecker";
 
 ReactGA4.initialize("G-X8S1ZMRM3C");
