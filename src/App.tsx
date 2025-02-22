@@ -6,16 +6,33 @@ import Routing from "./routes/Routing";
 import ReactGA4 from "react-ga4";
 import "./Widget.css";
 import { ToastContainer } from "react-toastify";
+import posthog from "posthog-js";
+import { useEffect } from "react";
+import { UpdateChecker } from "./components/UpdateChecker";
 
 ReactGA4.initialize("G-X8S1ZMRM3C");
+
+// Initialize PostHog
+posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
+  api_host: "https://eu.i.posthog.com",
+  person_profiles: "identified_only"
+});
+
+// Create a separate component for the authenticated content
+const AppContent = () => {
+  return (
+    <BrowserRouter>
+      <UpdateChecker />
+      <Routing />
+      <ToastContainer />
+    </BrowserRouter>
+  );
+};
 
 const App = () => {
   return (
     <AuthProvider authType={"localstorage"} authName={"sparkaichatbot"}>
-      <BrowserRouter>
-        <Routing />
-        <ToastContainer />
-      </BrowserRouter>
+      <AppContent />
     </AuthProvider>
   );
 };
