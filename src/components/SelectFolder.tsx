@@ -9,8 +9,18 @@ import { Spinner } from "@/components/ui/spinner";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import BreadCrumbs from "./BreadCrumbs";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
+interface SelectFolderProps {
+  onFolderSelect: (folders: string[]) => void;
+  initialSelectedFolders?: string[];
+}
+
+const SelectFolder: React.FC<SelectFolderProps> = ({
+  onFolderSelect,
+  initialSelectedFolders = []
+}) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -30,15 +40,18 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
 
   const [updateTrigger, setUpdateTrigger] = useState(0);
 
+  // Pagination states
+  const foldersPerPage = 10;
+
   const getTopLevelFolders = () => {
     const folders = availableCollections.filter(
-      (collection) =>
+      (collection: string) =>
         !collection.includes("FORWARDSLASH") &&
         !collection.startsWith("TenderLibrary_")
     );
 
     // Sort the folders to put "default" first
-    return folders.sort((a, b) => {
+    return folders.sort((a: string, b: string) => {
       if (a === "default") return -1;
       if (b === "default") return 1;
       return a.localeCompare(b);
@@ -167,16 +180,14 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
     if (activeFolder === null) {
       const topLevelFolders = getTopLevelFolders();
       const itemsCount = topLevelFolders.length;
-      const pages = Math.ceil(itemsCount);
+      const pages = Math.ceil(itemsCount / foldersPerPage);
       setTotalPages(pages);
-      setCurrentPage(1);
     } else {
       const itemsCount = folderContents[activeFolder]?.length || 0;
-      const pages = Math.ceil(itemsCount);
+      const pages = Math.ceil(itemsCount / foldersPerPage);
       setTotalPages(pages);
-      setCurrentPage(1);
     }
-  }, [activeFolder, folderContents, availableCollections]);
+  }, [activeFolder, folderContents, availableCollections, foldersPerPage]);
 
   const formatDisplayName = (name) => {
     if (typeof name !== "string") return "";
@@ -274,6 +285,14 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
     });
   };
 
+  // Get the current page's folders
+  const getCurrentPageFolders = () => {
+    const allFolders = getTopLevelFolders();
+    const indexOfLastFolder = currentPage * foldersPerPage;
+    const indexOfFirstFolder = indexOfLastFolder - foldersPerPage;
+    return allFolders.slice(indexOfFirstFolder, indexOfLastFolder);
+  };
+
   return (
     <Card className="h-[22.5rem] bg-white rounded-md shadow-sm p-4">
       <CardContent className="h-full p-0">
@@ -298,13 +317,52 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
               <Spinner />
             </div>
           ) : (
-            <Table>
-              <TableBody>
-                {activeFolder
-                  ? renderFolderContents(activeFolder)
-                  : renderFolderStructure(folderStructure)}
-              </TableBody>
-            </Table>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                {getCurrentPageFolders().map((folder: string) => (
+                  <div key={folder} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={folder}
+                      checked={selectedFolders.includes(folder)}
+                      onCheckedChange={() => handleFolderSelect(folder)}
+                    />
+                    <label
+                      htmlFor={folder}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {folder === "default" ? "Whole Content Library" : folder}
+                    </label>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between pt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
+                  </Button>
+                  <span className="text-sm text-gray-600">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </CardContent>
