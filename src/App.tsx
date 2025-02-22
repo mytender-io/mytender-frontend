@@ -8,6 +8,7 @@ import "./Widget.css";
 import { ToastContainer } from "react-toastify";
 import posthog from "posthog-js";
 import { UpdateChecker } from "./components/UpdateChecker";
+import 'react-toastify/dist/ReactToastify.css';
 
 ReactGA4.initialize("G-X8S1ZMRM3C");
 
@@ -23,7 +24,15 @@ const AppContent = () => {
     <BrowserRouter>
       <UpdateChecker />
       <Routing />
-      <ToastContainer />
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable={false}
+      />
     </BrowserRouter>
   );
 };

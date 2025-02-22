@@ -11,6 +11,14 @@ export const UpdateChecker = () => {
   const auth = getAuth();
   const [lastChecked, setLastChecked] = useState<number>(Date.now());
 
+  // Add this effect to test toast functionality
+  useEffect(() => {
+    toast.info('Update checker initialized', {
+      position: "bottom-right",
+      autoClose: 3000
+    });
+  }, []);
+
   useEffect(() => {
     const checkForUpdates = async () => {
       console.log('UpdateChecker: Starting version check...');
@@ -78,13 +86,14 @@ export const UpdateChecker = () => {
             timestamp: new Date().toISOString()
           });
           
-          // Show a toast notification instead of a confirm dialog
-          toast.info(
-            <div>
-              A new version is available!
+          // Try both toast.info and toast directly
+          const toastId = toast.info(
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span>A new version is available!</span>
               <button 
                 onClick={() => {
                   console.log('UpdateChecker: Update button clicked, reloading...');
+                  toast.dismiss(toastId);
                   window.location.reload();
                 }}
                 style={{ 
@@ -104,9 +113,23 @@ export const UpdateChecker = () => {
               autoClose: false,
               closeOnClick: false,
               position: "bottom-right",
-              closeButton: true
+              closeButton: true,
+              draggable: false,
+              toastId: 'update-notification' // Prevent duplicate toasts
             }
           );
+
+          // Backup notification in case toast.info fails
+          if (!toastId) {
+            toast(
+              "A new version is available! Please refresh the page.",
+              {
+                autoClose: false,
+                position: "bottom-right",
+                toastId: 'update-notification-backup'
+              }
+            );
+          }
         } else {
           console.log('UpdateChecker: No update needed', {
             currentHash,
@@ -116,6 +139,10 @@ export const UpdateChecker = () => {
         }
       } catch (error) {
         console.error('UpdateChecker: Version check failed:', error);
+        // Show error toast
+        toast.error('Failed to check for updates', {
+          position: "bottom-right"
+        });
       }
     };
 
