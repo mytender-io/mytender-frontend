@@ -141,7 +141,7 @@ const ProposalPreview = () => {
                 />
               ) : (
                 <div className="flex justify-center items-center h-full bg-muted p-5 text-center">
-                  <p>Generate a Proposal to preview it here.</p>
+                  <p>Generate a Proposal to preview it here. Click on the bid outline tab, then on the generate proposal button.</p>
                 </div>
               )}
             </div>
