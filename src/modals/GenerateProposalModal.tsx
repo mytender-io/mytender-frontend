@@ -21,8 +21,18 @@ import { Button } from "@/components/ui/button";
 import wordpaneImage from "../resources/images/wordpanescreenshot.png";
 import Confetti from "react-confetti";
 import FastIcon from "@/components/icons/FastIcon";
+import { fetchOutline } from "../services/outline";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
-const GenerateProposalModal = ({ bid_id, outline }) => {
+interface GenerateProposalModalProps {
+  bid_id: string;
+  outline: Array<{
+    status: string;
+    [key: string]: any;
+  }>;
+}
+
+const GenerateProposalModal = ({ bid_id, outline }: GenerateProposalModalProps) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const navigate = useNavigate();
@@ -31,21 +41,11 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
   const tokenRef = useRef(auth?.token || "default");
   const [show, setShow] = useState(false);
   const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
-  const [isGenerationComplete, setIsGenerationComplete] = useState(false);
-
   const [showConfetti, setShowConfetti] = useState(false);
-  const [windowDimensions, setWindowDimensions] = useState({
+  const [windowDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight
   });
-
-  useEffect(() => {
-    if (currentStep === 2) {
-      setShowConfetti(true);
-      const timer = setTimeout(() => setShowConfetti(false), 5000); // Stop confetti after 5 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [currentStep]);
 
   const [loadingMessage, setLoadingMessage] = useState(
     "Analyzing tender requirements..."
@@ -96,13 +96,18 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
   ];
 
   const incompleteSections =
-    outline?.filter((section) => section.status !== "Completed") || [];
+    outline?.filter((section: { status: string }) => section.status !== "Completed") || [];
   const hasIncompleteSections = incompleteSections.length > 0;
 
   const [progress, setProgress] = useState(0);
-  const progressInterval = useRef(null);
+  const progressInterval = useRef<NodeJS.Timeout | null>(null);
 
-  const LinearProgressWithLabel = ({ value, message }) => {
+  interface ProgressProps {
+    value: number;
+    message: string;
+  }
+
+  const LinearProgressWithLabel = ({ value, message }: ProgressProps) => {
     return (
       <div className="flex flex-col items-center w-full">
         <div className="w-full">
@@ -134,8 +139,10 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
       currentProgress += increment;
 
       if (currentProgress >= 98) {
-        clearInterval(progressInterval.current);
-        clearInterval(messageRotationInterval);
+        if (progressInterval.current) {
+          clearInterval(progressInterval.current);
+          clearInterval(messageRotationInterval);
+        }
         if (!isGeneratingProposal) {
           setProgress(100);
           setLoadingMessage(
@@ -191,12 +198,13 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
       document.body.removeChild(link);
       setProgress(100);
       fetchOutline(bid_id, tokenRef, setSharedState);
-      setIsGenerationComplete(true); // Set completion state
       setCurrentStep(2); // Move to success step
     } catch (err) {
       console.error("Error generating proposal:", err);
     } finally {
-      clearInterval(progressInterval.current);
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+      }
       setIsGeneratingProposal(false);
     }
   };
@@ -227,7 +235,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
         <div className="px-2 py-4">
           <div className="px-3">
             <p className="mb-4">
-              This is where the magic happens! The proposal will be generated as
+              The proposal will be generated as
               a Word document that you can then edit and format as needed. You
               can preview the document in the Preview Proposal tab. Make sure
               you download our{" "}
@@ -271,7 +279,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
           )}
           <div className="mb-4 mt-4 animate-[scaleIn_0.5s_ease-out]">
             <FontAwesomeIcon
-              icon={faCheckCircle}
+              icon={faCheckCircle as IconProp}
               size="3x"
               className="text-green-500 animate-bounce"
             />
@@ -297,6 +305,14 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
     }
   };
 
+  useEffect(() => {
+    if (currentStep === 2) {
+      setShowConfetti(true);
+      const timer = setTimeout(() => setShowConfetti(false), 5000); // Stop confetti after 5 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep]);
+
   return (
     <>
       <Button variant="default" onClick={() => setShow(true)}>
@@ -316,7 +332,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
                 <Button onClick={handleNext} disabled={isGeneratingProposal}>
                   {isGeneratingProposal ? (
                     <>
-                      <FontAwesomeIcon icon={faSpinner} spin className="mr-2" />
+                      <FontAwesomeIcon icon={faSpinner as IconProp} spin className="mr-2" />
                       Processing...
                     </>
                   ) : (
