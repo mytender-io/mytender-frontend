@@ -45,7 +45,7 @@ const RegeneratePopover = ({
           <form onSubmit={handleSubmit} className="flex items-center">
             <Input
               type="text"
-              placeholder="Type instructions to improve subsection"
+              placeholder="Type instructions to adjust subsection"
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
               className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-lg !text-lg md:!text-lg h-12 px-4 placeholder:text-lg"
