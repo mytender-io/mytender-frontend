@@ -27,6 +27,14 @@ const SelectTenderLibraryFile: React.FC<{
     return Array.from(initialSelection);
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
+
+  const totalPages = Math.ceil(documents.length / rowsPerPage);
+
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
 
   const fetchDocuments = async () => {
     try {
