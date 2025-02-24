@@ -169,7 +169,7 @@ const Bids = () => {
 
     return (
       <SortUpIcon
-        className={cn("text-typo-900 transition-all duration-300", {
+        className={cn("w-3 h-3 text-typo-900 transition-all duration-300", {
           "rotate-180": sortConfig.direction === "desc"
         })}
       />
