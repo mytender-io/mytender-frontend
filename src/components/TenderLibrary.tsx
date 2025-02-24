@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, Loader, Check, X } from "lucide-react";
 import UploadPDF from "./UploadPDF";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
@@ -26,30 +26,24 @@ import {
 
 const DeleteConfirmation = ({ onConfirm, onCancel, isDeleting }) => {
   if (isDeleting) {
-    return <Spinner />;
+    return (
+      <div className="flex justify-center">
+        <Loader className="w-6 h-6 animate-spin" />
+      </div>
+    );
   }
 
   return (
-    <div className="flex items-center justify-end gap-2">
-      <Button
+    <div className="flex justify-center space-x-2">
+      <Check
+        className="w-6 h-6 text-green-600 cursor-pointer"
         onClick={onConfirm}
-        variant="ghost"
-        size="icon"
-        className="h-6 w-6 min-w-6 text-green-600 hover:text-green-700 hover:bg-green-50"
-      >
-        <FontAwesomeIcon icon={faCheck} className="h-4 w-4" />
-      </Button>
-      <Button
-        onClick={onCancel}
-        variant="ghost"
-        size="icon"
-        className="h-6 w-6 min-w-6 text-gray-900 hover:text-gray-700 hover:bg-gray-50"
-      >
-        <FontAwesomeIcon icon={faXmark} className="h-4 w-4" />
-      </Button>
+      />
+      <X className="w-6 h-6 text-black cursor-pointer" onClick={onCancel} />
     </div>
   );
 };
+
 const PDFErrorView = () => (
   <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50">
     <div className="text-2xl text-gray-600 mb-4">No PDF Found</div>
@@ -106,7 +100,7 @@ const TenderLibrary = ({ object_id }) => {
   const handleDeleteInitiate = (event, filename, index) => {
     event.stopPropagation();
     setDeleteConfirmationState({
-      showFor: `${filename}-${index}`, // Create unique identifier
+      showFor: filename, // Just store the filename
       filename: filename,
       index: index
     });
@@ -319,49 +313,45 @@ const TenderLibrary = ({ object_id }) => {
         </div>
       );
     }
-
+  
     return (
-      <div className="space-y-6">
-        <UploadPDF
-          bid_id={object_id}
-          get_collections={fetchDocuments}
-          apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
-          descriptionText="Upload documents and attachments that are part of the tender"
-        />
-        <div className="rounded-md border shadow-md">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none">
-                  <div
-                    className="flex items-center gap-2 cursor-pointer"
-                    onClick={handleSort}
-                  >
-                    Filename
-                    <FontAwesomeIcon
-                      icon={getSortIcon()}
-                      className={`h-4 w-4 ${
-                        isSorted ? "text-gray-900" : "text-gray-400"
-                      }`}
-                    />
-                  </div>
-                </TableHead>
-                <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none">
-                  Upload Date
-                </TableHead>
-                <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+      <div className="h-[400px] overflow-auto"> {/* Fixed height container with scroll */}
+        <div className="space-y-6 px-4"> {/* Added padding to prevent content touching edges */}
+          <UploadPDF
+            bid_id={object_id}
+            get_collections={fetchDocuments}
+            apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
+            descriptionText="Upload documents and attachments that are part of the tender"
+          />
+          <div className="rounded-md border shadow-md">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none">
+                    <div className="flex items-center gap-2 cursor-pointer" onClick={handleSort}>
+                      Filename
+                      <FontAwesomeIcon
+                        icon={getSortIcon()}
+                        className={`h-4 w-4 ${isSorted ? "text-gray-900" : "text-gray-400"}`}
+                      />
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none">
+                    Upload Date
+                  </TableHead>
+                  <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none text-center">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
               {documents.map((doc, index) => (
                 <TableRow
                   key={index}
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => handleFileSelect(doc.filename || doc)}
                 >
-                  <TableCell className="py-2">
+                  <TableCell className="py-2 px-4">
                     <div className="flex items-center gap-2">
                       <FontAwesomeIcon
                         icon={faFileAlt}
@@ -370,11 +360,11 @@ const TenderLibrary = ({ object_id }) => {
                       <span>{doc.filename || doc}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="py-2">
+                  <TableCell className="py-2 px-4">
                     {formatDate(doc.upload_date)}
                   </TableCell>
                   <TableCell
-                    className="text-right"
+                    className="text-center"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {deleteConfirmationState.showFor ===
@@ -392,7 +382,7 @@ const TenderLibrary = ({ object_id }) => {
                         size="icon"
                         className="h-6 w-6 min-w-6"
                         onClick={(e) =>
-                          handleDeleteInitiate(e, doc.filename || doc)
+                          handleDeleteInitiate(e, doc.filename || doc, index)
                         }
                       >
                         <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
@@ -404,6 +394,7 @@ const TenderLibrary = ({ object_id }) => {
             </TableBody>
           </Table>
         </div>
+      </div>
       </div>
     );
   };

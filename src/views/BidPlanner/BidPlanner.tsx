@@ -196,8 +196,8 @@ const BidPlanner = () => {
 
           {/* Library Modal */}
           <Dialog open={isLibraryOpen} onOpenChange={setIsLibraryOpen}>
-            <DialogContent className="max-w-5xl">
-              <DialogTitle>Tender Upload</DialogTitle>
+            <DialogContent className="max-w-5xl p-2">
+              <DialogTitle className="p-4">Tender Upload</DialogTitle>
               <TenderLibrary key={object_id} object_id={object_id} />
             </DialogContent>
           </Dialog>
