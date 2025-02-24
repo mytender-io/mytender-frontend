@@ -33,8 +33,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow
 } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
@@ -208,16 +206,6 @@ const Library = () => {
     setNewFolderParent(null);
   }, []);
 
-  // const handleDeleteClick = () => {
-  //   if (currentFile) {
-  //     setFileToDelete({
-  //       unique_id: currentFile.unique_id,
-  //       filename: currentFile.filename
-  //     });
-  //     setShowDeleteFileModal(true);
-  //   }
-  // };
-
   const handleShowPDFModal = (event, folder) => {
     event.stopPropagation();
     setUploadFolder(folder);
@@ -364,15 +352,6 @@ const Library = () => {
     },
     [tokenRef, fetchFolderStructure, fetchFolderContents, setActiveFolder]
   );
-
-  const modalRef = useRef();
-
-  const closeModal = (e) => {
-    if (modalRef.current && !modalRef.current.contains(e.target)) {
-      setShowPdfViewerModal(false);
-      setShowModal(true); // Close the modal after saving
-    }
-  };
 
   const handleOnClose = () => {
     setShowPDFModal(false);

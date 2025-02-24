@@ -54,25 +54,18 @@ const FileContentModal = ({
         <DialogHeader>
           <DialogTitle className="text-center">File Content</DialogTitle>
         </DialogHeader>
-
-        <div className="relative h-[500px]">
+        <div className="relative h-[500px] w-full max-w-full overflow-hidden">
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-50">
               <Spinner />
             </div>
           )}
 
-          {isEditing ? (
-            <Textarea
-              className="h-full w-full p-5 whitespace-pre-wrap break-words resize-none"
-              value={editableContent}
-              onChange={(e) => setEditableContent(e.target.value)}
-            />
-          ) : (
-            <pre className="h-full w-full p-5 whitespace-pre-wrap break-words overflow-x-hidden rounded border">
+          <div className="h-full w-full overflow-auto">
+            <pre className="w-full p-5 whitespace-pre-wrap break-all rounded border overflow-hidden">
               {modalContent}
             </pre>
-          )}
+          </div>
         </div>
 
         <DialogFooter>
