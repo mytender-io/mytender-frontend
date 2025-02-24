@@ -32,7 +32,7 @@ const MeshGradient = ({ children }: { children: ReactNode }) => {
           top: "calc(-10.6278vw)"
         }}
       />
-      <div className="container max-w-[1080px] h-full my-0 mx-auto flex flex-col justify-between items-center relative border-none shadow-none ">
+      <div className="container max-w-[1080px] h-full my-0 mx-auto flex flex-col justify-between items-center relative border-none shadow-none min-h-screen">
         {children}
       </div>
     </div>
