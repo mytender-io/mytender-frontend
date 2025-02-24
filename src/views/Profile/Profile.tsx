@@ -515,27 +515,38 @@ const ProfilePage = () => {
                                 />
                               </div>
                             </div>
-                            <div className="space-y-4 cursor-pointer">
-                              <div className="flex items-center gap-4">
+                            <div className="space-y-4">
+                              <div
+                                className="flex items-center gap-4 cursor-pointer hover:bg-gray-50 py-2 -2rounded-md transition-colors"
+                                onClick={() =>
+                                  window.open(
+                                    "https://billing.stripe.com/p/login/00g6p52WPfRG22I8ww",
+                                    "_blank"
+                                  )
+                                }
+                              >
                                 <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
-                                      >
-                                        <DownloadIcon className="text-gray-hint_text" />
-                                      </Button>
+                                      <div className="flex items-center gap-4 w-full">
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
+                                          onClick={(e) => e.stopPropagation()} // Prevent double triggering
+                                        >
+                                          <DownloadIcon className="text-gray-hint_text" />
+                                        </Button>
+                                        <span className="text-sm select-none px-3 text-gray-hint_text">
+                                          Download Invoices
+                                        </span>
+                                      </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                      Download you invoices here
+                                      Download your invoices here
                                     </TooltipContent>
                                   </Tooltip>
                                 </TooltipProvider>
-                                <span className="text-sm select-none px-3 text-gray-hint_text">
-                                  Download Invoices
-                                </span>
                               </div>
                             </div>
                           </div>
