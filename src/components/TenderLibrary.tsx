@@ -275,7 +275,7 @@ const TenderLibrary = ({ object_id }) => {
     if (fileExtension === "pdf") {
       if (hasPDFError) {
         return (
-          <div className="relative h-[600px] border border-gray-300 rounded">
+          <div className="relative h-[500px] border border-gray-300 rounded">
             <PDFErrorView />
           </div>
         );
@@ -283,12 +283,12 @@ const TenderLibrary = ({ object_id }) => {
       return (
         <iframe
           src={fileContent}
-          className="h-[600px] w-full rounded border border-border"
+          className="h-[500px] w-full rounded border border-border"
         />
       );
     } else if (["doc", "docx"].includes(fileExtension)) {
       return (
-        <pre className="h-[600px] w-full overflow-x-hidden whitespace-pre-wrap break-words rounded border border-border p-5 text-sm">
+        <pre className="h-[500px] w-full overflow-x-hidden whitespace-pre-wrap break-words rounded border border-border p-5 text-sm">
           {fileContent}
         </pre>
       );
@@ -300,7 +300,7 @@ const TenderLibrary = ({ object_id }) => {
   const renderLibraryView = () => {
     if (selectedFile) {
       return (
-        <div>
+        <div className="px-4">
           <div className="mb-4 mt-4 flex items-center">
             <FontAwesomeIcon
               icon={faArrowLeft}

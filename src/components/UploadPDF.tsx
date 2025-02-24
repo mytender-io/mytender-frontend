@@ -330,9 +330,9 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }
   };
   return (
-    <div className="bg-white rounded shadow-sm p-4">
+    <div className="bg-white rounded shadow-sm  ">
       {descriptionText ? (
-        <p className="font-medium my-4">{descriptionText}</p>
+        <p className="font-medium my-4 mt-0">{descriptionText}</p>
       ) : null}
       <div
         className={cn(
