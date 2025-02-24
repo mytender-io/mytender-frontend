@@ -516,7 +516,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         <DialogContent className="w-full max-w-5xl overflow-hidden p-0 bg-gray-light">
           <DialogTitle className="sr-only">Create New Tender</DialogTitle>
           <div className="bg-white border-b border-gray-200">
-            <div className="flex items-stretch w-full h-[60px] overflow-x-auto">
+            <div className="flex items-stretch w-full h-10 overflow-x-auto">
               {/* Details Step */}
               <div
                 className={cn(
@@ -539,7 +539,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                     Tender Details
                   </span>
                 </div>
-                <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
+                <div className="absolute top-1/2 -right-3 w-7 h-7 bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
                 <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
               </div>
 
@@ -565,7 +565,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                     Upload Documents
                   </span>
                 </div>
-                <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
+                <div className="absolute top-1/2 -right-3 w-7 h-7 bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
                 <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
               </div>
 
@@ -591,7 +591,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                     Select Questions
                   </span>
                 </div>
-                <div className="absolute top-1/2 -right-3 w-11 h-[42px] bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
+                <div className="absolute top-1/2 -right-3 w-7 h-7 bg-white transform -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-gray-200 z-[2]" />
                 <div className="absolute top-0 right-0 bottom-0 w-5 bg-white z-[1]" />
               </div>
 

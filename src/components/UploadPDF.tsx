@@ -358,9 +358,9 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
             disabled={isUploading}
           />
           <div className="relative flex items-center justify-center mb-2.5 w-20 h-20">
-            <FileIcon className="w-full h-full" />
+            <FileIcon className="w-full h-full text-gray-hint_text" />
             <div className="absolute bottom-0 right-0 flex items-center justify-center w-8 h-8 bg-orange rounded-full">
-              <UploadIcon width={20} height={20} />
+              <UploadIcon className="w-5 h-5" />
             </div>
           </div>
           <span className="font-bold">
