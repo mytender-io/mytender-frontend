@@ -173,7 +173,7 @@ const BidPlanner = () => {
           showHome={true}
         />
       </div>
-      <div className="px-6 py-4">
+      <div className="px-6 py-4 overflow-y-auto h-[calc(100vh-89px)]">
         <div className="space-y-4">
           <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}

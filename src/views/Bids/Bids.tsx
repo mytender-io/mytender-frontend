@@ -408,7 +408,7 @@ const Bids = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2">
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[55px]">
         <BreadcrumbNavigation
           currentPage="Tender Dashboard"
           parentPages={parentPages}
@@ -416,7 +416,7 @@ const Bids = () => {
         />
         <SearchInput value={searchTerm} onChange={setSearchTerm} />
       </div>
-      <div className="py-4 px-6 space-y-4">
+      <div className="py-4 px-6 space-y-4 ">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <span className="block text-2xl font-semibold">
@@ -439,84 +439,86 @@ const Bids = () => {
           </div>
         </div>
         {viewType === "table" ? (
-          <div className="space-y-4">
-            <div className="border border-typo-200 rounded-lg overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHead
-                        key={header.key}
-                        className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none"
-                        onClick={() => requestSort(header.key)}
-                      >
-                        <div className="flex items-center gap-2">
-                          {header.label}
-                          {getSortIcon(header.key)}
-                        </div>
+          <div className="h-[calc(100vh-250px)] overflow-y-auto">
+            <div className="space-y-4">
+              <div className="border border-typo-200 rounded-lg overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHead
+                          key={header.key}
+                          className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none"
+                          onClick={() => requestSort(header.key)}
+                        >
+                          <div className="flex items-center gap-2">
+                            {header.label}
+                            {getSortIcon(header.key)}
+                          </div>
+                        </TableHead>
+                      ))}
+                      <TableHead className="w-[100px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4 select-none">
+                        Action
                       </TableHead>
-                    ))}
-                    <TableHead className="w-[100px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4 select-none">
-                      Action
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    Array(14)
-                      .fill(0)
-                      .map((_, index) => <SkeletonRow key={index} />)
-                  ) : currentBids.length > 0 ? (
-                    currentBids.map((bid) => (
-                      <TableRow key={bid._id}>
-                        <TableCell className="px-4 group">
-                          <Link
-                            to="/bid-extractor"
-                            state={{ bid: bid, fromBidsTable: true }}
-                            onClick={() => navigateToChatbot(bid)}
-                            className="block truncate w-full text-gray-hint_text no-underline group-hover:text-orange group-hover:font-bold transition-colors duration-200"
-                          >
-                            {bid.bid_title}
-                          </Link>
-                        </TableCell>
-                        <TableCell className="px-4">
-                          {bid.timestamp
-                            ? new Date(bid.timestamp).toLocaleDateString()
-                            : ""}
-                        </TableCell>
-                        <TableCell className="px-4">{bid.value}</TableCell>
-                        <TableCell className="px-4">
-                          {bid.submission_deadline &&
-                          !isNaN(Date.parse(bid.submission_deadline))
-                            ? new Date(
-                                bid.submission_deadline
-                              ).toLocaleDateString()
-                            : ""}
-                        </TableCell>
-                        <TableCell className="px-4">
-                          <BidStatusMenu
-                            value={bid.status}
-                            onChange={(value) => {
-                              updateBidStatus(bid._id, value);
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell className="w-[100px] text-right px-4">
-                          <EllipsisMenuDashboard
-                            onClick={() => handleDeleteClick(bid._id)}
-                          />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loading ? (
+                      Array(14)
+                        .fill(0)
+                        .map((_, index) => <SkeletonRow key={index} />)
+                    ) : currentBids.length > 0 ? (
+                      currentBids.map((bid) => (
+                        <TableRow key={bid._id}>
+                          <TableCell className="px-4 group">
+                            <Link
+                              to="/bid-extractor"
+                              state={{ bid: bid, fromBidsTable: true }}
+                              onClick={() => navigateToChatbot(bid)}
+                              className="block truncate w-full text-gray-hint_text no-underline group-hover:text-orange group-hover:font-bold transition-colors duration-200"
+                            >
+                              {bid.bid_title}
+                            </Link>
+                          </TableCell>
+                          <TableCell className="px-4">
+                            {bid.timestamp
+                              ? new Date(bid.timestamp).toLocaleDateString()
+                              : ""}
+                          </TableCell>
+                          <TableCell className="px-4">{bid.value}</TableCell>
+                          <TableCell className="px-4">
+                            {bid.submission_deadline &&
+                            !isNaN(Date.parse(bid.submission_deadline))
+                              ? new Date(
+                                  bid.submission_deadline
+                                ).toLocaleDateString()
+                              : ""}
+                          </TableCell>
+                          <TableCell className="px-4">
+                            <BidStatusMenu
+                              value={bid.status}
+                              onChange={(value) => {
+                                updateBidStatus(bid._id, value);
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell className="w-[100px] text-right px-4">
+                            <EllipsisMenuDashboard
+                              onClick={() => handleDeleteClick(bid._id)}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell className="text-center py-4">
+                          No matching tenders found
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell className="text-center py-4">
-                        No matching tenders found
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
             <PaginationRow
               currentPage={currentPage}
