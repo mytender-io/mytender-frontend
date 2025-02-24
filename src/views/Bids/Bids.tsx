@@ -177,7 +177,7 @@ const Bids = () => {
   };
 
   const headers = [
-    { key: "bid_title", label: "Tender Name" },
+    { key: "bid_title", label: "Tender Name", width: "400px" },
     { key: "timestamp", label: "Last edited" },
     { key: "value", label: "Value" },
     { key: "submission_deadline", label: "Deadline" },
@@ -450,6 +450,7 @@ const Bids = () => {
                           key={header.key}
                           className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none"
                           onClick={() => requestSort(header.key)}
+                          style={{ width: header.width }}
                         >
                           <div className="flex items-center gap-2">
                             {header.label}
