@@ -286,7 +286,7 @@ const ProfilePage = () => {
         </div>
         <div className="overflow-hidden">
           <MeshGradient>
-            <Card className="max-w-5xl w-full bg-white mx-auto mt-10 mb-10">
+            <Card className="max-w-5xl w-full bg-white mx-auto mt-10">
               <CardContent className="px-0 rounded-lg overflow-hidden">
                 <div className="space-y-12">
                   <div className="relative w-full h-32 bg-orange-gradient">
