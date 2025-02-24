@@ -288,7 +288,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     if (selectedFiles.length === 0) return null;
 
     return (
-      <div className="w-full mt-5 p-0">
+      <div className="w-full mt-5">
         {selectedFiles.map((file, index) => (
           <div
             key={index}
@@ -330,7 +330,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }
   };
   return (
-    <div className="bg-white rounded shadow-sm">
+    <div className="bg-white rounded shadow-sm p-4">
       {descriptionText ? (
         <p className="font-medium my-4">{descriptionText}</p>
       ) : null}
@@ -372,19 +372,21 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         </div>
       </div>
 
-      {renderSelectedFiles()}
+      <div className="space-y-4">
+        {renderSelectedFiles()}
 
-      {selectedFiles.length > 0 && (
-        <div className="mt-4 text-right">
-          <Button onClick={handleUpload} disabled={isUploading}>
-            {isUploading
-              ? "Uploading..."
-              : `Upload ${selectedFiles.length} File${
-                  selectedFiles.length !== 1 ? "s" : ""
-                }`}
-          </Button>
-        </div>
-      )}
+        {selectedFiles.length > 0 && (
+          <div className="text-right">
+            <Button onClick={handleUpload} disabled={isUploading}>
+              {isUploading
+                ? "Uploading..."
+                : `Upload ${selectedFiles.length} File${
+                    selectedFiles.length !== 1 ? "s" : ""
+                  }`}
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
