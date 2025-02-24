@@ -92,7 +92,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
       }`}
     >
       <Button
-        className="absolute -right-4 top-[55px] p-1 bg-white border border-gray-200 rounded-full shadow-md hover:bg-gray-50 text-black w-9 h-9"
+        className="absolute -right-3 top-1/2 -translate-y-1/2 p-1 bg-white border border-gray-200 rounded-full shadow-md hover:bg-gray-50 text-black w-6 h-6"
         onClick={toggleCollapse}
       >
         {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}

@@ -416,7 +416,7 @@ const Bids = () => {
         />
         <SearchInput value={searchTerm} onChange={setSearchTerm} />
       </div>
-      <div className="py-4 px-6 space-y-4 ">
+      <div className="py-4 px-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <span className="block text-2xl font-semibold">
@@ -439,7 +439,7 @@ const Bids = () => {
           </div>
         </div>
         {viewType === "table" ? (
-          <div className="h-[calc(100vh-250px)] overflow-y-auto">
+          <div className="flex flex-col justify-between h-[calc(100vh-227px)] overflow-y-auto space-y-2">
             <div className="space-y-4">
               <div className="border border-typo-200 rounded-lg overflow-hidden">
                 <Table>
