@@ -42,7 +42,7 @@ const UploadButtonWithDropdown = ({
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="h-10 w-10 p-0 rounded-full bg-transparent hover:bg-gray-light focus-visible:ring-0"
+          className="h-10 w-10 p-0 rounded-full bg-transparent hover:bg-gray-light focus-visible:ring-0 [&_svg]:w-3 [&_svg]:h-3"
         >
           <ElipsisMenuIcon className="text-gray-hint_text" />
         </Button>

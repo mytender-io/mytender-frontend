@@ -34,7 +34,7 @@ const LibrarySidepane = () => {
       >
         <h3
           className={cn(
-            "text-2xl font-semibold transition-opacity duration-200",
+            "text-xl font-semibold transition-opacity duration-200",
             isCollapsed ? "opacity-0" : "opacity-100"
           )}
         >
@@ -55,10 +55,10 @@ const LibrarySidepane = () => {
             value="upload"
             className="p-3 border-dashed border-gray-line"
           >
-            <AccordionTrigger className="text-lg font-bold bg-transparent">
+            <AccordionTrigger className="text-base font-bold bg-transparent">
               What do I upload?
             </AccordionTrigger>
-            <AccordionContent className="text-base space-y-3">
+            <AccordionContent className="text-sm space-y-3">
               <p>
                 We recommend you upload everything that a new intern that just
                 started at your company would need to create a bid response.
@@ -78,10 +78,10 @@ const LibrarySidepane = () => {
             value="how-used"
             className="p-3 border-dashed border-gray-line"
           >
-            <AccordionTrigger className="text-lg font-bold bg-transparent">
+            <AccordionTrigger className="text-base font-bold bg-transparent">
               How is this information used?
             </AccordionTrigger>
-            <AccordionContent className="text-base space-y-3">
+            <AccordionContent className="text-sm space-y-3">
               <p>
                 When you put a question through our system, it firstly considers
                 the question, inputs and information from the tender.
@@ -98,10 +98,10 @@ const LibrarySidepane = () => {
             value="storage"
             className="p-3 border-dashed border-gray-line"
           >
-            <AccordionTrigger className="text-lg font-bold bg-transparent">
+            <AccordionTrigger className="text-base font-bold bg-transparent">
               How do we safely store your data?
             </AccordionTrigger>
-            <AccordionContent className="text-base space-y-3">
+            <AccordionContent className="text-sm space-y-3">
               <p>
                 Security is key and a pillar of our philosophy at mytender.io.
               </p>
@@ -114,10 +114,10 @@ const LibrarySidepane = () => {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="quality" className="p-3 border-none">
-            <AccordionTrigger className="text-lg font-bold bg-transparent">
+            <AccordionTrigger className="text-base font-bold bg-transparent">
               How much does the quality of my data matter?
             </AccordionTrigger>
-            <AccordionContent className="text-base space-y-3">
+            <AccordionContent className="text-sm space-y-3">
               <p>
                 A great question! Here's a formula we created to help understand
                 its impact:
