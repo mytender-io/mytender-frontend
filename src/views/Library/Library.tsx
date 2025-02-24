@@ -979,8 +979,8 @@ const Library = () => {
           showHome={true}
         />
       </div>
-      <div className="h-full flex gap-6">
-        <div className="flex-1 space-y-6 pt-4">
+      <div className="h-[calc(100vh-89px)] flex gap-6">
+        <div className="flex-1 space-y-6 py-4">
           <div className="pl-6 space-y-4">
             <div className="space-y-2">
               <span className="block text-2xl font-semibold">
@@ -1069,8 +1069,8 @@ const Library = () => {
               )}
             </div>
           </div>
-          <div className="pl-6">
-            <div className="border rounded-lg">
+          <div className="pl-6 h-[calc(100%-146px)]">
+            <div className="border rounded-lg h-full">
               <div className="p-4 border-b">
                 <div className="flex items-center justify-between">
                   <div>
@@ -1092,13 +1092,15 @@ const Library = () => {
                   )}
                 </div>
               </div>
-              <Table>
-                <TableBody>
-                  {activeFolder
-                    ? renderFolderContents(activeFolder)
-                    : renderFolderStructure()}
-                </TableBody>
-              </Table>
+              <div className="h-[calc(100%-62px)] overflow-y-auto">
+                <Table>
+                  <TableBody>
+                    {activeFolder
+                      ? renderFolderContents(activeFolder)
+                      : renderFolderStructure()}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </div>
 
