@@ -132,7 +132,6 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     "Looking at the tender docs...",
     "Searching for questions...",
     "Extracting information...",
-    "Planning outline...",
     "Generating outline... Please wait a little bit longer..."
   ];
 
@@ -178,18 +177,23 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     const increment = 98 / steps;
 
     let currentProgress = 0;
-    let messageIndex = 0;
-
-    const messageRotationInterval = setInterval(() => {
-      messageIndex = (messageIndex + 1) % loadingMessages.length;
-      setLoadingMessage(loadingMessages[messageIndex]);
-    }, 1000);
+    let lastMessageIndex = -1;
 
     progressInterval.current = setInterval(() => {
       currentProgress += increment;
+
+      // Update message at 25% intervals
+      const messageIndex = Math.floor(currentProgress / 25);
+      if (
+        messageIndex !== lastMessageIndex &&
+        messageIndex < loadingMessages.length
+      ) {
+        lastMessageIndex = messageIndex;
+        setLoadingMessage(loadingMessages[messageIndex]);
+      }
+
       if (currentProgress >= 98) {
         clearInterval(progressInterval.current);
-        clearInterval(messageRotationInterval);
         if (!isGeneratingOutline) {
           setProgress(100);
           setLoadingMessage("Finalizing outline structure...");
@@ -531,7 +535,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                   >
                     1
                   </span>
-                  <span className="text-lg font-bold whitespace-nowrap">
+                  <span className="text-base font-bold whitespace-nowrap">
                     Tender Details
                   </span>
                 </div>
@@ -557,7 +561,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                   >
                     2
                   </span>
-                  <span className="text-lg font-bold whitespace-nowrap">
+                  <span className="text-base font-bold whitespace-nowrap">
                     Upload Documents
                   </span>
                 </div>
@@ -583,7 +587,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                   >
                     3
                   </span>
-                  <span className="text-lg font-bold whitespace-nowrap">
+                  <span className="text-base font-bold whitespace-nowrap">
                     Select Questions
                   </span>
                 </div>
@@ -609,7 +613,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                   >
                     4
                   </span>
-                  <span className="text-lg font-bold whitespace-nowrap">
+                  <span className="text-base font-bold whitespace-nowrap">
                     Select Context
                   </span>
                 </div>

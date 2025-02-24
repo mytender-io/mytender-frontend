@@ -110,11 +110,12 @@ const SelectTenderLibraryFile: React.FC<{
                         <Checkbox
                           checked={selectedFiles.includes(doc.filename)}
                           onCheckedChange={() => handleFileSelect(doc.filename)}
-                        />
-                        <div className="flex items-center gap-2">
-                          <FileIcon className="h-4 w-4" />
-                          <span className="text-sm">{doc.filename}</span>
-                        </div>
+                        >
+                          <div className="flex items-center gap-2">
+                            <FileIcon className="h-4 w-4" />
+                            <span className="text-sm">{doc.filename}</span>
+                          </div>
+                        </Checkbox>
                       </TableCell>
                     </TableRow>
                   ))}

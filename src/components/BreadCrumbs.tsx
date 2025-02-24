@@ -14,8 +14,8 @@ const BreadCrumbs = ({
 
   if (!activeFolder) {
     return (
-      <span className="text-sm text-gray-600 flex items-center gap-2">
-        <FolderIcon className="h-4 w-4" />
+      <span className="text-xl text-gray-600 flex items-center gap-2">
+        <FolderIcon className="h-5 w-5" />
         Content Library
       </span>
     );

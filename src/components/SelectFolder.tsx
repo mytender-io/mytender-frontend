@@ -209,14 +209,15 @@ const SelectFolder: React.FC<SelectFolderProps> = ({
             <Checkbox
               checked={selectedFolders.includes(folderName)}
               onCheckedChange={() => handleFolderSelect(folderName)}
-            />
-            <div
-              className="flex items-center gap-2"
-              onClick={() => handleFolderClick(folderName)}
             >
-              {/* <FolderIcon className="h-4 w-4" /> */}
-              <span className="text-sm">{displayName}</span>
-            </div>
+              <div
+                className="flex items-center gap-2"
+                onClick={() => handleFolderClick(folderName)}
+              >
+                {/* <FolderIcon className="h-4 w-4" /> */}
+                <span className="text-sm">{displayName}</span>
+              </div>
+            </Checkbox>
           </TableCell>
         </TableRow>
       );
@@ -295,8 +296,8 @@ const SelectFolder: React.FC<SelectFolderProps> = ({
 
   return (
     <Card className="h-[22.5rem] bg-white rounded-md shadow-sm p-4">
-      <CardContent className="h-full p-0">
-        <div className="flex flex-col overflow-auto">
+      <CardContent className="h-full p-0 overflow-y-auto">
+        <div className="flex flex-col overflow-auto space-y-2">
           <div className="flex justify-between items-center mb-0 min-h-10">
             <BreadCrumbs
               activeFolder={activeFolder}
@@ -317,21 +318,24 @@ const SelectFolder: React.FC<SelectFolderProps> = ({
               <Spinner />
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="space-y-2">
+            <div className="h-full flex flex-col justify-between space-y-4">
+              <div className="space-y-4">
                 {getCurrentPageFolders().map((folder: string) => (
                   <div key={folder} className="flex items-center space-x-2">
                     <Checkbox
                       id={folder}
                       checked={selectedFolders.includes(folder)}
                       onCheckedChange={() => handleFolderSelect(folder)}
-                    />
-                    <label
-                      htmlFor={folder}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
-                      {folder === "default" ? "Whole Content Library" : folder}
-                    </label>
+                      <label
+                        htmlFor={folder}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {folder === "default"
+                          ? "Whole Content Library"
+                          : folder}
+                      </label>
+                    </Checkbox>
                   </div>
                 ))}
               </div>
@@ -342,7 +346,9 @@ const SelectFolder: React.FC<SelectFolderProps> = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(1, prev - 1))
+                    }
                     disabled={currentPage === 1}
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -354,7 +360,9 @@ const SelectFolder: React.FC<SelectFolderProps> = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                    }
                     disabled={currentPage === totalPages}
                   >
                     Next
