@@ -87,7 +87,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
 
   return (
     <div
-      className={`fixed top-0 left-0 h-screen bg-transparent transition-all duration-300 ${
+      className={`fixed top-0 left-0 h-screen bg-transparent transition-all duration-300 z-50 ${
         isCollapsed ? "w-20" : "w-56"
       }`}
     >
