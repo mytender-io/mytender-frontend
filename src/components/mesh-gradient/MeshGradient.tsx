@@ -9,7 +9,7 @@ const MeshGradient = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <div className="relative w-full h-screen">
+    <div className="relative w-full min-h-screen">
       {/* Canvas for the gradient background */}
       <canvas
         id="gradient-canvas"

@@ -99,10 +99,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         )}
       >
         <SideBar onCollapseChange={setSidebarCollapsed} />
-        <main
-          className="flex-1 transition-all duration-300 ease-in-out bg-white border border-typo-200
-            overflow-hidden rounded-2xl"
-        >
+        <main className="flex-1 transition-all duration-300 ease-in-out bg-white border border-typo-200 rounded-2xl">
           {children}
         </main>
       </div>
