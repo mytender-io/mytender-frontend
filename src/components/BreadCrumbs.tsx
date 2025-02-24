@@ -25,9 +25,9 @@ const BreadCrumbs = ({
 
   return (
     <div className="flex items-center gap-2">
-      <FolderIcon className="h-4 w-4" />
+      <FolderIcon className="h-5 w-5" />
       <span
-        className="text-sm text-orange hover:text-orange-hover transition-colors ease-in-out cursor-pointer"
+        className="text-xl text-orange hover:text-orange-hover transition-colors ease-in-out cursor-pointer"
         onClick={() => setActiveFolder(null)}
       >
         Content Library
