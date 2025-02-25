@@ -91,7 +91,7 @@ const LoadingOverlay = ({
             <img
               src={randomSloth}
               alt="Loading Sloth"
-              className="w-80 h-80 mx-auto rounded-lg"
+              className="w-80 h-80 mx-auto rounded-lg shadow-md"
             />
           ) : null}
           <span className={cn("block", expanded ? "text-center" : "mb-7")}>
