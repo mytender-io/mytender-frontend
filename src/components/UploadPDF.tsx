@@ -288,7 +288,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     if (selectedFiles.length === 0) return null;
 
     return (
-      <div className="w-full mt-5">
+      <div className="w-full max-h-80 overflow-y-auto mt-4">
         {selectedFiles.map((file, index) => (
           <div
             key={index}
