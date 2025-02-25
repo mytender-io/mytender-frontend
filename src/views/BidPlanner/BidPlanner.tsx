@@ -166,14 +166,14 @@ const BidPlanner = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[55px]">
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage={initialBidName}
           parentPages={parentPages}
           showHome={true}
         />
       </div>
-      <div className="px-6 py-4 overflow-y-auto h-[calc(100vh-89px)]">
+      <div className="px-6 py-4">
         <div className="space-y-4">
           <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}

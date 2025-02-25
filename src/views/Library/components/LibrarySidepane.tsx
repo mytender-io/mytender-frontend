@@ -49,7 +49,7 @@ const LibrarySidepane = () => {
       >
         <Accordion
           type="multiple"
-          className="text-gray-hint_text h-[calc(100vh - 184px)]"
+          className="text-gray-hint_text h-[calc(100vh-11.5rem)] overflow-y-auto"
         >
           <AccordionItem
             value="upload"

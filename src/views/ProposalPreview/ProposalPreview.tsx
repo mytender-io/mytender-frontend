@@ -101,21 +101,21 @@ const ProposalPreview = () => {
   };
   return (
     <div>
-      <div className="flex items-center justify-between w-full border-b border-border px-6 py-2 min-h-[55px]">
+      <div className="flex items-center justify-between w-full border-b border-border px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage={initialBidName}
           parentPages={parentPages}
           showHome={true}
         />
       </div>
-      <div className="px-6 pt-4 overflow-y-auto h-[calc(100vh-89px)]">
+      <div className="px-6 pt-4 overflow-y-auto h-[calc(100vh-5.5625rem)]">
         <div className="space-y-4">
           <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}
             initialBidName="Bid Outline"
             description="Enrich the generated structure by injecting specific instructions to each question to assemble your first draft response."
           />
-          <div className="flex flex-col h-[calc(100vh-246px)] overflow-hidden">
+          <div className="flex flex-col h-[calc(100vh-15.375rem)] overflow-hidden">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold">
                 Here is your first draft:
@@ -141,7 +141,10 @@ const ProposalPreview = () => {
                 />
               ) : (
                 <div className="flex justify-center items-center h-full bg-muted p-5 text-center">
-                  <p>Generate a Proposal to preview it here. Click on the bid outline tab, then on the generate proposal button.</p>
+                  <p>
+                    Generate a Proposal to preview it here. Click on the bid
+                    outline tab, then on the generate proposal button.
+                  </p>
                 </div>
               )}
             </div>
