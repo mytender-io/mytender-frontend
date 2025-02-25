@@ -32,6 +32,7 @@ const AppContent = () => {
         rtl={false}
         pauseOnFocusLoss
         draggable={false}
+        hideProgressBar={true}
       />
     </BrowserRouter>
   );
