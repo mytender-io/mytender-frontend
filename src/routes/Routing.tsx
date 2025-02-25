@@ -47,7 +47,7 @@ function Routing() {
         <Route path="/login" element={<SignInComponent />} />
         <Route path="/logout" element={<SignOut />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/reset-password" element={<ForgotPassword />} />
+        <Route path="/reset_password" element={<ForgotPassword />} />
         <Route
           element={
             <MainLayout>

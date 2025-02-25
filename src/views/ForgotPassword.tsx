@@ -15,6 +15,7 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const token = new URLSearchParams(location.search).get("token");
+  console.log(token);
 
   useEffect(() => {
     const validateToken = async () => {
