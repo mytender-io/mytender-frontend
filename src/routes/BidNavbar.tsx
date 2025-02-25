@@ -113,8 +113,9 @@ const BidNavbar: React.FC<{
   console.log(initialBidName);
 
   const baseNavLinkStyles =
-    "mr-6 text-base font-semibold text-gray-hint_text px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative hover:text-orange-500 after:content-[''] after:absolute after:bottom-[-0.3rem] after:left-0 after:w-0 after:h-[0.143rem] after:bg-orange-500 after:transition-[width] after:duration-300 after:ease-in-out hover:after:w-full";
-  const activeNavLinkStyles = "text-orange-500 after:w-full";
+    "mr-6 text-base font-semibold text-gray-hint_text hover:text-gray-hint_text px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative hover:bg-gray-light rounded-lg";
+  const activeNavLinkStyles =
+    "text-orange-500 after:content-[''] after:absolute after:bottom-[-0.3rem] after:left-0 after:w-full after:h-[0.143rem] after:bg-orange-500 after:transition-[width] after:duration-300 after:ease-in-out";
 
   return (
     <div>
