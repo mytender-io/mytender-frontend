@@ -70,9 +70,11 @@ const SupportChat = () => {
           );
 
           // Check if there are any new non-user messages (replies)
-          const hasNewReplies = newMessages.some(msg => 
-            !msg.text.startsWith("USER ") && 
-            (!latestMessageIdRef.current || msg.id !== latestMessageIdRef.current)
+          const hasNewReplies = newMessages.some(
+            (msg) =>
+              !msg.text.startsWith("USER ") &&
+              (!latestMessageIdRef.current ||
+                msg.id !== latestMessageIdRef.current)
           );
 
           if (hasNewReplies && prevMessages.length > 0 && !isOpen) {
@@ -89,7 +91,8 @@ const SupportChat = () => {
 
           // Update latest message id
           if (updatedMessages.length > 0) {
-            latestMessageIdRef.current = updatedMessages[updatedMessages.length - 1].id;
+            latestMessageIdRef.current =
+              updatedMessages[updatedMessages.length - 1].id;
           }
 
           return updatedMessages;
@@ -189,7 +192,7 @@ const SupportChat = () => {
       {isOpen && (
         <div className="w-[350px] h-[500px] rounded-xl flex flex-col bg-white shadow-lg absolute top-10 right-0 z-50 m-0 p-0 border border-gray-200">
           <div className="w-full h-28 bg-white text-gray-800 text-center p-4 flex flex-col items-center justify-center rounded-t-xl border-b relative">
-            <button 
+            <button
               onClick={handleCloseChat}
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
               aria-label="Close chat"
@@ -227,7 +230,7 @@ const SupportChat = () => {
                 placeholder="Type a message..."
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={(e) => {
+                onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     handleSendMessage();
                   }

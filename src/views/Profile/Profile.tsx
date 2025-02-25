@@ -268,7 +268,7 @@ const ProfilePage = () => {
   const parentPages = [] as Array<{ name: string; path: string }>;
 
   return (
-    <div>
+    <div className="flex flex-col h-screen">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.4375rem]">
         <BreadcrumbNavigation
           currentPage="Profile"
@@ -277,14 +277,14 @@ const ProfilePage = () => {
         />
       </div>
 
-      <div className="h-[calc(100vh-5.5625rem)] overflow-y-auto py-4 space-y-8">
+      <div className="flex-1 flex flex-col py-4 space-y-8">
         <div className="space-y-2 px-6">
           <h1 className="text-2xl font-semibold">Profile Section</h1>
           <p className="text-base text-muted-foreground">
             To manage all of your company information
           </p>
         </div>
-        <div className="overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
           <MeshGradient>
             <Card className="max-w-5xl w-full bg-white mx-auto mt-10">
               <CardContent className="px-0 rounded-lg overflow-hidden">

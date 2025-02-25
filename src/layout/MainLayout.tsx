@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import SideBar from "./SideBar";
 import { useAuthUser } from "react-auth-kit";
-import SupportChat from "@/components/SupportChat";
 import AutoLogout from "@/components/auth/AutoLogout";
 import posthog from "posthog-js";
 import { cn } from "@/utils";
@@ -94,12 +93,12 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       {isAuthenticated && <AutoLogout />}
       <div
         className={cn(
-          "flex h-screen c pr-4 py-4",
+          "flex h-screen bg-typo-100 pr-2 py-2",
           sidebarCollapsed ? "pl-20" : "pl-56"
         )}
       >
         <SideBar onCollapseChange={setSidebarCollapsed} />
-        <main className="flex-1 transition-all duration-300 ease-in-out bg-white border border-typo-200 rounded-2xl">
+        <main className="flex-1 transition-all duration-300 ease-in-out bg-white border border-typo-200 rounded-2xl overflow-x-auto">
           {children}
         </main>
       </div>

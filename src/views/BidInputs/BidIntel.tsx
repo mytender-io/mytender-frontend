@@ -246,7 +246,7 @@ const BidIntel = () => {
   const parentPages = [{ name: "Tender Dashboard", path: "/bids" }];
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage={initialBidName}
@@ -254,7 +254,7 @@ const BidIntel = () => {
           showHome={true}
         />
       </div>
-      <div className="px-6 py-4 overflow-y-auto h-[calc(100vh-5.5625rem)]">
+      <div className="px-6 py-4 flex-1 overflow-y-auto">
         <div className="space-y-4">
           <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}
@@ -263,7 +263,7 @@ const BidIntel = () => {
           />
           <div className="grid grid-cols-2 gap-6">
             {/* Customer Pain Points Card */}
-            <div className="bg-white rounded-lg shadow w-full h-full">
+            <div className="bg-white rounded-lg shadow w-full">
               <span className="font-medium px-4 py-3 bg-gray-100 rounded-t-lg border-b w-full block text-gray-hint_text">
                 Customer Pain Points
               </span>
@@ -287,7 +287,7 @@ const BidIntel = () => {
             </div>
 
             {/* Win Themes Card */}
-            <div className="bg-white rounded-lg shadow w-full h-full">
+            <div className="bg-white rounded-lg shadow w-full">
               <span className="font-medium px-4 py-3 bg-gray-100 rounded-t-lg border-b w-full block text-gray-hint_text">
                 Win themes:
               </span>
@@ -311,7 +311,7 @@ const BidIntel = () => {
             </div>
 
             {/* Differentiating Factors Card */}
-            <div className="bg-white rounded-lg shadow w-full h-full">
+            <div className="bg-white rounded-lg shadow w-full">
               <span className="font-medium px-4 py-3 bg-gray-100 rounded-t-lg border-b w-full block text-gray-hint_text">
                 Differentiating Factors
               </span>
@@ -335,7 +335,7 @@ const BidIntel = () => {
             </div>
 
             {/* Keep existing Case Study Card */}
-            <div className="bg-white rounded-lg shadow w-full h-full">
+            <div className="bg-white rounded-lg shadow w-full">
               <span className="font-medium px-4 py-3 bg-gray-100 rounded-t-lg border-b w-full block text-gray-hint_text">
                 Add Relevant Case Study
               </span>

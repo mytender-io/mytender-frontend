@@ -1354,7 +1354,7 @@ const QAGenerator = () => {
   const parentPages = [] as Array<{ name: string; path: string }>;
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage="Q&A Generator"
@@ -1362,7 +1362,7 @@ const QAGenerator = () => {
           showHome={true}
         />
       </div>
-      <div className="py-4 px-6 space-y-4 h-[calc(100vh-5.5625rem)] overflow-y-auto">
+      <div className="flex flex-col py-4 px-6 space-y-4 flex-1 overflow-y-auto">
         <div className="space-y-2">
           <span className="block text-2xl font-semibold">
             Complete Questions One-by-One
@@ -1441,8 +1441,8 @@ const QAGenerator = () => {
           </div>
         </div>
 
-        <div className="flex flex-row gap-4">
-          <div className="w-full space-y-3">
+        <div className="flex flex-row gap-4 flex-1">
+          <div className="flex flex-col h-full w-full space-y-3">
             <div className="flex justify-between items-center">
               <h1 id="answer-section" className="text-lg font-semibold">
                 Answer:
@@ -1463,9 +1463,9 @@ const QAGenerator = () => {
                 </Button>
               </div>
             </div>
-            <div className="flex flex-col space-y-2 h-[calc(100vh-27.285rem)]">
+            <div className="flex flex-col space-y-2 h-full">
               <div
-                className="flex-1 border rounded-lg px-4 bg-white text-sm h-[calc(100vh-453px)] overflow-y-auto"
+                className="flex-1 border rounded-lg px-4 bg-white text-sm overflow-y-auto"
                 ref={responseBoxRef}
               >
                 <div ref={editorRef}>
@@ -1483,11 +1483,11 @@ const QAGenerator = () => {
             </div>
           </div>
 
-          <div className="w-full space-y-3">
+          <div className="flex flex-col h-full w-full space-y-3">
             <h1 id="bid-pilot-section" className="text-lg font-semibold h-9">
               Bid Pilot
             </h1>
-            <div className="flex flex-col bg-white rounded-lg p-4 border border-gray-line h-[calc(100vh-27.285rem)] gap-4">
+            <div className="flex flex-col bg-white rounded-lg p-4 border border-gray-line h-full gap-4">
               {showOptions ? (
                 <div ref={optionsContainerRef} className="flex-1">
                   {copilotLoading ? (

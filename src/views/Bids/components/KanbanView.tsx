@@ -180,7 +180,7 @@ const KanbanView: React.FC<KanbanViewProps> = ({
   };
 
   return (
-    <div className="flex h-[calc(100vh-14.357rem)] overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-400 scrollbar-thumb-rounded-full scrollbar-thumb-border-white">
+    <div className="flex flex-1 overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-400 scrollbar-thumb-rounded-full scrollbar-thumb-border-white">
       {statusColumns.map((status, index) => (
         <div
           key={status}
