@@ -219,14 +219,14 @@ const ChatbotResponse = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="flex items-center justify-between w-full border-b border-border px-6 py-2 min-h-[55px]">
+      <div className="flex items-center justify-between w-full border-b border-border px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage="Chatbot"
           parentPages={parentPages}
           showHome={true}
         />
       </div>
-      <div className="px-6 py-4 h-[calc(100vh-89px)]">
+      <div className="px-6 py-4 h-[calc(100vh-5.5625rem)]">
         {messages.length > 0 ? (
           <div className="relative flex flex-col justify-between space-y-4 h-full">
             <div

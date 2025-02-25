@@ -269,7 +269,7 @@ const ProfilePage = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[55px]">
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.4375rem]">
         <BreadcrumbNavigation
           currentPage="Profile"
           parentPages={parentPages}
@@ -277,7 +277,7 @@ const ProfilePage = () => {
         />
       </div>
 
-      <div className="h-[calc(100vh-89px)] overflow-y-auto py-4 space-y-8">
+      <div className="h-[calc(100vh-5.5625rem)] overflow-y-auto py-4 space-y-8">
         <div className="space-y-2 px-6">
           <h1 className="text-2xl font-semibold">Profile Section</h1>
           <p className="text-base text-muted-foreground">

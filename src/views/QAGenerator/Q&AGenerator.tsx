@@ -1355,14 +1355,14 @@ const QAGenerator = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[55px]">
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage="Q&A Generator"
           parentPages={parentPages}
           showHome={true}
         />
       </div>
-      <div className="py-4 px-6 space-y-4 h-[calc(100vh-89px)] overflow-y-auto">
+      <div className="py-4 px-6 space-y-4 h-[calc(100vh-5.5625rem)] overflow-y-auto">
         <div className="space-y-2">
           <span className="block text-2xl font-semibold">
             Complete Questions One-by-One
@@ -1461,7 +1461,7 @@ const QAGenerator = () => {
                 <Button onClick={removeReferences}>Remove References</Button>
               </div>
             </div>
-            <div className="flex flex-col space-y-2 h-[calc(100vh-425px)]">
+            <div className="flex flex-col space-y-2 h-[calc(100vh-27.285rem)]">
               <div
                 className="flex-1 border rounded-lg px-4 bg-white text-sm h-[calc(100vh-453px)] overflow-y-auto"
                 ref={responseBoxRef}
@@ -1485,7 +1485,7 @@ const QAGenerator = () => {
             <h1 id="bid-pilot-section" className="text-lg font-semibold h-9">
               Bid Pilot
             </h1>
-            <div className="flex flex-col bg-white rounded-lg p-4 border border-gray-line h-[calc(100vh-425px)] gap-4">
+            <div className="flex flex-col bg-white rounded-lg p-4 border border-gray-line h-[calc(100vh-27.285rem)] gap-4">
               {showOptions ? (
                 <div ref={optionsContainerRef} className="flex-1">
                   {copilotLoading ? (

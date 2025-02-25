@@ -29,12 +29,7 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -951,14 +946,14 @@ const Library = () => {
 
   return (
     <div className="h-full">
-      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[55px]">
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage="Content Library"
           parentPages={parentPages}
           showHome={true}
         />
       </div>
-      <div className="h-[calc(100vh-89px)] flex gap-6">
+      <div className="h-[calc(100vh-5.5625rem)] flex gap-6">
         <div className="flex-1 space-y-6 py-4">
           <div className="pl-6 space-y-4">
             <div className="space-y-2">
@@ -1048,7 +1043,7 @@ const Library = () => {
               )}
             </div>
           </div>
-          <div className="pl-6 h-[calc(100%-146px)]">
+          <div className="pl-6 h-[calc(100%-9.125rem)]">
             <div className="border rounded-lg h-full">
               <div className="p-4 border-b">
                 <div className="flex items-center justify-between">
@@ -1071,7 +1066,7 @@ const Library = () => {
                   )}
                 </div>
               </div>
-              <div className="h-[calc(100%-62px)] overflow-y-auto">
+              <div className="h-[calc(100%-3.875rem)] overflow-y-auto">
                 <Table>
                   <TableBody>
                     {activeFolder

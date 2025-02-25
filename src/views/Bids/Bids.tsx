@@ -408,7 +408,7 @@ const Bids = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[55px]">
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage="Tender Dashboard"
           parentPages={parentPages}
@@ -439,7 +439,7 @@ const Bids = () => {
           </div>
         </div>
         {viewType === "table" ? (
-          <div className="flex flex-col justify-between h-[calc(100vh-227px)] overflow-y-auto space-y-2">
+          <div className="flex flex-col justify-between h-[calc(100vh-14.1875rem)] overflow-y-auto space-y-2">
             <div className="space-y-4">
               <div className="border border-typo-200 rounded-lg overflow-hidden">
                 <Table>
