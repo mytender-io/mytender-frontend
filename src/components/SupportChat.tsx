@@ -5,11 +5,28 @@ import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { useAuthUser } from "react-auth-kit";
-import { MessageCircleQuestion, X } from "lucide-react";
+import { MessageCircleQuestion, X, Send } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter
+} from "@/components/ui/card";
+import { cn } from "@/utils";
 
 const SupportChat = () => {
   const [messages, setMessages] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [hasNewMessages, setHasNewMessages] = useState(false);
   const messagesEndRef = useRef(null);
   const location = useLocation();
@@ -77,7 +94,7 @@ const SupportChat = () => {
                 msg.id !== latestMessageIdRef.current)
           );
 
-          if (hasNewReplies && prevMessages.length > 0 && !isOpen) {
+          if (hasNewReplies && prevMessages.length > 0 && !open) {
             setHasNewMessages(true);
           }
 
@@ -101,7 +118,7 @@ const SupportChat = () => {
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
-  }, [auth?.token, isOpen]);
+  }, [auth?.token, open]);
 
   useEffect(() => {
     if (auth?.token) {
@@ -157,15 +174,6 @@ const SupportChat = () => {
     }
   };
 
-  const handleOpenChat = () => {
-    setIsOpen(true);
-    setHasNewMessages(false);
-  };
-
-  const handleCloseChat = () => {
-    setIsOpen(false);
-  };
-
   const notRenderedUrls = [
     "/chatResponse",
     "/question-crafter",
@@ -179,74 +187,88 @@ const SupportChat = () => {
 
   return (
     <div className="relative">
-      <button
-        onClick={handleOpenChat}
-        className="text-gray-500 hover:text-gray-700 transition-colors duration-300 ml-2 relative"
-      >
-        <MessageCircleQuestion className="w-6 h-6" />
-        {hasNewMessages && (
-          <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border border-white"></div>
-        )}
-        <span className="sr-only">{isOpen ? "Close Chat" : "Open Chat"}</span>
-      </button>
-      {isOpen && (
-        <div className="w-[350px] h-[500px] rounded-xl flex flex-col bg-white shadow-lg absolute top-10 right-0 z-50 m-0 p-0 border border-gray-200">
-          <div className="w-full h-28 bg-white text-gray-800 text-center p-4 flex flex-col items-center justify-center rounded-t-xl border-b relative">
-            <button
-              onClick={handleCloseChat}
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
-              aria-label="Close chat"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <h3 className="text-xl font-semibold">Support Chat</h3>
-            <p className="text-gray-500 mt-1 text-sm">Ask us anything</p>
-          </div>
-          <div className="flex-grow overflow-y-auto p-3 flex flex-col">
-            {messages.map((msg, index) => {
-              return (
-                <div
-                  key={msg.id || index}
-                  className={`w-full flex mb-2 ${msg.isUserMessage ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[70%] px-3 py-2 rounded-2xl text-sm ${
-                      msg.isUserMessage
-                        ? "bg-orange-500 text-white"
-                        : "bg-gray-100 text-black"
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
-                </div>
-              );
-            })}
-            <div ref={messagesEndRef} />
-          </div>
-          <div className="w-full p-3 flex flex-col max-h-16 bg-white rounded-b-xl border-t">
-            <div className="flex items-center">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleSendMessage();
-                  }
-                }}
-                className="flex-1 py-1.5 px-3 text-sm rounded-l-lg bg-white border border-gray-200 focus:outline-none focus:border-orange-400"
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative [&_svg]:size-6 bg-transparent"
+          >
+            <MessageCircleQuestion className="text-gray-hint_text stroke-1" />
+            {hasNewMessages && (
+              <Badge
+                variant="destructive"
+                className="absolute -top-1 -right-1 h-2 w-2 p-0"
               />
-              <button
-                onClick={handleSendMessage}
-                className="bg-orange-500 text-white py-1.5 px-3 rounded-r-lg focus:outline-none hover:bg-orange-600 transition-colors"
+            )}
+            <span className="sr-only">Support Chat</span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[350px] p-0" align="end">
+          <Card className="border-0 shadow-none">
+            <CardHeader className="p-0 px-0 pt-0">
+              <div className="flex justify-center items-center border-b p-4 text-center">
+                <div className="text-center space-y-1">
+                  <h3 className="text-xl font-semibold">Support Chat</h3>
+                  <p className="text-gray-500 text-sm">Ask us anything</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setOpen(false)}
+                  className="h-8 w-8 absolute top-2 right-2"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="py-2 px-0">
+              <ScrollArea className="h-[350px] px-4">
+                {messages.map((msg, index) => (
+                  <div
+                    key={msg.id || index}
+                    className={cn(
+                      "w-full flex mb-2",
+                      msg.isUserMessage ? "justify-end" : "justify-start"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "max-w-[70%] px-3 py-2 rounded-2xl text-sm",
+                        msg.isUserMessage
+                          ? "bg-orange-500 text-white"
+                          : "bg-gray-100 text-black"
+                      )}
+                    >
+                      {msg.text}
+                    </div>
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </ScrollArea>
+            </CardContent>
+            <CardFooter className="p-3 border-t">
+              <form
+                className="flex w-full h-9"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendMessage();
+                }}
               >
-                <FontAwesomeIcon icon={faPaperPlane} className="text-sm" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                <Input
+                  placeholder="Type a message..."
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  className="flex-1 rounded-r-none h-full focus-visible:ring-0"
+                />
+                <Button type="submit" size="icon" className="rounded-l-none">
+                  <Send />
+                </Button>
+              </form>
+            </CardFooter>
+          </Card>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };
