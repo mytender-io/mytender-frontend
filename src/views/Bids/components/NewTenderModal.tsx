@@ -93,6 +93,9 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   // Add new state for confirmation dialog
   const [showConfirmClose, setShowConfirmClose] = useState(false);
 
+  // Add new state for error message
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
   const initialModalState = {
     bidInfo: "",
     opportunity_information: "",
@@ -219,20 +222,27 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     }));
   };
 
-  const isDetailsStepValid = () => {
-    return clientName && contractValue;
-  };
-
   const isDocumentsStepValid = () => {
     return documents.length > 0;
   };
 
+  const handlePrevStep = () => {
+    if (currentStep === "documents") {
+      setCurrentStep("details");
+    } else if (currentStep === "content") {
+      setCurrentStep("documents");
+    } else if (currentStep === "questions") {
+      setCurrentStep("content");
+    }
+  };
+
   const handleNextStep = () => {
     if (currentStep === "details") {
-      if (!isDetailsStepValid()) {
-        toast.error("Please fill in all required fields");
+      if (!clientName) {
+        setErrorMessage("Tender name cannot be empty.");
         return;
       }
+      setErrorMessage(""); // Clear error message if validation passes
       setSharedState((prevState) => ({
         ...prevState,
         bidInfo: clientName,
@@ -649,7 +659,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                   <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
                     <div className="flex items-center gap-2">
                       <Label className="font-bold text-nowrap min-w-40">
-                        Tender Name:
+                        Tender Name: *
                       </Label>
                       <Input
                         type="text"
@@ -658,7 +668,11 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                         placeholder="Enter tender name"
                       />
                     </div>
-
+                    {errorMessage && (
+                      <p className="text-red-500 text-sm ml-[10.5rem]">
+                        {errorMessage}
+                      </p>
+                    )}
                     <div className="flex items-center gap-2">
                       <Label className="font-bold text-nowrap min-w-40">
                         Deadline:
@@ -716,9 +730,10 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                 type="button"
                 variant="secondary"
                 className="text-sm py-4"
-                onClick={handleClose}
+                disabled={currentStep === "details"}
+                onClick={handlePrevStep}
               >
-                Exit
+                Back
               </Button>
               {currentStep === "questions" ? (
                 <Button type="submit" disabled={isGeneratingOutline}>
