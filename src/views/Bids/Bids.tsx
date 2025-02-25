@@ -26,9 +26,11 @@ import {
   TableRow
 } from "@/components/ui/table";
 import SortUpIcon from "@/components/icons/SortUpIcon.tsx";
-import { cn } from "@/utils";
+import customLocale, { cn } from "@/utils";
 import { toast } from "react-toastify";
 import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
+import { formatDistanceToNow } from "date-fns";
+
 interface Bid {
   _id: string;
   bid_title: string;
@@ -483,7 +485,10 @@ const Bids = () => {
                           </TableCell>
                           <TableCell className="px-4">
                             {bid.timestamp
-                              ? new Date(bid.timestamp).toLocaleDateString()
+                              ? formatDistanceToNow(new Date(bid.timestamp), {
+                                  addSuffix: true,
+                                  locale: customLocale
+                                })
                               : ""}
                           </TableCell>
                           <TableCell className="px-4">{bid.value}</TableCell>

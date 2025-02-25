@@ -149,7 +149,7 @@ const Signin = () => {
                                 id="email"
                                 placeholder="Email"
                                 className="w-full"
-                                type="password"
+                                type="email"
                                 value={forgotPasswordEmail}
                                 onChange={(e) =>
                                   setForgotPasswordEmail(e.target.value)
