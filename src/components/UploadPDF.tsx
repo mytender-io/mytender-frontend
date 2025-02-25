@@ -299,7 +299,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
                 icon={getFileIcon(file.type)}
                 className="mr-3 text-gray-700 text-xl"
               />
-              <span className="flex-1 text-gray-700 text-sm truncate mr-4 max-w-[280px]">
+              <span className="flex-1 text-gray-700 text-sm truncate max-w-52">
                 {file.name}
               </span>
             </div>
