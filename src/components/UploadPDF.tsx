@@ -377,7 +377,11 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
 
         {selectedFiles.length > 0 && (
           <div className="text-right">
-            <Button onClick={handleUpload} disabled={isUploading}>
+            <Button
+              variant="secondary"
+              onClick={handleUpload}
+              disabled={isUploading}
+            >
               {isUploading
                 ? "Uploading..."
                 : `Upload ${selectedFiles.length} File${
