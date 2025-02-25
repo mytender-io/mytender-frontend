@@ -557,7 +557,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
               );
             })}
           </TabsList>
-          <div className={cn("h-[calc(100vh-21.5625rem)] overflow-y-auto")}>
+          <div className={cn("h-[calc(100vh-21.785rem)] overflow-y-auto")}>
             {tabs.map((tab, index) => (
               <TabsContent key={index} value={index.toString()}>
                 <div className={cn("relative px-8 py-4")}>
