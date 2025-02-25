@@ -17,8 +17,7 @@ import useAuthSignIn from "./UseAuthsignIn";
 import AuthState from "./AuthState";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
-import MeshGradient from "../mesh-gradient/MeshGradient";
-import Logo from "@/resources/images/logo.png";
+import AuthLayout from "@/layout/AuthLayout";
 
 const Signin = () => {
   const { submitSignIn, isLoading } = useAuthSignIn();
@@ -91,146 +90,114 @@ const Signin = () => {
   };
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center m-0">
-      <MeshGradient>
-        <div className="flex items-center gap-2 max-w-[1080px] px-5 py-4 w-full">
-          <img src={Logo} className="h-14" alt="logo" />
+    <AuthLayout>
+      <div className="relative">
+        <div className="flex items-center gap-2 mb-5">
+          <h2 className="text-2xl font-bold text-center w-full">
+            Sign in to your account
+          </h2>
         </div>
-        <div className="space-y-6 max-w-lg w-full">
-          <div className="p-12 rounded-lg bg-white shadow-card">
-            <div className="relative">
-              <div className="flex items-center gap-2 mb-5">
-                <h2 className="text-2xl font-bold text-center w-full">
-                  Sign in to your account
-                </h2>
-              </div>
-              <form onSubmit={onSubmit}>
-                <div className="space-y-4">
-                  <div className="grid w-full items-center gap-3">
-                    <Label htmlFor="email">Username</Label>
-                    <Input
-                      type="text"
-                      id="email"
-                      placeholder="Username"
-                      className="w-full"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      onKeyDown={handleKeyPress}
-                    />
-                  </div>
-                  <div className="grid w-full items-center gap-3">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="email">Password</Label>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="text-orange bg-transparent hover:text-orange-light"
-                          >
-                            Forgot Password?
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px] bg-white">
-                          <DialogHeader>
-                            <DialogTitle className="text-2xl font-bold mb-3">
-                              Forgot Password
-                            </DialogTitle>
-                            <DialogDescription className="font-medium">
-                              Enter your email address and we'll send you a link
-                              to reset your password.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                            <div className="grid w-full items-center gap-3">
-                              <Label htmlFor="email">Email</Label>
-                              <Input
-                                id="email"
-                                placeholder="Email"
-                                className="w-full"
-                                type="email"
-                                value={forgotPasswordEmail}
-                                onChange={(e) =>
-                                  setForgotPasswordEmail(e.target.value)
-                                }
-                              />
-                            </div>
-                          </div>
-                          <DialogFooter>
-                            <DialogClose asChild>
-                              <Button
-                                type="button"
-                                variant="secondary"
-                                className="text-sm py-4"
-                              >
-                                Close
-                              </Button>
-                            </DialogClose>
-                            <Button
-                              onClick={handleForgotPassword}
-                              className="text-sm py-4 text-white bg-orange hover:bg-orange-light"
-                            >
-                              Send Email
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                    <Input
-                      type="password"
-                      id="password"
-                      placeholder="Password"
-                      className="w-full"
-                      value={formData.password}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          password: e.target.value
-                        })
-                      }
-                      onKeyDown={handleKeyPress}
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full h-12 text-lg text-white"
-                    size="lg"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Loading..." : "Sign in"}
-                  </Button>
-                </div>
-              </form>
+        <form onSubmit={onSubmit}>
+          <div className="space-y-4">
+            <div className="grid w-full items-center gap-3">
+              <Label htmlFor="email">Username</Label>
+              <Input
+                type="text"
+                id="email"
+                placeholder="Username"
+                className="w-full"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                onKeyDown={handleKeyPress}
+              />
             </div>
-            <AuthState />
+            <div className="grid w-full items-center gap-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="email">Password</Label>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="text-orange bg-transparent hover:text-orange-light"
+                    >
+                      Forgot Password?
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px] bg-white">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-bold mb-3">
+                        Forgot Password
+                      </DialogTitle>
+                      <DialogDescription className="font-medium">
+                        Enter your email address and we'll send you a link to
+                        reset your password.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid w-full items-center gap-3">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          placeholder="Email"
+                          className="w-full"
+                          type="email"
+                          value={forgotPasswordEmail}
+                          onChange={(e) =>
+                            setForgotPasswordEmail(e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          className="text-sm py-4"
+                        >
+                          Close
+                        </Button>
+                      </DialogClose>
+                      <Button
+                        onClick={handleForgotPassword}
+                        className="text-sm py-4 text-white bg-orange hover:bg-orange-light"
+                      >
+                        Send Email
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <Input
+                type="password"
+                id="password"
+                placeholder="Password"
+                className="w-full"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    password: e.target.value
+                  })
+                }
+                onKeyDown={handleKeyPress}
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full h-12 text-lg text-white"
+              size="lg"
+              disabled={isLoading}
+            >
+              {isLoading ? "Loading..." : "Sign in"}
+            </Button>
           </div>
-          <div className="px-2">
-            <span className="block text-sm font-medium text-muted-foreground">
-              Disclaimer: Answers generated with AI should always be checked for
-              accuracy, we view our platform as a tool to create amazing
-              proposals, but with the guidance of a human!
-            </span>
-          </div>
-        </div>
-        <div className="flex items-center gap-4 max-w-[1080px] px-5 py-4 text-left justify-start w-full">
-          <a
-            href="https://mytender.io/data_protection_overview"
-            className="text-sm font-semibold text-black"
-            target="_blank"
-          >
-            Privacy & Policy
-          </a>
-          <a
-            href="https://mytender.io/terms_and_conditions"
-            className="text-sm font-semibold text-black"
-            target="_blank"
-          >
-            Terms & Conditions
-          </a>
-        </div>
-      </MeshGradient>
-    </div>
+        </form>
+      </div>
+      <AuthState />
+    </AuthLayout>
   );
 };
 
