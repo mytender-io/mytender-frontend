@@ -13,6 +13,13 @@ import UserIcon from "@/components/icons/UserIcon";
 import HowtoIcon from "@/components/icons/HowtoIcon";
 import LogoutIcon from "@/components/icons/LogoutIcon";
 import { cn } from "@/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
+
 interface LastActiveBid {
   _id: string;
   bid_title: string;
@@ -37,6 +44,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
     localStorage.getItem("sidebarCollapsed") || "false"
   );
   const [isCollapsed, setIsCollapsed] = useState(initialCollapsedState);
+  const [isHovering, setIsHovering] = useState(false);
 
   const isActive = (path: string): boolean => location.pathname === path;
 
@@ -91,12 +99,36 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
         isCollapsed ? "w-20" : "w-56"
       }`}
     >
-      <Button
-        className="absolute -right-3 top-1/2 -translate-y-1/2 p-1 bg-white border border-gray-200 rounded-full shadow-md hover:bg-gray-50 text-black w-6 h-6"
-        onClick={toggleCollapse}
-      >
-        {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className={cn(
+                "absolute top-1/2 -translate-y-1/2 p-1 bg-white border border-gray-200 shadow-md hover:bg-gray-50 text-gray-hint_text",
+                isHovering
+                  ? "w-6 h-6 rounded-full -right-3"
+                  : "w-4 h-6 rounded-sm -right-2"
+              )}
+              onClick={toggleCollapse}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              {isHovering ? (
+                isCollapsed ? (
+                  <ChevronRight size={20} />
+                ) : (
+                  <ChevronLeft size={20} />
+                )
+              ) : (
+                <div className="w-[2px] h-3 bg-gray-hint_text"></div>
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            {isCollapsed ? "Expand" : "Collapse"}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <div className="flex flex-col h-full">
         <div
           className={cn(
