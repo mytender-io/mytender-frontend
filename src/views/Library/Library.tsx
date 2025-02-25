@@ -20,7 +20,8 @@ import {
   FolderIcon,
   Search,
   X,
-  HelpCircle
+  HelpCircle,
+  FileArchive
 } from "lucide-react";
 import {
   Dialog,
@@ -43,6 +44,7 @@ import BreadCrumbs from "@/components/BreadCrumbs.tsx";
 import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
 import { toast } from "react-toastify";
 import PDFViewer from "@/modals/PDFViewer.tsx";
+import UploadZip from "@/components/UploadZip.tsx";
 
 const NewFolderModal = React.memo(
   ({ show, onHide, onCreateFolder, title, parentFolder }) => {
@@ -136,6 +138,7 @@ const Library = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [activeFolder, setActiveFolder] = useState(null);
   const [showPDFModal, setShowPDFModal] = useState(false);
+  const [showZipModal, setShowZipModal] = useState(false);
   const [showTextModal, setShowTextModal] = useState(false);
   const [showDeleteFolderModal, setShowDeleteFolderModal] = useState(false);
   const [folderToDelete, setFolderToDelete] = useState("");
@@ -181,6 +184,7 @@ const Library = () => {
   const handleMenuItemClick = (action) => {
     if (action === "pdf") handleOpenPDFModal();
     else if (action === "text") handleOpenTextModal();
+    else if (action === "zip") handleOpenZipModal();
   };
 
   const handleDelete = async (folderTitle) => {
@@ -216,6 +220,11 @@ const Library = () => {
   const handleOpenPDFModal = () => {
     setUploadFolder(activeFolder || null); // Sfet to activeFolder if available, otherwise null
     setShowPDFModal(true);
+  };
+
+  const handleOpenZipModal = () => {
+    setUploadFolder(activeFolder || null); // Sfet to activeFolder if available, otherwise null
+    setShowZipModal(true);
   };
 
   const handleOpenTextModal = () => {
@@ -357,6 +366,24 @@ const Library = () => {
     setUpdateTrigger((prev) => prev + 1);
   };
 
+  const handleOnCloseZip = () => {
+    setShowZipModal(false);
+
+    // Give the backend time to finish processing and updating
+    setTimeout(async () => {
+      // First refresh the folder structure to get updated collections
+      await fetchFolderStructure();
+
+      // Then refresh the contents of the current folder if we're in a folder
+      if (uploadFolder) {
+        await fetchFolderContents(uploadFolder);
+      }
+
+      // Trigger a full update to ensure UI reflects new content
+      setUpdateTrigger((prev) => prev + 1);
+    }, 1500);
+  };
+
   const UploadPDFModal = ({
     show,
     onHide,
@@ -376,6 +403,30 @@ const Library = () => {
             onClose={onClose}
             apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile/`}
             descriptionText="Upload previous bids here for the AI to use as context in the Q&A Generator. This might take a while for large documents because we need to convert the documents into a format the AI can understand so sit tight!"
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
+  const UploadZipModal = ({
+    show,
+    onHide,
+    folder,
+    get_collections,
+    onClose
+  }) => (
+    <Dialog open={show} onOpenChange={onHide}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Upload Zip Folder</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <UploadZip
+            folder={folder}
+            get_collections={get_collections}
+            onClose={onClose}
+            descriptionText="Upload ZIP files containing multiple documents. The system will extract and process all files in the ZIP. This might take a while for large archives as we need to convert the documents into a format the AI can understand."
           />
         </div>
       </DialogContent>
@@ -714,7 +765,7 @@ const Library = () => {
 
     // Filter to only show direct children
     const directChildren = contents.filter(({ unique_id, isFolder }) => {
-      console.log("\nChecking item:", unique_id);
+      //console.log("\nChecking item:", unique_id);
 
       if (!isFolder) return true; // Files are always direct children
 
@@ -1033,6 +1084,12 @@ const Library = () => {
                       Upload Text
                     </DropdownMenuItem>
                     <DropdownMenuItem
+                      onClick={() => handleMenuItemClick("zip")}
+                    >
+                      <FileArchive className="h-4 w-4 mr-2" />
+                      Upload Zip Folder
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       onClick={() => handleNewFolderClick(activeFolder)}
                     >
                       <FolderIcon className="h-4 w-4 mr-2" />
@@ -1116,6 +1173,14 @@ const Library = () => {
             folder={uploadFolder}
             get_collections={fetchFolderStructure}
             onClose={handleOnClose}
+          />
+
+          <UploadZipModal
+            show={showZipModal}
+            onHide={() => setShowZipModal(false)}
+            folder={uploadFolder}
+            get_collections={fetchFolderStructure}
+            onClose={handleOnCloseZip}
           />
 
           <UploadTextModal
