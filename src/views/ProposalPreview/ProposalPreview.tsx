@@ -100,7 +100,7 @@ const ProposalPreview = () => {
     toast.error("You only have permission to view this bid.");
   };
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-border px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage={initialBidName}
@@ -108,14 +108,14 @@ const ProposalPreview = () => {
           showHome={true}
         />
       </div>
-      <div className="px-6 pt-4 overflow-y-auto h-[calc(100vh-5.5625rem)]">
-        <div className="space-y-4">
+      <div className="px-6 pt-4 flex-1 overflow-y-auto">
+        <div className="flex flex-col space-y-4 h-full">
           <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}
             initialBidName="Bid Outline"
             description="Enrich the generated structure by injecting specific instructions to each question to assemble your first draft response."
           />
-          <div className="flex flex-col h-[calc(100vh-15.375rem)] overflow-hidden">
+          <div className="flex flex-col flex-1 overflow-hidden">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold">
                 Here is your first draft:

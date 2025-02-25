@@ -14,7 +14,7 @@ const LibrarySidepane = () => {
   return (
     <div
       className={cn(
-        "relative border-gray-line transition-all duration-300 ease-in-out",
+        "relative border-gray-line transition-all duration-300 ease-in-out flex flex-col",
         isCollapsed
           ? "w-2 border-l-0 shadow-none"
           : "w-[360px] border-1 shadow-lg"
@@ -43,14 +43,11 @@ const LibrarySidepane = () => {
       </div>
       <div
         className={cn(
-          "transition-opacity duration-200",
+          "transition-opacity duration-200 flex-1 overflow-y-auto",
           isCollapsed ? "opacity-0 invisible" : "opacity-100 visible"
         )}
       >
-        <Accordion
-          type="multiple"
-          className="text-gray-hint_text h-[calc(100vh-11.5rem)] overflow-y-auto"
-        >
+        <Accordion type="multiple" className="text-gray-hint_text">
           <AccordionItem
             value="upload"
             className="p-3 border-dashed border-gray-line"

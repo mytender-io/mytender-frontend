@@ -165,7 +165,7 @@ const BidPlanner = () => {
   console.log(initialBidName);
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage={initialBidName}
@@ -173,8 +173,8 @@ const BidPlanner = () => {
           showHome={true}
         />
       </div>
-      <div className="px-6 py-4">
-        <div className="space-y-4">
+      <div className="px-6 pt-4 flex-1">
+        <div className="flex flex-col space-y-4 h-full">
           <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}
             initialBidName={initialBidName}
@@ -202,7 +202,7 @@ const BidPlanner = () => {
             </DialogContent>
           </Dialog>
 
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-5xl mx-auto w-full flex-1">
             <TenderAnalysis canUserEdit={canUserEdit} />
           </div>
         </div>

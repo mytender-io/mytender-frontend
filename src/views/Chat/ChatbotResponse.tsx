@@ -222,7 +222,7 @@ const ChatbotResponse = () => {
   const parentPages = [] as Array<{ name: string; path: string }>;
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-border px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage="Chatbot"
@@ -230,7 +230,7 @@ const ChatbotResponse = () => {
           showHome={true}
         />
       </div>
-      <div className="px-6 py-4 h-[calc(100vh-5.5625rem)]">
+      <div className="px-6 py-4 flex-1 overflow-y-auto">
         {messages.length > 0 ? (
           <div className="relative flex flex-col justify-between space-y-4 h-full">
             <div

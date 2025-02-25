@@ -996,7 +996,7 @@ const Library = () => {
   const parentPages = [];
 
   return (
-    <div className="h-full">
+    <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage="Content Library"
@@ -1004,203 +1004,204 @@ const Library = () => {
           showHome={true}
         />
       </div>
-      <div className="h-[calc(100vh-5.5625rem)] flex gap-6">
-        <div className="flex-1 space-y-6 py-4">
-          <div className="pl-6 space-y-4">
-            <div className="space-y-2">
-              <span className="block text-2xl font-semibold">
-                Build your knowledge base
-              </span>
-              <span className="block text-base text-muted-foreground">
-                Upload documents in PDF, word or excel to so responses are
-                grounded in your information.
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="relative w-full max-w-96">
-                <div className="relative flex items-center w-full px-4 py-2 border border-typo-grey-6 rounded-lg bg-white">
-                  <Search className="absolute left-4 h-6 w-6 text-typo-700 z-10" />
-                  <Input
-                    className="w-full pl-9 border-none outline-none focus-visible:ring-0 shadow-none text-base md:text-base py-0 h-6"
-                    placeholder="Search folders and files"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    onFocus={() => {
-                      setShowDropdown(true);
-                      setShowSearchResults(true);
-                    }}
-                    onBlur={() => {
-                      setTimeout(() => {
-                        setShowDropdown(false);
-                        setShowSearchResults(false);
-                      }, 200);
-                    }}
-                  />
-                  {searchQuery && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-2 h-8 w-8 p-0 hover:bg-transparent"
-                      onClick={() => {
-                        setSearchQuery("");
-                        setShowDropdown(false);
-                        setShowSearchResults(false);
+      <div className="flex-1 overflow-y-auto">
+        <div className="h-full flex gap-6 overflow-y-auto overflow-x-hidden">
+          <div className="flex flex-col flex-1 space-y-6 py-4 pl-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <span className="block text-2xl font-semibold">
+                  Build your knowledge base
+                </span>
+                <span className="block text-base text-muted-foreground">
+                  Upload documents in PDF, word or excel to so responses are
+                  grounded in your information.
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="relative w-full max-w-96">
+                  <div className="relative flex items-center w-full px-4 py-2 border border-typo-grey-6 rounded-lg bg-white">
+                    <Search className="absolute left-4 h-6 w-6 text-typo-700 z-10" />
+                    <Input
+                      className="w-full pl-9 border-none outline-none focus-visible:ring-0 shadow-none text-base md:text-base py-0 h-6"
+                      placeholder="Search folders and files"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      onFocus={() => {
+                        setShowDropdown(true);
+                        setShowSearchResults(true);
                       }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-                {showSearchResults && renderSearchResults()}
-              </div>
-              {!activeFolder ? (
-                <Button
-                  size="lg"
-                  className="px-4"
-                  onClick={() => handleNewFolderClick(null)}
-                >
-                  <PlusIcon className="text-white mr-2" />
-                  New Folder
-                </Button>
-              ) : (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="lg" className="px-4">
-                      <PlusIcon className="text-white mr-2" />
-                      Upload
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56">
-                    <DropdownMenuItem
-                      onClick={() => handleMenuItemClick("pdf")}
-                    >
-                      <FileIcon className="h-4 w-4 mr-2" />
-                      Upload PDF/Word/Excel
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleMenuItemClick("text")}
-                    >
-                      <FileTextIcon className="h-4 w-4 mr-2" />
-                      Upload Text
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleMenuItemClick("zip")}
-                    >
-                      <FileArchive className="h-4 w-4 mr-2" />
-                      Upload Zip Folder
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleNewFolderClick(activeFolder)}
-                    >
-                      <FolderIcon className="h-4 w-4 mr-2" />
-                      New Subfolder
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
-          </div>
-          <div className="pl-6 h-[calc(100%-9.125rem)]">
-            <div className="border rounded-lg h-full">
-              <div className="flex items-center p-4 border-b max-h-12">
-                <div className="flex items-center justify-between w-full">
-                  <div>
-                    <BreadCrumbs
-                      activeFolder={activeFolder}
-                      setActiveFolder={setActiveFolder}
+                      onBlur={() => {
+                        setTimeout(() => {
+                          setShowDropdown(false);
+                          setShowSearchResults(false);
+                        }, 200);
+                      }}
                     />
+                    {searchQuery && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-2 h-8 w-8 p-0 hover:bg-transparent"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setShowDropdown(false);
+                          setShowSearchResults(false);
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
-                  {activeFolder && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleBackClick()}
-                      className="flex items-center"
-                    >
-                      <ArrowLeftIcon className="h-4 w-4 mr-2" />
-                      Back
-                    </Button>
-                  )}
+                  {showSearchResults && renderSearchResults()}
                 </div>
-              </div>
-              <div className="h-[calc(100%-3.875rem)] overflow-y-auto">
-                <Table>
-                  <TableBody>
-                    {activeFolder
-                      ? renderFolderContents(activeFolder)
-                      : renderFolderStructure()}
-                  </TableBody>
-                </Table>
+                {!activeFolder ? (
+                  <Button
+                    size="lg"
+                    className="px-4"
+                    onClick={() => handleNewFolderClick(null)}
+                  >
+                    <PlusIcon className="text-white mr-2" />
+                    New Folder
+                  </Button>
+                ) : (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="lg" className="px-4">
+                        <PlusIcon className="text-white mr-2" />
+                        Upload
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuItem
+                        onClick={() => handleMenuItemClick("pdf")}
+                      >
+                        <FileIcon className="h-4 w-4 mr-2" />
+                        Upload PDF/Word/Excel
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleMenuItemClick("text")}
+                      >
+                        <FileTextIcon className="h-4 w-4 mr-2" />
+                        Upload Text
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleMenuItemClick("zip")}
+                      >
+                        <FileArchive className="h-4 w-4 mr-2" />
+                        Upload Zip Folder
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleNewFolderClick(activeFolder)}
+                      >
+                        <FolderIcon className="h-4 w-4 mr-2" />
+                        New Subfolder
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
             </div>
-          </div>
+            <div className="flex-1 overflow-y-auto border rounded-lg">
+              <div>
+                <div className="flex items-center p-4 border-b max-h-12">
+                  <div className="flex items-center justify-between w-full">
+                    <div>
+                      <BreadCrumbs
+                        activeFolder={activeFolder}
+                        setActiveFolder={setActiveFolder}
+                      />
+                    </div>
+                    {activeFolder && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleBackClick()}
+                        className="flex items-center"
+                      >
+                        <ArrowLeftIcon className="h-4 w-4 mr-2" />
+                        Back
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <Table>
+                    <TableBody>
+                      {activeFolder
+                        ? renderFolderContents(activeFolder)
+                        : renderFolderStructure()}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            </div>
 
-          {/* Modals */}
-          <FileContentModal
-            showModal={showModal}
-            setShowModal={setShowModal}
-            modalContent={modalContent}
-            onSave={(newContent) =>
-              saveFileContent(currentFileId, newContent, activeFolder)
-            }
-            documentId={currentFileId}
-            fileName={currentFileName}
-            folderName={activeFolder}
-            onViewPdf={viewPdfFile}
-            isLoading={isLoading}
-          />
+            {/* Modals */}
+            <FileContentModal
+              showModal={showModal}
+              setShowModal={setShowModal}
+              modalContent={modalContent}
+              onSave={(newContent) =>
+                saveFileContent(currentFileId, newContent, activeFolder)
+              }
+              documentId={currentFileId}
+              fileName={currentFileName}
+              folderName={activeFolder}
+              onViewPdf={viewPdfFile}
+              isLoading={isLoading}
+            />
 
-          <DeleteFolderModal
-            show={showDeleteFolderModal}
-            onHide={() => setShowDeleteFolderModal(false)}
-            onDelete={() => handleDelete(folderToDelete)}
-            folderTitle={folderToDelete}
-          />
+            <DeleteFolderModal
+              show={showDeleteFolderModal}
+              onHide={() => setShowDeleteFolderModal(false)}
+              onDelete={() => handleDelete(folderToDelete)}
+              folderTitle={folderToDelete}
+            />
 
-          <DeleteFileModal
-            show={showDeleteFileModal}
-            onHide={() => setShowDeleteFileModal(false)}
-            onDelete={() => {
-              deleteDocument(fileToDelete.unique_id);
-              setShowDeleteFileModal(false);
-            }}
-            fileName={fileToDelete ? fileToDelete.filename : ""}
-          />
+            <DeleteFileModal
+              show={showDeleteFileModal}
+              onHide={() => setShowDeleteFileModal(false)}
+              onDelete={() => {
+                deleteDocument(fileToDelete.unique_id);
+                setShowDeleteFileModal(false);
+              }}
+              fileName={fileToDelete ? fileToDelete.filename : ""}
+            />
 
-          <UploadPDFModal
-            show={showPDFModal}
-            onHide={() => setShowPDFModal(false)}
-            folder={uploadFolder}
-            get_collections={fetchFolderStructure}
-            onClose={handleOnClose}
-          />
+            <UploadPDFModal
+              show={showPDFModal}
+              onHide={() => setShowPDFModal(false)}
+              folder={uploadFolder}
+              get_collections={fetchFolderStructure}
+              onClose={handleOnClose}
+            />
 
-          <UploadZipModal
-            show={showZipModal}
-            onHide={() => setShowZipModal(false)}
-            folder={uploadFolder}
-            get_collections={fetchFolderStructure}
-            onClose={handleOnCloseZip}
-          />
+            <UploadZipModal
+              show={showZipModal}
+              onHide={() => setShowZipModal(false)}
+              folder={uploadFolder}
+              get_collections={fetchFolderStructure}
+              onClose={handleOnCloseZip}
+            />
 
-          <UploadTextModal
-            show={showTextModal}
-            onHide={() => setShowTextModal(false)}
-            folder={uploadFolder}
-            get_collections={fetchFolderStructure}
-          />
+            <UploadTextModal
+              show={showTextModal}
+              onHide={() => setShowTextModal(false)}
+              folder={uploadFolder}
+              get_collections={fetchFolderStructure}
+            />
 
-          <NewFolderModal
-            show={showNewFolderModal}
-            onHide={handleHideNewFolderModal}
-            onCreateFolder={handleCreateFolder}
-            title={
-              newFolderParent ? "Create New Subfolder" : "Create New Folder"
-            }
-            parentFolder={newFolderParent}
-          />
+            <NewFolderModal
+              show={showNewFolderModal}
+              onHide={handleHideNewFolderModal}
+              onCreateFolder={handleCreateFolder}
+              title={
+                newFolderParent ? "Create New Subfolder" : "Create New Folder"
+              }
+              parentFolder={newFolderParent}
+            />
 
-          {/* {contextMenu && contextMenuTarget && (
+            {/* {contextMenu && contextMenuTarget && (
             <LibraryContextMenu
               anchorPosition={{ x: contextMenu.mouseX, y: contextMenu.mouseY }}
               isOpen={Boolean(contextMenu)}
@@ -1238,15 +1239,16 @@ const Library = () => {
             />
           )} */}
 
-          {showPdfViewerModal && (
-            <PDFViewer
-              pdfUrl={pdfUrl}
-              isLoading={isLoading}
-              onClose={() => setShowPdfViewerModal(false)}
-            />
-          )}
+            {showPdfViewerModal && (
+              <PDFViewer
+                pdfUrl={pdfUrl}
+                isLoading={isLoading}
+                onClose={() => setShowPdfViewerModal(false)}
+              />
+            )}
+          </div>
+          <LibrarySidepane />
         </div>
-        <LibrarySidepane />
       </div>
     </div>
   );
