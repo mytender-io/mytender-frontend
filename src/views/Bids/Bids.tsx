@@ -26,7 +26,7 @@ import {
   TableRow
 } from "@/components/ui/table";
 import SortUpIcon from "@/components/icons/SortUpIcon.tsx";
-import customLocale, { cn } from "@/utils";
+import { customLocale, cn } from "@/utils";
 import { toast } from "react-toastify";
 import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
 import { formatDistanceToNow } from "date-fns";

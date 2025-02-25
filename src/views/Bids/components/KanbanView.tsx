@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { cn } from "@/utils";
+import { cn, customLocale } from "@/utils";
 import { formatDistanceToNow } from "date-fns";
-import customLocale from "@/utils";
 
 interface KanbanViewProps {
   bids: any[];
