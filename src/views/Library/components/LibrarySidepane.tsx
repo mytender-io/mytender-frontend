@@ -9,7 +9,7 @@ import SymbolEqualIcon from "@/components/icons/SymbolEqualIcon";
 import { cn } from "@/utils";
 
 const LibrarySidepane = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
     <div
