@@ -94,7 +94,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       {isAuthenticated && <AutoLogout />}
       <div
         className={cn(
-          "flex h-screen bg-typo-100 pr-4 py-4",
+          "flex h-screen c pr-4 py-4",
           sidebarCollapsed ? "pl-20" : "pl-56"
         )}
       >
@@ -103,7 +103,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           {children}
         </main>
       </div>
-      {isAuthenticated && <SupportChat auth={auth} />}
     </>
   );
 };

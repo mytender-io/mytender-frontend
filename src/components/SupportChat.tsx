@@ -2,16 +2,19 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
-import "./SupportChat.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComments, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { useAuthUser } from "react-auth-kit";
+import { MessageCircle, MessageCircleQuestion } from "lucide-react";
 
-const SupportChat = ({ auth }) => {
+const SupportChat = () => {
   const [messages, setMessages] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const messagesEndRef = useRef(null);
   const location = useLocation();
   const [inputMessage, setInputMessage] = useState("");
+  const getAuth = useAuthUser();
+  const auth = getAuth();
 
   const processMessage = (msg) => {
     console.log("Processing message:", JSON.stringify(msg));
@@ -147,26 +150,33 @@ const SupportChat = ({ auth }) => {
   }
 
   return (
-    <div className="support-chat-container">
-      <button onClick={() => setIsOpen(!isOpen)} className="chat-toggle-button">
-        <FontAwesomeIcon icon={faComments} />
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="text-gray-500 hover:text-gray-700 transition-colors duration-300 ml-2"
+      >
+        <MessageCircleQuestion className="w-7 h-7" />
         <span className="sr-only">{isOpen ? "Close Chat" : "Open Chat"}</span>
       </button>
       {isOpen && (
-        <div className="chat-widget">
-          <div className="chat-header">
-            <h3>Support Chat</h3>
-            <p>Ask us anything</p>
+        <div className="w-[450px] h-[650px] rounded-xl flex flex-col bg-white shadow-lg absolute top-10 right-0 z-50 m-0 p-0 border border-gray-200">
+          <div className="w-full h-36 bg-white text-gray-800 text-center p-5 flex flex-col items-center justify-center rounded-t-xl border-b">
+            <h3 className="text-2xl font-semibold">Support Chat</h3>
+            <p className="text-gray-500 mt-2">Ask us anything</p>
           </div>
-          <div className="chat-messages">
+          <div className="flex-grow overflow-y-auto p-3 flex flex-col">
             {messages.map((msg, index) => {
               return (
                 <div
                   key={msg.id || index}
-                  className={`message-container ${msg.isUserMessage ? "user-message-container" : "support-message-container"}`}
+                  className={`w-full flex mb-3 ${msg.isUserMessage ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`message ${msg.isUserMessage ? "user-message" : "support-message"}`}
+                    className={`max-w-[70%] px-3 py-2 rounded-2xl ${
+                      msg.isUserMessage
+                        ? "bg-orange-500 text-white"
+                        : "bg-gray-100 text-black"
+                    }`}
                   >
                     {msg.text}
                   </div>
@@ -175,8 +185,8 @@ const SupportChat = ({ auth }) => {
             })}
             <div ref={messagesEndRef} />
           </div>
-          <div className="chat-input">
-            <div className="bid-input-bar">
+          <div className="w-full p-4 flex flex-col max-h-20 bg-white rounded-b-xl border-t">
+            <div className="flex items-center">
               <input
                 type="text"
                 placeholder="Type a message..."
@@ -187,8 +197,12 @@ const SupportChat = ({ auth }) => {
                     handleSendMessage();
                   }
                 }}
+                className="flex-1 py-2 px-3 rounded-l-lg bg-white border border-gray-200 focus:outline-none focus:border-orange-400"
               />
-              <button onClick={handleSendMessage}>
+              <button
+                onClick={handleSendMessage}
+                className="bg-orange-500 text-white py-2 px-4 rounded-r-lg focus:outline-none hover:bg-orange-600 transition-colors"
+              >
                 <FontAwesomeIcon icon={faPaperPlane} />
               </button>
             </div>

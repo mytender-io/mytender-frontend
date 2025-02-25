@@ -19,7 +19,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   };
 
   return (
-    <div className="relative flex items-center w-full px-4 py-2 max-w-80 border border-typo-grey-6 rounded-lg bg-white">
+    <div className="relative flex items-center w-full px-4 py-2 w-[400px] border border-typo-grey-6 rounded-lg bg-white">
       <SearchIcon className="absolute left-4 h-4 w-4 text-typo-700 z-10" />
       <Input
         type="text"

@@ -413,8 +413,10 @@ const Bids = () => {
           currentPage="Tender Dashboard"
           parentPages={parentPages}
           showHome={true}
+          rightContent={
+            <SearchInput value={searchTerm} onChange={setSearchTerm} />
+          }
         />
-        <SearchInput value={searchTerm} onChange={setSearchTerm} />
       </div>
       <div className="py-4 px-6 space-y-4">
         <div className="flex items-center justify-between">
