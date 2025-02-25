@@ -415,10 +415,29 @@ const ProposalPlan = () => {
     try {
       // Create new outline by properly spreading nested objects
       const newOutline = [...sharedState.outline];
-      newOutline[index] = {
-        ...newOutline[index],
-        [field]: value
-      };
+
+      // If changing a field other than status and current status is "Not Started", update status to "In Progress"
+      if (field !== "status" && newOutline[index].status === "Not Started") {
+        newOutline[index] = {
+          ...newOutline[index],
+          [field]: value,
+          status: "In Progress"
+        };
+
+        // Track automatic status change
+        posthog.capture("proposal_section_status_auto_changed", {
+          bidId: object_id,
+          sectionIndex: index,
+          previousStatus: "Not Started",
+          newStatus: "In Progress",
+          triggerField: field
+        });
+      } else {
+        newOutline[index] = {
+          ...newOutline[index],
+          [field]: value
+        };
+      }
 
       // Update state using callback to ensure we have latest state
       setSharedState((prevState) => ({
