@@ -1458,7 +1458,9 @@ const QAGenerator = () => {
                       .filter(Boolean).length
                   }
                 </span>
-                <Button onClick={removeReferences}>Remove References</Button>
+                <Button variant="secondary" onClick={removeReferences}>
+                  Remove References
+                </Button>
               </div>
             </div>
             <div className="flex flex-col space-y-2 h-[calc(100vh-27.285rem)]">
