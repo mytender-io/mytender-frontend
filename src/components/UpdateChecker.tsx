@@ -13,7 +13,7 @@ export const UpdateChecker = () => {
 
   // Add this effect to test toast functionality
   useEffect(() => {
-    toast.info('Update checker initialized', {
+    toast.info("Update checker initialised", {
       position: "bottom-right",
       autoClose: 3000
     });
@@ -21,89 +21,104 @@ export const UpdateChecker = () => {
 
   useEffect(() => {
     const checkForUpdates = async () => {
-      console.log('UpdateChecker: Starting version check...');
+      console.log("UpdateChecker: Starting version check...");
       try {
         // Don't check if we checked in the last minute (prevents double checks)
         if (Date.now() - lastChecked < 60000) {
-          console.log('UpdateChecker: Skipping check - too soon since last check');
-          return;
-        }
-        
-        setLastChecked(Date.now());
-        
-        // Find all script tags and log them
-        const allScripts = Array.from(document.getElementsByTagName('script'));
-        console.log('UpdateChecker: Found script tags:', allScripts.map(s => s.src));
-        
-        const currentScript = allScripts.find(script => script.src.includes('assets/index.'));
-        
-        if (!currentScript) {
-          console.warn('UpdateChecker: Could not find main script tag');
+          console.log(
+            "UpdateChecker: Skipping check - too soon since last check"
+          );
           return;
         }
 
-        console.log('UpdateChecker: Found current script:', currentScript.src);
-        
+        setLastChecked(Date.now());
+
+        // Find all script tags and log them
+        const allScripts = Array.from(document.getElementsByTagName("script"));
+        console.log(
+          "UpdateChecker: Found script tags:",
+          allScripts.map((s) => s.src)
+        );
+
+        const currentScript = allScripts.find((script) =>
+          script.src.includes("assets/index.")
+        );
+
+        if (!currentScript) {
+          console.warn("UpdateChecker: Could not find main script tag");
+          return;
+        }
+
+        console.log("UpdateChecker: Found current script:", currentScript.src);
+
         const currentHash = currentScript.src.match(/index\.(.+?)\.js/)?.[1];
-        console.log('UpdateChecker: Current hash:', currentHash);
-        
-        console.log('UpdateChecker: Fetching index.html...');
+        console.log("UpdateChecker: Current hash:", currentHash);
+
+        console.log("UpdateChecker: Fetching index.html...");
         const response = await fetch(`/index.html?t=${Date.now()}`, {
           headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache"
           }
         });
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch index.html: ${response.status}`);
         }
 
         const html = await response.text();
-        console.log('UpdateChecker: Received HTML content length:', html.length);
-        
+        console.log(
+          "UpdateChecker: Received HTML content length:",
+          html.length
+        );
+
         // Log a snippet of the HTML around where we expect the script tag
-        const scriptIndex = html.indexOf('assets/index');
+        const scriptIndex = html.indexOf("assets/index");
         if (scriptIndex !== -1) {
-          console.log('UpdateChecker: HTML snippet around script tag:', 
-            html.substring(Math.max(0, scriptIndex - 50), 
-                         Math.min(html.length, scriptIndex + 100))
+          console.log(
+            "UpdateChecker: HTML snippet around script tag:",
+            html.substring(
+              Math.max(0, scriptIndex - 50),
+              Math.min(html.length, scriptIndex + 100)
+            )
           );
         }
-        
+
         const newHash = html.match(/assets\/index\.(.+?)\.js/)?.[1];
-        console.log('UpdateChecker: New hash:', newHash);
+        console.log("UpdateChecker: New hash:", newHash);
 
         if (!newHash) {
-          console.warn('UpdateChecker: Could not find new hash in index.html');
+          console.warn("UpdateChecker: Could not find new hash in index.html");
         }
 
         if (currentHash && newHash && currentHash !== newHash) {
-          console.log('UpdateChecker: Update available', { 
-            currentHash, 
+          console.log("UpdateChecker: Update available", {
+            currentHash,
             newHash,
             currentScriptSrc: currentScript.src,
             timestamp: new Date().toISOString()
           });
-          
+
           // Try both toast.info and toast directly
           const toastId = toast.info(
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <span>A new version is available!</span>
-              <button 
+              <button
                 onClick={() => {
-                  console.log('UpdateChecker: Update button clicked, reloading...');
+                  console.log(
+                    "UpdateChecker: Update button clicked, reloading..."
+                  );
                   toast.dismiss(toastId);
                   window.location.reload();
                 }}
-                style={{ 
-                  marginLeft: '10px',
-                  padding: '4px 8px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
+                style={{
+                  marginLeft: "10px",
+                  padding: "4px 8px",
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer"
                 }}
               >
                 Update Now
@@ -115,38 +130,35 @@ export const UpdateChecker = () => {
               position: "bottom-right",
               closeButton: true,
               draggable: false,
-              toastId: 'update-notification' // Prevent duplicate toasts
+              toastId: "update-notification" // Prevent duplicate toasts
             }
           );
 
           // Backup notification in case toast.info fails
           if (!toastId) {
-            toast(
-              "A new version is available! Please refresh the page.",
-              {
-                autoClose: false,
-                position: "bottom-right",
-                toastId: 'update-notification-backup'
-              }
-            );
+            toast("A new version is available! Please refresh the page.", {
+              autoClose: false,
+              position: "bottom-right",
+              toastId: "update-notification-backup"
+            });
           }
         } else {
-          console.log('UpdateChecker: No update needed', {
+          console.log("UpdateChecker: No update needed", {
             currentHash,
             newHash,
             hashesMatch: currentHash === newHash
           });
         }
       } catch (error) {
-        console.error('UpdateChecker: Version check failed:', error);
+        console.error("UpdateChecker: Version check failed:", error);
         // Show error toast
-        toast.error('Failed to check for updates', {
+        toast.error("Failed to check for updates", {
           position: "bottom-right"
         });
       }
     };
 
-    console.log('UpdateChecker: Setting up check interval');
+    console.log("UpdateChecker: Setting up check interval");
     // Check for updates immediately and set up interval
     checkForUpdates();
     const intervalId = setInterval(checkForUpdates, CHECK_INTERVAL);
@@ -160,10 +172,10 @@ export const UpdateChecker = () => {
     }
 
     return () => {
-      console.log('UpdateChecker: Cleaning up interval');
+      console.log("UpdateChecker: Cleaning up interval");
       clearInterval(intervalId);
     };
   }, [auth?.token, lastChecked]);
 
   return null;
-}; 
+};

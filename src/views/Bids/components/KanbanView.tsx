@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { cn } from "@/utils";
+import { cn, customLocale } from "@/utils";
+import { formatDistanceToNow } from "date-fns";
 
 interface KanbanViewProps {
   bids: any[];
@@ -165,7 +166,13 @@ const KanbanView: React.FC<KanbanViewProps> = ({
             <span className="text-base font-semibold">
               Due date: {formatDate(bid.submission_deadline)}
             </span>
-            <span className="text-xs block">Last edited 5m ago</span>
+            <span className="text-xs block">
+              Last edited{" "}
+              {formatDistanceToNow(new Date(bid.timestamp), {
+                addSuffix: true,
+                locale: customLocale
+              })}
+            </span>
           </div>
         )}
       </div>
