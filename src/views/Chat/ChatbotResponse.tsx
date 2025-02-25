@@ -12,6 +12,10 @@ import { cn } from "@/utils";
 import ThumbupIcon from "@/components/icons/ThumbupIcon";
 import ThumbdownIcon from "@/components/icons/ThumbdownIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
+import { TooltipContent } from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipTrigger } from "@/components/ui/tooltip";
 
 const ChatbotResponse = () => {
   const getAuth = useAuthUser();
@@ -284,40 +288,65 @@ const ChatbotResponse = () => {
                                 : "opacity-0 group-hover:opacity-100 transition-opacity"
                             )}
                           >
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full border border-gray-border"
-                              onClick={() => handleCopyText(message.text)}
-                            >
-                              <CopyIcon className="text-gray-hint_text" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className={cn(
-                                "rounded-full border border-gray-border hover:text-gray-hint_text",
-                                messageFeedback[index] === "positive"
-                                  ? "bg-gray-hint_text text-white"
-                                  : "text-gray-hint_text"
-                              )}
-                              onClick={() => handleFeedback(index, "positive")}
-                            >
-                              <ThumbupIcon />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className={cn(
-                                "rounded-full border border-gray-border hover:text-gray-hint_text",
-                                messageFeedback[index] === "negative"
-                                  ? "bg-gray-hint_text text-white"
-                                  : "text-gray-hint_text"
-                              )}
-                              onClick={() => handleFeedback(index, "negative")}
-                            >
-                              <ThumbdownIcon />
-                            </Button>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="rounded-full border border-gray-border"
+                                    onClick={() => handleCopyText(message.text)}
+                                  >
+                                    <CopyIcon className="text-gray-hint_text" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Copy response</TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={cn(
+                                      "rounded-full border border-gray-border hover:text-gray-hint_text",
+                                      messageFeedback[index] === "positive"
+                                        ? "bg-gray-hint_text text-white"
+                                        : "text-gray-hint_text"
+                                    )}
+                                    onClick={() =>
+                                      handleFeedback(index, "positive")
+                                    }
+                                  >
+                                    <ThumbupIcon />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Good response</TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={cn(
+                                      "rounded-full border border-gray-border hover:text-gray-hint_text",
+                                      messageFeedback[index] === "negative"
+                                        ? "bg-gray-hint_text text-white"
+                                        : "text-gray-hint_text"
+                                    )}
+                                    onClick={() =>
+                                      handleFeedback(index, "negative")
+                                    }
+                                  >
+                                    <ThumbdownIcon />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Bad response</TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           </div>
                         )}
                       </>
@@ -339,7 +368,7 @@ const ChatbotResponse = () => {
                 onClick={handleSendMessage}
                 disabled={isLoading}
                 size="icon"
-                className="h-6 w-6 rounded-full"
+                className="h-6 w-6 rounded-full pr-[1px] pt-[1px]"
               >
                 <Send className="h-6 w-6" />
               </Button>
@@ -348,7 +377,7 @@ const ChatbotResponse = () => {
         ) : (
           <div className="flex items-center justify-center h-full">
             <div className="space-y-6">
-              <h1 className="text-center">
+              <h1 className="text-center font-medium">
                 Welcome to Quick Question! <br />
                 You can ask questions here about your Content Library data.
               </h1>
