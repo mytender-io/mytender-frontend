@@ -35,7 +35,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
   );
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState(
-    "Analyzing tender documents..."
+    "Analysing tender documents..."
   );
   const progressInterval = useRef(null);
 
@@ -111,7 +111,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
     setIsGeneratingOutline(false);
     setSelectedFiles([]);
     setProgress(0);
-    setLoadingMessage("Analyzing tender documents...");
+    setLoadingMessage("Analysing tender documents...");
     if (progressInterval.current) {
       clearInterval(progressInterval.current);
     }

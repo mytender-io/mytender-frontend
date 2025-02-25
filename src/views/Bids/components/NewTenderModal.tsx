@@ -86,7 +86,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
 
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState(
-    "Analyzing tender documents..."
+    "Analysing tender documents..."
   );
   const progressInterval = useRef(null);
 

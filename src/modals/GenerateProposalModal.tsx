@@ -32,7 +32,10 @@ interface GenerateProposalModalProps {
   }>;
 }
 
-const GenerateProposalModal = ({ bid_id, outline }: GenerateProposalModalProps) => {
+const GenerateProposalModal = ({
+  bid_id,
+  outline
+}: GenerateProposalModalProps) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const navigate = useNavigate();
@@ -48,11 +51,11 @@ const GenerateProposalModal = ({ bid_id, outline }: GenerateProposalModalProps) 
   });
 
   const [loadingMessage, setLoadingMessage] = useState(
-    "Analyzing tender requirements..."
+    "Analysing tender requirements..."
   );
 
   const loadingMessages = [
-    "Analyzing tender requirements...",
+    "Analysing tender requirements...",
     "Cross-checking with company library...",
     "Mining past successful proposals...",
     "Evaluating win themes...",
@@ -77,7 +80,7 @@ const GenerateProposalModal = ({ bid_id, outline }: GenerateProposalModalProps) 
     "Polishing final draft...",
     "Downloading additional information...",
     "Resolving any remaining issues...",
-    "Analyzing market positioning...",
+    "Analysing market positioning...",
     "Refining unique selling points...",
     "Strengthening past performance examples...",
     "Enhancing capability statements...",
@@ -96,7 +99,9 @@ const GenerateProposalModal = ({ bid_id, outline }: GenerateProposalModalProps) 
   ];
 
   const incompleteSections =
-    outline?.filter((section: { status: string }) => section.status !== "Completed") || [];
+    outline?.filter(
+      (section: { status: string }) => section.status !== "Completed"
+    ) || [];
   const hasIncompleteSections = incompleteSections.length > 0;
 
   const [progress, setProgress] = useState(0);
@@ -235,10 +240,9 @@ const GenerateProposalModal = ({ bid_id, outline }: GenerateProposalModalProps) 
         <div className="px-2 py-4">
           <div className="px-3">
             <p className="mb-4">
-              The proposal will be generated as
-              a Word document that you can then edit and format as needed. You
-              can preview the document in the Preview Proposal tab. Make sure
-              you download our{" "}
+              The proposal will be generated as a Word document that you can
+              then edit and format as needed. You can preview the document in
+              the Preview Proposal tab. Make sure you download our{" "}
               <a
                 href="https://appsource.microsoft.com/en-us/product/office/WA200007690"
                 className="text-blue-600 hover:text-blue-800 underline"
@@ -332,7 +336,11 @@ const GenerateProposalModal = ({ bid_id, outline }: GenerateProposalModalProps) 
                 <Button onClick={handleNext} disabled={isGeneratingProposal}>
                   {isGeneratingProposal ? (
                     <>
-                      <FontAwesomeIcon icon={faSpinner as IconProp} spin className="mr-2" />
+                      <FontAwesomeIcon
+                        icon={faSpinner as IconProp}
+                        spin
+                        className="mr-2"
+                      />
                       Processing...
                     </>
                   ) : (

@@ -44,7 +44,7 @@ const LoadingState = () => {
     { icon: Target, text: "Identifying evaluation criteria..." },
     { icon: Brain, text: "Processing requirements..." },
     { icon: Crosshair, text: "Detecting critical success factors..." },
-    { icon: ChartBar, text: "Analyzing competitive landscape..." },
+    { icon: ChartBar, text: "Analysing competitive landscape..." },
     { icon: Gauge, text: "Evaluating market positioning..." },
     { icon: Telescope, text: "Exploring strategic opportunities..." },
     { icon: Lightbulb, text: "Generating innovative insights..." },
