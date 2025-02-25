@@ -121,8 +121,9 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           leaveDelay={0}
          </Tooltip> */}
 
-        <div className="flex flex-col flex-1 overflow-y-auto px-4 gap-3">
-          {/* <Link
+        <div className="flex flex-col flex-1 overflow-y-auto px-4 gap-10">
+          <div className="space-y-3">
+            {/* <Link
             to="/home"
             className={cn(
               "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
@@ -140,128 +141,129 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               </span>
             )}
           </Link> */}
-          <Link
-            to="/bids"
-            className={cn(
-              "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-              isActive("/bids") ||
-                isActive("/bid-extractor") ||
-                isActive("/bid-intel") ||
-                isActive("/proposal-planner") ||
-                isActive("/proposal-review")
-                ? "bg-typo-200"
-                : "bg-transparent"
-            )}
-          >
-            <DashboardIcon
-              className="text-gray-hint_text min-w-5 min-h-5"
-              width={20}
-              height={20}
-            />
-            {!isCollapsed && (
-              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
-                Tender Dashboard
-              </span>
-            )}
-          </Link>
-          <Link
-            to="/library"
-            className={cn(
-              "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-              isActive("/library") ? "bg-typo-200" : "bg-transparent"
-            )}
-          >
-            <ContentLibraryIcon
-              className="text-gray-hint_text min-w-5 min-h-5"
-              width={20}
-              height={20}
-            />
-            {!isCollapsed && (
-              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
-                Content Library
-              </span>
-            )}
-          </Link>
-          <span
-            className={cn(
-              "text-xs font-bold text-gray-hint_text",
-              isCollapsed ? "opacity-0" : "opacity-100"
-            )}
-          >
-            Tools
-          </span>
-          <Link
-            to="/chat"
-            className={cn(
-              "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-              isActive("/chat") ? "bg-typo-200" : "bg-transparent"
-            )}
-          >
-            <LibraryChatIcon
-              className="text-gray-hint_text min-w-5 min-h-5"
-              width={20}
-              height={20}
-            />
-            {!isCollapsed && (
-              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
-                Library Chat
-              </span>
-            )}
-          </Link>
-          <Link
-            to="/question-answer"
-            className={cn(
-              "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-              isActive("/question-answer") ? "bg-typo-200" : "bg-transparent"
-            )}
-          >
-            <QAIcon
-              className="text-gray-hint_text min-w-5 min-h-5 rotate-[270deg]"
-              width={20}
-              height={20}
-            />
-            {!isCollapsed && (
-              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
-                Q&A Generator
-              </span>
-            )}
-          </Link>
-
-          <Link
-            to="https://appsource.microsoft.com/en-us/product/office/WA200007690?src=office&corrid=bd0c24c3-6022-e897-73ad-0dc9bdf3558b&omexanonuid=&referralurl="
-            className="flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <WordpaneIcon
-              className="text-gray-hint_text min-w-5 min-h-5"
-              width={20}
-              height={20}
-            />
-            {!isCollapsed && (
-              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
-                Word Pane
-              </span>
-            )}
-          </Link>
-          <Link
-            to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
-            className="flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <HowtoIcon
-              className="text-gray-hint_text min-w-5 min-h-5"
-              width={20}
-              height={20}
-            />
-            {!isCollapsed && (
-              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
-                How To
-              </span>
-            )}
-          </Link>
-          {/* <Tooltip
+            <Link
+              to="/bids"
+              className={cn(
+                "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
+                isActive("/bids") ||
+                  isActive("/bid-extractor") ||
+                  isActive("/bid-intel") ||
+                  isActive("/proposal-planner") ||
+                  isActive("/proposal-review")
+                  ? "bg-typo-200"
+                  : "bg-transparent"
+              )}
+            >
+              <DashboardIcon
+                className="text-gray-hint_text min-w-5 min-h-5"
+                width={20}
+                height={20}
+              />
+              {!isCollapsed && (
+                <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+                  Tender Dashboard
+                </span>
+              )}
+            </Link>
+            <Link
+              to="/library"
+              className={cn(
+                "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
+                isActive("/library") ? "bg-typo-200" : "bg-transparent"
+              )}
+            >
+              <ContentLibraryIcon
+                className="text-gray-hint_text min-w-5 min-h-5"
+                width={20}
+                height={20}
+              />
+              {!isCollapsed && (
+                <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+                  Content Library
+                </span>
+              )}
+            </Link>
+          </div>
+          <div className="space-y-3">
+            <span
+              className={cn(
+                "text-xs font-bold text-gray-hint_text",
+                isCollapsed ? "opacity-0" : "opacity-100"
+              )}
+            >
+              Tools
+            </span>
+            <Link
+              to="/chat"
+              className={cn(
+                "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
+                isActive("/chat") ? "bg-typo-200" : "bg-transparent"
+              )}
+            >
+              <LibraryChatIcon
+                className="text-gray-hint_text min-w-5 min-h-5"
+                width={20}
+                height={20}
+              />
+              {!isCollapsed && (
+                <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+                  Library Chat
+                </span>
+              )}
+            </Link>
+            <Link
+              to="/question-answer"
+              className={cn(
+                "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
+                isActive("/question-answer") ? "bg-typo-200" : "bg-transparent"
+              )}
+            >
+              <QAIcon
+                className="text-gray-hint_text min-w-5 min-h-5 rotate-[270deg]"
+                width={20}
+                height={20}
+              />
+              {!isCollapsed && (
+                <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+                  Q&A Generator
+                </span>
+              )}
+            </Link>
+            <Link
+              to="https://appsource.microsoft.com/en-us/product/office/WA200007690?src=office&corrid=bd0c24c3-6022-e897-73ad-0dc9bdf3558b&omexanonuid=&referralurl="
+              className="flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <WordpaneIcon
+                className="text-gray-hint_text min-w-5 min-h-5"
+                width={20}
+                height={20}
+              />
+              {!isCollapsed && (
+                <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+                  Word Pane
+                </span>
+              )}
+            </Link>
+            <Link
+              to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
+              className="flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <HowtoIcon
+                className="text-gray-hint_text min-w-5 min-h-5"
+                width={20}
+                height={20}
+              />
+              {!isCollapsed && (
+                <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+                  How To
+                </span>
+              )}
+            </Link>
+            {/* <Tooltip
             title="Tender Dashboard - View and manage all your tenders in one place"
             placement="right"
             enterDelay={2000}
@@ -294,7 +296,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               )}
             </Link>
           </Tooltip> */}
-          {/* <Tooltip
+            {/* <Tooltip
             title="Content Library - Access and manage your organization's knowledge base and templates"
             placement="right"
             enterDelay={2000}
@@ -325,7 +327,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               {!isCollapsed && <span className="ml-3">Content Library</span>}
             </Link>
           </Tooltip> */}
-          {/* <Tooltip
+            {/* <Tooltip
             title="Library Chat - Interact with AI to get insights from your content library"
             placement="right"
             enterDelay={2000}
@@ -356,7 +358,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               {!isCollapsed && <span className="ml-3">Library Chat</span>}
             </Link>
           </Tooltip> */}
-          {/* <Tooltip
+            {/* <Tooltip
             title="Q&A Generator - Automatically generate question and answer pairs from your documents"
             placement="right"
             enterDelay={2000}
@@ -387,7 +389,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               {!isCollapsed && <span className="ml-3">Q&A Generator</span>}
             </Link>
           </Tooltip> */}
-          {/* <Tooltip
+            {/* <Tooltip
             title="Wordpane - Access your tender content directly within Microsoft Word"
             placement="right"
             enterDelay={2000}
@@ -415,7 +417,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               {!isCollapsed && <span className="ml-3">Wordpane</span>}
             </Link>
           </Tooltip> */}
-          {/* <Tooltip
+            {/* <Tooltip
             title="How To - Interactive guide to help you get the most out of mytender.io"
             placement="right"
             enterDelay={2000}
@@ -444,6 +446,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               {!isCollapsed && <span className="ml-3">How To</span>}
             </Link>
           </Tooltip> */}
+          </div>
         </div>
 
         <div className="flex flex-col border-t border-gray-200 p-4 gap-3">
