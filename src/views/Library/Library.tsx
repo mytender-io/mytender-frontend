@@ -1102,8 +1102,8 @@ const Library = () => {
           </div>
           <div className="pl-6 h-[calc(100%-9.125rem)]">
             <div className="border rounded-lg h-full">
-              <div className="p-4 border-b">
-                <div className="flex items-center justify-between">
+              <div className="flex items-center p-4 border-b max-h-12">
+                <div className="flex items-center justify-between w-full">
                   <div>
                     <BreadCrumbs
                       activeFolder={activeFolder}

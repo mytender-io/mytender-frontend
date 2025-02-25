@@ -14,8 +14,8 @@ const BreadCrumbs = ({
 
   if (!activeFolder) {
     return (
-      <span className="text-xl text-gray-600 flex items-center gap-2">
-        <FolderIcon className="h-5 w-5" />
+      <span className="text-sm font-semibold text-gray-600 flex items-center gap-2">
+        <FolderIcon className="h-4 w-4" />
         Content Library
       </span>
     );
@@ -25,9 +25,9 @@ const BreadCrumbs = ({
 
   return (
     <div className="flex items-center gap-2">
-      <FolderIcon className="h-5 w-5" />
+      <FolderIcon className="h-4 w-4" />
       <span
-        className="text-xl text-orange hover:text-orange-hover transition-colors ease-in-out cursor-pointer"
+        className="text-sm text-orange font-semibold hover:text-orange-hover transition-colors ease-in-out cursor-pointer"
         onClick={() => setActiveFolder(null)}
       >
         Content Library
@@ -36,7 +36,7 @@ const BreadCrumbs = ({
         <React.Fragment key={index}>
           <span className="mx-2 text-gray-400">&gt;</span>
           <span
-            className={`text-sm transition-colors ease-in-out${
+            className={`text-sm transition-colors ease-in-out ${
               index === parts.length - 1
                 ? "text-gray-600"
                 : "text-orange hover:text-orange-hover cursor-pointer"
