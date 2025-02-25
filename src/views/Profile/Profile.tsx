@@ -462,7 +462,7 @@ const ProfilePage = () => {
                                   id="email"
                                   name="email"
                                   value={formData.email}
-                                  placeholder="jamie@mytender.io"
+                                  placeholder="Enter your email here"
                                   readOnly={!editableFields.email}
                                   onClick={() => toggleEditable("email")}
                                   onBlur={() => toggleEditable("email")}
