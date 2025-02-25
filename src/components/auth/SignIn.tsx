@@ -45,8 +45,9 @@ const Signin = () => {
     try {
       const { success, message } = await submitSignIn(formData);
       if (isMounted) {
-        if (success) toast.success(message);
-        else toast.error("Incorrect Username or Password");
+        // if (success) toast.success(message);
+        // else toast.error("Incorrect Username or Password");
+        if (!success) toast.error("Incorrect Username or Password");
       }
     } catch (error) {
       if (isMounted) {
