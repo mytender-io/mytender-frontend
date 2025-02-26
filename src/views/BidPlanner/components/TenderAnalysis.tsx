@@ -623,7 +623,8 @@ const TenderAnalysis = ({ canUserEdit }) => {
           <TabsList
             ref={tabsRef}
             className={cn(
-              "w-full justify-start border-b border-gray-line h-auto py-0 px-0 rounded-none"
+              "w-full justify-start border-b border-gray-line h-auto py-0 px-0 rounded-none grid",
+              `grid-cols-${tabs.length}`
             )}
           >
             {tabs.map((tab, index) => {
@@ -634,7 +635,8 @@ const TenderAnalysis = ({ canUserEdit }) => {
                   value={index.toString()}
                   onClick={() => handleTabClick(index)}
                   className={cn(
-                    "relative flex items-center gap-2 px-6 py-3 data-[state=active]:text-orange bg-transparent"
+                    "relative flex items-center justify-center gap-2 px-6 py-3 data-[state=active]:text-orange bg-transparent w-full min-w-0",
+                    "min-w-0"
                   )}
                   disabled={loadingTab !== null && loadingTab !== index}
                 >
