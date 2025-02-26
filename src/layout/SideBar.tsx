@@ -213,7 +213,9 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               <ContentLibraryIcon
                 className={cn(
                   "min-w-5 min-h-5",
-                  isActive("/library") ? "text-orange" : "text-gray-hint_text"
+                  isActive("/library")
+                    ? "text-orange font-bold"
+                    : "text-gray-hint_text"
                 )}
                 width={20}
                 height={20}
@@ -222,7 +224,9 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                 <span
                   className={cn(
                     "text-sm font-medium whitespace-nowrap",
-                    isActive("/library") ? "text-orange" : "text-gray-hint_text"
+                    isActive("/library")
+                      ? "text-orange font-bold"
+                      : "text-gray-hint_text"
                   )}
                 >
                   Content Library
@@ -246,7 +250,9 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               <LibraryChatIcon
                 className={cn(
                   "min-w-5 min-h-5",
-                  isActive("/chat") ? "text-orange" : "text-gray-hint_text"
+                  isActive("/chat")
+                    ? "text-orange font-bold"
+                    : "text-gray-hint_text"
                 )}
                 width={20}
                 height={20}
@@ -255,7 +261,9 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                 <span
                   className={cn(
                     "text-sm font-medium whitespace-nowrap",
-                    isActive("/chat") ? "text-orange" : "text-gray-hint_text"
+                    isActive("/chat")
+                      ? "text-orange font-bold"
+                      : "text-gray-hint_text"
                   )}
                 >
                   Library Chat
@@ -519,7 +527,9 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             <UserIcon
               className={cn(
                 "min-w-5 min-h-5",
-                isActive("/profile") ? "text-orange" : "text-gray-hint_text"
+                isActive("/profile")
+                  ? "text-orange font-bold"
+                  : "text-gray-hint_text"
               )}
               width={20}
               height={20}
@@ -528,7 +538,9 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               <span
                 className={cn(
                   "text-sm font-medium whitespace-nowrap",
-                  isActive("/profile") ? "text-orange" : "text-gray-hint_text"
+                  isActive("/profile")
+                    ? "text-orange font-bold"
+                    : "text-gray-hint_text"
                 )}
               >
                 Profile
@@ -544,7 +556,9 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             <LogoutIcon
               className={cn(
                 "min-w-5 min-h-5",
-                isActive("/logout") ? "text-orange" : "text-gray-hint_text"
+                isActive("/logout")
+                  ? "text-orange font-bold"
+                  : "text-gray-hint_text"
               )}
               width={20}
               height={20}
@@ -553,7 +567,9 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               <span
                 className={cn(
                   "text-sm font-medium whitespace-nowrap",
-                  isActive("/logout") ? "text-orange" : "text-gray-hint_text"
+                  isActive("/logout")
+                    ? "text-orange font-bold"
+                    : "text-gray-hint_text"
                 )}
               >
                 Logout

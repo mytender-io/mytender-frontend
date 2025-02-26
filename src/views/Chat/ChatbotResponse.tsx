@@ -17,6 +17,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 import UserIcon from "@/components/icons/UserIcon";
+import { toast } from "react-toastify";
 
 const ChatbotResponse = () => {
   const getAuth = useAuthUser();
@@ -197,11 +198,12 @@ const ChatbotResponse = () => {
     setIsLoading(false);
   };
 
-  const handleCopyText = (text) => {
+  const handleCopyText = (text: string) => {
+    toast.success("Copied to clipboard");
     navigator.clipboard.writeText(text);
   };
 
-  const handleFeedback = (messageIndex, feedbackType) => {
+  const handleFeedback = (messageIndex: number, feedbackType: string) => {
     setMessageFeedback((prev) => {
       const currentFeedback = prev[messageIndex];
 
@@ -210,6 +212,12 @@ const ChatbotResponse = () => {
         const newFeedback = { ...prev };
         delete newFeedback[messageIndex];
         return newFeedback;
+      }
+
+      if (feedbackType === "positive") {
+        toast.success("Received good response");
+      } else if (feedbackType === "negative") {
+        toast.error("Received bad response");
       }
 
       // If clicking different button, switch to it
