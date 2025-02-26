@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import sidebarIcon from "../resources/images/mytender.io_badge.png";
+import Logo from "../resources/images/mytender.io_badge.png";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import HomeIcon from "@/components/icons/HomeIcon";
+// import HomeIcon from "@/components/icons/HomeIcon";
 import DashboardIcon from "@/components/icons/DashboardIcon";
 import ContentLibraryIcon from "@/components/icons/ContentLibraryIcon";
 import LibraryChatIcon from "@/components/icons/LibraryChatIcon";
@@ -129,7 +129,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full space-y-6">
         <div
           className={cn(
             "flex items-center p-4",
@@ -137,7 +137,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           )}
         >
           <img
-            src={sidebarIcon}
+            src={Logo}
             alt="mytender.io logo"
             className="h-10 w-10 min-w-10 min-h-10"
           />
@@ -145,14 +145,12 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             <span className="ml-2 font-semibold text-xl">mytender.io</span>
           )}
         </div>
-
         {/* <Tooltip
           title={isCollapsed ? "Expand" : "Collapse"}
           placement="right"
           enterDelay={1000}
           leaveDelay={0}
          </Tooltip> */}
-
         <div className="flex flex-col flex-1 overflow-y-auto px-4 gap-10">
           <div className="space-y-3">
             {/* <Link
