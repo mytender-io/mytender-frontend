@@ -77,19 +77,28 @@ const StatusMenu = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-32">
         <DropdownMenuItem
-          onClick={() => onChange("Not Started")}
+          onClick={(e) => {
+            e.stopPropagation();
+            onChange("Not Started");
+          }}
           className={cn("hover:bg-gray-100")}
         >
           Not Started
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => onChange("In Progress")}
+          onClick={(e) => {
+            e.stopPropagation();
+            onChange("In Progress");
+          }}
           className={cn("hover:bg-gray-100")}
         >
           In Progress
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => onChange("Completed")}
+          onClick={(e) => {
+            e.stopPropagation();
+            onChange("Completed");
+          }}
           className={cn("hover:bg-gray-100")}
         >
           Completed

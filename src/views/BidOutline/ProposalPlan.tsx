@@ -166,9 +166,9 @@ const ProposalPlan = () => {
   };
 
   const handleRowClick = (e: React.MouseEvent, index: number) => {
-    // Expand the list of elements to ignore to include MUI Select components
+    // Add data-status-menu to the list of elements to ignore
     const isInteractiveElement = (e.target as HTMLElement).closest(
-      'input, select, button, a, [role="button"], .editable-cell, .dropdown, .dropdown-toggle, .MuiSelect-root, .MuiSelect-select, .MuiMenuItem-root, .MuiPaper-root, .MuiList-root, .css-1dimb5e-singleValue, .css-1s2u09g-control, .css-b62m3t-container, [data-checkbox]'
+      'input, select, button, a, [role="button"], .editable-cell, .dropdown, .dropdown-toggle, .MuiSelect-root, .MuiSelect-select, .MuiMenuItem-root, .MuiPaper-root, .MuiList-root, .css-1dimb5e-singleValue, .css-1s2u09g-control, .css-b62m3t-container, [data-checkbox], [data-status-menu]'
     );
 
     if (!isInteractiveElement) {
@@ -829,7 +829,10 @@ const ProposalPlan = () => {
                             </div>
                           </TableCell>
                           <TableCell className="px-4">
-                            <div className="flex items-center justify-center">
+                            <div
+                              className="flex items-center justify-center"
+                              data-status-menu
+                            >
                               <StatusMenu
                                 value={section.status}
                                 onChange={(value) => {
