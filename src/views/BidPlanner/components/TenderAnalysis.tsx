@@ -19,7 +19,8 @@ import {
   ChartBar,
   CheckCircle2,
   Telescope,
-  ClipboardCheck
+  ClipboardCheck,
+  FileSearch
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -35,6 +36,7 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
+import { Input } from "@/components/ui/input";
 
 const LoadingState = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -576,83 +578,103 @@ const TenderAnalysis = ({ canUserEdit }) => {
   };
 
   return (
-    <div className={cn("h-full border border-gray-line rounded-md")}>
-      <Tabs
-        value={currentTabIndex.toString()}
-        onValueChange={(value) => handleTabChange(null, parseInt(value))}
-        className={cn("flex flex-col w-full h-full")}
-      >
-        <TabsList
-          ref={tabsRef}
-          className={cn(
-            "w-full justify-start border-b border-gray-line h-auto py-0 px-0 rounded-none"
-          )}
-        >
-          {tabs.map((tab, index) => {
-            const TabIcon = tab.Icon;
-            return (
-              <TabsTrigger
-                key={index}
-                value={index.toString()}
-                onClick={() => handleTabClick(index)}
-                className={cn(
-                  "relative flex items-center gap-2 px-6 py-3 data-[state=active]:text-orange bg-transparent"
-                )}
-                disabled={loadingTab !== null && loadingTab !== index}
-              >
-                {loadingTab === index && (
-                  <div
-                    className={cn(
-                      "absolute top-14 left-0 z-10 bg-white rounded-lg shadow-2xl"
-                    )}
-                  >
-                    <LoadingState />
-                  </div>
-                )}
-                <TabIcon
-                  size={16}
-                  className={cn(
-                    "transition-colors",
-                    currentTabIndex === index
-                      ? "text-orange"
-                      : "text-gray-600 hover:text-orange"
-                  )}
-                />
-                <span className={cn("font-medium")}>{tab.name}</span>
-                {tabContent[index as keyof typeof tabContent] && (
-                  <Button
-                    onClick={(e) => handleRegenerateClick(index, e)}
-                    variant="ghost"
-                    size="icon"
-                    disabled={loadingTab !== null}
-                    className={cn(
-                      "bg-gray-line hover:bg-orange-100 hover:text-orange h-6 w-6",
-                      currentTabIndex === index &&
-                        (loadingTab !== index
-                          ? "bg-orange-100"
-                          : "bg-transparent"),
-                      loadingTab === index && "animate-spin"
-                    )}
-                  >
-                    <RefreshCw size={14} />
-                  </Button>
-                )}
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
-        <div className={cn("h-[calc(100vh-20.857rem)] overflow-y-auto")}>
-          {tabs.map((tab, index) => (
-            <TabsContent key={index} value={index.toString()}>
-              <div className={cn("relative px-8 py-4")}>
-                {renderContent(
-                  tabContent[index as keyof typeof tabContent] || ""
-                )}
-              </div>
-            </TabsContent>
-          ))}
+    <div>
+      <div className="bg-gray-100 border border-gray-line rounded-md p-2 mb-4">
+        <div className="flex w-full items-center gap-2">
+          <div className="relative flex-1">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FileSearch className="h-5 w-5 text-gray-400" />
+            </div>
+            <Input
+              type="text"
+              placeholder="Type in a question about the tender..."
+              className="pl-10 bg-white"
+            />
+          </div>
+          <Button >
+            <Search className="h-5 w-5 text-white" />
+            Query Docs
+          </Button>
         </div>
-      </Tabs>
+      </div>
+      <div className={cn("h-full border border-gray-line rounded-md")}>
+        <Tabs
+          value={currentTabIndex.toString()}
+          onValueChange={(value) => handleTabChange(null, parseInt(value))}
+          className={cn("flex flex-col w-full h-full")}
+        >
+          <TabsList
+            ref={tabsRef}
+            className={cn(
+              "w-full justify-start border-b border-gray-line h-auto py-0 px-0 rounded-none"
+            )}
+          >
+            {tabs.map((tab, index) => {
+              const TabIcon = tab.Icon;
+              return (
+                <TabsTrigger
+                  key={index}
+                  value={index.toString()}
+                  onClick={() => handleTabClick(index)}
+                  className={cn(
+                    "relative flex items-center gap-2 px-6 py-3 data-[state=active]:text-orange bg-transparent"
+                  )}
+                  disabled={loadingTab !== null && loadingTab !== index}
+                >
+                  {loadingTab === index && (
+                    <div
+                      className={cn(
+                        "absolute top-14 left-0 z-10 bg-white rounded-lg shadow-2xl"
+                      )}
+                    >
+                      <LoadingState />
+                    </div>
+                  )}
+                  <TabIcon
+                    size={16}
+                    className={cn(
+                      "transition-colors",
+                      currentTabIndex === index
+                        ? "text-orange"
+                        : "text-gray-600 hover:text-orange"
+                    )}
+                  />
+                  <span className={cn("font-medium")}>{tab.name}</span>
+                  {tabContent[index as keyof typeof tabContent] && (
+                    <Button
+                      onClick={(e) => handleRegenerateClick(index, e)}
+                      variant="ghost"
+                      size="icon"
+                      disabled={loadingTab !== null}
+                      className={cn(
+                        "bg-gray-line hover:bg-orange-100 hover:text-orange h-6 w-6",
+                        currentTabIndex === index &&
+                          (loadingTab !== index
+                            ? "bg-orange-100"
+                            : "bg-transparent"),
+                        loadingTab === index && "animate-spin"
+                      )}
+                    >
+                      <RefreshCw size={14} />
+                    </Button>
+                  )}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+          <div className={cn("h-[calc(100vh-20.857rem)] overflow-y-auto")}>
+            {tabs.map((tab, index) => (
+              <TabsContent key={index} value={index.toString()}>
+                <div className={cn("relative px-8 py-4")}>
+                  {renderContent(
+                    tabContent[index as keyof typeof tabContent] || ""
+                  )}
+                </div>
+              </TabsContent>
+            ))}
+          </div>
+        </Tabs>
+      </div>
     </div>
   );
 };
