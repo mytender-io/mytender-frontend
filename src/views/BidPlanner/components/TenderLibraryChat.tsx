@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useAuthUser } from "react-auth-kit";
-import handleGAEvent from "../utilities/handleGAEvent";
-import { HTTP_PREFIX, API_URL } from "../helper/Constants";
+import handleGAEvent from "../../../utilities/handleGAEvent";
+import { HTTP_PREFIX, API_URL } from "../../../helper/Constants";
 import axios from "axios";
 import { Send, Trash2, MessageSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -19,23 +19,28 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
 
-const TenderLibraryChatDialog = ({ bid_id, open: externalOpen, onOpenChange: externalOnOpenChange }) => {
+const TenderLibraryChatDialog = ({
+  bid_id,
+  open: externalOpen,
+  onOpenChange: externalOnOpenChange
+}) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
   const [messageFeedback, setMessageFeedback] = useState({});
-  
+
   // Use internal state if external control props aren't provided
   const [internalOpen, setInternalOpen] = useState(false);
-  
+
   // Determine if we're using controlled or uncontrolled mode
-  const isControlled = externalOpen !== undefined && externalOnOpenChange !== undefined;
+  const isControlled =
+    externalOpen !== undefined && externalOnOpenChange !== undefined;
   const open = isControlled ? externalOpen : internalOpen;
   const setOpen = isControlled ? externalOnOpenChange : setInternalOpen;
-  
+
   const [messages, setMessages] = useState(() => {
     const savedMessages = localStorage.getItem("tenderLibChatMessages");
 
@@ -67,10 +72,10 @@ const TenderLibraryChatDialog = ({ bid_id, open: externalOpen, onOpenChange: ext
   const [isLoading, setIsLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
   const [startTime, setStartTime] = useState(null);
-  
+
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  
+
   // Add this ref for the messages container
   const messagesContainerRef = useRef(null);
   const inputRef = useRef(null);
@@ -135,7 +140,7 @@ const TenderLibraryChatDialog = ({ bid_id, open: externalOpen, onOpenChange: ext
 
     return response;
   };
-  
+
   // Add this function to handle scrolling
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -168,14 +173,14 @@ const TenderLibraryChatDialog = ({ bid_id, open: externalOpen, onOpenChange: ext
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-  
+
   // Scroll when dialog opens
   useEffect(() => {
     if (open) {
       setTimeout(scrollToBottom, 100); // Small delay to ensure dialog is fully rendered
     }
   }, [open]);
-  
+
   const sendQuestion = async (question) => {
     handleGAEvent("Chatbot", "Submit Question", "Submit Button");
     setQuestionAsked(true);
@@ -235,7 +240,7 @@ const TenderLibraryChatDialog = ({ bid_id, open: externalOpen, onOpenChange: ext
     }
     setIsLoading(false);
   };
-  
+
   const handleCopyText = (text) => {
     navigator.clipboard.writeText(text);
   };
@@ -261,7 +266,9 @@ const TenderLibraryChatDialog = ({ bid_id, open: externalOpen, onOpenChange: ext
 
   // Count unread messages (simple version - just counting bot messages after the last user message)
   const getUnreadCount = () => {
-    const lastUserIndex = [...messages].reverse().findIndex(msg => msg.type === "user");
+    const lastUserIndex = [...messages]
+      .reverse()
+      .findIndex((msg) => msg.type === "user");
     return lastUserIndex === -1 ? 0 : lastUserIndex;
   };
 
@@ -325,49 +332,42 @@ const TenderLibraryChatDialog = ({ bid_id, open: externalOpen, onOpenChange: ext
                                 : "opacity-0 group-hover:opacity-100 transition-opacity"
                             )}
                           >
-                         
-                              
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="rounded-full border border-gray-border"
-                                    onClick={() => handleCopyText(message.text)}
-                                  >
-                                    <CopyIcon className="text-gray-hint_text" />
-                                  </Button>
-                        
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={cn(
-                                      "rounded-full border border-gray-border hover:text-gray-hint_text",
-                                      messageFeedback[index] === "positive"
-                                        ? "bg-gray-hint_text text-white"
-                                        : "text-gray-hint_text"
-                                    )}
-                                    onClick={() =>
-                                      handleFeedback(index, "positive")
-                                    }
-                                  >
-                                    <ThumbupIcon />
-                                  </Button>
-                              
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={cn(
-                                      "rounded-full border border-gray-border hover:text-gray-hint_text",
-                                      messageFeedback[index] === "negative"
-                                        ? "bg-gray-hint_text text-white"
-                                        : "text-gray-hint_text"
-                                    )}
-                                    onClick={() =>
-                                      handleFeedback(index, "negative")
-                                    }
-                                  >
-                                    <ThumbdownIcon />
-                                  </Button>
-                               
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full border border-gray-border"
+                              onClick={() => handleCopyText(message.text)}
+                            >
+                              <CopyIcon className="text-gray-hint_text" />
+                            </Button>
+
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={cn(
+                                "rounded-full border border-gray-border hover:text-gray-hint_text",
+                                messageFeedback[index] === "positive"
+                                  ? "bg-gray-hint_text text-white"
+                                  : "text-gray-hint_text"
+                              )}
+                              onClick={() => handleFeedback(index, "positive")}
+                            >
+                              <ThumbupIcon />
+                            </Button>
+
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={cn(
+                                "rounded-full border border-gray-border hover:text-gray-hint_text",
+                                messageFeedback[index] === "negative"
+                                  ? "bg-gray-hint_text text-white"
+                                  : "text-gray-hint_text"
+                              )}
+                              onClick={() => handleFeedback(index, "negative")}
+                            >
+                              <ThumbdownIcon />
+                            </Button>
                           </div>
                         )}
                       </>
@@ -431,10 +431,12 @@ const TenderLibraryChatDialog = ({ bid_id, open: externalOpen, onOpenChange: ext
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           className="gap-2 relative"
-          onClick={() => handleGAEvent("Chatbot", "Open Dialog", "Tender Library Chat")}
+          onClick={() =>
+            handleGAEvent("Chatbot", "Open Dialog", "Tender Library Chat")
+          }
         >
           <MessageSquare className="h-5 w-5" />
           <span>Tender Library Chat</span>

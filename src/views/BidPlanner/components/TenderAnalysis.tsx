@@ -36,7 +36,8 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
-import TenderLibraryChatDialog from "@/components/TenderLibraryChat";
+import TenderLibraryChatDialog from "@/views/BidPlanner/components/TenderLibraryChat";
+import InterrogateTenderDialog from "./InterrogateTender";
 
 const LoadingState = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -602,13 +603,18 @@ const TenderAnalysis = ({ canUserEdit }) => {
             onOpenChange={setChatDialogOpen}
           />
 
-          <Button>
-            <Search className="h-5 w-5 text-white" />
-            Query Docs
-          </Button>
+          <InterrogateTenderDialog
+            bid_id={object_id}
+            triggerComponent={
+              <Button>
+                <Search className="h-5 w-5 text-white" />
+                Query Docs
+              </Button>
+            }
+          />
         </div>
       </div>
-      <div className={cn("h-full border border-gray-line rounded-md")}>
+      <div className={cn("h-full border border-gray-line rounded-md mb-4")}>
         <Tabs
           value={currentTabIndex.toString()}
           onValueChange={(value) => handleTabChange(null, parseInt(value))}
@@ -673,7 +679,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
               );
             })}
           </TabsList>
-          <div className={cn("h-[calc(100vh-20.857rem)] overflow-y-auto")}>
+          <div className={cn("h-[calc(100vh-10rem)] overflow-y-auto ")}>
             {tabs.map((tab, index) => (
               <TabsContent key={index} value={index.toString()}>
                 <div className={cn("relative px-8 py-4")}>
