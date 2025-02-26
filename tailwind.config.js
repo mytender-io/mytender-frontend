@@ -15,7 +15,9 @@ export default {
           light: "#FFA45A",
           lighter: "#FFE5CC",
           ultra_light: "#FFF0E6",
-          hover: "#cc6614"
+          hover: "#cc6614",
+          border: "#DC6E14",
+          focus: "#FFC492"
         },
         status: {
           success_light: "#E0F5E9",
