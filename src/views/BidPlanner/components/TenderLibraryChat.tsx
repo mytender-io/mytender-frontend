@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
+import UserIcon from "@/components/icons/UserIcon";
 
 const TenderLibraryChatDialog = ({
   bid_id,
@@ -314,14 +315,33 @@ const TenderLibraryChatDialog = ({
                         </div>
                       ) : (
                         <>
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html:
-                                isTyping && index === messages.length - 1
-                                  ? typingText
-                                  : message.text
-                            }}
-                          />
+                          <div className="flex items-center gap-2">
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html:
+                                  isTyping && index === messages.length - 1
+                                    ? typingText
+                                    : message.text
+                              }}
+                            />
+                            {message.type === "user" && (
+                              <div className="flex items-center gap-1">
+                                {auth?.profileUrl ? (
+                                  <img
+                                    src={auth?.profileUrl}
+                                    alt="Profile"
+                                    className="w-6 h-6 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <UserIcon
+                                    className={cn(
+                                      "w-5 h-5 min-w-5 min-h-5 text-gray-hint_text"
+                                    )}
+                                  />
+                                )}
+                              </div>
+                            )}
+                          </div>
                           {message.type === "bot" && (
                             <div
                               className={cn(

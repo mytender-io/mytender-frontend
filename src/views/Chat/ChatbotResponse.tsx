@@ -16,6 +16,7 @@ import { TooltipContent } from "@/components/ui/tooltip";
 import { Tooltip } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
+import UserIcon from "@/components/icons/UserIcon";
 
 const ChatbotResponse = () => {
   const getAuth = useAuthUser();
@@ -269,14 +270,35 @@ const ChatbotResponse = () => {
                       </div>
                     ) : (
                       <>
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html:
-                              isTyping && index === messages.length - 1
-                                ? typingText
-                                : message.text
-                          }}
-                        />
+                        <div className="flex items-center gap-2">
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html:
+                                isTyping && index === messages.length - 1
+                                  ? typingText
+                                  : message.text
+                            }}
+                          />
+                          {message.type === "user" && (
+                            <div className="flex items-center gap-1">
+                              {auth?.profileUrl ? (
+                                <img
+                                  src={auth?.profileUrl}
+                                  alt="Profile"
+                                  className="w-6 h-6 rounded-full object-cover"
+                                />
+                              ) : (
+                                <UserIcon
+                                  className={cn(
+                                    "min-w-5 min-h-5 text-gray-hint_text"
+                                  )}
+                                  width={20}
+                                  height={20}
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
                         {message.type === "bot" && (
                           <div
                             className={cn(
