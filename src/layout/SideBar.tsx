@@ -175,42 +175,58 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           </Link> */}
             <Link
               to="/bids"
-              className={cn(
-                "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-                isActive("/bids") ||
-                  isActive("/bid-extractor") ||
-                  isActive("/bid-intel") ||
-                  isActive("/proposal-planner") ||
-                  isActive("/proposal-review")
-                  ? "bg-typo-200"
-                  : "bg-transparent"
-              )}
+              className="flex items-center hover:bg-typo-200 bg-transparent rounded-xl px-3 py-2 gap-3"
             >
               <DashboardIcon
-                className="text-gray-hint_text min-w-5 min-h-5"
+                className={cn(
+                  "min-w-5 min-h-5",
+                  isActive("/bids") ||
+                    isActive("/bid-extractor") ||
+                    isActive("/bid-intel") ||
+                    isActive("/proposal-planner") ||
+                    isActive("/proposal-review")
+                    ? "text-orange"
+                    : "text-gray-hint_text"
+                )}
                 width={20}
                 height={20}
               />
               {!isCollapsed && (
-                <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+                <span
+                  className={cn(
+                    "text-sm font-medium whitespace-nowrap",
+                    isActive("/bids") ||
+                      isActive("/bid-extractor") ||
+                      isActive("/bid-intel") ||
+                      isActive("/proposal-planner") ||
+                      isActive("/proposal-review")
+                      ? "text-orange"
+                      : "text-gray-hint_text"
+                  )}
+                >
                   Tender Dashboard
                 </span>
               )}
             </Link>
             <Link
               to="/library"
-              className={cn(
-                "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-                isActive("/library") ? "bg-typo-200" : "bg-transparent"
-              )}
+              className="flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
             >
               <ContentLibraryIcon
-                className="text-gray-hint_text min-w-5 min-h-5"
+                className={cn(
+                  "min-w-5 min-h-5",
+                  isActive("/library") ? "text-orange" : "text-gray-hint_text"
+                )}
                 width={20}
                 height={20}
               />
               {!isCollapsed && (
-                <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+                <span
+                  className={cn(
+                    "text-sm font-medium whitespace-nowrap",
+                    isActive("/library") ? "text-orange" : "text-gray-hint_text"
+                  )}
+                >
                   Content Library
                 </span>
               )}
@@ -227,36 +243,50 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             </span>
             <Link
               to="/chat"
-              className={cn(
-                "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-                isActive("/chat") ? "bg-typo-200" : "bg-transparent"
-              )}
+              className="flex items-center hover:bg-typo-200 bg-transparent rounded-xl px-3 py-2 gap-3"
             >
               <LibraryChatIcon
-                className="text-gray-hint_text min-w-5 min-h-5"
+                className={cn(
+                  "min-w-5 min-h-5",
+                  isActive("/chat") ? "text-orange" : "text-gray-hint_text"
+                )}
                 width={20}
                 height={20}
               />
               {!isCollapsed && (
-                <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+                <span
+                  className={cn(
+                    "text-sm font-medium whitespace-nowrap",
+                    isActive("/chat") ? "text-orange" : "text-gray-hint_text"
+                  )}
+                >
                   Library Chat
                 </span>
               )}
             </Link>
             <Link
               to="/question-answer"
-              className={cn(
-                "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-                isActive("/question-answer") ? "bg-typo-200" : "bg-transparent"
-              )}
+              className="flex items-center hover:bg-typo-200 bg-transparent rounded-xl px-3 py-2 gap-3"
             >
               <QAIcon
-                className="text-gray-hint_text min-w-5 min-h-5 rotate-[270deg]"
+                className={cn(
+                  "min-w-5 min-h-5 rotate-[270deg]",
+                  isActive("/question-answer")
+                    ? "text-orange"
+                    : "text-gray-hint_text"
+                )}
                 width={20}
                 height={20}
               />
               {!isCollapsed && (
-                <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+                <span
+                  className={cn(
+                    "text-sm font-medium whitespace-nowrap",
+                    isActive("/question-answer")
+                      ? "text-orange"
+                      : "text-gray-hint_text"
+                  )}
+                >
                   Q&A Generator
                 </span>
               )}
@@ -485,17 +515,24 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           <Link
             to="/profile"
             className={cn(
-              "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-              isActive("/profile") ? "bg-typo-200" : "bg-transparent"
+              "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
             )}
           >
             <UserIcon
-              className="text-gray-hint_text min-w-5 min-h-5"
+              className={cn(
+                "min-w-5 min-h-5",
+                isActive("/profile") ? "text-orange" : "text-gray-hint_text"
+              )}
               width={20}
               height={20}
             />
             {!isCollapsed && (
-              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+              <span
+                className={cn(
+                  "text-sm font-medium whitespace-nowrap",
+                  isActive("/profile") ? "text-orange" : "text-gray-hint_text"
+                )}
+              >
                 Profile
               </span>
             )}
@@ -503,17 +540,24 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           <Link
             to="/logout"
             className={cn(
-              "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
-              isActive("/logout") ? "bg-typo-200" : "bg-transparent"
+              "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
             )}
           >
             <LogoutIcon
-              className="text-gray-hint_text min-w-5 min-h-5"
+              className={cn(
+                "min-w-5 min-h-5",
+                isActive("/logout") ? "text-orange" : "text-gray-hint_text"
+              )}
               width={20}
               height={20}
             />
             {!isCollapsed && (
-              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+              <span
+                className={cn(
+                  "text-sm font-medium whitespace-nowrap",
+                  isActive("/logout") ? "text-orange" : "text-gray-hint_text"
+                )}
+              >
                 Logout
               </span>
             )}
