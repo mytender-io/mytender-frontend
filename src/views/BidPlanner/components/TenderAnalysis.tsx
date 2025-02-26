@@ -18,7 +18,8 @@ import {
   Gauge,
   ChartBar,
   CheckCircle2,
-  Telescope
+  Telescope,
+  ClipboardCheck
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -151,14 +152,16 @@ const TenderAnalysis = ({ canUserEdit }) => {
     tender_summary,
     evaluation_criteria,
     derive_insights,
-    differentiation_opportunities
+    differentiation_opportunities,
+    compliance_requirements
   } = sharedState;
 
   const [tabContent, setTabContent] = useState({
     0: tender_summary || "",
     1: evaluation_criteria || "",
     2: derive_insights || "",
-    3: differentiation_opportunities || ""
+    3: differentiation_opportunities || "",
+    4: compliance_requirements || ""
   });
 
   const tabs = [
@@ -185,12 +188,19 @@ const TenderAnalysis = ({ canUserEdit }) => {
       extract_insights_prompt: "extract_section_derive_insights"
     },
     {
-      name: "Differentiation Opportunities",
+      name: "Differentiation Factors",
       Icon: Star,
       prompt: "generate_differentiation_opportunities",
       stateKey: "differentiation_opportunities",
       summaryKey: "differentiating_factors",
       extract_insights_prompt: "extract_differentiation_factors"
+    },
+    {
+      name: "Compliance Requirements",
+      Icon: ClipboardCheck,
+      prompt: "generate_compliance",
+      stateKey: "compliance_requirements",
+      extract_insights_prompt: "extract_compliance_requirements"
     }
   ];
 
@@ -215,7 +225,8 @@ const TenderAnalysis = ({ canUserEdit }) => {
       0: tender_summary || "",
       1: evaluation_criteria || "",
       2: derive_insights || "",
-      3: differentiation_opportunities || ""
+      3: differentiation_opportunities || "",
+      4: compliance_requirements || ""
     });
     return () => {
       mounted.current = false;
@@ -224,11 +235,13 @@ const TenderAnalysis = ({ canUserEdit }) => {
     tender_summary,
     evaluation_criteria,
     derive_insights,
-    differentiation_opportunities
+    differentiation_opportunities,
+    compliance_requirements
   ]);
 
   const handleTabChange = (_, newValue) => {
     if (loadingTab !== null) {
+      toast.warning("Please wait until the current generation completes.");
       return;
     }
     if (!canUserEdit) {
@@ -274,6 +287,10 @@ const TenderAnalysis = ({ canUserEdit }) => {
   };
 
   const handleTabClick = async (index) => {
+    if (loadingTab !== null) {
+      toast.warning("Please wait until the current generation completes.");
+      return;
+    }
     setCurrentTabIndex(index);
     console.log("tab click");
 
@@ -284,6 +301,13 @@ const TenderAnalysis = ({ canUserEdit }) => {
     }
 
     const tab = tabs[index];
+
+    // Use special handler for compliance tab
+    if (tab.prompt === "generate_compliance") {
+      handleCompliance(index);
+      return;
+    }
+
     setLoadingTab(index);
 
     try {
@@ -335,6 +359,58 @@ const TenderAnalysis = ({ canUserEdit }) => {
     }
   };
 
+  const handleCompliance = async (index) => {
+    if (!canUserEdit || !mounted.current) return;
+    if (!object_id) {
+      toast.warning("Please save the bid first.");
+      return;
+    }
+
+    const tab = tabs[index];
+    setLoadingTab(index);
+
+    try {
+      const formData = new FormData();
+      formData.append("bid_id", object_id);
+
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/generate_compliance_requirements`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${auth?.token}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      if (mounted.current) {
+        const generatedContent = result.data.requirements;
+        console.log(generatedContent);
+        setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
+        setSharedState((prev) => ({
+          ...prev,
+          [tab.stateKey]: generatedContent
+        }));
+
+        toast.success("Compliance requirements generated successfully!");
+      }
+    } catch (err) {
+      if (mounted.current) {
+        const errorMsg =
+          err.response?.status === 404
+            ? "No documents found in the tender library. Please upload documents before generating"
+            : "An error occurred while generating compliance requirements. Please try again.";
+        if (err.response?.status === 404) toast.warning(errorMsg);
+        else toast.error(errorMsg);
+      }
+    } finally {
+      if (mounted.current) {
+        setLoadingTab(null);
+      }
+    }
+  };
+
   const handleRegenerateClick = async (index, event) => {
     event.stopPropagation();
     if (!canUserEdit || !mounted.current) return;
@@ -346,6 +422,12 @@ const TenderAnalysis = ({ canUserEdit }) => {
     const tab = tabs[index];
     setLoadingTab(index);
     setCurrentTabIndex(index);
+
+    // Use special handler for compliance tab regeneration
+    if (tab.prompt === "generate_compliance") {
+      handleCompliance(index);
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -501,6 +583,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
         className={cn("flex flex-col w-full h-full")}
       >
         <TabsList
+          ref={tabsRef}
           className={cn(
             "w-full justify-start border-b border-gray-line h-auto py-0 px-0 rounded-none"
           )}
@@ -515,6 +598,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
                 className={cn(
                   "relative flex items-center gap-2 px-6 py-3 data-[state=active]:text-orange bg-transparent"
                 )}
+                disabled={loadingTab !== null && loadingTab !== index}
               >
                 {loadingTab === index && (
                   <div
@@ -540,6 +624,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
                     onClick={(e) => handleRegenerateClick(index, e)}
                     variant="ghost"
                     size="icon"
+                    disabled={loadingTab !== null}
                     className={cn(
                       "bg-gray-line hover:bg-orange-100 hover:text-orange h-6 w-6",
                       currentTabIndex === index &&

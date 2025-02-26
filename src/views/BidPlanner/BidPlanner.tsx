@@ -202,7 +202,7 @@ const BidPlanner = () => {
             </DialogContent>
           </Dialog>
 
-          <div className="max-w-5xl mx-auto w-full flex-1">
+          <div className="max-w-6xl mx-auto w-full flex-1">
             <TenderAnalysis canUserEdit={canUserEdit} />
           </div>
         </div>
