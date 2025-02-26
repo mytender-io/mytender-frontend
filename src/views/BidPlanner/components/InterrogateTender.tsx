@@ -31,7 +31,6 @@ const InterrogateTenderContent = ({
   const [isLoadingText, setIsLoadingText] = useState(false);
   const [searchQuery, setSearchQuery] = useState(initialSearchTerm);
   const [searchResults, setSearchResults] = useState(initialSearchResults);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (initialSearchResults.length > 0) {
@@ -42,7 +41,7 @@ const InterrogateTenderContent = ({
   const searchTenderDocs = useCallback(async () => {
     if (!searchQuery.trim()) return;
     setIsLoading(true);
-    setError(null);
+    // setError(null);
     try {
       console.log(
         "Sending request to:",
@@ -59,13 +58,11 @@ const InterrogateTenderContent = ({
       setSearchResults(response.data);
       onSearch(response.data, searchQuery);
       if (response.data.length === 0) {
-        setError("No results found. Please try a different search query.");
         toast.warning("No results found. Please try a different search query.");
       }
     } catch (error) {
       console.error("Error searching tender documents:", error);
       const errorMessage = error.response?.data?.detail || error.message;
-      setError(`Error: ${errorMessage}`);
       toast.error(`Error searching tender documents: ${errorMessage}`);
     } finally {
       setIsLoading(false);
@@ -117,12 +114,8 @@ const InterrogateTenderContent = ({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-700">
-        This search feature lets you search for specific words across documents
-        in your tender library. Enter specific terms or phrases related to the
-        buyer's requirements, evaluation criteria, or any other relevant aspects
-        of the tender. Clicking on a search result will take you to the
-        approximate location of the snippet in the relevant document.
+      <p className="text-sm text-gray-hint_text">
+        Extract quick tender insights to help formulate your bid strategy
       </p>
 
       <form onSubmit={handleSubmit} className="mb-4">

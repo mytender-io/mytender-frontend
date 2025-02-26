@@ -623,8 +623,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
           <TabsList
             ref={tabsRef}
             className={cn(
-              "w-full justify-start border-b border-gray-line h-auto py-0 px-0 rounded-none grid",
-              `grid-cols-${tabs.length}`
+              "w-full justify-start border-b border-gray-line h-auto py-0 px-0 rounded-none grid grid-cols-5"
             )}
           >
             {tabs.map((tab, index) => {

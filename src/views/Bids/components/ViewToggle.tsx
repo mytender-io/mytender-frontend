@@ -13,6 +13,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ value, onChange }) => {
   return (
     <div className="flex rounded-lg border border-typo-grey-7 overflow-hidden">
       <Button
+        variant="secondary"
         size="lg"
         className={cn(
           "text-typo-900 px-4 rounded-none hover:bg-white",
@@ -23,6 +24,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ value, onChange }) => {
         <LayoutTableIcon className="text-gray-hint_text" />
       </Button>
       <Button
+        variant="secondary"
         size="lg"
         className={cn(
           "text-typo-900 px-4 rounded-none hover:bg-white",

@@ -52,10 +52,10 @@ const TenderLibraryChatDialog = ({
     }
 
     return [
-      {
-        type: "bot",
-        text: "Ask questions here about your Tender Library documents"
-      }
+      // {
+      //   type: "bot",
+      //   text: "Ask questions here about your Tender Library documents"
+      // }
     ];
   });
 
@@ -277,7 +277,7 @@ const TenderLibraryChatDialog = ({
   // Only render the trigger if we're not in controlled mode
   // For controlled mode, the parent is responsible for opening the dialog
   const dialogContent = (
-    <DialogContent className="sm:max-w-[500px] md:max-w-[700px] h-[80vh] flex flex-col p-0">
+    <DialogContent className="max-w-6xl h-[80vh] flex flex-col p-0">
       <DialogHeader className="px-6 py-4 border-b">
         <DialogTitle>Tender Library Chat</DialogTitle>
       </DialogHeader>
@@ -286,95 +286,103 @@ const TenderLibraryChatDialog = ({
           <div className="relative flex flex-col justify-between space-y-4 h-full">
             <div
               ref={messagesContainerRef}
-              className="flex flex-col flex-1 w-full max-w-3xl mx-auto overflow-y-auto scrollbar-none"
+              className="flex flex-col flex-1 w-full max-w-4xl mx-auto overflow-y-auto scrollbar-none"
             >
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "group flex min-w-[50px] px-4 py-2 rounded-xl items-start gap-3 text-black",
-                    message.type === "user"
-                      ? "bg-gray-light self-end max-w-xl mb-4"
-                      : "bg-transparent"
-                  )}
-                >
-                  <div className="flex-1 flex flex-col">
-                    {message.text === "loading" ? (
-                      <div className="flex justify-start items-center h-full text-2xl tracking-wider leading-none font-semibold">
-                        <span className="animate-[blink_1.4s_infinite] text-black">
-                          .
-                        </span>
-                        <span className="animate-[blink_1.4s_infinite_0.2s] text-black">
-                          .
-                        </span>
-                        <span className="animate-[blink_1.4s_infinite_0.4s] text-black">
-                          .
-                        </span>
-                      </div>
-                    ) : (
-                      <>
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html:
-                              isTyping && index === messages.length - 1
-                                ? typingText
-                                : message.text
-                          }}
-                        />
-                        {message.type === "bot" && (
-                          <div
-                            className={cn(
-                              "flex gap-1 mt-3",
-                              index === messages.length - 1
-                                ? isTyping
-                                  ? "opacity-0"
-                                  : "relative"
-                                : "opacity-0 group-hover:opacity-100 transition-opacity"
-                            )}
-                          >
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full border border-gray-border"
-                              onClick={() => handleCopyText(message.text)}
-                            >
-                              <CopyIcon className="text-gray-hint_text" />
-                            </Button>
-
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className={cn(
-                                "rounded-full border border-gray-border hover:text-gray-hint_text",
-                                messageFeedback[index] === "positive"
-                                  ? "bg-gray-hint_text text-white"
-                                  : "text-gray-hint_text"
-                              )}
-                              onClick={() => handleFeedback(index, "positive")}
-                            >
-                              <ThumbupIcon />
-                            </Button>
-
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className={cn(
-                                "rounded-full border border-gray-border hover:text-gray-hint_text",
-                                messageFeedback[index] === "negative"
-                                  ? "bg-gray-hint_text text-white"
-                                  : "text-gray-hint_text"
-                              )}
-                              onClick={() => handleFeedback(index, "negative")}
-                            >
-                              <ThumbdownIcon />
-                            </Button>
-                          </div>
-                        )}
-                      </>
+              {messages.length > 0 ? (
+                messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "group flex min-w-[50px] px-4 py-2 rounded-xl items-start gap-3 text-black",
+                      message.type === "user"
+                        ? "bg-gray-light self-end max-w-xl mb-4"
+                        : "bg-transparent"
                     )}
+                  >
+                    <div className="flex-1 flex flex-col">
+                      {message.text === "loading" ? (
+                        <div className="flex justify-start items-center h-full text-2xl tracking-wider leading-none font-semibold">
+                          <span className="animate-[blink_1.4s_infinite] text-black">
+                            .
+                          </span>
+                          <span className="animate-[blink_1.4s_infinite_0.2s] text-black">
+                            .
+                          </span>
+                          <span className="animate-[blink_1.4s_infinite_0.4s] text-black">
+                            .
+                          </span>
+                        </div>
+                      ) : (
+                        <>
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html:
+                                isTyping && index === messages.length - 1
+                                  ? typingText
+                                  : message.text
+                            }}
+                          />
+                          {message.type === "bot" && (
+                            <div
+                              className={cn(
+                                "flex gap-1 mt-3",
+                                index === messages.length - 1
+                                  ? isTyping
+                                    ? "opacity-0"
+                                    : "relative"
+                                  : "opacity-0 group-hover:opacity-100 transition-opacity"
+                              )}
+                            >
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full border border-gray-border"
+                                onClick={() => handleCopyText(message.text)}
+                              >
+                                <CopyIcon className="text-gray-hint_text" />
+                              </Button>
+
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={cn(
+                                  "rounded-full border border-gray-border hover:text-gray-hint_text",
+                                  messageFeedback[index] === "positive"
+                                    ? "bg-gray-hint_text text-white"
+                                    : "text-gray-hint_text"
+                                )}
+                                onClick={() =>
+                                  handleFeedback(index, "positive")
+                                }
+                              >
+                                <ThumbupIcon />
+                              </Button>
+
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={cn(
+                                  "rounded-full border border-gray-border hover:text-gray-hint_text",
+                                  messageFeedback[index] === "negative"
+                                    ? "bg-gray-hint_text text-white"
+                                    : "text-gray-hint_text"
+                                )}
+                                onClick={() =>
+                                  handleFeedback(index, "negative")
+                                }
+                              >
+                                <ThumbdownIcon />
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <>Ask questions here about your Tender Library documents</>
+              )}
             </div>
           </div>
         </div>
