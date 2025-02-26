@@ -36,7 +36,7 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
-import { Input } from "@/components/ui/input";
+import TenderLibraryChatDialog from "@/components/TenderLibraryChat";
 
 const LoadingState = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -144,6 +144,7 @@ const CustomTable = ({ content }) => {
 const TenderAnalysis = ({ canUserEdit }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
   const [loadingTab, setLoadingTab] = useState(null);
+  const [chatDialogOpen, setChatDialogOpen] = useState(false);
   const { sharedState, setSharedState } = useContext(BidContext);
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -581,17 +582,27 @@ const TenderAnalysis = ({ canUserEdit }) => {
     <div>
       <div className="bg-gray-100 border border-gray-line rounded-md p-2 mb-4">
         <div className="flex w-full items-center gap-2">
-          <div className="relative flex-1">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FileSearch className="h-5 w-5 text-gray-400" />
+          <Button
+            onClick={() => setChatDialogOpen(true)}
+            variant="outline"
+            className="w-full justify-start border-gray-spacer_light hover:bg-background hover:text-current"
+          >
+            <div className="flex items-center space-x-3">
+              <FileSearch className="h-5 w-5 text-gray" />
+              <span className="text-gray-hint_text font-medium">
+                Ask questions about the tender...
+              </span>
             </div>
-            <Input
-              type="text"
-              placeholder="Type in a question about the tender..."
-              className="pl-10 bg-white"
-            />
-          </div>
-          <Button >
+          </Button>
+
+          {/* We use the `open` prop to control the dialog state */}
+          <TenderLibraryChatDialog
+            bid_id={object_id}
+            open={chatDialogOpen}
+            onOpenChange={setChatDialogOpen}
+          />
+
+          <Button>
             <Search className="h-5 w-5 text-white" />
             Query Docs
           </Button>
