@@ -4,7 +4,7 @@ import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import axios from "axios";
 import withAuth from "../../routes/withAuth.tsx";
 import { useAuthUser } from "react-auth-kit";
-import BidNavbar from "../../routes/BidNavbar.tsx";
+import BidNavbar from "@/components/BidNavbar";
 import {
   BidContext,
   Section,

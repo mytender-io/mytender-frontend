@@ -4,7 +4,7 @@ import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import SideBarSmall from "../routes/SidebarSmall.tsx";
-import BidNavbar from "../routes/BidNavbar.tsx";
+import BidNavbar from "@/components/BidNavbar";
 import {
   BidContext,
   Section,
@@ -14,7 +14,7 @@ import { displayAlert } from "../helper/Alert.tsx";
 import "./ComplianceMatrix.css";
 import { Link, useNavigate } from "react-router-dom";
 
-import './ComplianceMatrix.css';
+import "./ComplianceMatrix.css";
 import ComplianceEllipsisMenu from "../buttons/ComplianceEllipsisMenu.tsx";
 
 const ComplianceMatrix = () => {
@@ -25,17 +25,14 @@ const ComplianceMatrix = () => {
   const { sharedState, setSharedState } = useContext(BidContext);
   const [isLoading, setIsLoading] = useState(false);
 
-
   const { object_id, contributors, outline } = sharedState;
 
   const currentUserPermission = contributors[auth.email] || "viewer";
   const [showModal, setShowModal] = useState(false);
 
-
   useEffect(() => {
     fetchOutline();
   }, []);
-
 
   const showViewOnlyMessage = () => {
     displayAlert("You only have permission to view this bid.", "danger");
@@ -87,10 +84,7 @@ const ComplianceMatrix = () => {
     }
   };
 
-  const handleDelete = () => {
-
-  }
-
+  const handleDelete = () => {};
 
   return (
     <div className="chatpage">
@@ -113,10 +107,8 @@ const ComplianceMatrix = () => {
                 >
                   <thead>
                     <tr>
-                      <th style={{ width: "1200px"}}>Compliance Item</th>
-                      <th >
-                        Section
-                      </th>
+                      <th style={{ width: "1200px" }}>Compliance Item</th>
+                      <th>Section</th>
                       <th
                         className="text-center"
                         style={{ width: "60px" }}
@@ -127,21 +119,19 @@ const ComplianceMatrix = () => {
                     {outline.map((section, index) => {
                       return (
                         <React.Fragment key={index}>
-                          <tr
-                          
-                          >
+                          <tr>
                             <td className="compliance-item ">
-                           {section.compliance_requirements}
+                              {section.compliance_requirements}
                             </td>
                             <td className="compliance-item">
-                             {section.heading}
+                              {section.heading}
                             </td>
-                         
 
                             <td className="text-center">
                               <div className="d-flex justify-content-center pe-2">
-                              <ComplianceEllipsisMenu 
-                              onDelete={handleDelete}/>
+                                <ComplianceEllipsisMenu
+                                  onDelete={handleDelete}
+                                />
                               </div>
                             </td>
                           </tr>
@@ -151,7 +141,6 @@ const ComplianceMatrix = () => {
                   </tbody>
                 </table>
               </div>
-           
             </div>
           )}
         </div>

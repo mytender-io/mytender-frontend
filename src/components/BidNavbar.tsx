@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import { faEdit, faEye, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { useAuthUser } from "react-auth-kit";
-import BidTitle from "../components/BidTitle";
+import BidTitle from "./BidTitle";
 import GenerateProposalModal from "../modals/GenerateProposalModal";
 import SaveStatus from "@/components/SaveStatus";
 import { cn } from "@/utils";
@@ -113,9 +113,9 @@ const BidNavbar: React.FC<{
   console.log(initialBidName);
 
   const baseNavLinkStyles =
-    "mr-6 text-base font-semibold text-gray-hint_text hover:text-gray-hint_text px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative hover:bg-gray-light rounded-lg";
+    "mr-6 text-base font-semibold text-gray-hint_text hover:text-orange px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative";
   const activeNavLinkStyles =
-    "text-orange-500 after:content-[''] after:absolute after:bottom-[-0.3rem] after:left-0 after:w-full after:h-[0.143rem] after:bg-orange-500 after:transition-[width] after:duration-300 after:ease-in-out";
+    "text-orange after:content-[''] after:absolute after:bottom-[-0.3rem] after:left-0 after:w-full after:h-[0.1rem] after:bg-orange after:transition-[width] after:duration-1000 after:ease-in-out after:delay-1000";
 
   return (
     <div>

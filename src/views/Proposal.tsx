@@ -5,7 +5,7 @@ import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import SideBarSmall from "../routes/SidebarSmall.tsx";
 import { Button, Row } from "react-bootstrap";
-import BidNavbar from "../routes/BidNavbar.tsx";
+import BidNavbar from "@/components/BidNavbar";
 import ProposalEditor from "./ProposalEditor.tsx";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph, TextRun } from "docx";

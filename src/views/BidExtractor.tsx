@@ -13,7 +13,7 @@ import {
   OverlayTrigger,
   Tooltip
 } from "react-bootstrap";
-import BidNavbar from "../routes/BidNavbar.tsx";
+import BidNavbar from "@/components/BidNavbar";
 import "./BidExtractor.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert";

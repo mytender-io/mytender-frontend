@@ -4,7 +4,7 @@ import axios from "axios";
 import withAuth from "../../routes/withAuth.tsx";
 import { useAuthUser } from "react-auth-kit";
 import { useLocation } from "react-router-dom";
-import BidNavbar from "../../routes/BidNavbar.tsx";
+import BidNavbar from "@/components/BidNavbar";
 import { BidContext } from "../BidWritingStateManagerView.tsx";
 import { Check, Pencil, Search, X } from "lucide-react";
 import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";

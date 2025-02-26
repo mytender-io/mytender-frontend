@@ -5,13 +5,10 @@ import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import SideBarSmall from "../routes/SidebarSmall.tsx";
 import { Button, Card, Col, Form, Row, Spinner } from "react-bootstrap";
-import BidNavbar from "../routes/BidNavbar.tsx";
+import BidNavbar from "@/components/BidNavbar";
 import "./QuestionsCrafter.css";
 import "draft-js/dist/Draft.css";
-import {
-  BidContext,
-  Subheading
-} from "./BidWritingStateManagerView.tsx";
+import { BidContext, Subheading } from "./BidWritingStateManagerView.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import { displayAlert } from "../helper/Alert.tsx";
 import StatusMenu from "../buttons/StatusMenu.tsx";
@@ -113,7 +110,6 @@ const QuestionCrafter = () => {
 
       <div className="lib-container">
         <div className="scroll-container">
-
           <div>
             <Row
               className="justify-content-md-center"

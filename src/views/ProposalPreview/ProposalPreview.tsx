@@ -3,7 +3,7 @@ import { useAuthUser } from "react-auth-kit";
 import { BidContext } from "../BidWritingStateManagerView";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import axios from "axios";
-import BidNavbar from "../../routes/BidNavbar";
+import BidNavbar from "@/components/BidNavbar";
 import { Button } from "@/components/ui/button";
 import withAuth from "../../routes/withAuth";
 import mammoth from "mammoth";
