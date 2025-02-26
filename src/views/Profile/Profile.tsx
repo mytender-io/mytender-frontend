@@ -286,17 +286,17 @@ const ProfilePage = () => {
         </div>
         <div className="flex-1 overflow-y-auto">
           <MeshGradient>
-            <Card className="max-w-5xl w-full bg-white mx-auto mt-10">
+            <Card className="max-w-5xl w-full bg-transparent mx-auto mt-10">
               <CardContent className="px-0 rounded-lg overflow-hidden">
-                <div className="space-y-12">
-                  <div className="relative w-full h-32 bg-orange-gradient">
+                <div>
+                  <div className="relative w-full h-32 bg-orange-gradient/50">
                     <div className="absolute left-8 top-8 flex items-center justify-center bg-orange-lighter rounded-full w-32 h-32 border border-white">
                       <h1 className="text-3xl font-semibold uppercase">
                         {formData.username.slice(0, 1)}
                       </h1>
                     </div>
                   </div>
-                  <div className="flex gap-4 w-full px-4 ">
+                  <div className="flex gap-4 w-full px-4 bg-white pt-12">
                     <Card
                       className={cn(
                         "w-[30%] h-fit",

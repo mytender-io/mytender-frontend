@@ -1443,7 +1443,7 @@ const QAGenerator = () => {
 
         <div className="flex flex-row gap-4 flex-1">
           <div className="flex flex-col h-full w-full space-y-3">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center h-9">
               <h1 id="answer-section" className="text-lg font-semibold">
                 Answer:
               </h1>
@@ -1468,7 +1468,7 @@ const QAGenerator = () => {
                 className="flex-1 border rounded-lg px-4 bg-white text-sm overflow-y-auto"
                 ref={responseBoxRef}
               >
-                <div ref={editorRef}>
+                <div ref={editorRef} className="max-h-60">
                   <Editor
                     editorState={responseEditorState}
                     placeholder="Your response will be generated here..."
@@ -1484,9 +1484,11 @@ const QAGenerator = () => {
           </div>
 
           <div className="flex flex-col h-full w-full space-y-3">
-            <h1 id="bid-pilot-section" className="text-lg font-semibold h-9">
-              Bid Pilot
-            </h1>
+            <div className="flex items-center h-9">
+              <h1 id="bid-pilot-section" className="text-lg font-semibold">
+                Bid Pilot
+              </h1>
+            </div>
             <div className="flex flex-col bg-white rounded-lg p-4 border border-gray-line h-full gap-4">
               {showOptions ? (
                 <div ref={optionsContainerRef} className="flex-1">
