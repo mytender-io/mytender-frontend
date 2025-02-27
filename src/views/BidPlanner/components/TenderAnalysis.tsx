@@ -142,14 +142,17 @@ const CustomTable = ({ content }) => {
   );
 };
 
-const TenderAnalysis = ({ canUserEdit }) => {
-  const [currentTabIndex, setCurrentTabIndex] = useState(0);
+const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
+  const [currentTabIndex, setCurrentTabIndex] = useState<number>(0);
   const [loadingTab, setLoadingTab] = useState(null);
   const [chatDialogOpen, setChatDialogOpen] = useState(false);
   const { sharedState, setSharedState } = useContext(BidContext);
   const getAuth = useAuthUser();
   const auth = getAuth();
   const mounted = useRef(false);
+
+  const [editMode, setEditMode] = useState<number | null>(null);
+  const [editContent, setEditContent] = useState<string>("");
 
   const {
     object_id,
@@ -208,21 +211,6 @@ const TenderAnalysis = ({ canUserEdit }) => {
     }
   ];
 
-  // Add refs for the tabs container and tabs
-  const tabsRef = useRef(null);
-  const [tabRects, setTabRects] = useState([]);
-
-  // Add effect to measure tab positions
-  useEffect(() => {
-    if (tabsRef.current) {
-      const tabElements = tabsRef.current.querySelectorAll('[role="tab"]');
-      const rects = Array.from(tabElements).map((tab) =>
-        tab.getBoundingClientRect()
-      );
-      setTabRects(rects);
-    }
-  }, [currentTabIndex]); // Re-measure
-
   useEffect(() => {
     mounted.current = true;
     setTabContent({
@@ -243,7 +231,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
     compliance_requirements
   ]);
 
-  const handleTabChange = (_, newValue) => {
+  const handleTabChange = (_, newValue: number) => {
     if (loadingTab !== null) {
       toast.warning("Please wait until the current generation completes.");
       return;
@@ -262,7 +250,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
     }
 
     if (!object_id) {
-      displayAlert("Please save the bid first.", "warning");
+      toast.warning("Please save the bid first.");
       return;
     }
 
@@ -490,7 +478,47 @@ const TenderAnalysis = ({ canUserEdit }) => {
     }
   };
 
-  const renderContent = (content) => {
+  const handleEditClick = (index: number, content: string) => {
+    setEditMode(index);
+    setEditContent(content);
+  };
+
+  const handleSaveEdit = async (index: number) => {
+    if (!canUserEdit) return;
+
+    try {
+      const tab = tabs[index];
+      setTabContent((prev) => ({ ...prev, [index]: editContent }));
+      setSharedState((prev) => ({
+        ...prev,
+        [tab.stateKey]: editContent
+      }));
+      setEditMode(null);
+      toast.success("Content updated successfully!");
+    } catch (err) {
+      toast.error("Failed to save changes");
+    }
+  };
+
+  const renderContent = (content, index) => {
+    if (editMode === index) {
+      return (
+        <div className="flex flex-col gap-4 h-full">
+          <textarea
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            className="w-full flex-1 p-4 border rounded-md font-mono outline-none"
+          />
+          <div className="flex gap-2">
+            <Button onClick={() => handleSaveEdit(index)}>Save</Button>
+            <Button variant="outline" onClick={() => setEditMode(null)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
     const sections = content.split(/(?=\n\d+\.|#)/);
 
     return sections.map((section, index) => {
@@ -621,7 +649,6 @@ const TenderAnalysis = ({ canUserEdit }) => {
           className={cn("flex flex-col w-full h-full")}
         >
           <TabsList
-            ref={tabsRef}
             className={cn(
               "w-full justify-start border-b border-gray-line h-auto py-0 px-0 rounded-none grid grid-cols-5"
             )}
@@ -665,7 +692,7 @@ const TenderAnalysis = ({ canUserEdit }) => {
                       size="icon"
                       disabled={loadingTab !== null}
                       className={cn(
-                        "bg-gray-line hover:bg-orange-100 hover:text-orange h-6 w-6",
+                        "bg-gray-line hover:bg-orange-100 hover:text-orange h-6 w-6 min-w-6",
                         currentTabIndex === index &&
                           (loadingTab !== index
                             ? "bg-orange-100"
@@ -682,10 +709,26 @@ const TenderAnalysis = ({ canUserEdit }) => {
           </TabsList>
           <div className={cn("h-[calc(100vh-10rem)] overflow-y-auto")}>
             {tabs.map((tab, index) => (
-              <TabsContent key={index} value={index.toString()}>
-                <div className={cn("relative px-8 py-4")}>
+              <TabsContent
+                key={index}
+                value={index.toString()}
+                className="h-full pt-0 mt-0"
+              >
+                <div className={cn("relative px-8 py-4 h-full")}>
+                  {canUserEdit && editMode !== index && (
+                    <Button
+                      variant="outline"
+                      className="absolute top-4 right-8"
+                      onClick={() =>
+                        handleEditClick(index, tabContent[index] || "")
+                      }
+                    >
+                      Edit
+                    </Button>
+                  )}
                   {renderContent(
-                    tabContent[index as keyof typeof tabContent] || ""
+                    tabContent[index as keyof typeof tabContent] || "",
+                    index
                   )}
                 </div>
               </TabsContent>
