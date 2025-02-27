@@ -56,7 +56,8 @@ const ProfilePage = () => {
     licences: 0,
     productName: "",
     companyObjectives: "",
-    toneOfVoice: ""
+    toneOfVoice: "",
+    profilePicture: ""
   });
 
   const [inviteEmail, setInviteEmail] = useState("");
@@ -80,6 +81,8 @@ const ProfilePage = () => {
     company: false,
     jobRole: false
   });
+
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const toggleEditable = (field: keyof typeof editableFields) => {
     setEditableFields((prev) => ({
@@ -109,7 +112,8 @@ const ProfilePage = () => {
           licences: response.data.licenses || 0,
           productName: response.data.product_name || "",
           companyObjectives: response.data.company_objectives || "",
-          toneOfVoice: response.data.tone_of_voice || ""
+          toneOfVoice: response.data.tone_of_voice || "",
+          profilePicture: response.data.profile_picture || ""
         });
         setLoading(false);
       } catch (err) {
@@ -257,6 +261,51 @@ const ProfilePage = () => {
     }
   };
 
+  const handleProfilePictureUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      alert("File size exceeds 5MB limit");
+      return;
+    }
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Only JPG, PNG, and GIF files are allowed");
+      return;
+    }
+
+    setUploadingImage(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("profile_picture", file);
+
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/upload_profile_picture`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      setFormData((prev) => ({
+        ...prev,
+        profilePicture: response.data.profile_picture_url
+      }));
+    } catch (err) {
+      console.error("Error uploading profile picture:", err);
+      alert("Failed to upload profile picture. Please try again.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -290,10 +339,38 @@ const ProfilePage = () => {
               <CardContent className="px-0 rounded-lg overflow-hidden">
                 <div>
                   <div className="relative w-full h-32 bg-orange-gradient/50">
-                    <div className="absolute left-8 top-8 flex items-center justify-center bg-orange-lighter rounded-full w-32 h-32 border border-white">
-                      <h1 className="text-3xl font-semibold uppercase">
-                        {formData.username.slice(0, 1)}
-                      </h1>
+                    <div className="absolute left-8 top-8 flex items-center justify-center bg-orange-lighter rounded-full w-32 h-32 border border-white overflow-hidden group">
+                      {formData.profilePicture ? (
+                        <img
+                          src={formData.profilePicture}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <h1 className="text-3xl font-semibold uppercase">
+                          {formData.username.slice(0, 1)}
+                        </h1>
+                      )}
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <label
+                          htmlFor="profile-picture-upload"
+                          className="cursor-pointer text-white text-xs font-medium"
+                        >
+                          {uploadingImage ? (
+                            <Spinner className="text-white" />
+                          ) : (
+                            "Change Photo"
+                          )}
+                        </label>
+                        <input
+                          id="profile-picture-upload"
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif"
+                          className="hidden"
+                          onChange={handleProfilePictureUpload}
+                          disabled={uploadingImage}
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className="flex gap-4 w-full px-4 bg-white pt-12">
