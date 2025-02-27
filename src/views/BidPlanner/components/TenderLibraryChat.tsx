@@ -200,13 +200,10 @@ const TenderLibraryChatDialog = ({
 
     try {
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question`,
+        `http${HTTP_PREFIX}://${API_URL}/ask_tender_library_question`,
         {
-          choice: choice,
-          broadness: broadness,
-          input_text: question,
-          extra_instructions: backgroundInfo,
-          datasets: [],
+          question: question,
+          chat_history: backgroundInfo,
           bid_id: bid_id
         },
         {
@@ -215,6 +212,8 @@ const TenderLibraryChatDialog = ({
           }
         }
       );
+
+      console.log(result);
 
       // Replace the temporary loading message with the actual response
       const formattedResponse = formatResponse(result.data);
