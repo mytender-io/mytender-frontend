@@ -1504,19 +1504,19 @@ const QAGenerator = () => {
                           <Button
                             onClick={() => handleOptionSelect(option, index)}
                           >
-                            <span>Option {index + 1}</span>
+                            <span>Click to replace</span>
                           </Button>
                           {selectedOptionIndex === index && (
-                            <Button onClick={handleTick}>
+                            <Button onClick={handleTick} variant={"ghost"}>
                               <FontAwesomeIcon
                                 icon={faCheck}
-                                className="text-white"
+                                className=""
                               />
                             </Button>
                           )}
                         </div>
-                        <div className="mt-2 text-white">
-                          <p>{option}</p>
+                        <div className="mt-2">
+                          <p className="bg-gray-100 p-3 rounded-lg">{option}</p>
                         </div>
                       </div>
                     ))
