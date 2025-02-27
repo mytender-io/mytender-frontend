@@ -963,7 +963,7 @@ const Library = () => {
     if (!showSearchResults) return null;
 
     return (
-      <div className="absolute top-[calc(100%+4px)] left-0 w-full max-h-[14rem] overflow-y-auto rounded-xl border bg-background shadow-lg">
+      <div className="absolute top-[calc(100%+4px)] left-0 w-full max-h-[14rem] overflow-y-auto rounded-xl border bg-background shadow-lg z-10">
         {filteredResults.length === 0 ? (
           <div className="flex items-center gap-2 px-4 py-3 text-sm text-muted-foreground">
             <HelpCircle className="h-4 w-4" />

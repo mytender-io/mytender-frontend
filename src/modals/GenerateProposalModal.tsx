@@ -51,51 +51,23 @@ const GenerateProposalModal = ({
   });
 
   const [loadingMessage, setLoadingMessage] = useState(
-    "Analysing tender requirements..."
+    "Analysing the outline..."
   );
 
   const loadingMessages = [
-    "Analysing tender requirements...",
-    "Cross-checking with company library...",
-    "Mining past successful proposals...",
-    "Evaluating win themes...",
-    "Calculating competitive advantages...",
-    "Identifying key differentiators...",
-    "Structuring executive summary...",
-    "Crafting value propositions...",
-    "Optimizing technical approach...",
-    "Enhancing solution architecture...",
-    "Polishing management strategy...",
-    "Fine-tuning pricing strategy...",
-    "Adding compelling case studies...",
-    "Incorporating best practices...",
-    "Validating compliance requirements...",
-    "Optimizing proposal language...",
-    "Adding winning elements...",
-    "Performing quality checks...",
-    "Enhancing visual elements...",
-    "Reviewing risk mitigation strategies...",
-    "Finalizing implementation approach...",
-    "Double-checking all requirements...",
-    "Polishing final draft...",
-    "Downloading additional information...",
-    "Resolving any remaining issues...",
-    "Analysing market positioning...",
-    "Refining unique selling points...",
-    "Strengthening past performance examples...",
-    "Enhancing capability statements...",
-    "Optimizing resource allocation plans...",
-    "Validating delivery timelines...",
-    "Incorporating sustainability measures...",
-    "Detailing quality assurance processes...",
-    "Enhancing innovation descriptions...",
-    "Polishing methodology sections...",
-    "Refining cost breakdowns...",
-    "Adding social value elements...",
-    "Strengthening local content details...",
-    "Validating certification requirements...",
-    "Enhancing team credentials...",
-    "Optimizing project schedules..."
+    "Analysing the outline...",
+    "Sifting through the writing plans...",
+    "Thinking…",
+    "Planning the best proposal structure...",
+    "Analysing the inputs...",
+    "Retrieving the relevant content from the content library...",
+    "Considering win themes and the customer painpoints...",
+    "Polishing the proposal language...",
+    "Dotting i's and crossing t's...",
+    "Ensuring compliance with tender requirements from compliance inputs...",
+    "Adding the final improvements...",
+    "Almost there! Just applying the finishing touches...",
+    "All done! Ready to secure that contract."
   ];
 
   const incompleteSections =
@@ -135,10 +107,15 @@ const GenerateProposalModal = ({
     let currentProgress = 0;
     let messageIndex = 0;
 
+    // Calculate how often to change messages to ensure we get through all messages
+    const messageInterval = Math.floor(duration / loadingMessages.length);
+
     const messageRotationInterval = setInterval(() => {
-      messageIndex = (messageIndex + 1) % loadingMessages.length;
-      setLoadingMessage(loadingMessages[messageIndex]);
-    }, 1000); // Changed from 3000 to 1000 to rotate every second
+      if (messageIndex < loadingMessages.length - 1) {
+        messageIndex++;
+        setLoadingMessage(loadingMessages[messageIndex]);
+      }
+    }, messageInterval);
 
     progressInterval.current = setInterval(() => {
       currentProgress += increment;
@@ -150,9 +127,7 @@ const GenerateProposalModal = ({
         }
         if (!isGeneratingProposal) {
           setProgress(100);
-          setLoadingMessage(
-            "Post processing final document.... Document will be downloaded shortly..."
-          );
+          setLoadingMessage(loadingMessages[loadingMessages.length - 1]);
         } else {
           setProgress(98);
         }
