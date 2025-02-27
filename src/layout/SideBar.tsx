@@ -156,7 +156,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             {/* <Link
             to="/home"
             className={cn(
-              "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3",
+              "flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3",
               isActive("/home") ? "bg-typo-200" : "bg-transparent"
             )}
           >
@@ -173,7 +173,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           </Link> */}
             <Link
               to="/bids"
-              className="flex items-center hover:bg-typo-200 bg-transparent rounded-xl px-3 py-2 gap-3"
+              className="flex items-center hover:bg-typo-200 bg-transparent rounded-md px-3 py-2 gap-3"
             >
               <DashboardIcon
                 className={cn(
@@ -208,7 +208,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             </Link>
             <Link
               to="/library"
-              className="flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
+              className="flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3 bg-transparent"
             >
               <ContentLibraryIcon
                 className={cn(
@@ -243,7 +243,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             </span>
             <Link
               to="/chat"
-              className="flex items-center hover:bg-typo-200 bg-transparent rounded-xl px-3 py-2 gap-3"
+              className="flex items-center hover:bg-typo-200 bg-transparent rounded-md px-3 py-2 gap-3"
             >
               <LibraryChatIcon
                 className={cn(
@@ -268,7 +268,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             </Link>
             <Link
               to="/question-answer"
-              className="flex items-center hover:bg-typo-200 bg-transparent rounded-xl px-3 py-2 gap-3"
+              className="flex items-center hover:bg-typo-200 bg-transparent rounded-md px-3 py-2 gap-3"
             >
               <QAIcon
                 className={cn(
@@ -295,7 +295,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             </Link>
             <Link
               to="https://appsource.microsoft.com/en-us/product/office/WA200007690?src=office&corrid=bd0c24c3-6022-e897-73ad-0dc9bdf3558b&omexanonuid=&referralurl="
-              className="flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
+              className="flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3 bg-transparent"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -312,7 +312,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             </Link>
             <Link
               to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
-              className="flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
+              className="flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3 bg-transparent"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -517,7 +517,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           <Link
             to="/profile"
             className={cn(
-              "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
+              "flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3 bg-transparent"
             )}
           >
             <UserIcon
@@ -544,7 +544,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           <Link
             to="/logout"
             className={cn(
-              "flex items-center hover:bg-typo-200 rounded-xl px-3 py-2 gap-3 bg-transparent"
+              "flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3 bg-transparent"
             )}
           >
             <LogoutIcon
