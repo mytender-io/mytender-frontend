@@ -8,11 +8,13 @@ import { Spinner } from "@/components/ui/spinner";
 interface ProfilePhotoProps {
   size?: "sm" | "md" | "lg";
   className?: string;
+  uploadingImage?: boolean;
 }
 
 const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
   size = "md",
-  className = ""
+  className = "",
+  uploadingImage = false
 }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -55,7 +57,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
     };
 
     fetchProfileData();
-  }, [token]);
+  }, [token, uploadingImage]);
 
   // Size classes
   const sizeClasses = {

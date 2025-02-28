@@ -296,6 +296,7 @@ const ProfilePage = () => {
 
       // Convert file to base64 for preview
       const reader = new FileReader();
+
       reader.onloadend = () => {
         const base64String = reader.result as string;
         // Extract the base64 data part (remove the data:image/xxx;base64, prefix)
@@ -345,6 +346,7 @@ const ProfilePage = () => {
           currentPage="Profile"
           parentPages={parentPages}
           showHome={true}
+          uploadingImage={uploadingImage}
         />
       </div>
 
