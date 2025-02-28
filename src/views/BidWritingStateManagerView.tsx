@@ -25,6 +25,12 @@ export interface Subheading {
   word_count: number;
 }
 
+export interface HighlightedDocument {
+  name: string;
+  rawtext: string;
+  folder:string;
+}
+
 export interface Section {
   section_id: string;
   heading: string;
@@ -43,6 +49,7 @@ export interface Section {
   relevant_evaluation_criteria: string;
   relevant_derived_insights: string;
   relevant_differentiation_factors: string;
+  highlightedDocuments: HighlightedDocument[];
 }
 
 export interface Contributor {
@@ -271,7 +278,7 @@ const BidManagement: React.FC = () => {
       appendFormData("submission_deadline", submission_deadline);
       appendFormData("questions", questions);
       appendFormData("original_creator", original_creator);
-      
+
       formData.append("contributors", JSON.stringify(contributors || []));
       formData.append(
         "selectedFolders",
