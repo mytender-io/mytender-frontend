@@ -55,15 +55,11 @@ const BidNavbar: React.FC<{
     if (auth && auth.email) {
       const permission = contributors[auth.email] || "viewer";
       setCurrentUserPermission(permission);
-      console.log("currentUserpermissionnav", permission);
+      //console.log("currentUserpermissionnav", permission);
     }
   }, [location, bidInfo, auth]);
 
-  useEffect(() => {
-    if (auth) {
-      console.log("auth", auth);
-    }
-  }, [auth]);
+
 
   const getPermissionDetails = (permission) => {
     switch (permission) {
@@ -109,8 +105,6 @@ const BidNavbar: React.FC<{
       navigate(path);
     }, 300); // 300ms matches our CSS transition time
   };
-
-  console.log(initialBidName);
 
   const baseNavLinkStyles =
     "mr-6 text-base font-semibold text-gray-hint_text hover:text-orange px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative";

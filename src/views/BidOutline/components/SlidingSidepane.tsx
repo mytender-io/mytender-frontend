@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
-  faPlus
+  faPlus,
+  faFile,
+  faXmark
 } from "@fortawesome/free-solid-svg-icons";
 import DebouncedTextArea from "./DeboucedTextArea";
 import SubheadingCards from "./SubheadingCards";
@@ -17,7 +19,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/utils";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, FileIcon } from "lucide-react";
+import SelectFilePopup from "./SelectFilePopup";
+import { Badge } from "@/components/ui/badge";
+import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
+import axios from "axios";
+import { useAuthUser } from "react-auth-kit";
+import { toast } from "react-toastify";
+
+interface HighlightedDocument {
+  name: string;
+  folder: string;
+  unique_id?: string;
+  rawtext: string;
+}
 
 interface ProposalSidepaneProps {
   section: Section;
@@ -49,7 +64,6 @@ interface ProposalSidepaneProps {
   totalSections: number;
   onNavigate: (direction: "prev" | "next") => void;
 }
-
 const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   section,
   contributors,
@@ -65,19 +79,121 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     compliance: false,
     winThemes: false,
     painPoints: false,
-    differentiation: false
+    differentiation: false,
+    highlightedDocs: false
   });
 
-  const toggleSection = (section: keyof typeof openSections) => {
+  const toggleSection = (sectionName: keyof typeof openSections) => {
     setOpenSections((prev) => ({
       ...prev,
-      [section]: !prev[section]
+      [sectionName]: !prev[sectionName]
     }));
   };
 
-  if (!section) return null;
+  // Initialize highlighted documents specifically for this section
+  const [highlightedDocuments, setHighlightedDocuments] = useState<HighlightedDocument[]>(() => {
+    // Ensure we're getting the correct highlighted documents for this specific section
+    return section?.highlightedDocuments || [];
+  });
+  // Whenever the section prop changes, update the local state
+  useEffect(() => {
+    setHighlightedDocuments(section?.highlightedDocuments || []);
+  }, [section]);
 
-  const hasSubheadings = section.subheadings && section.subheadings.length > 0;
+  // For tracking loading states of document content fetching
+  const [loadingDocuments, setLoadingDocuments] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  const getAuth = useAuthUser();
+  const auth = useMemo(() => getAuth(), [getAuth]);
+  const tokenRef = useRef(auth?.token || "default");
+
+  // Function to fetch file content
+  // Modified to just fetch content and return it
+  const getFileContent = async (fileName: string, folderName: string) => {
+    // Set loading state for this specific document
+    setLoadingDocuments((prev) => ({ ...prev, [fileName]: true }));
+
+    const formData = new FormData();
+    formData.append("file_name", fileName);
+    formData.append("profile_name", folderName);
+
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/show_file_content`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+
+      console.log(`Content fetched for ${fileName}`);
+      return response.data; // Just return the content
+    } catch (error) {
+      console.error("Error viewing file:", error);
+      toast.error(`Error retrieving content for ${fileName}`);
+      return ""; // Return empty string on error
+    } finally {
+      setLoadingDocuments((prev) => ({ ...prev, [fileName]: false }));
+    }
+  };
+
+  // This is a partial implementation showing only the changes needed for the highlightedDocuments logic
+
+  const handleSaveSelectedFiles = async (selectedFilesWithMetadata) => {
+    console.log("Received files with metadata:", selectedFilesWithMetadata);
+
+    if (!selectedFilesWithMetadata || selectedFilesWithMetadata.length === 0) {
+      console.log("No files selected, keeping existing documents");
+      return;
+    }
+
+    // Convert to HighlightedDocument objects with the correct rawtext
+    const documentObjects: HighlightedDocument[] = await Promise.all(
+      selectedFilesWithMetadata.map(async (file) => {
+        // Try to find existing document to preserve its rawtext if already fetched
+        const existingDoc = highlightedDocuments.find(
+          (doc) => doc.name === file.filename
+        );
+
+        // If existing document has rawtext, use it; otherwise, fetch the content
+        const rawtext =
+          (await getFileContent(file.filename, file.folder));
+
+        return {
+          name: file.filename,
+          folder: file.folder,
+          rawtext: rawtext
+        };
+      })
+    );
+
+    // Update the state and section with the new document objects
+    setHighlightedDocuments(documentObjects);
+    handleSectionChange(index, "highlightedDocuments", documentObjects);
+  };
+
+  const handleRemoveDocument = (document: HighlightedDocument) => {
+    const updatedDocs = highlightedDocuments.filter(
+      (doc) => doc.name !== document.name
+    );
+    
+    // Update local state
+    setHighlightedDocuments(updatedDocs);
+
+    // Update section through parent's change handler
+    handleSectionChange(index, "highlightedDocuments", updatedDocs);
+  };
+
+  // Get just the file names for the SelectFilePopup component
+  const selectedFileNames = useMemo(() => {
+    return highlightedDocuments.map((doc) => doc.name);
+  }, [highlightedDocuments]);
+
+  if (!section) return null;
 
   return (
     <>
@@ -126,6 +242,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   >
                     <FontAwesomeIcon icon={faChevronLeft} />
                   </Button>
+
                   <span>
                     Question {index + 1} of {totalSections}
                   </span>
@@ -139,13 +256,70 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     <FontAwesomeIcon icon={faChevronRight} />
                   </Button>
                 </div>
-                <StatusMenu
-                  value={section.status}
-                  onChange={(value) =>
-                    handleSectionChange(index, "status", value)
-                  }
-                />
+                <div className="flex flex-row gap-2">
+                  <StatusMenu
+                    value={section.status}
+                    onChange={(value) =>
+                      handleSectionChange(index, "status", value)
+                    }
+                  />
+                  <SelectFilePopup
+                    onSaveSelectedFiles={handleSaveSelectedFiles}
+                    initialSelectedFiles={selectedFileNames}
+                  />
+                </div>
               </div>
+
+              {/* Selected Files Display */}
+              {highlightedDocuments.length > 0 && (
+                <div className="space-y-2 min-h-10">
+                  <span
+                    className="font-medium flex items-center gap-1 cursor-pointer select-none"
+                    onClick={() => toggleSection("highlightedDocs")}
+                  >
+                    <ChevronRight
+                      className={cn(
+                        "w-5 h-5 transition-transform duration-200",
+                        openSections.highlightedDocs && "rotate-90"
+                      )}
+                    />
+                    Highlighted Documents ({highlightedDocuments.length})
+                  </span>
+                  {openSections.highlightedDocs && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {highlightedDocuments.map((doc, idx) => (
+                        <Badge
+                          key={idx}
+                          className={cn(
+                            "flex items-center gap-1 px-2 py-1 border",
+                            loadingDocuments[doc.name]
+                              ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                              : doc.rawtext
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : "bg-blue-50 text-blue-700 border-blue-200"
+                          )}
+                        >
+                          <FileIcon className="h-3 w-3" />
+                          <span className="max-w-xs truncate">{doc.name}</span>
+                          {loadingDocuments[doc.name] && (
+                            <span className="ml-1 text-xs">(loading...)</span>
+                          )}
+                          <button
+                            onClick={() => handleRemoveDocument(doc)}
+                            className="ml-1 text-blue-700 hover:text-blue-900"
+                          >
+                            <FontAwesomeIcon
+                              icon={faXmark}
+                              className="h-3 w-3"
+                            />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <ReviewerDropdown
@@ -179,6 +353,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   />
                 </div>
               </div>
+
               <div className="space-y-2">
                 <span className="text-lg font-semibold">Question</span>
                 <DebouncedTextArea
