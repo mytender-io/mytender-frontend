@@ -2,12 +2,13 @@ import React, { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import SupportChat from "@/components/SupportChat";
+import ProfilePhoto from "@/layout/ProfilePhoto";
 
 const BreadcrumbNavigation = ({
   currentPage,
   parentPages = [] as Array<{ name: string; path: string }>,
   showHome = true,
-  rightContent,
+  rightContent
 }: {
   currentPage: string;
   parentPages?: Array<{ name: string; path: string }>;
@@ -32,10 +33,11 @@ const BreadcrumbNavigation = ({
           <span className="text-gray-black font-semibold">{currentPage}</span>
         )}
       </div>
-      
+
       <div className="flex items-center gap-4">
         {rightContent}
         <SupportChat />
+        <ProfilePhoto size="md" />
       </div>
     </nav>
   );
