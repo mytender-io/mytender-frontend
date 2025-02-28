@@ -40,6 +40,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import MeshGradient from "@/components/mesh-gradient/MeshGradient";
 import { cn } from "@/utils";
+import { toast } from "react-toastify";
 
 const ProfilePage = () => {
   const getAuth = useAuthUser();
@@ -63,9 +64,8 @@ const ProfilePage = () => {
   const [inviteEmail, setInviteEmail] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [inviteError, setInviteError] = useState(null);
-  const [inviteSuccess, setInviteSuccess] = useState(null);
+  const [inviteError, setInviteError] = useState("");
+  const [inviteSuccess, setInviteSuccess] = useState("");
   const [organizationUsers, setOrganizationUsers] = useState([]);
 
   const [companyObjectivesSaveState, setCompanyObjectivesSaveState] =
@@ -102,6 +102,16 @@ const ProfilePage = () => {
             }
           }
         );
+
+        const profilePicture = await axios.get(
+          `http${HTTP_PREFIX}://${API_URL}/get_company_logo`,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`
+            }
+          }
+        );
+
         setFormData({
           username: response.data.login || "",
           email: response.data.email || "",
@@ -113,11 +123,12 @@ const ProfilePage = () => {
           productName: response.data.product_name || "",
           companyObjectives: response.data.company_objectives || "",
           toneOfVoice: response.data.tone_of_voice || "",
-          profilePicture: response.data.profile_picture || ""
+          profilePicture: profilePicture.data.image || ""
         });
         setLoading(false);
       } catch (err) {
-        setError("Failed to load profile data");
+        console.log(err);
+        toast.error("Failed to load profile data");
         setLoading(false);
       }
     };
@@ -125,10 +136,10 @@ const ProfilePage = () => {
     fetchUserData();
   }, [tokenRef]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-
-    console.log(name, value);
     setFormData((prevData) => ({
       ...prevData,
       [name]: value
@@ -206,15 +217,13 @@ const ProfilePage = () => {
     }
   }, [formData.userType]);
 
-  if (error) return <p>{error}</p>;
-
-  const handleInviteSubmit = async (e) => {
+  const handleInviteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setInviteError(null);
-    setInviteSuccess(null);
+    setInviteError("");
+    setInviteSuccess("");
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/invite_user`,
         { email: inviteEmail },
         {
@@ -228,7 +237,7 @@ const ProfilePage = () => {
         ...prevData,
         licences: prevData.licences - 1 // Deduct the license count
       }));
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error inviting user:", err);
 
       if (err.response) {
@@ -261,8 +270,10 @@ const ProfilePage = () => {
     }
   };
 
-  const handleProfilePictureUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleProfilePictureUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e?.target?.files?.[0];
     if (!file) return;
 
     const maxSize = 5 * 1024 * 1024; // 5MB
@@ -281,10 +292,24 @@ const ProfilePage = () => {
 
     try {
       const formData = new FormData();
-      formData.append("profile_picture", file);
+      formData.append("file", file);
 
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/upload_profile_picture`,
+      // Convert file to base64 for preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        // Extract the base64 data part (remove the data:image/xxx;base64, prefix)
+        const base64Data = base64String.split(",")[1];
+
+        setFormData((prev) => ({
+          ...prev,
+          profilePicture: base64Data
+        }));
+      };
+      reader.readAsDataURL(file);
+
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/set_company_logo`,
         formData,
         {
           headers: {
@@ -294,13 +319,10 @@ const ProfilePage = () => {
         }
       );
 
-      setFormData((prev) => ({
-        ...prev,
-        profilePicture: response.data.profile_picture_url
-      }));
+      toast.success("Profile picture updated successfully");
     } catch (err) {
       console.error("Error uploading profile picture:", err);
-      alert("Failed to upload profile picture. Please try again.");
+      toast.error("Failed to upload profile picture. Please try again.");
     } finally {
       setUploadingImage(false);
     }
@@ -317,7 +339,7 @@ const ProfilePage = () => {
   const parentPages = [] as Array<{ name: string; path: string }>;
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.4375rem]">
         <BreadcrumbNavigation
           currentPage="Profile"
@@ -326,7 +348,7 @@ const ProfilePage = () => {
         />
       </div>
 
-      <div className="flex-1 flex flex-col py-4 space-y-8">
+      <div className="flex-1 flex flex-col py-4 space-y-8 overflow-y-auto">
         <div className="space-y-2 px-6">
           <h1 className="text-2xl font-semibold">Profile Section</h1>
           <p className="text-base text-muted-foreground">
@@ -342,7 +364,7 @@ const ProfilePage = () => {
                     <div className="absolute left-8 top-8 flex items-center justify-center bg-orange-lighter rounded-full w-32 h-32 border border-white overflow-hidden group">
                       {formData.profilePicture ? (
                         <img
-                          src={formData.profilePicture}
+                          src={`data:image/jpeg;base64,${formData.profilePicture}`}
                           alt="Profile"
                           className="w-full h-full object-cover"
                         />
@@ -409,7 +431,7 @@ const ProfilePage = () => {
                                   id="username"
                                   name="username"
                                   value={formData.username}
-                                  placeholder="Jamie Horsnell"
+                                  placeholder="Username"
                                   readOnly
                                   className="border-none outline-none shadow-none text-gray-hint_text focus:border-none focus:outline-none focus-visible:ring-0"
                                 />
@@ -687,15 +709,17 @@ const ProfilePage = () => {
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                  {organizationUsers.map((user, index) => (
-                                    <TableRow key={index}>
-                                      <TableCell>{user.email}</TableCell>
-                                      <TableCell>
-                                        {user.username || "Request Pending"}
-                                      </TableCell>
-                                      <TableCell>{user.role}</TableCell>
-                                    </TableRow>
-                                  ))}
+                                  {organizationUsers.map(
+                                    (user: any, index: number) => (
+                                      <TableRow key={index}>
+                                        <TableCell>{user.email}</TableCell>
+                                        <TableCell>
+                                          {user.username || "Request Pending"}
+                                        </TableCell>
+                                        <TableCell>{user.role}</TableCell>
+                                      </TableRow>
+                                    )
+                                  )}
                                 </TableBody>
                               </Table>
                             </CardContent>
@@ -732,7 +756,9 @@ const ProfilePage = () => {
                           id="companyObjectives"
                           name="companyObjectives"
                           value={formData.companyObjectives}
-                          onChange={handleInputChange}
+                          onChange={(e: React.ChangeEvent<HTMLElement>) =>
+                            handleInputChange(e)
+                          }
                           placeholder="Outline your company's overall mission..."
                           className="min-h-[150px]"
                         />
@@ -767,7 +793,9 @@ const ProfilePage = () => {
                           id="toneOfVoice"
                           name="toneOfVoice"
                           value={formData.toneOfVoice}
-                          onChange={handleInputChange}
+                          onChange={(e: React.ChangeEvent<HTMLElement>) =>
+                            handleInputChange(e)
+                          }
                           placeholder="Define the preferred tone..."
                           className="min-h-[100px]"
                         />
