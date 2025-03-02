@@ -67,7 +67,7 @@ const GenerateProposalModal = ({
     "Ensuring compliance with tender requirements from compliance inputs...",
     "Adding the final improvements...",
     "Almost there! Just applying the finishing touches...",
-    "All done! Ready to secure that contract."
+    "Finalizing the proposal..."
   ];
 
   const incompleteSections =
