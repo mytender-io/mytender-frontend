@@ -23,10 +23,12 @@ type BidStatus =
 
 const BidStatusMenu = ({
   value,
-  onChange
+  onChange,
+  disabled = false
 }: {
   value: string;
   onChange: (value: BidStatus) => void;
+  disabled?: boolean;
 }) => {
   const statusMapping: { [key: string]: BidStatus } = {
     Identification: "Planning",
@@ -64,7 +66,6 @@ const BidStatusMenu = ({
       Complete:
         "bg-status-success_light text-status-success hover:text-status-success hover:bg-status-success_light/90 border-status-success"
     };
-
     return styles[status];
   };
 
@@ -84,12 +85,13 @@ const BidStatusMenu = ({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild disabled={disabled}>
         <Button
           variant="ghost"
           className={cn(
             "font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px]",
-            getStatusStyles(currentStatus)
+            getStatusStyles(currentStatus),
+            disabled && "opacity-50 cursor-not-allowed pointer-events-none"
           )}
         >
           {currentStatus}
@@ -101,19 +103,21 @@ const BidStatusMenu = ({
           (status) => {
             const statusItem = normalizeStatus(status);
             const StatusIcon = getStatusIcon(statusItem);
-
             return (
               <DropdownMenuItem
                 key={status}
                 onClick={() => onChange(status as BidStatus)}
                 className="px-0 py-0"
+                disabled={disabled}
               >
                 <Button
                   variant="ghost"
                   className={cn(
                     "font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px] w-full",
-                    getStatusStyles(statusItem)
+                    getStatusStyles(statusItem),
+                    disabled && "opacity-50 cursor-not-allowed"
                   )}
+                  disabled={disabled}
                 >
                   {status}
                   <StatusIcon className="ml-2 h-4 w-4" />

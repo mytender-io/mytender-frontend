@@ -46,7 +46,8 @@ interface Bid {
   bid_manager?: string;
   opportunity_owner?: string;
   bid_qualification_result?: string;
-  [key: string]: string | undefined; // Index signature for dynamic access
+  win_themes?: string[];
+  [key: string]: string | string[] | undefined; // Index signature for dynamic access
 }
 
 interface SortConfig {
@@ -73,6 +74,24 @@ const Bids = () => {
   const navigate = useNavigate();
 
   const [viewType, setViewType] = useState("table"); // or 'kanban'
+
+  // Function to check if a bid was edited less than 20 minutes ago and has empty win themes
+  const isRecentlyCreatedWithEmptyThemes = (bid: Bid): boolean => {
+    // Check if timestamp exists
+    if (!bid.timestamp) return false;
+    
+    // Calculate time difference in minutes
+    const bidTime = new Date(bid.timestamp).getTime();
+    const currentTime = new Date().getTime();
+    const timeDiffMinutes = (currentTime - bidTime) / (1000 * 60);
+    
+    // Check if win_themes array is empty or undefined
+    const hasEmptyWinThemes = !bid.win_themes || 
+                             (Array.isArray(bid.win_themes) && bid.win_themes.length === 0);
+    
+    // Return true if edited less than 20 minutes ago and has empty win themes
+    return timeDiffMinutes < 20 && hasEmptyWinThemes;
+  };
 
   // Modify the ViewToggle button click handler
   const handleViewChange = (view: "table" | "kanban") => {
@@ -215,6 +234,12 @@ const Bids = () => {
   }, [sortedBids, currentPage, pageSize]);
 
   const navigateToChatbot = (bid: Bid) => {
+    // Check if bid is disabled
+    if (isRecentlyCreatedWithEmptyThemes(bid)) {
+      toast.info("This tender is still being created. Please try again later.");
+      return;
+    }
+
     localStorage.setItem("navigatedFromBidsTable", "true");
     localStorage.removeItem("bidState");
     navigate("/bid-extractor", { state: { bid: bid, fromBidsTable: true } });
@@ -474,53 +499,64 @@ const Bids = () => {
                         .fill(0)
                         .map((_, index) => <SkeletonRow key={index} />)
                     ) : currentBids.length > 0 ? (
-                      currentBids.map((bid) => (
-                        <TableRow key={bid._id}>
-                          <TableCell className="px-4 group">
-                            <Link
-                              to="/bid-extractor"
-                              state={{ bid: bid, fromBidsTable: true }}
-                              onClick={() => navigateToChatbot(bid)}
-                              className="block truncate w-full text-gray-hint_text no-underline group-hover:text-orange group-hover:font-bold transition-colors duration-200"
-                            >
-                              {bid.bid_title}
-                            </Link>
-                          </TableCell>
-                          <TableCell className="px-4">
-                            {bid.timestamp
-                              ? formatDistanceToNow(new Date(bid.timestamp), {
-                                  addSuffix: true,
-                                  locale: customLocale
-                                })
-                              : ""}
-                          </TableCell>
-                          <TableCell className="px-4">{bid.value}</TableCell>
-                          <TableCell className="px-4">
-                            {bid.submission_deadline &&
-                            !isNaN(Date.parse(bid.submission_deadline))
-                              ? new Date(
-                                  bid.submission_deadline
-                                ).toLocaleDateString()
-                              : ""}
-                          </TableCell>
-                          <TableCell className="px-4">
-                            <BidStatusMenu
-                              value={bid.status}
-                              onChange={(value) => {
-                                updateBidStatus(bid._id, value);
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell className="w-[100px] text-right px-4">
-                            <EllipsisMenuDashboard
-                              onClick={() => handleDeleteClick(bid._id)}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))
+                      currentBids.map((bid) => {
+                        const isDisabled = isRecentlyCreatedWithEmptyThemes(bid);
+                        return (
+                          <TableRow key={bid._id} className={isDisabled ? "opacity-50" : ""}>
+                            <TableCell className="px-4 group">
+                              {isDisabled ? (
+                                <span className="block truncate w-full text-gray-400 cursor-not-allowed">
+                                  {bid.bid_title} (Creating...)
+                                </span>
+                              ) : (
+                                <Link
+                                  to="/bid-extractor"
+                                  state={{ bid: bid, fromBidsTable: true }}
+                                  onClick={() => navigateToChatbot(bid)}
+                                  className="block truncate w-full text-gray-hint_text no-underline group-hover:text-orange group-hover:font-bold transition-colors duration-200"
+                                >
+                                  {bid.bid_title}
+                                </Link>
+                              )}
+                            </TableCell>
+                            <TableCell className="px-4">
+                              {bid.timestamp
+                                ? formatDistanceToNow(new Date(bid.timestamp), {
+                                    addSuffix: true,
+                                    locale: customLocale
+                                  })
+                                : ""}
+                            </TableCell>
+                            <TableCell className="px-4">{bid.value}</TableCell>
+                            <TableCell className="px-4">
+                              {bid.submission_deadline &&
+                              !isNaN(Date.parse(bid.submission_deadline))
+                                ? new Date(
+                                    bid.submission_deadline
+                                  ).toLocaleDateString()
+                                : ""}
+                            </TableCell>
+                            <TableCell className="px-4">
+                              <BidStatusMenu
+                                value={bid.status}
+                                onChange={(value) => {
+                                  updateBidStatus(bid._id, value);
+                                }}
+                               disabled={isDisabled}
+                              />
+                            </TableCell>
+                            <TableCell className="w-[100px] text-right px-4">
+                              <EllipsisMenuDashboard
+                                onClick={() => handleDeleteClick(bid._id)}
+                                disabled={isDisabled}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
                     ) : (
                       <TableRow>
-                        <TableCell className="text-center py-4">
+                        <TableCell className="text-center py-4" colSpan={6}>
                           No matching tenders found
                         </TableCell>
                       </TableRow>
@@ -547,6 +583,7 @@ const Bids = () => {
           show={showModal}
           onHide={handleModalClose}
           existingBids={bids}
+          fetchBids={fetchBids}
         />
 
         <DeleteConfirmationDialog

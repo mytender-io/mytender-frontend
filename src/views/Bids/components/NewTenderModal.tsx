@@ -33,6 +33,7 @@ interface NewTenderModalProps {
   show: boolean;
   onHide: () => void;
   existingBids: Array<{ bid_title: string }>;
+  fetchBids: () => void;
 }
 
 type Step = "details" | "documents" | "content" | "questions";
@@ -40,11 +41,12 @@ type Step = "details" | "documents" | "content" | "questions";
 const LoadingOverlay = ({
   isOpen,
   progress,
-  loadingMessage
+  loadingMessage,
 }: {
   isOpen: boolean;
   progress: number;
   loadingMessage: string;
+
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -110,7 +112,8 @@ const LoadingOverlay = ({
 const NewTenderModal: React.FC<NewTenderModalProps> = ({
   show,
   onHide,
-  existingBids
+  existingBids,
+  fetchBids
 }) => {
   const getAuth = useAuthUser();
   const auth = useMemo(() => getAuth(), [getAuth]);
@@ -321,13 +324,14 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       toast.error("Please select at least one content folder");
       return;
     }
+    
     try {
       setIsGeneratingOutline(true);
       startProgressBar();
       console.log(selectedFiles);
-
-      // Capture the response from the API call
-      const response = await axios.post(
+      
+      // Start the outline generation API call (don't await it yet)
+      const outlinePromise = axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_outline`,
         {
           bid_id: sharedState.object_id,
@@ -341,15 +345,26 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
           }
         }
       );
-
+      
+      // Wait for 6 seconds - during this time the bid should be created
+      // while the outline is still generating
+      await new Promise(resolve => setTimeout(resolve, 6000));
+      
+      // Fetch the bids to update the list now that the bid should be created
+      await fetchBids();
+      console.log("Bids refreshed while outline is still generating");
+      
+      // Now await the outline response
+      const response = await outlinePromise;
+      
       console.log("outline final submit");
       console.log(response.data.outline);
       console.log(response.data.tender_summary);
       console.log(response.data.evaluation_criteria);
       console.log(response.data.pain_points);
       console.log(response.data.differentiation_opportunities);
-
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      
+      // Update shared state with outline data
       setSharedState((prevState) => ({
         ...prevState,
         outline: response.data?.outline || [],
@@ -363,11 +378,12 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         differentiating_factors:
           response.data?.relevant_differentiation_opportunities || []
       }));
-
+      
+      // Navigate after updating shared state
       navigate("/bid-extractor");
-
       resetForm();
       onHide();
+      
     } catch (err) {
       console.error("Full error:", err.response?.data);
       handleError(err);
