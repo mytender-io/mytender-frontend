@@ -182,7 +182,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                     isActive("/bid-extractor") ||
                     isActive("/bid-intel") ||
                     isActive("/proposal-planner") ||
-                    isActive("/proposal-review")
+                    isActive("/proposal-preview")
                     ? "text-orange"
                     : "text-gray-hint_text"
                 )}
@@ -197,7 +197,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                       isActive("/bid-extractor") ||
                       isActive("/bid-intel") ||
                       isActive("/proposal-planner") ||
-                      isActive("/proposal-review")
+                      isActive("/proposal-preview")
                       ? "text-orange font-bold"
                       : "text-gray-hint_text"
                   )}
