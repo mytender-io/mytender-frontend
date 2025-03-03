@@ -271,50 +271,35 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
               {/* Selected Files Display */}
               {highlightedDocuments.length > 0 && (
                 <div className="space-y-2 min-h-10">
-                  <span
-                    className="font-medium flex items-center gap-1 cursor-pointer select-none"
-                    onClick={() => toggleSection("highlightedDocs")}
-                  >
-                    <ChevronRight
-                      className={cn(
-                        "w-5 h-5 transition-transform duration-200",
-                        openSections.highlightedDocs && "rotate-90"
-                      )}
-                    />
-                    Highlighted Documents ({highlightedDocuments.length})
-                  </span>
-                  {openSections.highlightedDocs && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {highlightedDocuments.map((doc, idx) => (
-                        <Badge
-                          key={idx}
-                          className={cn(
-                            "flex items-center gap-1 px-2 py-1 border",
-                            loadingDocuments[doc.name]
-                              ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                              : doc.rawtext
-                                ? "bg-green-50 text-green-700 border-green-200"
-                                : "bg-blue-50 text-blue-700 border-blue-200"
-                          )}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {highlightedDocuments.map((doc, idx) => (
+                      <Badge
+                        key={idx}
+                        className={cn(
+                          "flex items-center gap-1 px-2 py-1 border",
+                          loadingDocuments[doc.name]
+                            ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                            : doc.rawtext
+                              ? "bg-green-50 text-green-700 border-green-200"
+                              : "bg-blue-50 text-blue-700 border-blue-200"
+                        )}
+                      >
+                        <FileIcon className="h-3 w-3" />
+                        <span className="max-w-xs truncate">{doc.name}</span>
+                        {loadingDocuments[doc.name] && (
+                          <span className="ml-1 text-xs">(loading...)</span>
+                        )}
+                        <Button
+                          onClick={() => handleRemoveDocument(doc)}
+                          variant="ghost"
+                          size="icon"
+                          className="ml-1 h-4 w-4 p-0"
                         >
-                          <FileIcon className="h-3 w-3" />
-                          <span className="max-w-xs truncate">{doc.name}</span>
-                          {loadingDocuments[doc.name] && (
-                            <span className="ml-1 text-xs">(loading...)</span>
-                          )}
-                          <button
-                            onClick={() => handleRemoveDocument(doc)}
-                            className="ml-1 text-blue-700 hover:text-blue-900"
-                          >
-                            <FontAwesomeIcon
-                              icon={faXmark}
-                              className="h-3 w-3"
-                            />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
+                          <FontAwesomeIcon icon={faXmark} className="h-3 w-3" />
+                        </Button>
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               )}
 
