@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import axios from "axios";
 import withAuth from "../../routes/withAuth.tsx";
@@ -38,7 +37,8 @@ import {
   KeyboardSensor,
   PointerSensor,
   useSensor,
-  useSensors
+  useSensors,
+  DragOverlay
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -50,11 +50,11 @@ import { CSS } from "@dnd-kit/utilities";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/utils";
 
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
-  const navigate = useNavigate();
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState, setSharedState } = useContext(BidContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -91,6 +91,8 @@ const ProposalPlan = () => {
     section: Section;
     index: number;
   } | null>(null);
+
+  const [activeId, setActiveId] = useState(null);
 
   // Bulk Update functions
   const handleSelectSection = (index) => {
@@ -606,24 +608,24 @@ const ProposalPlan = () => {
     }
   };
 
-  const handleChoiceSelection = (selectedChoice) => {
-    if (selectedChoices.includes(selectedChoice)) {
-      setSelectedChoices(
-        selectedChoices.filter((choice) => choice !== selectedChoice)
-      );
-      setWordAmounts((prevWordAmounts) => {
-        const newWordAmounts = { ...prevWordAmounts };
-        delete newWordAmounts[selectedChoice];
-        return newWordAmounts;
-      });
-    } else {
-      setSelectedChoices([...selectedChoices, selectedChoice]);
-      setWordAmounts((prevWordAmounts) => ({
-        ...prevWordAmounts,
-        [selectedChoice]: 100 // Default word amount
-      }));
-    }
-  };
+  // const handleChoiceSelection = (selectedChoice) => {
+  //   if (selectedChoices.includes(selectedChoice)) {
+  //     setSelectedChoices(
+  //       selectedChoices.filter((choice) => choice !== selectedChoice)
+  //     );
+  //     setWordAmounts((prevWordAmounts) => {
+  //       const newWordAmounts = { ...prevWordAmounts };
+  //       delete newWordAmounts[selectedChoice];
+  //       return newWordAmounts;
+  //     });
+  //   } else {
+  //     setSelectedChoices([...selectedChoices, selectedChoice]);
+  //     setWordAmounts((prevWordAmounts) => ({
+  //       ...prevWordAmounts,
+  //       [selectedChoice]: 100 // Default word amount
+  //     }));
+  //   }
+  // };
 
   // const renderChoices = () => {
   //   return (
@@ -739,12 +741,12 @@ const ProposalPlan = () => {
   };
 
   const parentPages = [{ name: "Tender Dashboard", path: "/bids" }];
-  const location = useLocation();
   const initialBidName = sharedState.bidInfo;
 
-  // Add this function to handle drag end events
+  // Update handleDragEnd to also clear the activeId
   const handleDragEnd = (event) => {
     const { active, over } = event;
+    setActiveId(null);
 
     if (active.id !== over.id) {
       const oldIndex = outline.findIndex(
@@ -775,6 +777,12 @@ const ProposalPlan = () => {
     }
   };
 
+  // Add this function to handle drag start
+  const handleDragStart = (event) => {
+    const { active } = event;
+    setActiveId(active.id);
+  };
+
   // Set up sensors for drag and drop
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -795,7 +803,8 @@ const ProposalPlan = () => {
       setNodeRef,
       transform,
       transition,
-      isDragging
+      isDragging,
+      over
     } = useSortable({ id: section.section_id });
 
     const style = {
@@ -806,11 +815,18 @@ const ProposalPlan = () => {
       position: "relative" as const
     };
 
+    // Add this to show the orange indicator line
+    const isOver = over?.id === section.section_id;
+
     return (
       <TableRow
         ref={setNodeRef}
         style={style}
-        className={`cursor-pointer hover:bg-muted/50 ${isDragging ? "bg-muted/50" : ""}`}
+        className={cn(
+          "cursor-pointer hover:bg-muted/50",
+          isDragging && "bg-muted/50",
+          isOver && "border-t border-orange"
+        )}
         onClick={(e) => handleRowClick(e, index)}
         onContextMenu={(e) => handleContextMenu(e, index)}
       >
@@ -965,6 +981,7 @@ const ProposalPlan = () => {
                       sensors={sensors}
                       collisionDetection={closestCenter}
                       onDragEnd={handleDragEnd}
+                      onDragStart={handleDragStart}
                       modifiers={[restrictToVerticalAxis]}
                     >
                       <SortableContext
@@ -1041,6 +1058,21 @@ const ProposalPlan = () => {
                     canRevert={canRevert}
                   />
                 )}
+
+                {/* Add DragOverlay for better visual feedback */}
+                <DragOverlay>
+                  {activeId ? (
+                    <TableRow className="bg-background border shadow-md">
+                      <TableCell colSpan={8} className="px-4">
+                        {
+                          outline.find(
+                            (section) => section.section_id === activeId
+                          )?.heading
+                        }
+                      </TableCell>
+                    </TableRow>
+                  ) : null}
+                </DragOverlay>
               </div>
             )}
           </div>
