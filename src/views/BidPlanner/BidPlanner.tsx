@@ -88,11 +88,17 @@ const BidPlanner = () => {
           outline: bidData?.outline || [],
           win_themes: bidData?.win_themes || [],
           customer_pain_points: bidData?.customer_pain_points || [],
-          differentiating_factors: bidData?.differentiating_factors || []
+          differentiating_factors: bidData?.differentiating_factors || [],
+          solution: bidData?.solution || {
+            product: "",
+            features: "",
+            approach: ""
+          }
         };
       });
       console.log("bid planner");
       console.log(bidData?.selectedFolders);
+      console.log(bidData?.solution);
       localStorage.setItem("navigatedFromBidsTable", "false");
     }
   }, []);
