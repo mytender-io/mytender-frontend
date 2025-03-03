@@ -3,11 +3,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
-  faPlus,
-  faFile,
   faXmark
 } from "@fortawesome/free-solid-svg-icons";
-import DebouncedTextArea from "./DeboucedTextArea";
+import DebouncedTextArea from "./DebouncedTextArea";
 import SubheadingCards from "./SubheadingCards";
 import RegenerateButton from "./RegenerateButton";
 import { Contributor, Section } from "../../BidWritingStateManagerView";
@@ -15,7 +13,6 @@ import StatusMenu from "@/buttons/StatusMenu";
 import ReviewerDropdown from "@/views/BidOutline/components/ReviewerDropdown";
 import QuestionTypeDropdown from "@/views/BidOutline/components/QuestionTypeDropdown";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/utils";
@@ -91,7 +88,9 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   };
 
   // Initialize highlighted documents specifically for this section
-  const [highlightedDocuments, setHighlightedDocuments] = useState<HighlightedDocument[]>(() => {
+  const [highlightedDocuments, setHighlightedDocuments] = useState<
+    HighlightedDocument[]
+  >(() => {
     // Ensure we're getting the correct highlighted documents for this specific section
     return section?.highlightedDocuments || [];
   });
@@ -160,8 +159,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
         );
 
         // If existing document has rawtext, use it; otherwise, fetch the content
-        const rawtext =
-          (await getFileContent(file.filename, file.folder));
+        const rawtext = await getFileContent(file.filename, file.folder);
 
         return {
           name: file.filename,
@@ -180,7 +178,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     const updatedDocs = highlightedDocuments.filter(
       (doc) => doc.name !== document.name
     );
-    
+
     // Update local state
     setHighlightedDocuments(updatedDocs);
 

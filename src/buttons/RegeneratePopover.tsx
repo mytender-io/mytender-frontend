@@ -17,7 +17,7 @@ const RegeneratePopover = ({
   isLoading = false
 }) => {
   const [instructions, setInstructions] = useState("");
- 
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onRegenerateSubheading(e, subIndex, instructions);
@@ -31,10 +31,10 @@ const RegeneratePopover = ({
         onOpenChange={(open) => onOpenChange(open, subIndex)}
       >
         <PopoverTrigger asChild>
-          <button className="flex items-center space-x-1 px-2 py-1 text-lg text-gray-600 hover:text-gray-900 transition-colors">
-            <Sparkles className="h-6 w-6 me-2" />
-            <span className="text-lg">Modify</span>
-          </button>
+          <Button variant="ghost" className="[&_svg]:w-6 [&_svg]:h-6">
+            <Sparkles className="text-gray-hint_text" />
+            <span className="text-gray-hint_text">Modify</span>
+          </Button>
         </PopoverTrigger>
         <PopoverContent
           className="w-[450px] z-[9999] relative text-lg"
@@ -48,7 +48,7 @@ const RegeneratePopover = ({
               placeholder="Type instructions to adjust subsection"
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
-              className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-lg !text-lg md:!text-lg h-12 px-4 placeholder:text-lg"
+              className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-lg h-12 px-4 placeholder:text-lg"
               disabled={isLoading}
             />
             {isLoading ? (

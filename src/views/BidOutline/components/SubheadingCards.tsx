@@ -3,14 +3,11 @@ import { useCallback, useState, useRef, useContext, useMemo } from "react";
 import { useAuthUser } from "react-auth-kit";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
-import DebouncedTextArea from "./DeboucedTextArea";
-import { Plus, PlusIcon, Trash } from "lucide-react";
+import DebouncedTextArea from "./DebouncedTextArea";
+import { PlusIcon, Trash } from "lucide-react";
 import RegeneratePopover from "@/buttons/RegeneratePopover";
 import RegenerateButton from "./RegenerateButton";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 
 const SubheadingCards = ({
@@ -172,16 +169,18 @@ const SubheadingCards = ({
   };
 
   return (
-    <div className="sidepane-section">
-      <div className="proposal-header mb-4">
+    <div>
+      <div className="flex items-center justify-between mb-4">
         <div>Writing Plan</div>
         <div className="flex items-center">
-          <button
-            className="bg-white rounded-lg p-2 me-2 shadow-sm hover:bg-gray-50 transition-colors"
+          <Button
+            variant="outline"
+            size="icon"
+            className="me-2"
             onClick={handleAddSubheading}
           >
-            <PlusIcon className="w-6 h-6" />
-          </button>
+            <PlusIcon className="w-4 h-4" />
+          </Button>
           <RegenerateButton
             section={section}
             index={index}
@@ -195,29 +194,26 @@ const SubheadingCards = ({
         {section.subheadings.map((subheading, subIndex) => (
           <div key={subIndex} className="bg-white rounded-lg shadow-md">
             <div className="p-2 bg-gray-50 border-b">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div className="flex-1">
                   <DebouncedTextArea
                     value={subheading.title}
                     onChange={(value) => handleTitleChange(subIndex, value)}
-                    className="w-full bg-transparent resize-none focus:outline-none"
-                    style={{
-                      minHeight: "24px",
-                      padding: "2px",
-                      lineHeight: "20px"
-                    }}
+                    className="w-full bg-transparent resize-none focus:outline-none min-h-6 p-1"
                     placeholder="Write the name of the subtopic..."
                     rows={1}
                   />
                 </div>
                 <div className="flex items-center space-x-2">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => handleDeleteSubheading(index, subIndex)}
-                    className="p-2 text-gray-500 hover:text-red-500 transition-colors flex-shrink-0"
+                    className="text-gray-500 hover:text-red-500 transition-colors flex-shrink-0"
                     title="Delete subheading"
                   >
-                    <Trash className="h-6 w-6" />
-                  </button>
+                    <Trash className="h-4 w-4" />
+                  </Button>
 
                   <RegeneratePopover
                     subIndex={subIndex}
