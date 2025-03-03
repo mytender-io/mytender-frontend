@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from .views import calculator, guide, home, create_checkout_session, cancel, success, trial_signup
+from .views import calculator, guide, home, create_checkout_session, cancel, success, trial_signup, trial_signup_oxygen_finance
 from django.views.generic import TemplateView
 
 urlpatterns = [
@@ -26,6 +26,7 @@ urlpatterns = [
     path('create-checkout-session/', create_checkout_session, name='create-checkout-session'),
     path('terms_and_conditions', TemplateView.as_view(template_name="terms_and_conditions.html"), name='terms_and_conditions'),
     path('data_protection_overview', TemplateView.as_view(template_name="data_protection_overview.html"), name='data_protection_overview'),
-    path('bidstats', trial_signup, name='landing_page')
+    path('bidstats', trial_signup, name='landing_page'),
+    path('oxygen-finance', trial_signup_oxygen_finance, name='landing_page_oxygen_finance')
 ]
 

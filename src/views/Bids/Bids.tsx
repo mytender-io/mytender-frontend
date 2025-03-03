@@ -376,6 +376,7 @@ const Bids = () => {
   const handleModalClose = () => {
     setShowModal(false);
     setBidName("");
+    fetchBids();
   };
 
   const SkeletonRow = () => (

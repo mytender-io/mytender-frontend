@@ -82,6 +82,61 @@ def trial_signup(request):
     else:
         form = TrialSignupForm()
     
+    return render(request, 'bidstatsLandingPage.html', {'form': form})
+
+def trial_signup_oxygen_finance(request):
+    print("testing")
+    if request.method == 'POST':
+        form = TrialSignupForm(request.POST)
+        print("post")
+        if form.is_valid():
+            try:
+                # Get cleaned data
+                data = form.cleaned_data
+                
+                # Generate trial coupon/credentials here
+                trial_code = "BIDSTATS2024"
+                print(f"Trial form submitted: {data['email']}")
+                
+                # Send welcome email with trial credentials
+                welcome_message = f"""
+                Hi {data['first_name']},
+
+                Thank you for signing up for a free trial of mytender.io!
+                Your trial code is: {trial_code}
+                
+                You can activate your trial by entering the discount code in your stripe checkout.
+                Your trial will be valid for 14 days.
+
+                If you have any questions, please contact us at info@mytender.io.
+
+                Best regards,
+                The mytender.io Team
+                """
+                
+                send_mail(
+                    subject="Welcome to mytender.io - Your Free Trial",
+                    message=welcome_message,
+                    from_email="sam@mytender.io",
+                    recipient_list=[data['email']],
+                    fail_silently=False,
+                )
+                
+                # Log the signup
+                logger.info(f"New trial signup: {data['email']} - Company Size: {data['company_size']}")
+                
+                messages.add_message(request, messages.SUCCESS, "Thank you! Your trial credentials have been sent to your email.")
+                return redirect('trial_success')
+                
+            except Exception as e:
+                logger.error(f"Error processing trial signup: {e}")
+                messages.add_message(request, messages.ERROR, "Sorry, there was an error processing your request. Please try again.")
+        else:
+            print("Form errors:", form.errors)
+            messages.add_message(request, messages.ERROR, "Please correct the errors below.")
+    else:
+        form = TrialSignupForm()
+    
     return render(request, 'oxygenFinanceLandingPage.html', {'form': form})
 
 
