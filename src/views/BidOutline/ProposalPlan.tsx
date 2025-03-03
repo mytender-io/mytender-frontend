@@ -30,8 +30,26 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox.tsx";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DeleteConfirmationDialog } from "../../modals/DeleteConfirmationModal.tsx";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { GripVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
@@ -724,6 +742,162 @@ const ProposalPlan = () => {
   const location = useLocation();
   const initialBidName = sharedState.bidInfo;
 
+  // Add this function to handle drag end events
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      const oldIndex = outline.findIndex(
+        (section) => section.section_id === active.id
+      );
+      const newIndex = outline.findIndex(
+        (section) => section.section_id === over.id
+      );
+
+      setSharedState((prevState) => {
+        const newOutline = [...prevState.outline];
+        const [movedItem] = newOutline.splice(oldIndex, 1);
+        newOutline.splice(newIndex, 0, movedItem);
+
+        return {
+          ...prevState,
+          outline: newOutline
+        };
+      });
+
+      // Track the drag and drop action
+      posthog.capture("proposal_section_reordered", {
+        bidId: object_id,
+        sectionId: active.id,
+        oldIndex,
+        newIndex
+      });
+    }
+  };
+
+  // Set up sensors for drag and drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8
+      }
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  );
+
+  // Create a sortable table row component
+  const SortableTableRow = ({ section, index }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging
+    } = useSortable({ id: section.section_id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+      zIndex: isDragging ? 1 : 0,
+      position: "relative" as const
+    };
+
+    return (
+      <TableRow
+        ref={setNodeRef}
+        style={style}
+        className={`cursor-pointer hover:bg-muted/50 ${isDragging ? "bg-muted/50" : ""}`}
+        onClick={(e) => handleRowClick(e, index)}
+        onContextMenu={(e) => handleContextMenu(e, index)}
+      >
+        <TableCell className="w-[60px] px-4" data-checkbox>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              className="cursor-grab touch-none px-1 h-6"
+              {...attributes}
+              {...listeners}
+            >
+              <GripVertical size={16} />
+            </Button>
+            <Checkbox
+              checked={selectedSections.has(index)}
+              onCheckedChange={() => handleSelectSection(index)}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </TableCell>
+        <TableCell className="px-4">
+          <div className="truncate max-w-md">
+            <span>{section.heading}</span>
+          </div>
+        </TableCell>
+        <TableCell className="px-4">
+          <div className="flex items-center justify-center">
+            <ReviewerDropdown
+              value={section.reviewer}
+              onChange={(value) =>
+                handleSectionChange(index, "reviewer", value)
+              }
+              contributors={contributors}
+            />
+          </div>
+        </TableCell>
+        <TableCell className="px-4">
+          <div className="flex items-center justify-center">
+            <QuestionTypeDropdown
+              value={section.choice}
+              onChange={(value) => handleSectionChange(index, "choice", value)}
+            />
+          </div>
+        </TableCell>
+        <TableCell className="px-4">
+          <div className="flex items-center justify-center" data-status-menu>
+            <StatusMenu
+              value={section.status}
+              onChange={(value) => {
+                handleSectionChange(index, "status", value);
+              }}
+            />
+          </div>
+        </TableCell>
+        <TableCell className="px-4 text-center">
+          {section.subsections}
+        </TableCell>
+        <TableCell className="px-4">
+          <div className="flex items-center justify-center">
+            <Input
+              type="number"
+              value={section.word_count || 0}
+              min={0}
+              step={50}
+              className="w-20 text-center"
+              onChange={(e) => {
+                const value = parseInt(e.target.value);
+                if (!isNaN(value) && value >= 0) {
+                  handleSectionChange(index, "word_count", value);
+                }
+              }}
+            />
+          </div>
+        </TableCell>
+        <TableCell className="w-[60px] text-right px-4">
+          <SectionControls
+            onDelete={() => handleDeleteClick(section, index)}
+            onMoveDown={() => handleMoveSection(index, "down")}
+            onMoveUp={() => handleMoveSection(index, "up")}
+            isFirst={index === 0}
+            isLast={index === outline.length - 1}
+          />
+        </TableCell>
+      </TableRow>
+    );
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
@@ -755,7 +929,7 @@ const ProposalPlan = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
+                        <TableHead className="w-[60px] flex items-center justify-end gap-2 h-full text-sm text-typo-900 font-semibold py-3.5 px-4">
                           <Checkbox
                             checked={selectedSections.size === outline.length}
                             onCheckedChange={(checked) =>
@@ -787,98 +961,27 @@ const ProposalPlan = () => {
                         </TableHead>
                       </TableRow>
                     </TableHeader>
-                    <TableBody>
-                      {outline.map((section, index) => (
-                        <TableRow
-                          key={index}
-                          className="cursor-pointer hover:bg-muted/50"
-                          onClick={(e) => handleRowClick(e, index)}
-                          onContextMenu={(e) => handleContextMenu(e, index)}
-                        >
-                          <TableCell className="px-4" data-checkbox>
-                            <Checkbox
-                              checked={selectedSections.has(index)}
-                              onCheckedChange={() => handleSelectSection(index)}
-                              onClick={(e) => e.stopPropagation()}
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                      modifiers={[restrictToVerticalAxis]}
+                    >
+                      <SortableContext
+                        items={outline.map((section) => section.section_id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <TableBody>
+                          {outline.map((section, index) => (
+                            <SortableTableRow
+                              key={section.section_id}
+                              section={section}
+                              index={index}
                             />
-                          </TableCell>
-                          <TableCell className="px-4">
-                            <div className="truncate max-w-md">
-                              <span>{section.heading}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="px-4">
-                            <div className="flex items-center justify-center">
-                              <ReviewerDropdown
-                                value={section.reviewer}
-                                onChange={(value) =>
-                                  handleSectionChange(index, "reviewer", value)
-                                }
-                                contributors={contributors}
-                              />
-                            </div>
-                          </TableCell>
-                          <TableCell className="px-4">
-                            <div className="flex items-center justify-center">
-                              <QuestionTypeDropdown
-                                value={section.choice}
-                                onChange={(value) =>
-                                  handleSectionChange(index, "choice", value)
-                                }
-                              />
-                            </div>
-                          </TableCell>
-                          <TableCell className="px-4">
-                            <div
-                              className="flex items-center justify-center"
-                              data-status-menu
-                            >
-                              <StatusMenu
-                                value={section.status}
-                                onChange={(value) => {
-                                  handleSectionChange(index, "status", value);
-                                }}
-                              />
-                            </div>
-                          </TableCell>
-                          <TableCell className="px-4 text-center">
-                            {section.subsections}
-                          </TableCell>
-                          <TableCell className="px-4">
-                            <div className="flex items-center justify-center">
-                              <Input
-                                type="number"
-                                value={section.word_count || 0}
-                                min={0}
-                                step={50}
-                                className="w-20 text-center"
-                                onChange={(e) => {
-                                  const value = parseInt(e.target.value);
-                                  if (!isNaN(value) && value >= 0) {
-                                    handleSectionChange(
-                                      index,
-                                      "word_count",
-                                      value
-                                    );
-                                  }
-                                }}
-                              />
-                            </div>
-                          </TableCell>
-                          <TableCell className="w-[60px] text-right px-4">
-                            <SectionControls
-                              onDelete={() => handleDeleteClick(section, index)}
-                              onMoveDown={() =>
-                                handleMoveSection(index, "down")
-                              }
-                              onMoveUp={() => handleMoveSection(index, "up")}
-                              isFirst={index === 0}
-                              isLast={index === outline.length - 1}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
+                          ))}
+                        </TableBody>
+                      </SortableContext>
+                    </DndContext>
                   </Table>
                 </div>
 
