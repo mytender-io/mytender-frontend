@@ -56,6 +56,12 @@ export interface Contributor {
   [login: string]: string; // login: permission
 }
 
+export interface Solution {
+  product: string;
+  features: string;
+  approach: string;
+}
+
 export interface SharedState {
   bidInfo: string;
   opportunity_information: string;
@@ -83,8 +89,8 @@ export interface SharedState {
   win_themes: string[];
   customer_pain_points: string[];
   differentiating_factors: string[];
+  solution: Solution; // New solution field
 }
-
 export interface BidContextType {
   sharedState: SharedState;
   setSharedState: React.Dispatch<React.SetStateAction<SharedState>>;
@@ -118,7 +124,12 @@ const defaultState: BidContextType = {
     outline: [],
     win_themes: [],
     customer_pain_points: [],
-    differentiating_factors: []
+    differentiating_factors: [],
+    solution: { // Initialize solution with empty values
+      product: "",
+      features: "",
+      approach: ""
+    }
   },
   setSharedState: () => {},
   saveProposal: () => {},
@@ -237,7 +248,8 @@ const BidManagement: React.FC = () => {
         outline,
         win_themes,
         customer_pain_points,
-        differentiating_factors
+        differentiating_factors,
+        solution  // Add solution to the destructuring
       } = stateCopy;
 
       if (!bidInfo || bidInfo.trim() === "") {
@@ -294,6 +306,8 @@ const BidManagement: React.FC = () => {
         "differentiating_factors",
         JSON.stringify(differentiating_factors || [])
       );
+
+      formData.append("solution", JSON.stringify(solution || { product: "", features: "", approach: "" }));
       if (object_id) {
         appendFormData("object_id", object_id);
       }
@@ -412,6 +426,7 @@ const BidManagement: React.FC = () => {
     sharedState.win_themes,
     sharedState.differentiating_factors,
     sharedState.customer_pain_points,
+    JSON.stringify(sharedState.solution),
     JSON.stringify(
       sharedState.outline.map((s) => ({
         id: s.section_id,

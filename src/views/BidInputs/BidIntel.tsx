@@ -6,11 +6,19 @@ import { useAuthUser } from "react-auth-kit";
 import { useLocation } from "react-router-dom";
 import BidNavbar from "@/components/BidNavbar";
 import { BidContext } from "../BidWritingStateManagerView.tsx";
-import { Check, Pencil, Search, X } from "lucide-react";
+import { Check, Pencil, X, ChevronDown } from "lucide-react";
 import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ToneOfVoiceLibrary from "./ToneOfVoiceLibrary.tsx";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from "@/components/ui/accordion";
+import Solution from "./Solution.tsx";
 
 const BidIntel = () => {
   const getAuth = useAuthUser();
@@ -123,59 +131,61 @@ const BidIntel = () => {
       editingState.type === type && editingState.index === index;
 
     return (
-      <div className="flex items-center justify-between border-b py-2 px-4 border-gray-200 last:border-b-0">
-        {isEditing ? (
-          <div className="flex-1 flex items-center gap-2">
-            <Input
-              value={editingState.text}
-              onChange={(e) =>
-                setEditingState((prev) => ({ ...prev, text: e.target.value }))
-              }
-              className="flex-1"
-              autoFocus
-            />
-            <Button
-              size="icon"
-              variant="ghost"
-              className="hover:bg-green-100 hover:text-green-600 w-6 h-6"
-              onClick={handleSaveEdit}
-            >
-              <Check className="w-4 h-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="hover:bg-red-100 hover:text-red-600 w-6 h-6"
-              onClick={handleCancelEdit}
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        ) : (
-          <>
-            <span className="text-sm text-gray-hint_text">
-              {index + 1}. {text}
-            </span>
-            <div className="flex gap-2">
+      <div>
+        <div className="flex items-center justify-between border-b py-2 px-4 border-gray-200 last:border-b-0">
+          {isEditing ? (
+            <div className="flex-1 flex items-center gap-2">
+              <Input
+                value={editingState.text}
+                onChange={(e) =>
+                  setEditingState((prev) => ({ ...prev, text: e.target.value }))
+                }
+                className="flex-1"
+                autoFocus
+              />
               <Button
                 size="icon"
                 variant="ghost"
-                className="hover:bg-orange-100 hover:text-orange w-6 h-6"
-                onClick={() => handleEditStart(text, type, index)}
+                className="hover:bg-green-100 hover:text-green-600 w-6 h-6"
+                onClick={handleSaveEdit}
               >
-                <Pencil className="w-4 h-4" />
+                <Check className="w-4 h-4" />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
                 className="hover:bg-red-100 hover:text-red-600 w-6 h-6"
-                onClick={() => handleDelete(type, index)}
+                onClick={handleCancelEdit}
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
-          </>
-        )}
+          ) : (
+            <>
+              <span className="text-sm text-gray-hint_text">
+                {index + 1}. {text}
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="hover:bg-orange-100 hover:text-orange w-6 h-6"
+                  onClick={() => handleEditStart(text, type, index)}
+                >
+                  <Pencil className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="hover:bg-red-100 hover:text-red-600 w-6 h-6"
+                  onClick={() => handleDelete(type, index)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     );
   };
@@ -261,7 +271,8 @@ const BidIntel = () => {
             initialBidName="Bid Inputs"
             description="Review and refine the AI-suggested inputs from the tender documents to configure your response strategy."
           />
-          <div className="grid grid-cols-2 gap-6">
+
+          <div className="grid grid-cols-3 gap-6">
             {/* Customer Pain Points Card */}
             <div className="bg-white rounded-lg shadow w-full">
               <span className="font-medium px-4 py-3 bg-gray-100 rounded-t-lg border-b w-full block text-gray-hint_text">
@@ -333,32 +344,69 @@ const BidIntel = () => {
                 )}
               </div>
             </div>
+          </div>
 
-            {/* Keep existing Case Study Card */}
-            <div className="bg-white rounded-lg shadow w-full">
-              <span className="font-medium px-4 py-3 bg-gray-100 rounded-t-lg border-b w-full block text-gray-hint_text">
-                Add Relevant Case Study
-              </span>
-              <div className="p-4">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    type="text"
-                    placeholder="Search for case study..."
-                    className="pl-10"
-                    disabled
+          {/* Solution Accordion */}
+          {/* Solution Accordion */}
+          <div className="bg-white rounded-lg w-full">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="solution" className="border-none">
+                <AccordionTrigger className="px-4 py-3 w-full text-lg text-gray-hint_text">
+                  Solution
+                </AccordionTrigger>
+                <AccordionContent className="p-0">
+                  <Solution
+                    initialData={sharedState.solution || {}}
+                    onSave={(solutionData) => {
+                      const updatedState = {
+                        ...sharedState,
+                        solution: solutionData
+                      };
+                      setSharedState(updatedState);
+                    }}
+                    readOnly={!canUserEdit}
                   />
-                </div>
-                <div className="flex flex-col items-center justify-center h-48 text-center">
-                  <p className="text-lg text-gray-400 font-medium">
-                    Coming Soon
-                  </p>
-                  <p className="text-sm text-gray-400 mt-2">
-                    Case study search functionality will be available in future
-                    updates
-                  </p>
-                </div>
-              </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+
+          {/* Select Case Studies Accordion */}
+          <div className="bg-white rounded-lg w-full">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="case-studies" className="border-none">
+                <AccordionTrigger className="px-4 py-3 w-full text-lg text-gray-hint_text">
+                  Select Case Studies
+                </AccordionTrigger>
+                <AccordionContent className="p-4">
+                  <div className="bg-gray-50 rounded p-8 text-center">
+                    <p className="text-lg text-gray-400 font-medium">
+                      Coming Soon
+                    </p>
+                    <p className="text-sm text-gray-400 mt-2">
+                      Case study selection functionality will be available in
+                      future updates
+                    </p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+
+          {/* Accordions Section */}
+          <div className="space-y-4">
+            {/* Tone of Voice Accordion */}
+            <div className="bg-white rounded-lg w-full">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="tone-of-voice" className="border-none">
+                  <AccordionTrigger className="px-4 py-3 w-full text-lg text-gray-hint_text">
+                    Tone of Voice
+                  </AccordionTrigger>
+                  <AccordionContent className="p-0">
+                    <ToneOfVoiceLibrary />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </div>
         </div>
