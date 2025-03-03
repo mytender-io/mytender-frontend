@@ -18,11 +18,58 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 import UserIcon from "@/components/icons/UserIcon";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
+// Create a global state for chat processing
+const globalChatState = {
+  isProcessing: false,
+  pendingQuestions: [],
+  processQueue: async function () {
+    if (this.isProcessing || this.pendingQuestions.length === 0) return;
+
+    this.isProcessing = true;
+    const { question, token, onComplete } = this.pendingQuestions.shift();
+
+    try {
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/question`,
+        {
+          choice: "2",
+          broadness: "2",
+          input_text: question,
+          extra_instructions: "",
+          datasets: ["default"]
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (onComplete) onComplete(result.data);
+
+      // Show notification
+      toast.success("New response received from chatbot");
+    } catch (error) {
+      console.error("Background chat error:", error);
+      toast.error("Failed to get response from chatbot");
+    } finally {
+      this.isProcessing = false;
+      this.processQueue(); // Process next in queue
+    }
+  },
+  addToQueue: function (question, token, onComplete) {
+    this.pendingQuestions.push({ question, token, onComplete });
+    this.processQueue();
+  }
+};
 
 const ChatbotResponse = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
+  const navigate = useNavigate();
   const [messageFeedback, setMessageFeedback] = useState({});
   const [messages, setMessages] = useState(() => {
     const savedMessages = localStorage.getItem("chatResponseMessages");
@@ -50,9 +97,6 @@ const ChatbotResponse = () => {
 
   const [inputValue, setInputValue] = useState("");
 
-  const [choice, setChoice] = useState("2");
-  const [broadness, setBroadness] = useState("2");
-
   const [isLoading, setIsLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
   const [startTime, setStartTime] = useState(null);
@@ -62,6 +106,41 @@ const ChatbotResponse = () => {
 
   // Add this ref for the messages container
   const messagesContainerRef = useRef(null);
+
+  // Add this effect to check for background responses
+  useEffect(() => {
+    const checkInterval = setInterval(() => {
+      const pendingNotification = localStorage.getItem(
+        "pendingChatNotification"
+      );
+      if (pendingNotification) {
+        const data = JSON.parse(pendingNotification);
+
+        // Check if this response is already in our messages
+        const responseExists = messages.some(
+          (msg) =>
+            msg.type === "bot" && msg.text === formatResponse(data.response)
+        );
+
+        if (!responseExists) {
+          // First remove any loading message
+          setMessages((prevMessages) => {
+            const filteredMessages = prevMessages.filter(
+              (msg) => msg.text !== "loading"
+            );
+            return [
+              ...filteredMessages,
+              { type: "bot", text: formatResponse(data.response) }
+            ];
+          });
+        }
+
+        localStorage.removeItem("pendingChatNotification");
+      }
+    }, 1000);
+
+    return () => clearInterval(checkInterval);
+  }, [messages]);
 
   const handleSendMessage = () => {
     if (inputValue.trim() !== "") {
@@ -113,7 +192,7 @@ const ChatbotResponse = () => {
     }
   };
 
-  // Modify the typeMessage function to scroll while typing
+  // Modify the typeMessage function to not force scroll while typing
   const typeMessage = (message) => {
     setIsTyping(true);
     setTypingText("");
@@ -123,26 +202,37 @@ const ChatbotResponse = () => {
       if (index < message.length) {
         setTypingText((prev) => prev + message[index]);
         index++;
-        scrollToBottom(); // Add scroll after each character
+        // Remove the scrollToBottom() call here
         setTimeout(typeChar, 1);
       } else {
         setIsTyping(false);
+        scrollToBottom(); // Only scroll at the end of typing
       }
     };
 
     typeChar();
   };
 
-  // Add useEffect to scroll on new messages
+  // Modify useEffect to only scroll on new messages when appropriate
   useEffect(() => {
-    scrollToBottom();
+    // Only auto-scroll if user is already at the bottom
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      const isAtBottom =
+        container.scrollHeight - container.scrollTop <=
+        container.clientHeight + 100;
+
+      if (isAtBottom) {
+        scrollToBottom();
+      }
+    }
   }, [messages]);
 
   const sendQuestion = async (question) => {
     handleGAEvent("Chatbot", "Submit Question", "Submit Button");
     setQuestionAsked(true);
     setIsLoading(true);
-    setStartTime(Date.now()); // Set start time for the timer
+    setStartTime(Date.now());
 
     // Add a temporary bot message with loading dots
     setMessages((prevMessages) => [
@@ -153,48 +243,32 @@ const ChatbotResponse = () => {
     const backgroundInfo = messages
       .map((msg) => `${msg.type}: ${msg.text}`)
       .join("\n");
-    console.log(backgroundInfo);
 
-    try {
-      const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question`,
-        {
-          choice: choice,
-          broadness: broadness,
-          input_text: question,
-          extra_instructions: backgroundInfo,
-          datasets: ["default"]
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`
-          }
-        }
+    // Add to background processing queue
+    globalChatState.addToQueue(question, tokenRef.current, (response) => {
+      // This callback will be executed when the response is received
+
+      // Store the response in localStorage for retrieval if user navigated away
+      localStorage.setItem(
+        "pendingChatNotification",
+        JSON.stringify({
+          response: response,
+          timestamp: Date.now()
+        })
       );
 
-      // Replace the temporary loading message with the actual response
-      const formattedResponse = formatResponse(result.data);
+      // If still on this page, update UI directly
+      const formattedResponse = formatResponse(response);
+      if (window.location.pathname.includes("/chat")) {
+        setMessages((prevMessages) => [
+          ...prevMessages.slice(0, -1), // Remove loading message
+          { type: "bot", text: formattedResponse }
+        ]);
+        typeMessage(formattedResponse);
+      }
+    });
 
-      setMessages((prevMessages) => [
-        ...prevMessages.slice(0, -1),
-        { type: "bot", text: formattedResponse }
-      ]);
-      typeMessage(formattedResponse); // Start typing animation
-    } catch (error) {
-      console.error("Error sending question:", error);
-
-      // Replace the temporary loading message with the error message
-      setMessages((prevMessages) => [
-        ...prevMessages.slice(0, -1),
-        {
-          type: "bot",
-          text:
-            error.response?.status === 400
-              ? "Message failed, please contact support..."
-              : error.message
-        }
-      ]);
-    }
+    // Allow user to navigate away immediately
     setIsLoading(false);
   };
 
@@ -230,6 +304,13 @@ const ChatbotResponse = () => {
 
   const parentPages = [] as Array<{ name: string; path: string }>;
 
+  // Add a function to navigate away while keeping chat in background
+  const navigateAway = (path) => {
+    // Save current state
+    localStorage.setItem("chatResponseMessages", JSON.stringify(messages));
+    navigate(path);
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-border px-6 py-2 min-h-[3.43785rem]">
@@ -239,12 +320,12 @@ const ChatbotResponse = () => {
           showHome={true}
         />
       </div>
-      <div className="px-6 py-4 flex-1 overflow-y-auto">
+      <div className="px-6 pt-4 mb-4 flex-1 overflow-y-auto">
         {messages.length > 0 ? (
           <div className="relative flex flex-col justify-between space-y-4 h-full">
             <div
               ref={messagesContainerRef}
-              className="flex flex-col flex-1 w-full max-w-3xl mx-auto overflow-y-auto scrollbar-none"
+              className="flex flex-col flex-1 w-full max-w-3xl mx-auto"
             >
               {messages.map((message, index: number) => (
                 <div
@@ -433,8 +514,16 @@ const ChatbotResponse = () => {
           </div>
         )}
       </div>
+      {/* You could add a notification that chat is processing in background */}
+      {/* {globalChatState.isProcessing && (
+        <div className="fixed bottom-4 right-4 bg-primary text-white p-2 rounded-md shadow-lg">
+          Processing chat in background...
+        </div>
+      )} */}
     </div>
   );
 };
 
+// Export the globalChatState to be used elsewhere in the app
+export { globalChatState };
 export default withAuth(ChatbotResponse);
