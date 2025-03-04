@@ -9,6 +9,7 @@ import { ToastContainer } from "react-toastify";
 import posthog from "posthog-js";
 import { UpdateChecker } from "./components/UpdateChecker";
 import "react-toastify/dist/ReactToastify.css";
+import { StatusLabelsProvider } from "./views/Bids/components/BidStatusMenu";
 
 ReactGA4.initialize("G-X8S1ZMRM3C");
 
@@ -22,18 +23,20 @@ posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
 const AppContent = () => {
   return (
     <BrowserRouter>
-      <UpdateChecker />
-      <Routing />
-      <ToastContainer
-        position="bottom-right"
-        autoClose={4000}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable={false}
-        hideProgressBar={true}
-      />
+      <StatusLabelsProvider>
+        <UpdateChecker />
+        <Routing />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={4000}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable={false}
+          hideProgressBar={true}
+        />
+      </StatusLabelsProvider>
     </BrowserRouter>
   );
 };

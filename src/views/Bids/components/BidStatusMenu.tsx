@@ -3,16 +3,27 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Search,
   ClipboardList,
   FileWarning,
   FileCheck,
-  FileSignature
+  FileSignature,
+  Edit,
+  Save
 } from "lucide-react";
 import { cn } from "@/utils";
+import {
+  useState,
+  useContext,
+  createContext,
+  ReactNode,
+  useEffect
+} from "react";
 
 type BidStatus =
   | "Planning"
@@ -20,6 +31,62 @@ type BidStatus =
   | "First Draft"
   | "Reviewing"
   | "Complete";
+
+// Define a status item with key and label
+interface StatusItem {
+  key: BidStatus;
+  label: string;
+}
+
+// Create a context to share status labels across components
+interface StatusLabelsContextType {
+  statusItems: StatusItem[];
+  updateStatusItems: (items: StatusItem[]) => void;
+  getStatusLabel: (key: string) => string;
+}
+
+const defaultStatusItems: StatusItem[] = [
+  { key: "Planning", label: "Planning" },
+  { key: "Research", label: "Research" },
+  { key: "First Draft", label: "First Draft" },
+  { key: "Reviewing", label: "Reviewing" },
+  { key: "Complete", label: "Complete" }
+];
+
+const StatusLabelsContext = createContext<StatusLabelsContextType>({
+  statusItems: defaultStatusItems,
+  updateStatusItems: () => {},
+  getStatusLabel: (key) => key
+});
+
+export const StatusLabelsProvider = ({ children }: { children: ReactNode }) => {
+  const [statusItems, setStatusItems] = useState<StatusItem[]>(() => {
+    // Try to load from localStorage
+    const savedItems = localStorage.getItem("bidStatusItems");
+    return savedItems ? JSON.parse(savedItems) : defaultStatusItems;
+  });
+
+  const updateStatusItems = (items: StatusItem[]) => {
+    setStatusItems(items);
+    // Save to localStorage for persistence
+    localStorage.setItem("bidStatusItems", JSON.stringify(items));
+  };
+
+  const getStatusLabel = (key: string): string => {
+    const item = statusItems.find((item) => item.key === key);
+    return item ? item.label : key;
+  };
+
+  return (
+    <StatusLabelsContext.Provider
+      value={{ statusItems, updateStatusItems, getStatusLabel }}
+    >
+      {children}
+    </StatusLabelsContext.Provider>
+  );
+};
+
+export const useStatusLabels = () => useContext(StatusLabelsContext);
 
 const BidStatusMenu = ({
   value,
@@ -30,6 +97,15 @@ const BidStatusMenu = ({
   onChange: (value: BidStatus) => void;
   disabled?: boolean;
 }) => {
+  const { statusItems, updateStatusItems } = useStatusLabels();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedItems, setEditedItems] = useState<StatusItem[]>(statusItems);
+
+  // Update local state when context changes
+  useEffect(() => {
+    setEditedItems(statusItems);
+  }, [statusItems]);
+
   const statusMapping: { [key: string]: BidStatus } = {
     Identification: "Planning",
     "Capture Planning": "Research",
@@ -39,18 +115,19 @@ const BidStatusMenu = ({
   };
 
   const normalizeStatus = (status: string): BidStatus => {
-    const validStatuses: BidStatus[] = [
-      "Planning",
-      "Research",
-      "First Draft",
-      "Reviewing",
-      "Complete"
-    ];
-    return status in statusMapping
-      ? statusMapping[status]
-      : validStatuses.includes(status as BidStatus)
-        ? (status as BidStatus)
-        : "Planning";
+    // First check if it's a key in our status items
+    const matchingItem = statusItems.find((item) => item.key === status);
+    if (matchingItem) return matchingItem.key;
+
+    // Then check if it's a label in our status items
+    const matchingLabel = statusItems.find((item) => item.label === status);
+    if (matchingLabel) return matchingLabel.key;
+
+    // Then check the legacy mapping
+    if (status in statusMapping) return statusMapping[status];
+
+    // Default to first status if nothing matches
+    return statusItems.length > 0 ? statusItems[0].key : "Planning";
   };
 
   const getStatusStyles = (status: BidStatus): string => {
@@ -66,7 +143,18 @@ const BidStatusMenu = ({
       Complete:
         "bg-status-success_light text-status-success hover:text-status-success hover:bg-status-success_light/90 border-status-success"
     };
-    return styles[status];
+    return styles[status] || styles.Planning;
+  };
+
+  const getStatusColor = (status: BidStatus): string => {
+    const colors = {
+      Planning: "bg-status-planning border-status-planning",
+      Research: "bg-status-research border-status-research",
+      "First Draft": "bg-status-draft border-status-draft",
+      Reviewing: "bg-status-review border-status-review",
+      Complete: "bg-status-success border-status-success"
+    };
+    return colors[status] || colors.Planning;
   };
 
   const getStatusIcon = (status: BidStatus) => {
@@ -80,8 +168,37 @@ const BidStatusMenu = ({
     return icons[status] || Search;
   };
 
-  const currentStatus = normalizeStatus(value);
-  const StatusIcon = getStatusIcon(currentStatus);
+  const handleEditLabels = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditedItems([...statusItems]);
+    setIsEditing(true);
+  };
+
+  const handleSaveLabels = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    updateStatusItems([...editedItems]);
+    setIsEditing(false);
+
+    // If the current status is no longer valid, reset to the first status
+    const currentStatusKey = normalizeStatus(value);
+    if (!editedItems.some((item) => item.key === currentStatusKey)) {
+      onChange(editedItems[0].key);
+    }
+  };
+
+  const handleLabelChange = (index: number, newLabel: string) => {
+    const newItems = [...editedItems];
+    newItems[index] = { ...newItems[index], label: newLabel };
+    setEditedItems(newItems);
+  };
+
+  const currentStatusKey = normalizeStatus(value);
+  const currentItem = statusItems.find(
+    (item) => item.key === currentStatusKey
+  ) || { key: currentStatusKey, label: currentStatusKey };
+  const StatusIcon = getStatusIcon(currentStatusKey);
 
   return (
     <DropdownMenu>
@@ -90,41 +207,109 @@ const BidStatusMenu = ({
           variant="ghost"
           className={cn(
             "font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px]",
-            getStatusStyles(currentStatus),
+            getStatusStyles(currentStatusKey),
             disabled && "opacity-50 cursor-not-allowed pointer-events-none"
           )}
         >
-          {currentStatus}
+          {currentItem.label}
           <StatusIcon className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-fit shadow-lg space-y-2 p-2">
-        {["Planning", "Research", "First Draft", "Reviewing", "Complete"].map(
-          (status) => {
-            const statusItem = normalizeStatus(status);
-            const StatusIcon = getStatusIcon(statusItem);
-            return (
-              <DropdownMenuItem
-                key={status}
-                onClick={() => onChange(status as BidStatus)}
-                className="px-0 py-0"
-                disabled={disabled}
+      <DropdownMenuContent
+        className="w-fit shadow-lg space-y-2 p-2"
+        onCloseAutoFocus={(e) => {
+          if (isEditing) {
+            e.preventDefault();
+          }
+        }}
+      >
+        {isEditing ? (
+          <>
+            {editedItems.map((item, index) => {
+              const ItemIcon = getStatusIcon(item.key);
+              return (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 w-full max-w-40"
+                >
+                  <div className="flex items-center w-full relative">
+                    <div
+                      className={cn(
+                        "absolute left-2 flex items-center justify-center h-6 w-6 rounded-md",
+                        getStatusColor(item.key)
+                      )}
+                    >
+                      <ItemIcon className="h-4 w-4 text-white" />
+                    </div>
+                    <Input
+                      value={item.label}
+                      onChange={(e) => handleLabelChange(index, e.target.value)}
+                      className="h-8 text-sm pl-9"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleSaveLabels}
+              className="px-0 py-0"
+              onSelect={(e) => e.preventDefault()}
+            >
+              <Button
+                variant="ghost"
+                className="font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px] w-full text-green-600 hover:text-green-800 hover:bg-green-50"
+                onClick={handleSaveLabels}
               >
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px] w-full",
-                    getStatusStyles(statusItem),
-                    disabled && "opacity-50 cursor-not-allowed"
-                  )}
+                Save Changes
+                <Save className="h-4 w-4" />
+              </Button>
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <>
+            {statusItems.map((item) => {
+              const StatusIcon = getStatusIcon(item.key);
+              return (
+                <DropdownMenuItem
+                  key={item.key}
+                  onClick={() => onChange(item.key)}
+                  className="px-0 py-0"
                   disabled={disabled}
                 >
-                  {status}
-                  <StatusIcon className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuItem>
-            );
-          }
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px] w-full",
+                      getStatusStyles(item.key),
+                      disabled && "opacity-50 cursor-not-allowed"
+                    )}
+                    disabled={disabled}
+                  >
+                    {item.label}
+                    <StatusIcon className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuItem>
+              );
+            })}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleEditLabels}
+              className="px-0 py-0"
+              onSelect={(e) => e.preventDefault()}
+            >
+              <Button
+                variant="ghost"
+                className="font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px] w-full text-gray-600 hover:text-gray-800"
+                onClick={handleEditLabels}
+              >
+                Edit Labels
+                <Edit className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuItem>
+          </>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
