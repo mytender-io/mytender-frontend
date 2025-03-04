@@ -5,12 +5,20 @@ import LibraryContent from "./LibraryContent"; // Component for the existing lib
 import CaseStudies from "./CaseStudies";
 import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation";
 import withAuth from "@/routes/withAuth";
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 
 const Library = () => {
   const [activeTab, setActiveTab] = useState("library");
 
   const baseNavLinkStyles =
     "mr-6 text-base font-semibold text-gray-hint_text hover:text-orange px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative";
+
   const activeNavLinkStyles =
     "text-orange after:content-[''] after:absolute after:bottom-[-0.3rem] after:left-0 after:w-full after:h-[0.1rem] after:bg-orange after:transition-[width] after:duration-1000 after:ease-in-out after:delay-1000";
 
@@ -40,18 +48,36 @@ const Library = () => {
           >
             Company Library
           </button>
-          <button
-            className={cn(
-              baseNavLinkStyles,
-              activeTab === "case-studies" && activeNavLinkStyles
-            )}
-            onClick={() => handleTabClick("case-studies")}
-          >
-            Case Studies
-          </button>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className={cn(
+                    baseNavLinkStyles,
+                    activeTab === "case-studies" && activeNavLinkStyles
+                  )}
+                  onClick={() => handleTabClick("case-studies")}
+                >
+                  Case Studies
+                </button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="bottom"
+                align="center"
+                sideOffset={5}
+                className="flex flex-col items-center max-w-[200px] text-center"
+              >
+                <TooltipArrow className="text-primary" />
+                <p>
+                  Upload Case Studies here to directly reference them in the Bid
+                  Inputs Page
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
-
       <div className="flex-1 overflow-y-auto">
         {activeTab === "library" ? <LibraryContent /> : <CaseStudies />}
       </div>
