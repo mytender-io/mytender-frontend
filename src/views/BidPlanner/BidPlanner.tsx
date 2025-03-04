@@ -168,15 +168,12 @@ const BidPlanner = () => {
 
   const parentPages = [{ name: "Tender Dashboard", path: "/bids" }];
 
-  console.log(initialBidName);
-
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
         <BreadcrumbNavigation
           currentPage={initialBidName}
           parentPages={parentPages}
-          showHome={true}
         />
       </div>
       <div className="px-6 pt-4 flex-1 overflow-y-auto">

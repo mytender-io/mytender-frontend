@@ -261,7 +261,6 @@ const BidIntel = () => {
         <BreadcrumbNavigation
           currentPage={initialBidName}
           parentPages={parentPages}
-          showHome={true}
         />
       </div>
       <div className="px-6 py-4 flex-1 overflow-y-auto">

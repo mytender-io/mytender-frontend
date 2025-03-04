@@ -363,8 +363,6 @@ const ProposalPlan = () => {
   useEffect(() => {
     // Only show modal if we have an object_id (meaning shared state is populated)
     // and outline is empty
-    console.log(outline);
-    console.log(sharedState.outline);
     if (object_id && outline.length === 0) {
       setShowModal(true);
     }
@@ -920,7 +918,6 @@ const ProposalPlan = () => {
         <BreadcrumbNavigation
           currentPage={initialBidName}
           parentPages={parentPages}
-          showHome={true}
         />
       </div>
       <div className="px-6 py-4 flex-1 overflow-y-auto">

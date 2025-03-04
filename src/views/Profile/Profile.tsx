@@ -345,7 +345,6 @@ const ProfilePage = () => {
         <BreadcrumbNavigation
           currentPage="Profile"
           parentPages={parentPages}
-          showHome={true}
           uploadingImage={uploadingImage}
         />
       </div>

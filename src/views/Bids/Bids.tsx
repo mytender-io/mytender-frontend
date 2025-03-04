@@ -79,16 +79,17 @@ const Bids = () => {
   const isRecentlyCreatedWithEmptyThemes = (bid: Bid): boolean => {
     // Check if timestamp exists
     if (!bid.timestamp) return false;
-    
+
     // Calculate time difference in minutes
     const bidTime = new Date(bid.timestamp).getTime();
     const currentTime = new Date().getTime();
     const timeDiffMinutes = (currentTime - bidTime) / (1000 * 60);
-    
+
     // Check if win_themes array is empty or undefined
-    const hasEmptyWinThemes = !bid.win_themes || 
-                             (Array.isArray(bid.win_themes) && bid.win_themes.length === 0);
-    
+    const hasEmptyWinThemes =
+      !bid.win_themes ||
+      (Array.isArray(bid.win_themes) && bid.win_themes.length === 0);
+
     // Return true if edited less than 20 minutes ago and has empty win themes
     return timeDiffMinutes < 20 && hasEmptyWinThemes;
   };
@@ -440,7 +441,6 @@ const Bids = () => {
         <BreadcrumbNavigation
           currentPage="Tender Dashboard"
           parentPages={parentPages}
-          showHome={true}
           rightContent={
             <SearchInput value={searchTerm} onChange={setSearchTerm} />
           }
@@ -463,7 +463,7 @@ const Bids = () => {
               className="px-4"
               onClick={handleWriteProposalClick}
             >
-              <PlusIcon className="text-white mr-2" />
+              <PlusIcon className="text-white" />
               New Tender
             </Button>
           </div>
@@ -500,9 +500,13 @@ const Bids = () => {
                         .map((_, index) => <SkeletonRow key={index} />)
                     ) : currentBids.length > 0 ? (
                       currentBids.map((bid) => {
-                        const isDisabled = isRecentlyCreatedWithEmptyThemes(bid);
+                        const isDisabled =
+                          isRecentlyCreatedWithEmptyThemes(bid);
                         return (
-                          <TableRow key={bid._id} className={isDisabled ? "opacity-50" : ""}>
+                          <TableRow
+                            key={bid._id}
+                            className={isDisabled ? "opacity-50" : ""}
+                          >
                             <TableCell className="px-4 group">
                               {isDisabled ? (
                                 <span className="block truncate w-full text-gray-400 cursor-not-allowed">
@@ -542,7 +546,7 @@ const Bids = () => {
                                 onChange={(value) => {
                                   updateBidStatus(bid._id, value);
                                 }}
-                               disabled={isDisabled}
+                                disabled={isDisabled}
                               />
                             </TableCell>
                             <TableCell className="w-[100px] text-right px-4">

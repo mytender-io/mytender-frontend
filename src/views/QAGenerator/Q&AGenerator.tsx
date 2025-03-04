@@ -1359,7 +1359,6 @@ const QAGenerator = () => {
         <BreadcrumbNavigation
           currentPage="Q&A Generator"
           parentPages={parentPages}
-          showHome={true}
         />
       </div>
       <div className="flex flex-col py-4 px-6 space-y-4 flex-1 overflow-y-auto">
@@ -1508,10 +1507,7 @@ const QAGenerator = () => {
                           </Button>
                           {selectedOptionIndex === index && (
                             <Button onClick={handleTick} variant={"ghost"}>
-                              <FontAwesomeIcon
-                                icon={faCheck}
-                                className=""
-                              />
+                              <FontAwesomeIcon icon={faCheck} className="" />
                             </Button>
                           )}
                         </div>

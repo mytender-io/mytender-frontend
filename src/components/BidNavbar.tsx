@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { BidContext } from "../views/BidWritingStateManagerView";
-import { faEdit, faEye, faUsers } from "@fortawesome/free-solid-svg-icons";
+// import { faEdit, faEye, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { useAuthUser } from "react-auth-kit";
 import BidTitle from "./BidTitle";
 import GenerateProposalModal from "../modals/GenerateProposalModal";
@@ -59,46 +59,41 @@ const BidNavbar: React.FC<{
     }
   }, [location, bidInfo, auth]);
 
+  // const getPermissionDetails = (permission) => {
+  //   switch (permission) {
+  //     case "admin":
+  //       return {
+  //         icon: faUsers,
+  //         text: "Admin",
+  //         description: "You have full access to edit and manage this proposal."
+  //       };
+  //     case "editor":
+  //       return {
+  //         icon: faEdit,
+  //         text: "Editor",
+  //         description:
+  //           "You can edit this proposal but cannot change permissions."
+  //       };
+  //     default:
+  //       return {
+  //         icon: faEye,
+  //         text: "Viewer",
+  //         description: "You can view this proposal but cannot make changes."
+  //       };
+  //   }
+  // };
 
+  // const permissionDetails = getPermissionDetails(currentUserPermission);
 
-  const getPermissionDetails = (permission) => {
-    switch (permission) {
-      case "admin":
-        return {
-          icon: faUsers,
-          text: "Admin",
-          description: "You have full access to edit and manage this proposal."
-        };
-      case "editor":
-        return {
-          icon: faEdit,
-          text: "Editor",
-          description:
-            "You can edit this proposal but cannot change permissions."
-        };
-      default:
-        return {
-          icon: faEye,
-          text: "Viewer",
-          description: "You can view this proposal but cannot make changes."
-        };
-    }
-  };
+  // const handleBackClick = () => {
+  //   if (location.pathname == "/question-crafter") {
+  //     navigate("/proposal-planner");
+  //   } else {
+  //     navigate("/bids");
+  //   }
+  // };
 
-  const permissionDetails = getPermissionDetails(currentUserPermission);
-
-  const handleBackClick = () => {
-    if (location.pathname == "/question-crafter") {
-      navigate("/proposal-planner");
-    } else {
-      navigate("/bids");
-    }
-  };
-
-  const handleTabClick = (path) => {
-    // Don't set active tab immediately to avoid visual conflict with animation
-    const currentTab = location.pathname;
-
+  const handleTabClick = (path: string) => {
     // Delay navigation to allow animation to play
     setTimeout(() => {
       setActiveTab(path);
@@ -108,8 +103,39 @@ const BidNavbar: React.FC<{
 
   const baseNavLinkStyles =
     "mr-6 text-base font-semibold text-gray-hint_text hover:text-orange px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative";
-  const activeNavLinkStyles =
-    "text-orange after:content-[''] after:absolute after:bottom-[-0.3rem] after:left-0 after:w-full after:h-[0.1rem] after:bg-orange after:transition-[width] after:duration-1000 after:ease-in-out after:delay-1000";
+  const activeNavLinkStyles = "text-orange";
+
+  // Get width and position for the sliding indicator
+  const getIndicatorStyle = () => {
+    // Define widths for each tab (adjust these values based on your actual text widths)
+    const tabWidths = {
+      "/bid-extractor": 120, // Width for "Tender Insights"
+      "/bid-intel": 90, // Width for "Bid Inputs"
+      "/proposal-planner": 85, // Width for "Bid Outline"
+      "/question-crafter": 85, // Same as proposal-planner
+      "/proposal-preview": 95 // Width for "Bid Review"
+    };
+
+    // Define positions (cumulative widths plus margins)
+    const tabPositions = {
+      "/bid-extractor": 0,
+      "/bid-intel": tabWidths["/bid-extractor"] + 24, // 24px for margin
+      "/proposal-planner":
+        tabWidths["/bid-extractor"] + tabWidths["/bid-intel"] + 48,
+      "/question-crafter":
+        tabWidths["/bid-extractor"] + tabWidths["/bid-intel"] + 48,
+      "/proposal-preview":
+        tabWidths["/bid-extractor"] +
+        tabWidths["/bid-intel"] +
+        tabWidths["/proposal-planner"] +
+        72
+    };
+    return {
+      width: `${tabWidths[activeTab as keyof typeof tabWidths] || 100}px`,
+      transform: `translateX(${tabPositions[activeTab as keyof typeof tabPositions] || 0}px)`,
+      opacity: activeTab ? 1 : 0
+    };
+  };
 
   return (
     <div>
@@ -126,7 +152,13 @@ const BidNavbar: React.FC<{
 
       <div>
         <div className="flex justify-between items-center border-b border-gray-line">
-          <div className="flex items-center mt-3 mb-1">
+          <div className="flex items-center mt-3 mb-1 relative">
+            {/* Sliding indicator */}
+            <div
+              className="absolute bottom-0 h-0.5 bg-orange transition-all duration-300 ease-in-out"
+              style={getIndicatorStyle()}
+            />
+
             <NavLink
               to="/bid-extractor"
               className={({ isActive }) =>

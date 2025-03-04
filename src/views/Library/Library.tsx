@@ -18,7 +18,7 @@ const Library = () => {
     setActiveTab(tab);
   };
 
-  const parentPages = [];
+  const parentPages = [] as Array<{ name: string; path: string }>;
 
   return (
     <div className="flex flex-col h-full">
@@ -26,7 +26,6 @@ const Library = () => {
         <BreadcrumbNavigation
           currentPage="Content Library"
           parentPages={parentPages}
-          showHome={true}
         />
       </div>
       <div className="flex justify-between items-center border-b border-gray-line">
