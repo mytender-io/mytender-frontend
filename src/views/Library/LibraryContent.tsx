@@ -880,15 +880,17 @@ const LibraryContent = () => {
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-
+  
     if (query.length > 0) {
-      // Filter out the default folder from folder matches
+      // Filter out the default folder and case_studies_collection from folder matches
       const folderMatches = availableCollections
         .filter(
           (collection) =>
             collection.toLowerCase().includes(query) &&
             collection !== "default" && // Exclude the default folder
-            !collection.startsWith("defaultFORWARDSLASH") // Exclude subfolders of default
+            !collection.startsWith("defaultFORWARDSLASH") && // Exclude subfolders of default
+            collection !== "case_studies_collection" && // Exclude the case_studies_collection folder
+            !collection.startsWith("case_studies_collectionFORWARDSLASH") // Exclude subfolders of case_studies_collection
         )
         .map((collection) => ({
           name: collection.split("FORWARDSLASH").pop(),
@@ -896,13 +898,16 @@ const LibraryContent = () => {
           path: collection,
           fullName: collection.replace(/FORWARDSLASH/g, "/")
         }));
-
-      // Filter out files from the default folder and its contents
+  
+      // Filter out files from the default folder and case_studies_collection folder and their contents
       const fileMatches = Object.entries(folderContents)
         .filter(
           ([folder]) =>
-            folder !== "default" && !folder.startsWith("defaultFORWARDSLASH")
-        ) // Exclude both default folder and its subfolders
+            folder !== "default" && 
+            !folder.startsWith("defaultFORWARDSLASH") && // Exclude both default folder and its subfolders
+            folder !== "case_studies_collection" &&
+            !folder.startsWith("case_studies_collectionFORWARDSLASH") // Exclude both case_studies_collection folder and its subfolders
+        )
         .flatMap(([folder, contents]) =>
           contents
             .filter((item) => item.filename.toLowerCase().includes(query))
@@ -914,7 +919,7 @@ const LibraryContent = () => {
               unique_id: item.unique_id
             }))
         );
-
+  
       const results = [...folderMatches, ...fileMatches];
       setFilteredResults(results);
       setShowSearchResults(true);

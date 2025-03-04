@@ -835,41 +835,49 @@ const CaseStudies = () => {
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-
+  
     if (query.length > 0) {
-      // Filter out the default folder from folder matches
+      // Filter folder matches
       const folderMatches = availableCollections
         .filter(
-          (collection) =>
-            collection.toLowerCase().includes(query) &&
-            collection !== "default" && // Exclude the default folder
-            !collection.startsWith("defaultFORWARDSLASH") // Exclude subfolders of default
+          (collection) => collection.toLowerCase().includes(query)
         )
-        .map((collection) => ({
-          name: collection.split("FORWARDSLASH").pop(),
-          type: "folder",
-          path: collection,
-          fullName: collection.replace(/FORWARDSLASH/g, "/")
-        }));
-
-      // Filter out files from the default folder and its contents
+        .map((collection) => {
+          // Extract just the relevant part of the path (remove case_studies_collection prefix)
+          const parts = collection.split("FORWARDSLASH");
+          const displayParts = parts.slice(1); // Skip the first part (case_studies_collection)
+          
+          return {
+            name: parts[parts.length - 1],
+            type: "folder",
+            path: collection,
+            // Create a clean display path without the case_studies_collection prefix
+            fullName: displayParts.join("/")
+          };
+        });
+  
+      // Filter file matches
       const fileMatches = Object.entries(folderContents)
-        .filter(
-          ([folder]) =>
-            folder !== "default" && !folder.startsWith("defaultFORWARDSLASH")
-        ) // Exclude both default folder and its subfolders
         .flatMap(([folder, contents]) =>
           contents
             .filter((item) => item.filename.toLowerCase().includes(query))
-            .map((item) => ({
-              name: item.filename,
-              type: item.isFolder ? "folder" : "file",
-              path: folder,
-              fullName: `${folder.replace(/FORWARDSLASH/g, "/")}/${item.filename}`,
-              unique_id: item.unique_id
-            }))
+            .map((item) => {
+              // Extract folder parts to create cleaner display path
+              const folderParts = folder.split("FORWARDSLASH");
+              const displayFolderParts = folderParts.slice(1); // Skip case_studies_collection
+              const displayFolder = displayFolderParts.join("/");
+              
+              return {
+                name: item.filename,
+                type: item.isFolder ? "folder" : "file",
+                path: folder,
+                // Show cleaner path without case_studies_collection prefix
+                fullName: displayFolder ? `${displayFolder}/${item.filename}` : item.filename,
+                unique_id: item.unique_id
+              };
+            })
         );
-
+  
       const results = [...folderMatches, ...fileMatches];
       setFilteredResults(results);
       setShowSearchResults(true);
@@ -939,7 +947,7 @@ const CaseStudies = () => {
               )}
               <span>
                 {result.type === "file"
-                  ? `${result.name} (in ${result.path.replace(/FORWARDSLASH/g, "/")})`
+                  ? `${result.name} (in ${result.fullName.split("/").slice(0, -1).join("/")})`
                   : result.fullName}
               </span>
             </div>
