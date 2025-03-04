@@ -167,24 +167,25 @@ const CaseStudies = () => {
   const getTopLevelFolders = () => {
     // Extract case study folder names from the availableCollections
     const caseStudyFolders = availableCollections
-      .filter((collection) => collection.startsWith("case_studies_collection"))
+      .filter((collection) => {
+        // Only include direct children of case_studies_collection
+        const parts = collection.split("FORWARDSLASH");
+        return (
+          parts.length === 2 && collection.startsWith("case_studies_collection")
+        );
+      })
       .map((collection) => {
         const parts = collection.split("FORWARDSLASH");
-        if (parts.length >= 2) {
-          // Return an object with both the name and the full path
-          return {
-            name: parts[1], // Just the folder name
-            path: collection // Full path for navigation
-          };
-        }
-        return null;
-      })
-      .filter(Boolean); // Remove null values
+        // Return an object with both the name and the full path
+        return {
+          name: parts[1], // Just the folder name
+          path: collection // Full path for navigation
+        };
+      });
 
     // Sort the folders alphabetically
     return caseStudyFolders.sort((a, b) => a.name.localeCompare(b.name));
   };
-
   const handleMenuItemClick = (action) => {
     if (action === "pdf") handleOpenPDFModal();
     else if (action === "text") handleOpenTextModal();
@@ -835,18 +836,16 @@ const CaseStudies = () => {
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-  
+
     if (query.length > 0) {
       // Filter folder matches
       const folderMatches = availableCollections
-        .filter(
-          (collection) => collection.toLowerCase().includes(query)
-        )
+        .filter((collection) => collection.toLowerCase().includes(query))
         .map((collection) => {
           // Extract just the relevant part of the path (remove case_studies_collection prefix)
           const parts = collection.split("FORWARDSLASH");
           const displayParts = parts.slice(1); // Skip the first part (case_studies_collection)
-          
+
           return {
             name: parts[parts.length - 1],
             type: "folder",
@@ -855,10 +854,10 @@ const CaseStudies = () => {
             fullName: displayParts.join("/")
           };
         });
-  
+
       // Filter file matches
-      const fileMatches = Object.entries(folderContents)
-        .flatMap(([folder, contents]) =>
+      const fileMatches = Object.entries(folderContents).flatMap(
+        ([folder, contents]) =>
           contents
             .filter((item) => item.filename.toLowerCase().includes(query))
             .map((item) => {
@@ -866,18 +865,20 @@ const CaseStudies = () => {
               const folderParts = folder.split("FORWARDSLASH");
               const displayFolderParts = folderParts.slice(1); // Skip case_studies_collection
               const displayFolder = displayFolderParts.join("/");
-              
+
               return {
                 name: item.filename,
                 type: item.isFolder ? "folder" : "file",
                 path: folder,
                 // Show cleaner path without case_studies_collection prefix
-                fullName: displayFolder ? `${displayFolder}/${item.filename}` : item.filename,
+                fullName: displayFolder
+                  ? `${displayFolder}/${item.filename}`
+                  : item.filename,
                 unique_id: item.unique_id
               };
             })
-        );
-  
+      );
+
       const results = [...folderMatches, ...fileMatches];
       setFilteredResults(results);
       setShowSearchResults(true);
