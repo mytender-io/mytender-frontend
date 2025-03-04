@@ -45,8 +45,7 @@ import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
 import { toast } from "react-toastify";
 import PDFViewer from "@/modals/PDFViewer.tsx";
 import UploadZip from "@/components/UploadZip.tsx";
-import { NavLink } from "react-router-dom";
-import { cn } from "@/utils/index.ts";
+
 
 const NewFolderModal = React.memo(
   ({ show, onHide, onCreateFolder, title, parentFolder }) => {
@@ -167,11 +166,6 @@ const LibraryContent = () => {
   const [updateTrigger, setUpdateTrigger] = useState(0);
 
   const [isLoading, setIsLoading] = useState(false);
-
-  const baseNavLinkStyles =
-    "mr-6 text-base font-semibold text-gray-hint_text hover:text-orange px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative";
-  const activeNavLinkStyles =
-    "text-orange after:content-[''] after:absolute after:bottom-[-0.3rem] after:left-0 after:w-full after:h-[0.1rem] after:bg-orange after:transition-[width] after:duration-1000 after:ease-in-out after:delay-1000";
 
   const getTopLevelFolders = () => {
     const folders = availableCollections.filter(
