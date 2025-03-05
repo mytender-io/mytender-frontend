@@ -74,11 +74,7 @@ const ToneOfVoiceLibrary = () => {
       }
     } catch (err) {
       toast.error(
-        "Failed to load tone of voice library. Please try again later.",
-        {
-          position: "top-right",
-          autoClose: 5000
-        }
+        "Failed to load tone of voice library. Please try again later."
       );
       console.error("Error fetching tones:", err);
     } finally {
@@ -93,10 +89,7 @@ const ToneOfVoiceLibrary = () => {
         ...sharedState,
         tone_of_voice: ""
       });
-      toast.success("Tone of voice cleared", {
-        position: "top-right",
-        autoClose: 3000
-      });
+      toast.success("Tone of voice cleared");
     } else {
       setSelectedTone(tone);
       setSharedState({
@@ -104,10 +97,7 @@ const ToneOfVoiceLibrary = () => {
         tone_of_voice: tone
       });
 
-      toast.success(`Tone of voice set to: ${tone}`, {
-        position: "top-right",
-        autoClose: 3000
-      });
+      toast.success(`Tone of voice set to: ${tone}`);
     }
   };
 
