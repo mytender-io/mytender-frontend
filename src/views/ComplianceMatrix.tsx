@@ -3,19 +3,15 @@ import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
-import SideBarSmall from "../routes/SidebarSmall.tsx";
-import BidNavbar from "@/components/BidNavbar";
-import {
-  BidContext,
-  Section,
-  Subheading
-} from "./BidWritingStateManagerView.tsx";
-import { displayAlert } from "../helper/Alert.tsx";
+import SideBarSmall from "../routes/SidebarSmall";
+import BidNavbar from "@/views/Bid/components/BidNavbar";
+import { BidContext, Section, Subheading } from "./BidWritingStateManagerView";
+import { displayAlert } from "../helper/Alert";
 import "./ComplianceMatrix.css";
 import { Link, useNavigate } from "react-router-dom";
 
 import "./ComplianceMatrix.css";
-import ComplianceEllipsisMenu from "../buttons/ComplianceEllipsisMenu.tsx";
+import ComplianceEllipsisMenu from "../buttons/ComplianceEllipsisMenu";
 
 const ComplianceMatrix = () => {
   const getAuth = useAuthUser();

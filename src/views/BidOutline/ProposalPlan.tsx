@@ -1,24 +1,17 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
+import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import axios from "axios";
-import withAuth from "../../routes/withAuth.tsx";
+import withAuth from "../../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
-import BidNavbar from "@/components/BidNavbar";
-import {
-  BidContext,
-  Section,
-  Subheading
-} from "../BidWritingStateManagerView.tsx";
-import StatusMenu from "../../buttons/StatusMenu.tsx";
-import SectionMenu from "../../buttons/SectionMenu.tsx";
+import { BidContext, Section, Subheading } from "../BidWritingStateManagerView";
+import StatusMenu from "../../buttons/StatusMenu";
+import SectionMenu from "../../buttons/SectionMenu";
 import posthog from "posthog-js";
-import OutlineInstructionsModal from "./components/OutlineInstructionsModal.tsx";
-import ProposalSidepane from "./components/SlidingSidepane.tsx";
-import ReviewerDropdown from "./components/ReviewerDropdown.tsx";
-import QuestionTypeDropdown from "./components/QuestionTypeDropdown.tsx";
-import SectionControls from "./components/SectionControls.tsx";
-import BulkControls from "./components/BulkControls.tsx";
-import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
+import ProposalSidepane from "./components/SlidingSidepane";
+import ReviewerDropdown from "./components/ReviewerDropdown";
+import QuestionTypeDropdown from "./components/QuestionTypeDropdown";
+import SectionControls from "./components/SectionControls";
+import BulkControls from "./components/BulkControls";
 import { toast } from "react-toastify";
 import {
   Table,
@@ -30,7 +23,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DeleteConfirmationDialog } from "../../modals/DeleteConfirmationModal.tsx";
+import { DeleteConfirmationDialog } from "../../modals/DeleteConfirmationModal";
 import {
   DndContext,
   closestCenter,
@@ -76,8 +69,6 @@ const ProposalPlan = () => {
   const { object_id, contributors, outline } = sharedState;
 
   // const currentUserPermission = contributors[auth.email] || "viewer";
-
-  const [showModal, setShowModal] = useState(false);
 
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
@@ -354,22 +345,6 @@ const ProposalPlan = () => {
       console.error("Error in handleEditClick:", error);
       toast.error("Failed to update section");
     }
-  };
-
-  const showViewOnlyMessage = () => {
-    toast.error("You only have permission to view this bid.");
-  };
-
-  useEffect(() => {
-    // Only show modal if we have an object_id (meaning shared state is populated)
-    // and outline is empty
-    if (object_id && outline.length === 0) {
-      setShowModal(true);
-    }
-  }, [outline.length, object_id]);
-
-  const handleRegenerateClick = () => {
-    setShowModal(true);
   };
 
   const deleteSection = async (sectionId: string, sectionIndex: number) => {
@@ -738,9 +713,6 @@ const ProposalPlan = () => {
     }
   };
 
-  const parentPages = [{ name: "Tender Dashboard", path: "/bids" }];
-  const initialBidName = sharedState.bidInfo;
-
   // Update handleDragEnd to also clear the activeId
   const handleDragEnd = (event) => {
     const { active, over } = event;
@@ -913,169 +885,143 @@ const ProposalPlan = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
-        <BreadcrumbNavigation
-          currentPage={initialBidName}
-          parentPages={parentPages}
-        />
-      </div>
-      <div className="px-6 py-4 flex-1 overflow-y-auto">
-        <div className="flex flex-col space-y-4 h-full">
-          <BidNavbar
-            showViewOnlyMessage={showViewOnlyMessage}
-            initialBidName="Bid Outline"
-            description="Enrich the generated structure by injecting specific instructions to each question to assemble your first draft response."
-            outline={outline}
-            object_id={object_id}
-            handleRegenerateClick={handleRegenerateClick}
-          />
-          <div className="flex-1">
-            <OutlineInstructionsModal
-              show={showModal}
-              onHide={() => setShowModal(false)}
-              bid_id={object_id}
+    <>
+      <div className="flex-1">
+        {outline.length === 0 ? null : (
+          <div className="h-full">
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[60px] flex items-center justify-end gap-2 h-full text-sm text-typo-900 font-semibold py-3.5 px-4">
+                      <Checkbox
+                        checked={selectedSections.size === outline.length}
+                        onCheckedChange={(checked) => handleSelectAll(checked)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </TableHead>
+                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
+                      Section
+                    </TableHead>
+                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                      Reviewer
+                    </TableHead>
+                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                      Question Type
+                    </TableHead>
+                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                      Completed
+                    </TableHead>
+                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                      Subsections
+                    </TableHead>
+                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                      Words
+                    </TableHead>
+                    <TableHead className="w-[60px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4">
+                      Action
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                  onDragStart={handleDragStart}
+                  modifiers={[restrictToVerticalAxis]}
+                >
+                  <SortableContext
+                    items={outline.map((section) => section.section_id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <TableBody>
+                      {outline.map((section, index) => (
+                        <SortableTableRow
+                          key={section.section_id}
+                          section={section}
+                          index={index}
+                        />
+                      ))}
+                    </TableBody>
+                  </SortableContext>
+                </DndContext>
+              </Table>
+            </div>
+
+            <DeleteConfirmationDialog
+              isOpen={showDeleteDialog}
+              onClose={() => {
+                setShowDeleteDialog(false);
+                setSectionToDelete(null);
+              }}
+              onConfirm={handleConfirmDelete}
+              title="Delete Section"
+              message="Are you sure you want to delete this section? This action cannot be undone."
             />
-            {outline.length === 0 ? null : (
-              <div className="h-full">
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[60px] flex items-center justify-end gap-2 h-full text-sm text-typo-900 font-semibold py-3.5 px-4">
-                          <Checkbox
-                            checked={selectedSections.size === outline.length}
-                            onCheckedChange={(checked) =>
-                              handleSelectAll(checked)
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
-                          Section
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                          Reviewer
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                          Question Type
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                          Completed
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                          Subsections
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                          Words
-                        </TableHead>
-                        <TableHead className="w-[60px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4">
-                          Action
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <DndContext
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
-                      onDragStart={handleDragStart}
-                      modifiers={[restrictToVerticalAxis]}
-                    >
-                      <SortableContext
-                        items={outline.map((section) => section.section_id)}
-                        strategy={verticalListSortingStrategy}
-                      >
-                        <TableBody>
-                          {outline.map((section, index) => (
-                            <SortableTableRow
-                              key={section.section_id}
-                              section={section}
-                              index={index}
-                            />
-                          ))}
-                        </TableBody>
-                      </SortableContext>
-                    </DndContext>
-                  </Table>
-                </div>
 
-                <DeleteConfirmationDialog
-                  isOpen={showDeleteDialog}
-                  onClose={() => {
-                    setShowDeleteDialog(false);
-                    setSectionToDelete(null);
-                  }}
-                  onConfirm={handleConfirmDelete}
-                  title="Delete Section"
-                  message="Are you sure you want to delete this section? This action cannot be undone."
-                />
-
-                {contextMenu && (
-                  <SectionMenu
-                    x={contextMenu.x}
-                    y={contextMenu.y}
-                    onClose={() => setContextMenu(null)}
-                    onAddSection={handleAddSection}
-                    onDeleteSection={handleDeleteSection}
-                  />
-                )}
-
-                {selectedSection !== null && (
-                  <ProposalSidepane
-                    section={outline[selectedSection]}
-                    contributors={contributors}
-                    index={selectedSection}
-                    isOpen={isSidepaneOpen}
-                    onClose={() => {
-                      setIsSidepaneOpen(false);
-                      setSelectedSection(null);
-                    }}
-                    isLoading={isLoading}
-                    isPreviewLoading={isPreviewLoading}
-                    handleEditClick={handleEditClick}
-                    handleSectionChange={handleSectionChange}
-                    sendQuestionToChatbot={sendQuestionToChatbot}
-                    apiChoices={apiChoices}
-                    selectedChoices={selectedChoices}
-                    submitSelections={submitSelections}
-                    handleDeleteSubheading={handleDeleteSubheading}
-                    totalSections={outline.length}
-                    onNavigate={handleSectionNavigation}
-                  />
-                )}
-
-                {selectedSections.size > 0 && (
-                  <BulkControls
-                    selectedCount={selectedSections.size}
-                    onClose={() => setSelectedSections(new Set())}
-                    onUpdateSections={handleBulkUpdate}
-                    onDeleteSections={handleBulkDelete}
-                    contributors={contributors}
-                    onRevert={handleRevert}
-                    canRevert={canRevert}
-                  />
-                )}
-
-                {/* Add DragOverlay for better visual feedback */}
-                <DragOverlay>
-                  {activeId ? (
-                    <TableRow className="bg-background border shadow-md">
-                      <TableCell colSpan={8} className="px-4">
-                        {
-                          outline.find(
-                            (section) => section.section_id === activeId
-                          )?.heading
-                        }
-                      </TableCell>
-                    </TableRow>
-                  ) : null}
-                </DragOverlay>
-              </div>
+            {contextMenu && (
+              <SectionMenu
+                x={contextMenu.x}
+                y={contextMenu.y}
+                onClose={() => setContextMenu(null)}
+                onAddSection={handleAddSection}
+                onDeleteSection={handleDeleteSection}
+              />
             )}
+
+            {selectedSection !== null && (
+              <ProposalSidepane
+                section={outline[selectedSection]}
+                contributors={contributors}
+                index={selectedSection}
+                isOpen={isSidepaneOpen}
+                onClose={() => {
+                  setIsSidepaneOpen(false);
+                  setSelectedSection(null);
+                }}
+                isLoading={isLoading}
+                isPreviewLoading={isPreviewLoading}
+                handleEditClick={handleEditClick}
+                handleSectionChange={handleSectionChange}
+                sendQuestionToChatbot={sendQuestionToChatbot}
+                apiChoices={apiChoices}
+                selectedChoices={selectedChoices}
+                submitSelections={submitSelections}
+                handleDeleteSubheading={handleDeleteSubheading}
+                totalSections={outline.length}
+                onNavigate={handleSectionNavigation}
+              />
+            )}
+
+            {selectedSections.size > 0 && (
+              <BulkControls
+                selectedCount={selectedSections.size}
+                onClose={() => setSelectedSections(new Set())}
+                onUpdateSections={handleBulkUpdate}
+                onDeleteSections={handleBulkDelete}
+                contributors={contributors}
+                onRevert={handleRevert}
+                canRevert={canRevert}
+              />
+            )}
+
+            {/* Add DragOverlay for better visual feedback */}
+            <DragOverlay>
+              {activeId ? (
+                <TableRow className="bg-background border shadow-md">
+                  <TableCell colSpan={8} className="px-4">
+                    {
+                      outline.find((section) => section.section_id === activeId)
+                        ?.heading
+                    }
+                  </TableCell>
+                </TableRow>
+              ) : null}
+            </DragOverlay>
           </div>
-        </div>
+        )}
       </div>
-    </div>
+    </>
   );
 };
 

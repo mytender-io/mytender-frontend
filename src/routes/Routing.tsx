@@ -12,21 +12,18 @@ import Proposal from "../views/Proposal";
 import Dashboard from "../views/Dashboard";
 import ChatbotResponse from "../views/Chat/ChatbotResponse";
 // import BidExtractor from "../views/BidExtractor.tsx";
-import QuestionCrafter from "../views/QuestionCrafter.tsx";
+import QuestionCrafter from "../views/QuestionCrafter";
 import Calculator from "../views/Calculator.tsx";
 import BidManagement from "../views/BidWritingStateManagerView.tsx";
 import HowTo from "../views/HowTo.tsx";
 import ProfilePage from "../views/Profile/Profile";
 import Signup from "../components/auth/Signup";
 import ForgotPassword from "../components/auth/ForgotPassword";
-import ProposalPlan from "../views/BidOutline/ProposalPlan";
 import QAGenerator from "../views/QAGenerator/Q&AGenerator";
-import ProposalPreview from "../views/ProposalPreview/ProposalPreview";
 import ComplianceMatrix from "../views/ComplianceMatrix.tsx";
-import BidPlanner from "../views/BidPlanner/BidPlanner";
-import BidIntel from "@/views/BidInputs/BidIntel";
 import MainLayout from "@/layout/MainLayout";
 import posthog from "posthog-js";
+import Bid from "@/views/Bid/Bid";
 
 function Routing() {
   const location = useLocation();
@@ -67,14 +64,10 @@ function Routing() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/question-answer" element={<QAGenerator />} />
           <Route element={<BidManagement />}>
-            {/* <Route path="/bid-extractor" element={<BidExtractor />} /> */}
-            <Route path="/bid-extractor" element={<BidPlanner />} />
-            <Route path="/bid-intel" element={<BidIntel />} />
-            <Route path="/proposal-planner" element={<ProposalPlan />} />
+            <Route path="/bid" element={<Bid />} />
             <Route path="/question-crafter" element={<QuestionCrafter />} />
             <Route path="/compliance-matrix" element={<ComplianceMatrix />} />
             <Route path="/proposal" element={<Proposal />} />
-            <Route path="/proposal-preview" element={<ProposalPreview />} />
             <Route path="/bids" element={<Bids />} />
           </Route>
         </Route>

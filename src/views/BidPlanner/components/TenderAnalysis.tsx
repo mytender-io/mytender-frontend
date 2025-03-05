@@ -97,22 +97,22 @@ const LoadingState = () => {
   );
 };
 
-const CustomTable = ({ content }) => {
-  const parseTable = (text) => {
-    const lines = text.split("\n").filter((line) => line.trim());
+const CustomTable = ({ content }: { content: string }) => {
+  const parseTable = (text: string) => {
+    const lines = text.split("\n").filter((line: string) => line.trim());
     const headers = lines[0]
       .split("|")
-      .map((cell) => cell.trim())
+      .map((cell: string) => cell.trim())
       .filter(Boolean);
     const dataRows = lines
       .slice(2)
       .map((line) =>
         line
           .split("|")
-          .map((cell) => cell.trim())
+          .map((cell: string) => cell.trim())
           .filter(Boolean)
       )
-      .filter((row) => row.length > 0);
+      .filter((row: string[]) => row.length > 0);
     return { headers, rows: dataRows };
   };
 
@@ -123,15 +123,15 @@ const CustomTable = ({ content }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            {headers.map((header, index) => (
+            {headers.map((header: string, index: number) => (
               <TableHead key={index}>{header}</TableHead>
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((row, rowIndex) => (
+          {rows.map((row: string[], rowIndex: number) => (
             <TableRow key={rowIndex}>
-              {row.map((cell, cellIndex) => (
+              {row.map((cell: string, cellIndex: number) => (
                 <TableCell key={cellIndex}>{cell}</TableCell>
               ))}
             </TableRow>
@@ -286,7 +286,7 @@ const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
     setCurrentTabIndex(index);
     console.log("tab click");
 
-    if (tabContent[index]?.trim()) return; // Only return if there's actual content
+    if (tabContent[index as keyof typeof tabContent]?.trim()) return; // Only return if there's actual content
     if (!object_id) {
       toast.warning("Please save the bid first.");
       return;
@@ -500,7 +500,7 @@ const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
     }
   };
 
-  const renderContent = (content, index) => {
+  const renderContent = (content: string, index: number) => {
     if (editMode === index) {
       return (
         <div className="flex flex-col gap-4 h-full">
@@ -720,7 +720,10 @@ const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
                       <Button
                         variant="outline"
                         onClick={() =>
-                          handleEditClick(index, tabContent[index] || "")
+                          handleEditClick(
+                            index,
+                            tabContent[index as keyof typeof tabContent] || ""
+                          )
                         }
                       >
                         <FileText className="h-4 w-4" />

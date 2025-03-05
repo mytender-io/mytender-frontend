@@ -1,10 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { BidContext } from "../views/BidWritingStateManagerView";
+import React, { useContext } from "react";
+import { BidContext, Section } from "../../BidWritingStateManagerView";
 // import { faEdit, faEye, faUsers } from "@fortawesome/free-solid-svg-icons";
-import { useAuthUser } from "react-auth-kit";
-import BidTitle from "./BidTitle";
-import GenerateProposalModal from "../modals/GenerateProposalModal";
+import BidTitle from "../../../components/BidTitle";
+import GenerateProposalModal from "../../../modals/GenerateProposalModal";
 import SaveStatus from "@/components/SaveStatus";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
@@ -14,50 +12,22 @@ const BidNavbar: React.FC<{
   showViewOnlyMessage: () => void;
   initialBidName: string;
   description?: string;
-  outline?: string[];
+  outline?: Section[];
   object_id?: string | null;
   handleRegenerateClick?: () => void;
+  activeTab: string;
+  handleTabClick: (path: string) => void;
 }> = ({
   showViewOnlyMessage,
   initialBidName,
   description,
   outline,
   object_id,
-  handleRegenerateClick
+  handleRegenerateClick,
+  activeTab,
+  handleTabClick
 }) => {
-  const { sharedState, setSharedState } = useContext(BidContext);
-  const { isLoading, saveSuccess, bidInfo } = sharedState;
-
-  const getAuth = useAuthUser();
-  const [auth, setAuth] = useState(null);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { contributors } = sharedState;
-  const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem("lastActiveTab") || "/bid-extractor";
-  });
-
-  const [currentUserPermission, setCurrentUserPermission] = useState("viewer");
-
-  useEffect(() => {
-    const authData = getAuth();
-    setAuth(authData);
-  }, [getAuth]);
-
-  useEffect(() => {
-    if (location.pathname !== "/question-crafter") {
-      // Update active tab based on current location
-      setActiveTab(location.pathname);
-      localStorage.setItem("lastActiveTab", location.pathname);
-    }
-
-    // Update user permission when bidInfo and auth changes
-    if (auth && auth.email) {
-      const permission = contributors[auth.email] || "viewer";
-      setCurrentUserPermission(permission);
-      //console.log("currentUserpermissionnav", permission);
-    }
-  }, [location, bidInfo, auth]);
+  const { sharedState } = useContext(BidContext);
 
   // const getPermissionDetails = (permission) => {
   //   switch (permission) {
@@ -93,14 +63,6 @@ const BidNavbar: React.FC<{
   //   }
   // };
 
-  const handleTabClick = (path: string) => {
-    // Delay navigation to allow animation to play
-    setTimeout(() => {
-      setActiveTab(path);
-      navigate(path);
-    }, 300); // 300ms matches our CSS transition time
-  };
-
   const baseNavLinkStyles =
     "mr-6 text-base font-semibold text-gray-hint_text hover:text-orange px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative";
   const activeNavLinkStyles = "text-orange";
@@ -112,7 +74,6 @@ const BidNavbar: React.FC<{
       "/bid-extractor": 120, // Width for "Tender Insights"
       "/bid-intel": 90, // Width for "Bid Inputs"
       "/proposal-planner": 85, // Width for "Bid Outline"
-      "/question-crafter": 85, // Same as proposal-planner
       "/proposal-preview": 95 // Width for "Bid Review"
     };
 
@@ -121,8 +82,6 @@ const BidNavbar: React.FC<{
       "/bid-extractor": 0,
       "/bid-intel": tabWidths["/bid-extractor"] + 24, // 24px for margin
       "/proposal-planner":
-        tabWidths["/bid-extractor"] + tabWidths["/bid-intel"] + 48,
-      "/question-crafter":
         tabWidths["/bid-extractor"] + tabWidths["/bid-intel"] + 48,
       "/proposal-preview":
         tabWidths["/bid-extractor"] +
@@ -155,56 +114,54 @@ const BidNavbar: React.FC<{
           <div className="flex items-center mt-3 mb-1 relative">
             {/* Sliding indicator */}
             <div
-              className="absolute bottom-0 h-0.5 bg-orange transition-all duration-300 ease-in-out"
+              className="absolute -bottom-1 h-0.5 bg-orange transition-all duration-300 ease-in-out"
               style={getIndicatorStyle()}
             />
 
-            <NavLink
-              to="/bid-extractor"
-              className={({ isActive }) =>
-                cn(baseNavLinkStyles, isActive && activeNavLinkStyles)
-              }
+            <span
+              className={cn(
+                baseNavLinkStyles,
+                activeTab === "/bid-extractor" && activeNavLinkStyles
+              )}
               onClick={() => handleTabClick("/bid-extractor")}
             >
               Tender Insights
-            </NavLink>
-            <NavLink
-              to="/bid-intel"
-              className={({ isActive }) =>
-                cn(baseNavLinkStyles, isActive && activeNavLinkStyles)
-              }
+            </span>
+            <span
+              className={cn(
+                baseNavLinkStyles,
+                activeTab === "/bid-intel" && activeNavLinkStyles
+              )}
               onClick={() => handleTabClick("/bid-intel")}
             >
               Bid Inputs
-            </NavLink>
-            <NavLink
-              to="/proposal-planner"
-              className={({ isActive }) =>
-                cn(
-                  baseNavLinkStyles,
-                  (isActive || activeTab === "/question-crafter") &&
-                    activeNavLinkStyles
-                )
-              }
+            </span>
+            <span
+              className={cn(
+                baseNavLinkStyles,
+                activeTab === "/proposal-planner" && activeNavLinkStyles
+              )}
               onClick={() => handleTabClick("/proposal-planner")}
             >
               Bid Outline
-            </NavLink>
-            <NavLink
-              to="/proposal-preview"
-              className={({ isActive }) =>
-                cn(baseNavLinkStyles, isActive && activeNavLinkStyles)
-              }
+            </span>
+            <span
+              className={cn(
+                baseNavLinkStyles,
+                activeTab === "/proposal-preview" && activeNavLinkStyles
+              )}
               onClick={() => handleTabClick("/proposal-preview")}
             >
               Bid Review
-            </NavLink>
+            </span>
             <SaveStatus
               isLoading={sharedState.isLoading}
               saveSuccess={sharedState.saveSuccess}
             />
           </div>
-          {outline && outline.length > 0 ? (
+          {activeTab === "/proposal-planner" &&
+          outline &&
+          outline.length > 0 ? (
             <div className="flex items-center flex-shrink-0 gap-2">
               <Button variant="outline" onClick={handleRegenerateClick}>
                 <PlusIcon />

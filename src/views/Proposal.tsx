@@ -3,10 +3,10 @@ import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
-import SideBarSmall from "../routes/SidebarSmall.tsx";
+import SideBarSmall from "../routes/SidebarSmall";
 import { Button, Row } from "react-bootstrap";
-import BidNavbar from "@/components/BidNavbar";
-import ProposalEditor from "./ProposalEditor.tsx";
+import BidNavbar from "@/views/Bid/components/BidNavbar";
+import ProposalEditor from "./ProposalEditor";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import {
@@ -16,11 +16,11 @@ import {
   ContentState
 } from "draft-js";
 import "./Proposal.css";
-import { BidContext } from "./BidWritingStateManagerView.tsx";
-import { TabProvider } from "../routes/TabProvider.tsx";
-import BidCompilerWizard from "../wizards/BidCompilerWizard.tsx";
+import { BidContext } from "./BidWritingStateManagerView";
+import { TabProvider } from "../routes/TabProvider";
+import BidCompilerWizard from "../wizards/BidCompilerWizard";
 import posthog from "posthog-js";
-import { displayAlert } from "../helper/Alert.tsx";
+import { displayAlert } from "../helper/Alert";
 
 const Proposal = () => {
   const getAuth = useAuthUser();

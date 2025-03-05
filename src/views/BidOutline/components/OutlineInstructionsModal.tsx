@@ -1,7 +1,6 @@
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { API_URL, HTTP_PREFIX } from "../../../helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
@@ -26,7 +25,6 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState, setSharedState } = useContext(BidContext);
   const [currentStep, setCurrentStep] = useState(1);
-  const navigate = useNavigate();
 
   const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -230,11 +228,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
 
   const onCancel = () => {
     resetModalState();
-    if (!sharedState.outline || sharedState.outline.length === 0) {
-      navigate("/bid-extractor");
-    } else {
-      onHide();
-    }
+    onHide();
   };
 
   const getHeaderTitle = () => {

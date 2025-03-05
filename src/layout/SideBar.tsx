@@ -178,11 +178,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               <DashboardIcon
                 className={cn(
                   "min-w-5 min-h-5",
-                  isActive("/bids") ||
-                    isActive("/bid-extractor") ||
-                    isActive("/bid-intel") ||
-                    isActive("/proposal-planner") ||
-                    isActive("/proposal-preview")
+                  isActive("/bids") || isActive("/bid")
                     ? "text-orange"
                     : "text-gray-hint_text"
                 )}
@@ -193,11 +189,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                 <span
                   className={cn(
                     "text-sm font-medium whitespace-nowrap",
-                    isActive("/bids") ||
-                      isActive("/bid-extractor") ||
-                      isActive("/bid-intel") ||
-                      isActive("/proposal-planner") ||
-                      isActive("/proposal-preview")
+                    isActive("/bids") || isActive("/bid")
                       ? "text-orange font-bold"
                       : "text-gray-hint_text"
                   )}

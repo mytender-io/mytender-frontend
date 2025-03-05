@@ -243,7 +243,9 @@ const Bids = () => {
 
     localStorage.setItem("navigatedFromBidsTable", "true");
     localStorage.removeItem("bidState");
-    navigate("/bid-extractor", { state: { bid: bid, fromBidsTable: true } });
+    navigate(`/bid?id=${bid._id}`, {
+      state: { bid: bid, fromBidsTable: true }
+    });
     handleGAEvent("Bid Tracker", "Navigate to Bid", "Bid Table Link");
   };
 
@@ -514,7 +516,7 @@ const Bids = () => {
                                 </span>
                               ) : (
                                 <Link
-                                  to="/bid-extractor"
+                                  to={`/bid?id=${bid._id}`}
                                   state={{ bid: bid, fromBidsTable: true }}
                                   onClick={() => navigateToChatbot(bid)}
                                   className="block truncate w-full text-gray-hint_text no-underline group-hover:text-orange group-hover:font-bold transition-colors duration-200"
