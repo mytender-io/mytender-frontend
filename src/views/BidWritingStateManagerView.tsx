@@ -28,7 +28,7 @@ export interface Subheading {
 export interface HighlightedDocument {
   name: string;
   rawtext: string;
-  folder:string;
+  folder: string;
 }
 
 export interface Section {
@@ -89,7 +89,8 @@ export interface SharedState {
   win_themes: string[];
   customer_pain_points: string[];
   differentiating_factors: string[];
-  solution: Solution; // New solution field
+  solution: Solution;
+  selectedCaseStudies: HighlightedDocument[]; // Array of highlighted document objects
 }
 export interface BidContextType {
   sharedState: SharedState;
@@ -129,7 +130,8 @@ const defaultState: BidContextType = {
       product: "",
       features: "",
       approach: ""
-    }
+    },
+    selectedCaseStudies: [] // Initialize with an empty array
   },
   setSharedState: () => {},
   saveProposal: () => {},
@@ -165,7 +167,8 @@ const BidManagement: React.FC = () => {
           isLoading: false,
           saveSuccess: null,
           object_id: parsedState.object_id || null,
-          selectedFolders: parsedState.selectedFolders || ["default"]
+          selectedFolders: parsedState.selectedFolders || ["default"],
+          selectedCaseStudies: parsedState.selectedCaseStudies || [] // Ensure selectedCaseStudies exists
         };
       }
       return defaultState.sharedState;
@@ -249,7 +252,8 @@ const BidManagement: React.FC = () => {
         win_themes,
         customer_pain_points,
         differentiating_factors,
-        solution  // Add solution to the destructuring
+        solution,
+        selectedCaseStudies // Include the selectedCaseStudies
       } = stateCopy;
 
       if (!bidInfo || bidInfo.trim() === "") {
@@ -308,6 +312,13 @@ const BidManagement: React.FC = () => {
       );
 
       formData.append("solution", JSON.stringify(solution || { product: "", features: "", approach: "" }));
+      
+      // Add selectedCaseStudies to the form data
+      formData.append(
+        "selectedCaseStudies",
+        JSON.stringify(selectedCaseStudies || [])
+      );
+      
       if (object_id) {
         appendFormData("object_id", object_id);
       }
@@ -379,6 +390,7 @@ const BidManagement: React.FC = () => {
       originalCreator: sharedState.original_creator,
       constributors: sharedState.contributors,
       selectedFolders: sharedState.selectedFolders,
+      selectedCaseStudies: sharedState.selectedCaseStudies,
       canSave: canUserSave()
     });
 
@@ -427,6 +439,7 @@ const BidManagement: React.FC = () => {
     sharedState.differentiating_factors,
     sharedState.customer_pain_points,
     JSON.stringify(sharedState.solution),
+    JSON.stringify(sharedState.selectedCaseStudies), // Add the selectedCaseStudies dependency
     JSON.stringify(
       sharedState.outline.map((s) => ({
         id: s.section_id,

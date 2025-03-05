@@ -11,17 +11,21 @@ import BreadCrumbs from "./BreadCrumbs";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// Updated interface for SelectFileProps to handle file metadata
+// Updated interface for SelectFileProps to handle file metadata and API endpoint
 interface SelectFileProps {
   onFileSelect: (
     files: Array<{ unique_id: string; filename: string; folder: string }>
   ) => void;
   initialSelectedFiles?: string[];
+  apiEndpoint?: string; // New prop for the API endpoint
+  rootFolderName?: string; // Optional prop for the root folder name display
 }
 
 const SelectFile: React.FC<SelectFileProps> = ({
   onFileSelect,
-  initialSelectedFiles = []
+  initialSelectedFiles = [],
+  apiEndpoint = "get_collections", // Default to get_collections if not specified
+  rootFolderName = "Whole Content Library" // Default name for the root folder
 }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -49,31 +53,62 @@ const SelectFile: React.FC<SelectFileProps> = ({
 
 
   const getTopLevelFolders = () => {
-    const folders = availableCollections.filter(
-      (collection: string) =>
-        !collection.includes("FORWARDSLASH") &&
-        !collection.startsWith("TenderLibrary_")
-    );
+    // For case studies, we don't exclude FORWARDSLASH if apiEndpoint is get_case_studies
+    const isCaseStudies = apiEndpoint === "get_case_studies";
+    
+    if (isCaseStudies) {
+      // For case studies endpoint, only include direct children of case_studies_collection
+      const caseStudyFolders = availableCollections
+        .filter((collection: string) => {
+          const parts = collection.split("FORWARDSLASH");
+          return parts.length === 2 && collection.startsWith("case_studies_collection");
+        })
+        .map((collection: string) => {
+          const parts = collection.split("FORWARDSLASH");
+          // Return full path for navigation
+          return collection;
+        });
+      
+      return caseStudyFolders.sort((a: string, b: string) => a.localeCompare(b));
+    } else {
+      // Original behavior for regular collections
+      const folders = availableCollections.filter(
+        (collection: string) =>
+          !collection.includes("FORWARDSLASH") &&
+          !collection.startsWith("TenderLibrary_")
+      );
 
-    // Sort the folders to put "default" first
-    return folders.sort((a: string, b: string) => {
-      if (a === "default") return -1;
-      if (b === "default") return 1;
-      return a.localeCompare(b);
-    });
+      // Sort the folders to put "default" first
+      return folders.sort((a: string, b: string) => {
+        if (a === "default") return -1;
+        if (b === "default") return 1;
+        return a.localeCompare(b);
+      });
+    }
   };
 
   const fetchFolderStructure = async () => {
     try {
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_collections`,
+        `http${HTTP_PREFIX}://${API_URL}/${apiEndpoint}`,
         {},
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
 
-      setAvailableCollections(response.data.collections);
+      // Handle different response structures based on the endpoint
+      if (apiEndpoint === "get_case_studies") {
+        setAvailableCollections(response.data.case_studies || []);
+      } else {
+        setAvailableCollections(response.data.collections || []);
+      }
+
+      // Build the folder structure regardless of the endpoint
       const structure = {};
-      response.data.collections.forEach((collectionName) => {
+      const collections = apiEndpoint === "get_case_studies" 
+        ? response.data.case_studies || []
+        : response.data.collections || [];
+        
+      collections.forEach((collectionName) => {
         const parts = collectionName.split("FORWARDSLASH");
         let currentLevel = structure;
         parts.forEach((part, index) => {
@@ -86,7 +121,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
 
       setFolderStructure(structure);
     } catch (error) {
-      console.error("Error fetching folder structure:", error);
+      console.error(`Error fetching folder structure from ${apiEndpoint}:`, error);
     } finally {
       setIsLoading(false);
     }
@@ -245,7 +280,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
     if (activeFolder) {
       fetchFolderContents(activeFolder);
     }
-  }, [updateTrigger, activeFolder]);
+  }, [updateTrigger, activeFolder, apiEndpoint]);
 
   useEffect(() => {
     if (activeFolder === null) {
@@ -258,11 +293,20 @@ const SelectFile: React.FC<SelectFileProps> = ({
       const pages = Math.ceil(itemsCount / itemsPerPage);
       setTotalPages(pages);
     }
-  }, [activeFolder, folderContents, availableCollections, itemsPerPage]);
+  }, [activeFolder, folderContents, availableCollections, itemsPerPage, apiEndpoint]);
 
   const formatDisplayName = (name) => {
     if (typeof name !== "string") return "";
     return name.replace(/_/g, " ");
+  };
+
+  // For case studies, extract just the folder name from the path
+  const getDisplayName = (path) => {
+    if (apiEndpoint === "get_case_studies" && path.includes("FORWARDSLASH")) {
+      const parts = path.split("FORWARDSLASH");
+      return formatDisplayName(parts[parts.length - 1]);
+    }
+    return path === "default" ? rootFolderName : formatDisplayName(path);
   };
 
   const getCurrentPageItems = () => {
@@ -292,9 +336,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
           >
             <FolderIcon className="h-4 w-4" />
             <span className="text-sm">
-              {folder === "default"
-                ? "Whole Content Library"
-                : formatDisplayName(folder)}
+              {getDisplayName(folder)}
             </span>
           </TableCell>
         </TableRow>
@@ -354,6 +396,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
             <BreadCrumbs
               activeFolder={activeFolder}
               setActiveFolder={setActiveFolder}
+              rootFolderName={apiEndpoint === "get_case_studies" ? "Case Studies" : rootFolderName}
             />
             {activeFolder && (
               <div
@@ -405,8 +448,6 @@ const SelectFile: React.FC<SelectFileProps> = ({
                   </Button>
                 </div>
               )}
-              
-          
             </div>
           )}
         </div>

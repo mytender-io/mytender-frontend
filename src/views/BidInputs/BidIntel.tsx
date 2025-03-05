@@ -19,6 +19,7 @@ import {
   AccordionTrigger
 } from "@/components/ui/accordion";
 import Solution from "./Solution.tsx";
+import SelectCaseStudy from "./SelectCaseStudy.tsx";
 
 const BidIntel = () => {
   const getAuth = useAuthUser();
@@ -378,15 +379,7 @@ const BidIntel = () => {
                   Select Case Studies
                 </AccordionTrigger>
                 <AccordionContent className="p-4">
-                  <div className="bg-gray-50 rounded p-8 text-center">
-                    <p className="text-lg text-gray-400 font-medium">
-                      Coming Soon
-                    </p>
-                    <p className="text-sm text-gray-400 mt-2">
-                      Case study selection functionality will be available in
-                      future updates
-                    </p>
-                  </div>
+                 <SelectCaseStudy/>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
