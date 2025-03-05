@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
-import { cn } from "@/utils/index.ts";
+import withAuth from "@/routes/withAuth";
+import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation";
 import LibraryContent from "./LibraryContent"; // Component for the existing library content
 import CaseStudies from "./CaseStudies";
-import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation";
-import withAuth from "@/routes/withAuth";
 import {
   Tooltip,
   TooltipArrow,
@@ -12,17 +10,38 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip";
+import { cn } from "@/utils";
+import { Button } from "@/components/ui/button";
 
 const Library = () => {
   const [activeTab, setActiveTab] = useState("library");
 
   const baseNavLinkStyles =
-    "mr-6 text-base font-semibold text-gray-hint_text hover:text-orange px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative";
+    "mr-6 text-base font-semibold text-gray-hint_text hover:text-orange px-3 py-2.5 transition-all duration-300 ease-in-out relative bg-transparent hover:bg-transparent";
+  const activeNavLinkStyles = "text-orange";
 
-  const activeNavLinkStyles =
-    "text-orange after:content-[''] after:absolute after:bottom-[-0.3rem] after:left-0 after:w-full after:h-[0.1rem] after:bg-orange after:transition-[width] after:duration-1000 after:ease-in-out after:delay-1000";
+  // Get width and position for the sliding indicator
+  const getIndicatorStyle = () => {
+    // Define widths for each tab
+    const tabWidths = {
+      library: 130, // Width for "Company Library"
+      "case-studies": 110 // Width for "Case Studies"
+    };
 
-  const handleTabClick = (tab) => {
+    // Define positions (cumulative widths plus margins)
+    const tabPositions = {
+      library: 0,
+      "case-studies": tabWidths["library"] + 24 // 24px for margin
+    };
+
+    return {
+      width: `${tabWidths[activeTab as keyof typeof tabWidths] || 100}px`,
+      transform: `translateX(${tabPositions[activeTab as keyof typeof tabPositions] || 0}px)`,
+      opacity: activeTab ? 1 : 0
+    };
+  };
+
+  const handleTabClick = (tab: string) => {
     setActiveTab(tab);
   };
 
@@ -37,8 +56,15 @@ const Library = () => {
         />
       </div>
       <div className="flex justify-between items-center border-b border-gray-line">
-        <div className="flex items-center mt-3 mb-1 px-3">
-          <button
+        <div className="flex items-center mt-3 mb-1 px-3 relative">
+          {/* Sliding indicator */}
+          <div
+            className="absolute -bottom-1 h-0.5 bg-orange transition-all duration-300 ease-in-out"
+            style={getIndicatorStyle()}
+          />
+
+          <Button
+            variant="ghost"
             className={cn(
               baseNavLinkStyles,
               activeTab === "library" && activeNavLinkStyles
@@ -46,12 +72,13 @@ const Library = () => {
             onClick={() => handleTabClick("library")}
           >
             Company Library
-          </button>
+          </Button>
 
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <Button
+                  variant="ghost"
                   className={cn(
                     baseNavLinkStyles,
                     activeTab === "case-studies" && activeNavLinkStyles
@@ -59,7 +86,7 @@ const Library = () => {
                   onClick={() => handleTabClick("case-studies")}
                 >
                   Case Studies
-                </button>
+                </Button>
               </TooltipTrigger>
               <TooltipContent
                 side="bottom"

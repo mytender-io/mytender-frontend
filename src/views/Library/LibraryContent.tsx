@@ -11,7 +11,6 @@ import FileContentModal from "./components/FileContentModal.tsx";
 // import LibraryContextMenu from "./components/LibraryContextMenu.tsx";
 import EllipsisMenu from "./components/EllipsisMenu.tsx";
 import LibrarySidepane from "./components/LibrarySidepane.tsx";
-import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
 import PlusIcon from "@/components/icons/PlusIcon.tsx";
 import {
   ArrowLeftIcon,
@@ -45,7 +44,6 @@ import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
 import { toast } from "react-toastify";
 import PDFViewer from "@/modals/PDFViewer.tsx";
 import UploadZip from "@/components/UploadZip.tsx";
-
 
 const NewFolderModal = React.memo(
   ({ show, onHide, onCreateFolder, title, parentFolder }) => {
@@ -880,7 +878,7 @@ const LibraryContent = () => {
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-  
+
     if (query.length > 0) {
       // Filter out the default folder and case_studies_collection from folder matches
       const folderMatches = availableCollections
@@ -898,12 +896,12 @@ const LibraryContent = () => {
           path: collection,
           fullName: collection.replace(/FORWARDSLASH/g, "/")
         }));
-  
+
       // Filter out files from the default folder and case_studies_collection folder and their contents
       const fileMatches = Object.entries(folderContents)
         .filter(
           ([folder]) =>
-            folder !== "default" && 
+            folder !== "default" &&
             !folder.startsWith("defaultFORWARDSLASH") && // Exclude both default folder and its subfolders
             folder !== "case_studies_collection" &&
             !folder.startsWith("case_studies_collectionFORWARDSLASH") // Exclude both case_studies_collection folder and its subfolders
@@ -919,7 +917,7 @@ const LibraryContent = () => {
               unique_id: item.unique_id
             }))
         );
-  
+
       const results = [...folderMatches, ...fileMatches];
       setFilteredResults(results);
       setShowSearchResults(true);
