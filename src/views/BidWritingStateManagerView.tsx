@@ -91,6 +91,7 @@ export interface SharedState {
   differentiating_factors: string[];
   solution: Solution;
   selectedCaseStudies: HighlightedDocument[]; // Array of highlighted document objects
+  tone_of_voice: string;
 }
 export interface BidContextType {
   sharedState: SharedState;
@@ -131,7 +132,8 @@ const defaultState: BidContextType = {
       features: "",
       approach: ""
     },
-    selectedCaseStudies: [] // Initialize with an empty array
+    selectedCaseStudies: [], // Initialize with an empty array
+    tone_of_voice: "" // Initialize tone_of_voice with empty string
   },
   setSharedState: () => {},
   saveProposal: () => {},
@@ -168,7 +170,8 @@ const BidManagement: React.FC = () => {
           saveSuccess: null,
           object_id: parsedState.object_id || null,
           selectedFolders: parsedState.selectedFolders || ["default"],
-          selectedCaseStudies: parsedState.selectedCaseStudies || [] // Ensure selectedCaseStudies exists
+          selectedCaseStudies: parsedState.selectedCaseStudies || [], // Ensure selectedCaseStudies exists
+          tone_of_voice: parsedState.tone_of_voice || "" // Ensure tone_of_voice exists
         };
       }
       return defaultState.sharedState;
@@ -253,7 +256,8 @@ const BidManagement: React.FC = () => {
         customer_pain_points,
         differentiating_factors,
         solution,
-        selectedCaseStudies // Include the selectedCaseStudies
+        selectedCaseStudies, // Include the selectedCaseStudies
+        tone_of_voice // Include tone_of_voice
       } = stateCopy;
 
       if (!bidInfo || bidInfo.trim() === "") {
@@ -294,6 +298,7 @@ const BidManagement: React.FC = () => {
       appendFormData("submission_deadline", submission_deadline);
       appendFormData("questions", questions);
       appendFormData("original_creator", original_creator);
+      appendFormData("tone_of_voice", tone_of_voice); // Add tone_of_voice to form data
 
       formData.append("contributors", JSON.stringify(contributors || []));
       formData.append(
@@ -391,6 +396,7 @@ const BidManagement: React.FC = () => {
       constributors: sharedState.contributors,
       selectedFolders: sharedState.selectedFolders,
       selectedCaseStudies: sharedState.selectedCaseStudies,
+      tone_of_voice: sharedState.tone_of_voice, // Log tone_of_voice changes
       canSave: canUserSave()
     });
 
@@ -438,8 +444,9 @@ const BidManagement: React.FC = () => {
     sharedState.win_themes,
     sharedState.differentiating_factors,
     sharedState.customer_pain_points,
+    sharedState.tone_of_voice, // Add tone_of_voice as a dependency
     JSON.stringify(sharedState.solution),
-    JSON.stringify(sharedState.selectedCaseStudies), // Add the selectedCaseStudies dependency
+    JSON.stringify(sharedState.selectedCaseStudies),
     JSON.stringify(
       sharedState.outline.map((s) => ({
         id: s.section_id,
