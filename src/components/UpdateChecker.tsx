@@ -13,10 +13,7 @@ export const UpdateChecker = () => {
 
   // Add this effect to test toast functionality
   useEffect(() => {
-    toast.info("Update checker initialised", {
-      position: "bottom-right",
-      autoClose: 3000
-    });
+    toast.info("Update checker initialised");
   }, []);
 
   useEffect(() => {
@@ -125,11 +122,6 @@ export const UpdateChecker = () => {
               </button>
             </div>,
             {
-              autoClose: false,
-              closeOnClick: false,
-              position: "bottom-right",
-              closeButton: true,
-              draggable: false,
               toastId: "update-notification" // Prevent duplicate toasts
             }
           );
@@ -137,8 +129,6 @@ export const UpdateChecker = () => {
           // Backup notification in case toast.info fails
           if (!toastId) {
             toast("A new version is available! Please refresh the page.", {
-              autoClose: false,
-              position: "bottom-right",
               toastId: "update-notification-backup"
             });
           }
@@ -152,9 +142,7 @@ export const UpdateChecker = () => {
       } catch (error) {
         console.error("UpdateChecker: Version check failed:", error);
         // Show error toast
-        toast.error("Failed to check for updates", {
-          position: "bottom-right"
-        });
+        toast.error("Failed to check for updates");
       }
     };
 

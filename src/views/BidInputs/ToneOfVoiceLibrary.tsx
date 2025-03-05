@@ -1,33 +1,33 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useAuthUser } from 'react-auth-kit';
-import { API_URL, HTTP_PREFIX } from '../../helper/Constants.tsx';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Save, Trash2 } from 'lucide-react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useAuthUser } from "react-auth-kit";
+import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Save, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
 const ToneOfVoiceLibrary = () => {
   const [tones, setTones] = useState([]);
-  const [newTone, setNewTone] = useState('');
+  const [newTone, setNewTone] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [toneToDelete, setToneToDelete] = useState(null);
@@ -55,15 +55,10 @@ const ToneOfVoiceLibrary = () => {
       );
       setTones(response.data.tone_of_voice_library || []);
     } catch (err) {
-      toast.error('Failed to load tone of voice library. Please try again later.', {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true
-      });
-      console.error('Error fetching tones:', err);
+      toast.error(
+        "Failed to load tone of voice library. Please try again later."
+      );
+      console.error("Error fetching tones:", err);
     } finally {
       setIsLoading(false);
     }
@@ -81,49 +76,28 @@ const ToneOfVoiceLibrary = () => {
           }
         }
       );
-      toast.success('Tone of voice library updated successfully!', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true
-      });
+      toast.success("Tone of voice library updated successfully!");
     } catch (err) {
-      toast.error('Failed to update tone of voice library. Please try again.', {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true
-      });
-      console.error('Error saving tones:', err);
+      toast.error("Failed to update tone of voice library. Please try again.");
+      console.error("Error saving tones:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
   const addTone = () => {
-    if (newTone.trim() === '') return;
+    if (newTone.trim() === "") return;
     if (tones.includes(newTone.trim())) {
-      toast.warning('This tone already exists in your library.', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true
-      });
+      toast.warning("This tone already exists in your library.");
       return;
     }
-    
+
     setTones([...tones, newTone.trim()]);
-    setNewTone('');
+    setNewTone("");
   };
 
   const handleNewToneKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       addTone();
     }
   };
@@ -142,14 +116,7 @@ const ToneOfVoiceLibrary = () => {
   const handleConfirmDelete = () => {
     if (toneToDelete !== null) {
       removeTone(toneToDelete);
-      toast.info('Tone removed from library.', {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true
-      });
+      toast.info("Tone removed from library.");
     }
     setShowConfirmDialog(false);
     setToneToDelete(null);
@@ -165,7 +132,7 @@ const ToneOfVoiceLibrary = () => {
             Manage your tone of voice options for content creation
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="p-6">
           <div className="flex mb-6">
             <Input
@@ -180,21 +147,23 @@ const ToneOfVoiceLibrary = () => {
               Add
             </Button>
           </div>
-          
+
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Your Tones</h3>
             {tones.length === 0 ? (
-              <p className="text-slate-500 italic">No tones added yet. Add your first tone above.</p>
+              <p className="text-slate-500 italic">
+                No tones added yet. Add your first tone above.
+              </p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {tones.map((tone, index) => (
-                  <Badge 
-                    key={index} 
+                  <Badge
+                    key={index}
                     variant="secondary"
                     className="px-3 py-1 text-sm flex items-center gap-2"
                   >
                     {tone}
-                    <button 
+                    <button
                       onClick={() => confirmDeleteTone(index)}
                       className="ml-1 text-slate-500 hover:text-red-500 transition-colors"
                       aria-label={`Remove ${tone}`}
@@ -207,13 +176,9 @@ const ToneOfVoiceLibrary = () => {
             )}
           </div>
         </CardContent>
-        
+
         <CardFooter className="bg-slate-50 border-t p-4">
-          <Button 
-            onClick={saveTones} 
-            disabled={isLoading}
-            className="ml-auto"
-          >
+          <Button onClick={saveTones} disabled={isLoading} className="ml-auto">
             <Save className="h-4 w-4 mr-2" />
             Save Changes
           </Button>
@@ -229,16 +194,13 @@ const ToneOfVoiceLibrary = () => {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex space-x-2 justify-end">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setShowConfirmDialog(false)}
               >
                 Cancel
               </Button>
-              <Button 
-                variant="destructive" 
-                onClick={handleConfirmDelete}
-              >
+              <Button variant="destructive" onClick={handleConfirmDelete}>
                 Delete
               </Button>
             </DialogFooter>
