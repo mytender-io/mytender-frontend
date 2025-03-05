@@ -94,7 +94,8 @@ const BidPlanner = () => {
             product: "",
             features: "",
             approach: ""
-          }
+          },
+          tone_of_voice: bidData?.tone_of_voice || ""
         };
       });
       console.log("bid planner");
