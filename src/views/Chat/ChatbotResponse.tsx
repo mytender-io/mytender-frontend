@@ -35,7 +35,7 @@ const globalChatState = {
         `http${HTTP_PREFIX}://${API_URL}/question`,
         {
           choice: "2",
-          broadness: "2",
+          broadness: "8",
           input_text: question,
           extra_instructions: "",
           datasets: ["default"]
