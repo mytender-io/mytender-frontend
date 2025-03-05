@@ -716,16 +716,17 @@ const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
               >
                 <div className={cn("relative px-8 py-4 h-full")}>
                   {canUserEdit && editMode !== index && (
-                    <Button
-                      variant="outline"
-                      className="absolute top-4 right-8"
-                      onClick={() =>
-                        handleEditClick(index, tabContent[index] || "")
-                      }
-                    >
-                      <FileText className="h-4 w-4" />
-                      Edit
-                    </Button>
+                    <div className="text-right">
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          handleEditClick(index, tabContent[index] || "")
+                        }
+                      >
+                        <FileText className="h-4 w-4" />
+                        Edit
+                      </Button>
+                    </div>
                   )}
                   {renderContent(
                     tabContent[index as keyof typeof tabContent] || "",
