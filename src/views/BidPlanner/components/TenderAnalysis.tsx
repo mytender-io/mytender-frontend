@@ -723,6 +723,7 @@ const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
                         handleEditClick(index, tabContent[index] || "")
                       }
                     >
+                      <FileText className="h-4 w-4" />
                       Edit
                     </Button>
                   )}
