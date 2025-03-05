@@ -371,11 +371,11 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   {openSections.compliance && (
                     <DebouncedTextArea
                       value={section.compliance_requirements}
-                      onChange={(e) =>
+                      onChange={(value) =>
                         handleSectionChange(
                           index,
                           "compliance_requirements",
-                          e.target.value
+                          value
                         )
                       }
                       placeholder="These are the compliance requirements relevant to the section..."
@@ -398,11 +398,11 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   {openSections.winThemes && (
                     <DebouncedTextArea
                       value={section.relevant_evaluation_criteria}
-                      onChange={(e) =>
+                      onChange={(value) =>
                         handleSectionChange(
                           index,
                           "relevant_evaluation_criteria",
-                          e.target.value
+                          value
                         )
                       }
                       placeholder="These are the win themes relevant to the section..."
@@ -425,11 +425,11 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   {openSections.painPoints && (
                     <DebouncedTextArea
                       value={section.relevant_derived_insights}
-                      onChange={(e) =>
+                      onChange={(value) =>
                         handleSectionChange(
                           index,
                           "relevant_derived_insights",
-                          e.target.value
+                          value
                         )
                       }
                       placeholder="These are the customer pain points relevant to the section..."
@@ -452,11 +452,11 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   {openSections.differentiation && (
                     <DebouncedTextArea
                       value={section.relevant_differentiation_factors}
-                      onChange={(e) =>
+                      onChange={(value) =>
                         handleSectionChange(
                           index,
                           "relevant_differentiation_factors",
-                          e.target.value
+                          value
                         )
                       }
                       placeholder="These are the competitor differentiation factors relevant to the section..."
