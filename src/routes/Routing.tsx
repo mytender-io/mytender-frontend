@@ -24,6 +24,7 @@ import ComplianceMatrix from "../views/ComplianceMatrix.tsx";
 import MainLayout from "@/layout/MainLayout";
 import posthog from "posthog-js";
 import Bid from "@/views/Bid/Bid";
+import Home from "@/views/Home/Home.tsx";
 
 function Routing() {
   const location = useLocation();
@@ -51,6 +52,7 @@ function Routing() {
             </MainLayout>
           }
         >
+          <Route path="/home" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/" element={<Bids />} />
           <Route path="/calculator" element={<Calculator />} />

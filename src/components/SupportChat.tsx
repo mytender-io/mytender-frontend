@@ -2,11 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { useAuthUser } from "react-auth-kit";
 import { MessageCircleQuestion, X, Send } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,6 +20,8 @@ import {
   CardFooter
 } from "@/components/ui/card";
 import { cn } from "@/utils";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SupportChat = () => {
   const [messages, setMessages] = useState([]);
@@ -34,21 +33,21 @@ const SupportChat = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const latestMessageIdRef = useRef(null);
+  const userSentMessageRef = useRef(false);
+  const notifiedMessageIdsRef = useRef(new Set());
+  // const notificationSound = useRef(new Audio("/notification.mp3"));
 
   const processMessage = (msg) => {
     console.log("Processing message:", JSON.stringify(msg));
     let text = msg.text;
     let isUserMessage = false;
-
     console.log("Initial text:", text);
-
     // Remove the unexpected "!" prefix if present
     if (text.startsWith("!")) {
       console.log("Found '!' prefix, removing...");
       text = text.slice(1).trim();
       console.log("Text after removing '!':", text);
     }
-
     // Check for "USER" prefix
     if (text.startsWith("USER ")) {
       console.log("Found 'USER' prefix, marking as user message...");
@@ -56,13 +55,11 @@ const SupportChat = () => {
       text = text.slice(5).trim();
       console.log("Text after removing 'USER':", text);
     }
-
     const processedMsg = {
       ...msg,
       isUserMessage,
       text
     };
-
     return processedMsg;
   };
 
@@ -79,7 +76,6 @@ const SupportChat = () => {
         }
       );
       const { messages: fetchedMessages } = response.data;
-
       if (Array.isArray(fetchedMessages)) {
         setMessages((prevMessages) => {
           const newMessages = fetchedMessages.filter(
@@ -87,16 +83,54 @@ const SupportChat = () => {
           );
 
           // Check if there are any new non-user messages (replies)
-          const hasNewReplies = newMessages.some(
+          const newSupportReplies = newMessages.filter(
             (msg) =>
               !msg.text.startsWith("USER ") &&
-              (!latestMessageIdRef.current ||
-                msg.id !== latestMessageIdRef.current)
+              !notifiedMessageIdsRef.current.has(msg.id)
           );
 
-          if (hasNewReplies && prevMessages.length > 0 && !open) {
-            setHasNewMessages(true);
+          const hasNewSupportReplies = newSupportReplies.length > 0;
+
+          // Show toast notification and play sound only if there are new support replies
+          // and we didn't just send a message ourselves
+          if (
+            hasNewSupportReplies &&
+            prevMessages.length > 0 &&
+            !userSentMessageRef.current
+          ) {
+            if (!open) {
+              setHasNewMessages(true);
+            }
+
+            // Track which messages we've already shown notifications for
+            newSupportReplies.forEach((msg) => {
+              // Only show one notification regardless of how many new messages
+              if (msg.id && !notifiedMessageIdsRef.current.has(msg.id)) {
+                notifiedMessageIdsRef.current.add(msg.id);
+              }
+            });
+
+            // Show toast notification for support replies only (just once)
+            toast.info("New support message received", {
+              position: "bottom-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              toastId: "new-support-message" // Prevents duplicate toasts
+            });
+
+            // Play notification sound
+            // try {
+            //   notificationSound.current.play().catch(e => console.error("Failed to play notification sound:", e));
+            // } catch (error) {
+            //   console.error("Error playing notification sound:", error);
+            // }
           }
+
+          // Reset the userSentMessage flag after processing
+          userSentMessageRef.current = false;
 
           const updatedMessages = [
             ...prevMessages,
@@ -105,13 +139,11 @@ const SupportChat = () => {
               return processedMsg;
             })
           ];
-
           // Update latest message id
           if (updatedMessages.length > 0) {
             latestMessageIdRef.current =
               updatedMessages[updatedMessages.length - 1].id;
           }
-
           return updatedMessages;
         });
       }
@@ -132,8 +164,17 @@ const SupportChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    // Reset hasNewMessages when the chat popover is opened
+    if (open) {
+      setHasNewMessages(false);
+    }
+  }, [open]);
+
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
+      // Set the flag to indicate user sent a message
+      userSentMessageRef.current = true;
       handleNewUserMessage(inputMessage);
       setInputMessage(""); // Clear input immediately after sending
     }
@@ -181,12 +222,14 @@ const SupportChat = () => {
     "/reset_password",
     "/login"
   ];
+
   if (notRenderedUrls.includes(location.pathname)) {
     return null;
   }
 
   return (
     <div className="relative">
+      <ToastContainer />
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button

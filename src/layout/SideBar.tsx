@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Logo from "../resources/images/mytender.io_badge.png";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, HomeIcon } from "lucide-react";
 // import HomeIcon from "@/components/icons/HomeIcon";
 import DashboardIcon from "@/components/icons/DashboardIcon";
 import ContentLibraryIcon from "@/components/icons/ContentLibraryIcon";
@@ -153,24 +153,33 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
          </Tooltip> */}
         <div className="flex flex-col flex-1 overflow-y-auto px-4 gap-10">
           <div className="space-y-3">
-            {/* <Link
-            to="/home"
-            className={cn(
-              "flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3",
-              isActive("/home") ? "bg-typo-200" : "bg-transparent"
-            )}
-          >
-            <HomeIcon
-              className="text-gray-hint_text min-w-5 min-h-5"
-              width={20}
-              height={20}
-            />
-            {!isCollapsed && (
-              <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
-                Home
-              </span>
-            )}
-          </Link> */}
+          <Link
+              to="/home"
+              className="flex items-center hover:bg-typo-200 bg-transparent rounded-md px-3 py-2 gap-3"
+            >
+              <HomeIcon
+                className={cn(
+                  "min-w-5 min-h-5",
+                  isActive("/home")
+                    ? "text-orange"
+                    : "text-gray-hint_text"
+                )}
+                width={20}
+                height={20}
+              />
+              {!isCollapsed && (
+                <span
+                  className={cn(
+                    "text-sm font-medium whitespace-nowrap",
+                    isActive("/home") 
+                      ? "text-orange font-bold"
+                      : "text-gray-hint_text"
+                  )}
+                >
+                  Home
+                </span>
+              )}
+            </Link>
             <Link
               to="/bids"
               className="flex items-center hover:bg-typo-200 bg-transparent rounded-md px-3 py-2 gap-3"
