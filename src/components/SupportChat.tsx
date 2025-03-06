@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const SupportChat = () => {
   const [messages, setMessages] = useState([]);

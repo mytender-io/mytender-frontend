@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useAuthUser } from "react-auth-kit";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import {
