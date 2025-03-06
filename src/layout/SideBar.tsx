@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Logo from "../resources/images/mytender.io_badge.png";
-import { ChevronLeft, ChevronRight, HomeIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, HomeIcon, UserRound } from "lucide-react";
 // import HomeIcon from "@/components/icons/HomeIcon";
 import DashboardIcon from "@/components/icons/DashboardIcon";
 import ContentLibraryIcon from "@/components/icons/ContentLibraryIcon";
 import LibraryChatIcon from "@/components/icons/LibraryChatIcon";
 import QAIcon from "@/components/icons/QAIcon";
 import WordpaneIcon from "@/components/icons/WordpaneIcon";
-import UserIcon from "@/components/icons/UserIcon";
 import HowtoIcon from "@/components/icons/HowtoIcon";
 import LogoutIcon from "@/components/icons/LogoutIcon";
 import { cn } from "@/utils";
@@ -153,15 +152,15 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
          </Tooltip> */}
         <div className="flex flex-col flex-1 overflow-y-auto px-4 gap-10">
           <div className="space-y-3">
-          <Link
+            <Link
               to="/home"
               className="flex items-center hover:bg-typo-200 bg-transparent rounded-md px-3 py-2 gap-3"
             >
               <HomeIcon
                 className={cn(
-                  "min-w-5 min-h-5",
+                  "min-w-5 min-h-5 stroke-1",
                   isActive("/home")
-                    ? "text-orange"
+                    ? "text-orange stroke-2"
                     : "text-gray-hint_text"
                 )}
                 width={20}
@@ -171,7 +170,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                 <span
                   className={cn(
                     "text-sm font-medium whitespace-nowrap",
-                    isActive("/home") 
+                    isActive("/home")
                       ? "text-orange font-bold"
                       : "text-gray-hint_text"
                   )}
@@ -191,6 +190,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                     ? "text-orange"
                     : "text-gray-hint_text"
                 )}
+                strokeWidth={isActive("/bids") || isActive("/bid") ? 2 : 1}
                 width={20}
                 height={20}
               />
@@ -216,6 +216,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                   "min-w-5 min-h-5",
                   isActive("/library") ? "text-orange" : "text-gray-hint_text"
                 )}
+                strokeWidth={isActive("/library") ? 1.5 : 1}
                 width={20}
                 height={20}
               />
@@ -251,6 +252,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                   "min-w-5 min-h-5",
                   isActive("/chat") ? "text-orange" : "text-gray-hint_text"
                 )}
+                strokeWidth={isActive("/chat") ? 2 : 1}
                 width={20}
                 height={20}
               />
@@ -278,6 +280,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                     ? "text-orange"
                     : "text-gray-hint_text"
                 )}
+                strokeWidth={isActive("/question-answer") ? 2 : 1}
                 width={20}
                 height={20}
               />
@@ -328,189 +331,6 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                 </span>
               )}
             </Link>
-            {/* <Tooltip
-            title="Tender Dashboard - View and manage all your tenders in one place"
-            placement="right"
-            enterDelay={2000}
-            enterNextDelay={2000}
-            leaveDelay={0}
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: "rgba(51, 51, 51, 0.7)",
-                  color: "white",
-                  fontSize: "14px",
-                  padding: "8px 12px",
-                  maxWidth: "300px",
-                  backdropFilter: "blur(4px)"
-                }
-              }
-            }}
-          >
-            <Link
-              to="/bids"
-              className={`flex items-center px-4 py-3 hover:bg-gray-50 ${
-                isActive("/bids") ? "bg-blue-50 text-blue-600" : "text-gray-700"
-              }`}
-            >
-              <DashboardIcon className="text-gray-hint_text min-w-5 min-h-5" width={20} height={20} />
-              {!isCollapsed && (
-                <span className="ml-3 text-sm text-gray-hint_text">
-                  Tender Dashboard
-                </span>
-              )}
-            </Link>
-          </Tooltip> */}
-            {/* <Tooltip
-            title="Content Library - Access and manage your organization's knowledge base and templates"
-            placement="right"
-            enterDelay={2000}
-            enterNextDelay={2000}
-            leaveDelay={0}
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: "rgba(51, 51, 51, 0.7)",
-                  color: "white",
-                  fontSize: "14px",
-                  padding: "8px 12px",
-                  maxWidth: "300px",
-                  backdropFilter: "blur(4px)"
-                }
-              }
-            }}
-          >
-            <Link
-              to="/library"
-              className={`flex items-center px-4 py-3 hover:bg-gray-50 ${
-                isActive("/library")
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-700"
-              }`}
-            >
-              <BookMarked size={24} />
-              {!isCollapsed && <span className="ml-3">Content Library</span>}
-            </Link>
-          </Tooltip> */}
-            {/* <Tooltip
-            title="Library Chat - Interact with AI to get insights from your content library"
-            placement="right"
-            enterDelay={2000}
-            enterNextDelay={2000}
-            leaveDelay={0}
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: "rgba(51, 51, 51, 0.7)",
-                  color: "white",
-                  fontSize: "14px",
-                  padding: "8px 12px",
-                  maxWidth: "300px",
-                  backdropFilter: "blur(4px)"
-                }
-              }
-            }}
-          >
-            <Link
-              to="/chatResponse"
-              className={`flex items-center px-4 py-3 hover:bg-gray-50 ${
-                isActive("/chatResponse")
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-700"
-              }`}
-            >
-              <Sparkles size={24} />
-              {!isCollapsed && <span className="ml-3">Library Chat</span>}
-            </Link>
-          </Tooltip> */}
-            {/* <Tooltip
-            title="Q&A Generator - Automatically generate question and answer pairs from your documents"
-            placement="right"
-            enterDelay={2000}
-            enterNextDelay={2000}
-            leaveDelay={0}
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: "rgba(51, 51, 51, 0.7)",
-                  color: "white",
-                  fontSize: "14px",
-                  padding: "8px 12px",
-                  maxWidth: "300px",
-                  backdropFilter: "blur(4px)"
-                }
-              }
-            }}
-          >
-            <Link
-              to="/question-answer"
-              className={`flex items-center px-4 py-3 hover:bg-gray-50 ${
-                isActive("/question-answer")
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-700"
-              }`}
-            >
-              <Files size={24} />
-              {!isCollapsed && <span className="ml-3">Q&A Generator</span>}
-            </Link>
-          </Tooltip> */}
-            {/* <Tooltip
-            title="Wordpane - Access your tender content directly within Microsoft Word"
-            placement="right"
-            enterDelay={2000}
-            enterNextDelay={2000}
-            leaveDelay={0}
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: "rgba(51, 51, 51, 0.7)",
-                  color: "white",
-                  fontSize: "14px",
-                  padding: "8px 12px",
-                  maxWidth: "300px",
-                  backdropFilter: "blur(4px)"
-                }
-              }
-            }}
-          >
-            <Link
-              to="#"
-              className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-700"
-              onClick={handleWordAddInClick}
-            >
-              <FileText size={24} />
-              {!isCollapsed && <span className="ml-3">Wordpane</span>}
-            </Link>
-          </Tooltip> */}
-            {/* <Tooltip
-            title="How To - Interactive guide to help you get the most out of mytender.io"
-            placement="right"
-            enterDelay={2000}
-            enterNextDelay={2000}
-            leaveDelay={0}
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: "rgba(51, 51, 51, 0.7)",
-                  color: "white",
-                  fontSize: "14px",
-                  padding: "8px 12px",
-                  maxWidth: "300px",
-                  backdropFilter: "blur(4px)"
-                }
-              }
-            }}
-          >
-            <Link
-              to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
-              className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-700"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <GraduationCap size={24} />
-              {!isCollapsed && <span className="ml-3">How To</span>}
-            </Link>
-          </Tooltip> */}
           </div>
         </div>
 
@@ -521,10 +341,12 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               "flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3 bg-transparent"
             )}
           >
-            <UserIcon
+            <UserRound
               className={cn(
-                "min-w-5 min-h-5",
-                isActive("/profile") ? "text-orange" : "text-gray-hint_text"
+                "min-w-5 min-h-5 stroke-1",
+                isActive("/profile")
+                  ? "text-orange stroke-2"
+                  : "text-gray-hint_text"
               )}
               width={20}
               height={20}
@@ -569,43 +391,6 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               </span>
             )}
           </Link>
-          {/* <Tooltip
-            title="Profile - Manage your account settings"
-            placement="right"
-            enterDelay={2000}
-            leaveDelay={0}
-          >
-            <Link
-              to="/profile"
-              className={`flex items-center px-2 py-2 mb-2 rounded hover:bg-gray-50 ${
-                isActive("/profile")
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-700"
-              }`}
-            >
-              <User2 size={16} />
-              {!isCollapsed && <span className="ml-3">Profile</span>}
-            </Link>
-          </Tooltip> */}
-
-          {/* <Tooltip
-            title="Logout - Sign out of your account"
-            placement="right"
-            enterDelay={2000}
-            leaveDelay={0}
-          >
-            <Link
-              to="/logout"
-              className={`flex items-center px-2 py-2 rounded hover:bg-gray-50 ${
-                isActive("/logout")
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-700"
-              }`}
-            >
-              <LogOut size={16} />
-              {!isCollapsed && <span className="ml-3">Logout</span>}
-            </Link>
-          </Tooltip> */}
         </div>
       </div>
     </div>

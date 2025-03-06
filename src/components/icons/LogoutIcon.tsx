@@ -21,25 +21,25 @@ const LogoutIcon: React.FC<IconProps> = ({
           id="Rectangle 177466"
           stroke="currentColor"
           d="M7 4V1h15v18l-9.5 3.5V19H7v-"
-          strokeWidth="2"
+          strokeWidth="1"
         ></path>
         <path
           id="Rectangle 177467"
           stroke="currentColor"
           d="m22 1 -9.5 3.5v18"
-          strokeWidth="2"
+          strokeWidth="1"
         ></path>
         <path
           id="Vector 2860"
           stroke="currentColor"
           d="M9.99992 10.042H2.00391"
-          strokeWidth="2"
+          strokeWidth="1"
         ></path>
         <path
           id="Vector 2249"
           stroke="currentColor"
           d="m6 14.042 -4 -4 4 -4.00001"
-          strokeWidth="2"
+          strokeWidth="1"
         ></path>
       </g>
     </svg>

@@ -26,16 +26,6 @@ const AppContent = () => {
       <StatusLabelsProvider>
         <UpdateChecker />
         <Routing />
-        <ToastContainer
-          position="bottom-right"
-          autoClose={4000}
-          newestOnTop={false}
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          draggable={false}
-          hideProgressBar={true}
-        />
       </StatusLabelsProvider>
     </BrowserRouter>
   );
@@ -45,6 +35,16 @@ const App = () => {
   return (
     <AuthProvider authType={"localstorage"} authName={"sparkaichatbot"}>
       <AppContent />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={4000}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable={false}
+        hideProgressBar={true}
+      />
     </AuthProvider>
   );
 };

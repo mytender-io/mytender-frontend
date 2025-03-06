@@ -20,7 +20,7 @@ import {
   CardFooter
 } from "@/components/ui/card";
 import { cn } from "@/utils";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const SupportChat = () => {
@@ -229,7 +229,6 @@ const SupportChat = () => {
 
   return (
     <div className="relative">
-      <ToastContainer />
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button

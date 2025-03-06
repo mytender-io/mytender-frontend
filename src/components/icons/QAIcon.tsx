@@ -4,7 +4,8 @@ import IconProps from ".";
 const QAIcon: React.FC<IconProps> = ({
   className,
   width = 24,
-  height = 24
+  height = 24,
+  strokeWidth = 1
 }) => {
   return (
     <svg
@@ -21,7 +22,7 @@ const QAIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
       <path
         d="M4.5 6.5h-2a1 1 0 0 0 -1 1v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1 -1v-2"
@@ -29,7 +30,7 @@ const QAIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
     </svg>
   );

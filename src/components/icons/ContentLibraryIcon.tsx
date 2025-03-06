@@ -4,7 +4,8 @@ import IconProps from ".";
 const ContentLibraryIcon: React.FC<IconProps> = ({
   className,
   width = 24,
-  height = 24
+  height = 24,
+  strokeWidth = 1
 }) => {
   return (
     <svg
@@ -21,7 +22,7 @@ const ContentLibraryIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
       <path
         d="M3.5 8A20.582 20.582 0 0 1 10 9.421"
@@ -29,7 +30,7 @@ const ContentLibraryIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
       <path
         d="M3.5 11.405a20.585 20.585 0 0 1 6.5 1.419"
@@ -37,7 +38,7 @@ const ContentLibraryIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
       <path
         d="M3.5 14.809a20.557 20.557 0 0 1 6.5 1.419"
@@ -45,7 +46,7 @@ const ContentLibraryIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
       <path
         d="m12 7.001 0 16.375"
@@ -53,7 +54,7 @@ const ContentLibraryIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
       <path
         d="M21 6.5a3 3 0 1 0 -4 2.817V10.5h2V9.318A2.992 2.992 0 0 0 21 6.5Z"
@@ -61,7 +62,7 @@ const ContentLibraryIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
       <path
         d="m17 12.501 2 0"
@@ -69,7 +70,7 @@ const ContentLibraryIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
       <path
         d="m17.5 14.501 1 0"
@@ -77,7 +78,7 @@ const ContentLibraryIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
       <path
         d="m18 1.501 0 -1"
@@ -85,7 +86,7 @@ const ContentLibraryIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
       <path
         d="m21.536 2.966 0.707 -0.707"
@@ -93,7 +94,7 @@ const ContentLibraryIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
       <path
         d="m14.465 2.966 -0.708 -0.707"
@@ -101,7 +102,7 @@ const ContentLibraryIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1"
+        strokeWidth={strokeWidth}
       ></path>
     </svg>
   );
