@@ -471,7 +471,7 @@ const Bids = () => {
           </div>
         </div>
         {viewType === "table" ? (
-          <div className="flex flex-col justify-between flex-1 overflow-y-auto space-y-2">
+          <div className="flex flex-col justify-between flex-1 overflow-y-auto spface-y-2">
             <div className="space-y-4">
               <div className="border border-typo-200 rounded-lg overflow-hidden">
                 <Table>
