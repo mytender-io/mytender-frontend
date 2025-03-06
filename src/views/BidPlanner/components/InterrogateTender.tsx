@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 import { API_URL, HTTP_PREFIX } from "../../../helper/Constants";
-import { Search, Loader2, FileSearch, ArrowLeft } from "lucide-react";
+import { Search, FileSearch, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,8 +13,8 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
-import { toast } from "react-toastify";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "react-toastify";
 
 // The actual InterrogateTender component that will be shown in the dialog
 const InterrogateTenderContent = ({
@@ -134,7 +134,7 @@ const InterrogateTenderContent = ({
             className="absolute right-0 top-0 h-full rounded-l-none"
           >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Spinner className="w-4 h-4" />
             ) : (
               <span className="flex items-center gap-2">
                 <Search className="h-4 w-4" />
@@ -488,7 +488,7 @@ const InterrogateTenderDialog = ({ bid_id, triggerComponent }) => {
           <>
             {isLoadingText ? (
               <div className="flex justify-center items-center p-10">
-                <Spinner className="w-6 h-6 text-orange" />
+                <Spinner />
               </div>
             ) : (
               <div

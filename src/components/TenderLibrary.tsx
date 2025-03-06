@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  ChevronUp,
-  ChevronDown,
-  Loader,
-  Check,
-  X,
-  ArrowLeft
-} from "lucide-react";
+import { ChevronUp, ChevronDown, Check, X, ArrowLeft } from "lucide-react";
 import UploadPDF from "./UploadPDF";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
@@ -29,7 +22,7 @@ const DeleteConfirmation = ({ onConfirm, onCancel, isDeleting }) => {
   if (isDeleting) {
     return (
       <div className="flex justify-center">
-        <Loader className="w-6 h-6 animate-spin" />
+        <Spinner />
       </div>
     );
   }

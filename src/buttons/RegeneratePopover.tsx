@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -8,6 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover";
+import { Spinner } from "@/components/ui/spinner";
 
 const RegeneratePopover = ({
   subIndex,
@@ -53,7 +54,7 @@ const RegeneratePopover = ({
             />
             {isLoading ? (
               <div className="px-4 h-12 flex items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
+                <Spinner />
               </div>
             ) : (
               <Button

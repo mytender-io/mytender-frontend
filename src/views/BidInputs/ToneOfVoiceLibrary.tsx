@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
+import { Plus } from "lucide-react";
 import { BidContext } from "../BidWritingStateManagerView.tsx";
 import CreateToneOfVoiceDialog from "./components/CreateToneOfVoiceDialog.tsx";
 
@@ -123,8 +124,8 @@ const ToneOfVoiceLibrary = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center p-8 text-gray-500 italic">
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        <div className="flex items-center justify-center p-8 text-gray-500 italic gap-2">
+          <Spinner className="w-4 h-4" />
           <span>Loading tones...</span>
         </div>
       ) : (
