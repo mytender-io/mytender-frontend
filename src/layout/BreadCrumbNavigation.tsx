@@ -7,13 +7,13 @@ import ProfilePhoto from "@/layout/ProfilePhoto";
 const BreadcrumbNavigation = ({
   currentPage,
   parentPages = [] as Array<{ name: string; path: string }>,
-  uploadingImage = false,
+  refreshImage = false,
   rightContent
 }: {
   currentPage: string;
   parentPages?: Array<{ name: string; path: string }>;
   rightContent?: ReactNode;
-  uploadingImage?: boolean;
+  refreshImage?: boolean;
 }) => {
   return (
     <nav className="flex items-center justify-between w-full rounded-lg">
@@ -37,7 +37,11 @@ const BreadcrumbNavigation = ({
       <div className="flex items-center gap-4">
         {rightContent}
         <SupportChat />
-        <ProfilePhoto size="md" uploadingImage={uploadingImage} />
+        <ProfilePhoto
+          size="md"
+          refreshImage={refreshImage}
+          showTeamMembers={true}
+        />
       </div>
     </nav>
   );

@@ -82,7 +82,7 @@ const ProfilePage = () => {
     jobRole: false
   });
 
-  const [uploadingImage, setUploadingImage] = useState(false);
+  const [refreshImage, setRefreshImage] = useState(false);
 
   const toggleEditable = (field: keyof typeof editableFields) => {
     setEditableFields((prev) => ({
@@ -103,15 +103,6 @@ const ProfilePage = () => {
           }
         );
 
-        const profilePicture = await axios.get(
-          `http${HTTP_PREFIX}://${API_URL}/get_company_logo`,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`
-            }
-          }
-        );
-
         setFormData({
           username: response.data.login || "",
           email: response.data.email || "",
@@ -123,7 +114,7 @@ const ProfilePage = () => {
           productName: response.data.product_name || "",
           companyObjectives: response.data.company_objectives || "",
           toneOfVoice: response.data.tone_of_voice || "",
-          profilePicture: profilePicture.data.image || ""
+          profilePicture: response.data.company_logo || ""
         });
         setLoading(false);
       } catch (err) {
@@ -288,7 +279,7 @@ const ProfilePage = () => {
       return;
     }
 
-    setUploadingImage(true);
+    setRefreshImage(true);
 
     try {
       const formData = new FormData();
@@ -325,7 +316,7 @@ const ProfilePage = () => {
       console.error("Error uploading profile picture:", err);
       toast.error("Failed to upload profile picture. Please try again.");
     } finally {
-      setUploadingImage(false);
+      setRefreshImage(false);
     }
   };
 
@@ -345,7 +336,7 @@ const ProfilePage = () => {
         <BreadcrumbNavigation
           currentPage="Profile"
           parentPages={parentPages}
-          uploadingImage={uploadingImage}
+          refreshImage={refreshImage}
         />
       </div>
 
@@ -379,7 +370,7 @@ const ProfilePage = () => {
                           htmlFor="profile-picture-upload"
                           className="cursor-pointer text-white text-xs font-medium"
                         >
-                          {uploadingImage ? (
+                          {refreshImage ? (
                             <Spinner className="text-white" />
                           ) : (
                             "Change Photo"
@@ -391,7 +382,7 @@ const ProfilePage = () => {
                           accept="image/jpeg,image/png,image/gif"
                           className="hidden"
                           onChange={handleProfilePictureUpload}
-                          disabled={uploadingImage}
+                          disabled={refreshImage}
                         />
                       </div>
                     </div>

@@ -4,40 +4,38 @@ import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Spinner } from "@/components/ui/spinner";
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
+import { cn } from "@/utils";
 interface ProfilePhotoProps {
   size?: "sm" | "md" | "lg";
   className?: string;
-  uploadingImage?: boolean;
+  refreshImage?: boolean;
+  showTeamMembers?: boolean;
 }
 
 const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
   size = "md",
   className = "",
-  uploadingImage = false
+  showTeamMembers = false,
+  refreshImage = false
 }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const token = auth?.token || "default";
 
-  const [profilePicture, setProfilePicture] = useState<string>("");
-  const [username, setUsername] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [profile, setProfile] = useState([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [organizationUsers, setOrganizationUsers] = useState([]);
 
   useEffect(() => {
     const fetchProfileData = async () => {
+      setLoading(true);
       try {
-        // Fetch profile picture
-        const pictureResponse = await axios.get(
-          `http${HTTP_PREFIX}://${API_URL}/get_company_logo`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
-
-        // Fetch username for fallback
         const profileResponse = await axios.get(
           `http${HTTP_PREFIX}://${API_URL}/profile`,
           {
@@ -46,9 +44,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
             }
           }
         );
-
-        setProfilePicture(pictureResponse.data.image || "");
-        setUsername(profileResponse.data.login || "");
+        setProfile(profileResponse.data);
         setLoading(false);
       } catch (err) {
         console.error("Failed to load profile photo:", err);
@@ -57,7 +53,32 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
     };
 
     fetchProfileData();
-  }, [token, uploadingImage]);
+  }, [token, refreshImage]);
+
+  useEffect(() => {
+    const fetchOrganizationUsers = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `http${HTTP_PREFIX}://${API_URL}/organization_users`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        setOrganizationUsers(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching organization users:", err);
+        setLoading(false);
+      }
+    };
+
+    if (profile.userType === "owner" && showTeamMembers) {
+      fetchOrganizationUsers();
+    }
+  }, [token, profile, showTeamMembers]);
 
   // Size classes
   const sizeClasses = {
@@ -69,26 +90,129 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
   if (loading) {
     return (
       <div
-        className={`flex items-center justify-center ${sizeClasses[size]} ${className}`}
+        className={cn(
+          "flex items-center justify-center",
+          sizeClasses[size],
+          className
+        )}
       >
         <Spinner />
       </div>
     );
   }
 
+  // Only show up to 3 organization users
+  const displayedUsers = organizationUsers.slice(0, 3);
+
   return (
-    <Avatar className={`${sizeClasses[size]} ${className}`}>
-      {profilePicture ? (
-        <AvatarImage
-          src={`data:image/jpeg;base64,${profilePicture}`}
-          alt="Profile"
-          className="object-cover"
-        />
-      ) : null}
-      <AvatarFallback className="bg-orange-lighter text-primary font-semibold">
-        {username.slice(0, 1).toUpperCase()}
-      </AvatarFallback>
-    </Avatar>
+    <div className="flex items-center">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Avatar
+              className={cn(
+                "border border-gray-300",
+                sizeClasses[size],
+                className,
+                "cursor-pointer z-50"
+              )}
+            >
+              {profile.company_logo ? (
+                <AvatarImage
+                  src={`data:image/jpeg;base64,${profile.company_logo}`}
+                  alt="Profile"
+                  className="object-cover"
+                />
+              ) : null}
+              <AvatarFallback className="bg-orange-lighter text-primary font-semibold">
+                {profile.login?.slice(0, 1).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </TooltipTrigger>
+          <TooltipContent>
+            <div>
+              <div className="flex items-center">
+                <div>
+                  <p className="font-semibold">{profile.login}</p>
+                  <p className="text-xs">{profile.email}</p>
+                </div>
+              </div>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+        {showTeamMembers &&
+          profile.userType === "owner" &&
+          displayedUsers.length > 0 && (
+            <div className="flex -space-x-3 -ml-3 opacity-50">
+              {displayedUsers.map((member, index: number) => (
+                <Tooltip key={member?.email}>
+                  <TooltipTrigger asChild>
+                    <div
+                      className={cn(
+                        "relative",
+                        index === 0
+                          ? "z-[49]"
+                          : index === 1
+                            ? "z-[48]"
+                            : index === 2
+                              ? "z-[47]"
+                              : ""
+                      )}
+                    >
+                      <Avatar
+                        className={cn(
+                          "border border-gray-300",
+                          sizeClasses.md,
+                          "cursor-pointer"
+                        )}
+                      >
+                        {member.image ? (
+                          <AvatarImage
+                            src={`data:image/jpeg;base64,${member.image}`}
+                            alt={member.username}
+                            className="object-cover"
+                          />
+                        ) : null}
+                        <AvatarFallback className="bg-orange-lighter text-primary font-semibold text-xs">
+                          {member.username?.slice(0, 1).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div>
+                      <p className="font-semibold">{member.username}</p>
+                      <p className="text-xs">{member.email}</p>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+              {organizationUsers.length > 3 && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Avatar
+                      className={cn(
+                        "border border-gray-300",
+                        sizeClasses.md,
+                        "bg-gray-100"
+                      )}
+                    >
+                      <AvatarFallback className="text-gray-500 text-xs font-medium">
+                        +{organizationUsers.length - 3}
+                      </AvatarFallback>
+                    </Avatar>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-sm">
+                      {organizationUsers.length - 3} more team members
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          )}
+      </TooltipProvider>
+    </div>
   );
 };
 

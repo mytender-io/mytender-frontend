@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronUp, ChevronDown, Loader, Check, X } from "lucide-react";
+import {
+  ChevronUp,
+  ChevronDown,
+  Loader,
+  Check,
+  X,
+  ArrowLeft
+} from "lucide-react";
 import UploadPDF from "./UploadPDF";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faTrash,
-  faFileAlt,
-  faCheck,
-  faXmark,
-  faArrowLeft
-} from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
@@ -301,22 +302,24 @@ const TenderLibrary = ({ object_id }) => {
     if (selectedFile) {
       return (
         <div className="px-4">
-          <div className="mb-4 mt-4 flex items-center">
-            <FontAwesomeIcon
-              icon={faArrowLeft}
-              className="mr-3 cursor-pointer text-lg"
+          <div className="mb-4 flex items-center gap-2">
+            <ArrowLeft
+              className="cursor-pointer"
+              size={20}
               onClick={handleBackToLibrary}
             />
-            <span className="text-xl font-bold">Back to Tender Upload</span>
+            <span className="font-semibold">Back to Tender Upload</span>
           </div>
           {renderFileContent()}
         </div>
       );
     }
-  
+
     return (
-      <div className="h-[400px] overflow-auto"> {/* Fixed height container with scroll */}
-        <div className="space-y-6 px-4"> {/* Added padding to prevent content touching edges */}
+      <div className="h-[400px] overflow-auto">
+        {/* Fixed height container with scroll */}
+        <div className="space-y-6 px-4">
+          {/* Added padding to prevent content touching edges */}
           <UploadPDF
             bid_id={object_id}
             get_collections={fetchDocuments}
@@ -328,7 +331,10 @@ const TenderLibrary = ({ object_id }) => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none">
-                    <div className="flex items-center gap-2 cursor-pointer" onClick={handleSort}>
+                    <div
+                      className="flex items-center gap-2 cursor-pointer"
+                      onClick={handleSort}
+                    >
                       Filename
                       <FontAwesomeIcon
                         icon={getSortIcon()}
@@ -345,56 +351,56 @@ const TenderLibrary = ({ object_id }) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-              {documents.map((doc, index) => (
-                <TableRow
-                  key={index}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleFileSelect(doc.filename || doc)}
-                >
-                  <TableCell className="py-2 px-4">
-                    <div className="flex items-center gap-2">
-                      <FontAwesomeIcon
-                        icon={faFileAlt}
-                        className="text-muted-foreground"
-                      />
-                      <span>{doc.filename || doc}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-2 px-4">
-                    {formatDate(doc.upload_date)}
-                  </TableCell>
-                  <TableCell
-                    className="text-center"
-                    onClick={(e) => e.stopPropagation()}
+                {documents.map((doc, index) => (
+                  <TableRow
+                    key={index}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleFileSelect(doc.filename || doc)}
                   >
-                    {deleteConfirmationState.showFor ===
-                    (doc.filename || doc) ? (
-                      <DeleteConfirmation
-                        onConfirm={(e) =>
-                          handleDeleteConfirm(e, doc.filename || doc)
-                        }
-                        onCancel={handleDeleteCancel}
-                        isDeleting={isDeletingFile}
-                      />
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 min-w-6"
-                        onClick={(e) =>
-                          handleDeleteInitiate(e, doc.filename || doc, index)
-                        }
-                      >
-                        <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    <TableCell className="py-2 px-4">
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon
+                          icon={faFileAlt}
+                          className="text-muted-foreground"
+                        />
+                        <span>{doc.filename || doc}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-2 px-4">
+                      {formatDate(doc.upload_date)}
+                    </TableCell>
+                    <TableCell
+                      className="text-center"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {deleteConfirmationState.showFor ===
+                      (doc.filename || doc) ? (
+                        <DeleteConfirmation
+                          onConfirm={(e) =>
+                            handleDeleteConfirm(e, doc.filename || doc)
+                          }
+                          onCancel={handleDeleteCancel}
+                          isDeleting={isDeletingFile}
+                        />
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 min-w-6"
+                          onClick={(e) =>
+                            handleDeleteInitiate(e, doc.filename || doc, index)
+                          }
+                        >
+                          <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-      </div>
       </div>
     );
   };
