@@ -44,6 +44,9 @@ import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
+import SelectOrganisationUserButton from "@/buttons/SelectOrganisationUserButton";
+import { Spinner } from "@/components/ui/spinner";
+import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
@@ -68,6 +71,10 @@ const ProposalPlan = () => {
 
   const { object_id, contributors, outline } = sharedState;
 
+  const [organizationUsers, setOrganizationUsers] = useState([]);
+  const [isOrganizationUsersLoading, setIsOrganizationUsersLoading] =
+    useState(true);
+
   // const currentUserPermission = contributors[auth.email] || "viewer";
 
   const [contextMenu, setContextMenu] = useState(null);
@@ -84,6 +91,37 @@ const ProposalPlan = () => {
   } | null>(null);
 
   const [activeId, setActiveId] = useState(null);
+
+  useEffect(() => {
+    const fetchOrganizationUsers = async () => {
+      try {
+        setIsOrganizationUsersLoading(true);
+
+        // Create form data
+        const formData = new FormData();
+        formData.append("include_pending", "false");
+
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/get_organization_users`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`,
+              "Content-Type": "multipart/form-data"
+            }
+          }
+        );
+
+        setOrganizationUsers(response.data);
+        setIsOrganizationUsersLoading(false);
+      } catch (err) {
+        console.error("Error fetching organization users:", err);
+        setIsOrganizationUsersLoading(false);
+      }
+    };
+
+    fetchOrganizationUsers();
+  }, [tokenRef]);
 
   // Bulk Update functions
   const handleSelectSection = (index) => {
@@ -177,17 +215,27 @@ const ProposalPlan = () => {
   };
 
   const handleRowClick = (e: React.MouseEvent, index: number) => {
-    // Add data-status-menu to the list of elements to ignore
+    // Check if the click is on or within the SelectOrganisationUserButton component
+    // This includes checking for any parent elements with data-org-user-dropdown
+    const isOrgUserButton = (e.target as HTMLElement).closest(
+      "[data-org-user-dropdown]"
+    );
+
+    // Check for other interactive elements as before
     const isInteractiveElement = (e.target as HTMLElement).closest(
       'input, select, button, a, [role="button"], .editable-cell, .dropdown, .dropdown-toggle, .MuiSelect-root, .MuiSelect-select, .MuiMenuItem-root, .MuiPaper-root, .MuiList-root, .css-1dimb5e-singleValue, .css-1s2u09g-control, .css-b62m3t-container, [data-checkbox], [data-status-menu]'
     );
 
-    if (!isInteractiveElement) {
-      e.preventDefault();
-      setSelectedSection(index);
-      setIsSidepaneOpen(true);
-      setApiChoices([]);
+    // If it's either an org user button or another interactive element, don't open the sidepane
+    if (isOrgUserButton || isInteractiveElement) {
+      return; // Exit early without opening the sidepane
     }
+
+    // Otherwise, open the sidepane
+    e.preventDefault();
+    setSelectedSection(index);
+    setIsSidepaneOpen(true);
+    setApiChoices([]);
   };
 
   // Add these types and functions to your ProposalPlan component:
@@ -777,6 +825,90 @@ const ProposalPlan = () => {
       over
     } = useSortable({ id: section.section_id });
 
+    const handleAnswererSelect = (user) => {
+      // Extract the username from the user object
+      const username = user.username || "";
+      handleSectionChange(index, "answerer", username);
+    };
+
+    const handleReviewerSelect = async (user) => {
+      // Extract the username and email from the user object
+      const username = user.username || "";
+      const email = user.email || "";
+
+      // Skip if no email is provided
+      if (!email) {
+        handleSectionChange(index, "reviewer", username);
+        return;
+      }
+
+      // First update the section with the new reviewer
+      const success = await handleSectionChange(index, "reviewer", username);
+
+      if (success) {
+        // After successfully setting the reviewer, create a task for them
+        try {
+          const taskData = {
+            name: `Review section: ${section.heading}`,
+            bid_id: object_id,
+            index: index
+          };
+
+          // Create the task
+          const response = await axios.post(
+            `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
+            taskData,
+            {
+              headers: {
+                Authorization: `Bearer ${tokenRef.current}`
+              }
+            }
+          );
+
+          if (response.data.success) {
+            // Task created successfully, now send email notification
+            const bidTitle = sharedState.bid_title || "Untitled Bid";
+            const message = `You have been assigned to review the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
+            const subject = `New Review Task: ${section.heading}`;
+
+            // Send the email notification
+            await sendOrganizationEmail({
+              recipient: email,
+              message,
+              subject,
+              token: tokenRef.current,
+              onSuccess: () => {
+                toast.success(
+                  `Task assigned to ${username} with email notification`
+                );
+              },
+              onError: (error) => {
+                // The task was created but email notification failed
+                toast.warning(
+                  `Task assigned to ${username}, but email notification failed: ${error}`
+                );
+              }
+            });
+
+            // Track task creation with posthog
+            posthog.capture("reviewer_task_created", {
+              bidId: object_id,
+              sectionId: section.section_id,
+              sectionHeading: section.heading,
+              reviewer: username,
+              emailSent: true
+            });
+          } else {
+            console.error("Error creating reviewer task:", response.data.error);
+            toast.error("Failed to assign task to reviewer");
+          }
+        } catch (error) {
+          console.error("Error creating task for reviewer:", error);
+          toast.error("Failed to assign task to reviewer");
+        }
+      }
+    };
+
     const style = {
       transform: CSS.Transform.toString(transform),
       transition,
@@ -822,17 +954,7 @@ const ProposalPlan = () => {
             <span>{section.heading}</span>
           </div>
         </TableCell>
-        <TableCell className="px-4">
-          <div className="flex items-center justify-center">
-            <ReviewerDropdown
-              value={section.reviewer}
-              onChange={(value) =>
-                handleSectionChange(index, "reviewer", value)
-              }
-              contributors={contributors}
-            />
-          </div>
-        </TableCell>
+
         <TableCell className="px-4">
           <div className="flex items-center justify-center">
             <QuestionTypeDropdown
@@ -851,9 +973,6 @@ const ProposalPlan = () => {
             />
           </div>
         </TableCell>
-        <TableCell className="px-4 text-center">
-          {section.subsections}
-        </TableCell>
         <TableCell className="px-4">
           <div className="flex items-center justify-center">
             <Input
@@ -868,6 +987,24 @@ const ProposalPlan = () => {
                   handleSectionChange(index, "word_count", value);
                 }
               }}
+            />
+          </div>
+        </TableCell>
+        <TableCell className="px-4">
+          <div className="flex items-center justify-center">
+            <SelectOrganisationUserButton
+              selectedUser={section.answerer}
+              onSelectUser={handleAnswererSelect}
+              organizationUsers={organizationUsers}
+            />
+          </div>
+        </TableCell>
+        <TableCell className="px-4">
+          <div className="flex items-center justify-center">
+            <SelectOrganisationUserButton
+              selectedUser={section.reviewer}
+              onSelectUser={handleReviewerSelect}
+              organizationUsers={organizationUsers}
             />
           </div>
         </TableCell>
@@ -889,64 +1026,78 @@ const ProposalPlan = () => {
       <div className="flex-1">
         {outline.length === 0 ? null : (
           <div className="h-full">
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[60px] flex items-center justify-end gap-2 h-full text-sm text-typo-900 font-semibold py-3.5 px-4">
-                      <Checkbox
-                        checked={selectedSections.size === outline.length}
-                        onCheckedChange={(checked) => handleSelectAll(checked)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </TableHead>
-                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
-                      Section
-                    </TableHead>
-                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                      Reviewer
-                    </TableHead>
-                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                      Question Type
-                    </TableHead>
-                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                      Completed
-                    </TableHead>
-                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                      Subsections
-                    </TableHead>
-                    <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                      Words
-                    </TableHead>
-                    <TableHead className="w-[60px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4">
-                      Action
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                  onDragStart={handleDragStart}
-                  modifiers={[restrictToVerticalAxis]}
-                >
-                  <SortableContext
-                    items={outline.map((section) => section.section_id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <TableBody>
-                      {outline.map((section, index) => (
-                        <SortableTableRow
-                          key={section.section_id}
-                          section={section}
-                          index={index}
+            {isOrganizationUsersLoading ? (
+              <div className="flex items-center justify-center w-full h-64">
+                <div className="flex flex-col items-center gap-4">
+                  <Spinner size="lg" />
+                  <p className="text-muted-foreground">
+                    Loading organization data...
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[60px] flex items-center justify-end gap-2 h-full text-sm text-typo-900 font-semibold py-3.5 px-4">
+                        <Checkbox
+                          checked={selectedSections.size === outline.length}
+                          onCheckedChange={(checked) =>
+                            handleSelectAll(checked)
+                          }
+                          onClick={(e) => e.stopPropagation()}
                         />
-                      ))}
-                    </TableBody>
-                  </SortableContext>
-                </DndContext>
-              </Table>
-            </div>
+                      </TableHead>
+                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
+                        Section
+                      </TableHead>
+
+                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                        Question Type
+                      </TableHead>
+                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                        Words
+                      </TableHead>
+                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                        Answerer
+                      </TableHead>
+                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                        Reviewer
+                      </TableHead>
+                      <TableHead className="w-[60px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4">
+                        Action
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                    onDragStart={handleDragStart}
+                    modifiers={[restrictToVerticalAxis]}
+                  >
+                    <SortableContext
+                      items={outline.map((section) => section.section_id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <TableBody>
+                        {outline.map((section, index) => (
+                          <SortableTableRow
+                            key={section.section_id}
+                            section={section}
+                            index={index}
+                          />
+                        ))}
+                      </TableBody>
+                    </SortableContext>
+                  </DndContext>
+                </Table>
+              </div>
+            )}
 
             <DeleteConfirmationDialog
               isOpen={showDeleteDialog}
@@ -969,7 +1120,7 @@ const ProposalPlan = () => {
               />
             )}
 
-            {selectedSection !== null && (
+            {selectedSection !== null && !isOrganizationUsersLoading && (
               <ProposalSidepane
                 section={outline[selectedSection]}
                 contributors={contributors}
@@ -990,10 +1141,13 @@ const ProposalPlan = () => {
                 handleDeleteSubheading={handleDeleteSubheading}
                 totalSections={outline.length}
                 onNavigate={handleSectionNavigation}
+                organizationUsers={
+                  organizationUsers
+                } /* Pass org users to the sidepane if needed */
               />
             )}
 
-            {selectedSections.size > 0 && (
+            {selectedSections.size > 0 && !isOrganizationUsersLoading && (
               <BulkControls
                 selectedCount={selectedSections.size}
                 onClose={() => setSelectedSections(new Set())}
@@ -1002,6 +1156,9 @@ const ProposalPlan = () => {
                 contributors={contributors}
                 onRevert={handleRevert}
                 canRevert={canRevert}
+                organizationUsers={
+                  organizationUsers
+                } /* Pass org users to bulk controls if needed */
               />
             )}
 
@@ -1024,5 +1181,4 @@ const ProposalPlan = () => {
     </>
   );
 };
-
 export default withAuth(ProposalPlan);

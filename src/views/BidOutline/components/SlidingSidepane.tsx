@@ -305,13 +305,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <ReviewerDropdown
-                    value={section.reviewer}
-                    onChange={(value) =>
-                      handleSectionChange(index, "reviewer", value)
-                    }
-                    contributors={contributors}
-                  />
+             
                   <QuestionTypeDropdown
                     value={section.choice}
                     onChange={(value) =>

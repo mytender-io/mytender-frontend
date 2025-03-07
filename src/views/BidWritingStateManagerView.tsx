@@ -38,6 +38,7 @@ export interface Section {
   word_count: number;
   answer: string;
   reviewer: string;
+  answerer: string;
   status: "Not Started" | "In Progress" | "Completed";
   weighting?: string;
   page_limit?: string;
@@ -127,7 +128,8 @@ const defaultState: BidContextType = {
     win_themes: [],
     customer_pain_points: [],
     differentiating_factors: [],
-    solution: { // Initialize solution with empty values
+    solution: {
+      // Initialize solution with empty values
       product: "",
       features: "",
       approach: ""
@@ -316,14 +318,17 @@ const BidManagement: React.FC = () => {
         JSON.stringify(differentiating_factors || [])
       );
 
-      formData.append("solution", JSON.stringify(solution || { product: "", features: "", approach: "" }));
-      
+      formData.append(
+        "solution",
+        JSON.stringify(solution || { product: "", features: "", approach: "" })
+      );
+
       // Add selectedCaseStudies to the form data
       formData.append(
         "selectedCaseStudies",
         JSON.stringify(selectedCaseStudies || [])
       );
-      
+
       if (object_id) {
         appendFormData("object_id", object_id);
       }
