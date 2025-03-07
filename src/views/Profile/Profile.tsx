@@ -189,14 +189,20 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
       try {
-        const response = await axios.get(
-          `http${HTTP_PREFIX}://${API_URL}/organization_users`,
+        const formData = new FormData();
+        formData.append("include_pending", "true");
+
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/get_organization_users`,
+          formData,
           {
             headers: {
-              Authorization: `Bearer ${tokenRef.current}`
+              Authorization: `Bearer ${tokenRef.current}`,
+              "Content-Type": "multipart/form-data"
             }
           }
         );
+
         setOrganizationUsers(response.data);
       } catch (err) {
         console.error("Error fetching organization users:", err);

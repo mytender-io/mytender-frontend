@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuthUser } from "react-auth-kit";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
@@ -26,7 +26,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
-  const token = auth?.token || "default";
+   const tokenRef = useRef(auth?.token || "default");
 
   const [profile, setProfile] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -40,7 +40,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
           `http${HTTP_PREFIX}://${API_URL}/profile`,
           {
             headers: {
-              Authorization: `Bearer ${token}`
+              Authorization: `Bearer ${tokenRef}`
             }
           }
         );
@@ -53,17 +53,22 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
     };
 
     fetchProfileData();
-  }, [token, refreshImage]);
+  }, [tokenRef, refreshImage]);
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
-          `http${HTTP_PREFIX}://${API_URL}/organization_users`,
+        const formData = new FormData();
+        formData.append("include_pending", "true");
+
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/get_organization_users`,
+          formData,
           {
             headers: {
-              Authorization: `Bearer ${token}`
+              Authorization: `Bearer ${tokenRef.current}`,
+              "Content-Type": "multipart/form-data"
             }
           }
         );
@@ -78,7 +83,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
     if (profile.userType === "owner" && showTeamMembers) {
       fetchOrganizationUsers();
     }
-  }, [token, profile, showTeamMembers]);
+  }, [tokenRef, profile, showTeamMembers]);
 
   // Size classes
   const sizeClasses = {
