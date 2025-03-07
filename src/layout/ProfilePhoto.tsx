@@ -40,7 +40,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
           `http${HTTP_PREFIX}://${API_URL}/profile`,
           {
             headers: {
-              Authorization: `Bearer ${tokenRef}`
+              Authorization: `Bearer ${tokenRef.current}`
             }
           }
         );
@@ -60,7 +60,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
       setLoading(true);
       try {
         const formData = new FormData();
-        formData.append("include_pending", "true");
+        formData.append("include_pending", "false");
 
         const response = await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/get_organization_users`,
@@ -72,6 +72,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
             }
           }
         );
+        console.log(response);
         setOrganizationUsers(response.data);
         setLoading(false);
       } catch (err) {

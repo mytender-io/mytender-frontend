@@ -37,22 +37,22 @@ const SupportChat = () => {
   // const notificationSound = useRef(new Audio("/notification.mp3"));
 
   const processMessage = (msg) => {
-    console.log("Processing message:", JSON.stringify(msg));
+    //console.log("Processing message:", JSON.stringify(msg));
     let text = msg.text;
     let isUserMessage = false;
-    console.log("Initial text:", text);
+    //console.log("Initial text:", text);
     // Remove the unexpected "!" prefix if present
     if (text.startsWith("!")) {
-      console.log("Found '!' prefix, removing...");
+      //console.log("Found '!' prefix, removing...");
       text = text.slice(1).trim();
-      console.log("Text after removing '!':", text);
+      //console.log("Text after removing '!':", text);
     }
     // Check for "USER" prefix
     if (text.startsWith("USER ")) {
-      console.log("Found 'USER' prefix, marking as user message...");
+      //console.log("Found 'USER' prefix, marking as user message...");
       isUserMessage = true;
       text = text.slice(5).trim();
-      console.log("Text after removing 'USER':", text);
+      //console.log("Text after removing 'USER':", text);
     }
     const processedMsg = {
       ...msg,
@@ -197,15 +197,15 @@ const SupportChat = () => {
       if (error) {
         console.error("Error sending message:", error);
       } else if (typeof message === "string") {
-        console.log("Raw new user message:", message);
+        //console.log("Raw new user message:", message);
         const newUserMessage = processMessage({
           id: new Date().getTime().toString(),
           text: message
         });
-        console.log(
-          "Processed new user message:",
-          JSON.stringify(newUserMessage)
-        );
+        // console.log(
+        //   "Processed new user message:",
+        //   JSON.stringify(newUserMessage)
+        // );
         setMessages((prevMessages) => [...prevMessages, newUserMessage]);
         fetchMessages();
       }
