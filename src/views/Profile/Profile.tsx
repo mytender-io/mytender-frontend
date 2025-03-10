@@ -73,23 +73,7 @@ const ProfilePage = () => {
   const [toneOfVoiceSaveState, setToneOfVoiceSaveState] = useState("normal");
   const [profileSaveState, setProfileSaveState] = useState("normal");
 
-  const [editableFields, setEditableFields] = useState({
-    productName: false,
-    username: false,
-    email: false,
-    region: false,
-    company: false,
-    jobRole: false
-  });
-
   const [refreshImage, setRefreshImage] = useState(false);
-
-  const toggleEditable = (field: keyof typeof editableFields) => {
-    setEditableFields((prev) => ({
-      ...prev,
-      [field]: !prev[field]
-    }));
-  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -127,16 +111,21 @@ const ProfilePage = () => {
     fetchUserData();
   }, [tokenRef]);
 
+  // Keeping the function for textarea changes but removing it for input fields
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value
-    }));
+    // Only allow changes to textareas
+    if (e.target instanceof HTMLTextAreaElement) {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value
+      }));
+    }
   };
 
+  // Modified to show success without making API call
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
     formType: string
@@ -154,36 +143,11 @@ const ProfilePage = () => {
 
     setSaveState("loading");
 
-    try {
-      const dataToSend = {
-        username: formData.username,
-        email: formData.email,
-        region: formData.region,
-        company: formData.company,
-        jobRole: formData.jobRole,
-        userType: formData.userType,
-        licences: formData.licences,
-        productName: formData.productName,
-        company_objectives: formData.companyObjectives,
-        tone_of_voice: formData.toneOfVoice
-      };
-
-      await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/update_company_info`,
-        dataToSend,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`
-          }
-        }
-      );
+    // Simulate success after delay without making API call
+    setTimeout(() => {
       setSaveState("success");
       setTimeout(() => setSaveState("normal"), 2000); // Reset after 2 seconds
-    } catch (err) {
-      console.error(`Error updating ${formType}:`, err);
-      setSaveState("normal");
-      // Handle error (e.g., show an error message)
-    }
+    }, 1000);
   };
 
   useEffect(() => {
@@ -408,168 +372,56 @@ const ProfilePage = () => {
                           <div className="space-y-3">
                             <h3 className="text-base font-bold">About</h3>
                             <div className="space-y-2">
-                              <div className="flex items-center gap-4">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
-                                      >
-                                        <UserProfileIcon className="text-gray-hint_text" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      Select this field to add your name
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                <Input
-                                  id="username"
-                                  name="username"
-                                  value={formData.username}
-                                  placeholder="Username"
-                                  readOnly
-                                  className="border-none outline-none shadow-none text-gray-hint_text focus:border-none focus:outline-none focus-visible:ring-0"
-                                />
+                              <div className="flex items-center gap-4 py-2 cursor-default">
+                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                  <UserProfileIcon className="text-gray-hint_text" />
+                                </div>
+                                <span className="text-gray-hint_text">
+                                  {formData.username ||
+                                    "Username not available"}
+                                </span>
                               </div>
-                              <div className="flex items-center gap-4">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
-                                      >
-                                        <JobResponseIcon className="text-gray-hint_text" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      Select this feild to add your job title
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                <Input
-                                  id="jobRole"
-                                  name="jobRole"
-                                  value={formData.jobRole}
-                                  placeholder="Job Role"
-                                  readOnly={!editableFields.jobRole}
-                                  onClick={() => toggleEditable("jobRole")}
-                                  onBlur={() => toggleEditable("jobRole")}
-                                  onChange={handleInputChange}
-                                  className={
-                                    editableFields.jobRole
-                                      ? ""
-                                      : "border-none outline-none shadow-none text-gray-hint_text"
-                                  }
-                                />
+                              <div className="flex items-center gap-4 py-2 cursor-default">
+                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                  <JobResponseIcon className="text-gray-hint_text" />
+                                </div>
+                                <span className="text-gray-hint_text">
+                                  {formData.jobRole || "Job Role not available"}
+                                </span>
                               </div>
-                              <div className="flex items-center gap-4">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
-                                      >
-                                        <CompanyIcon className="text-gray-hint_text" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      Select this feild to add your company
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                <Input
-                                  id="company"
-                                  name="company"
-                                  value={formData.company}
-                                  placeholder="Company Name"
-                                  readOnly={!editableFields.company}
-                                  onClick={() => toggleEditable("company")}
-                                  onBlur={() => toggleEditable("company")}
-                                  onChange={handleInputChange}
-                                  className={
-                                    editableFields.company
-                                      ? ""
-                                      : "border-none outline-none shadow-none text-gray-hint_text"
-                                  }
-                                />
+                              <div className="flex items-center gap-4 py-2 cursor-default">
+                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                  <CompanyIcon className="text-gray-hint_text" />
+                                </div>
+                                <span className="text-gray-hint_text">
+                                  {formData.company || "Company not available"}
+                                </span>
                               </div>
-                              <div className="flex items-center gap-4">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
-                                      >
-                                        <LocationIcon className="text-gray-hint_text" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      Select this field to add your country
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                <Input
-                                  id="region"
-                                  name="region"
-                                  value={formData.region}
-                                  placeholder="Location"
-                                  readOnly={!editableFields.region}
-                                  onClick={() => toggleEditable("region")}
-                                  onBlur={() => toggleEditable("region")}
-                                  onChange={handleInputChange}
-                                  className={
-                                    editableFields.region
-                                      ? ""
-                                      : "border-none outline-none shadow-none text-gray-hint_text"
-                                  }
-                                />
+                              <div className="flex items-center gap-4 py-2 cursor-default">
+                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                  <LocationIcon className="text-gray-hint_text" />
+                                </div>
+                                <span className="text-gray-hint_text">
+                                  {formData.region || "Location not available"}
+                                </span>
                               </div>
                             </div>
                           </div>
                           <div className="space-y-3">
                             <h3 className="text-base font-bold">Contact</h3>
                             <div className="space-y-4">
-                              <div className="flex items-center gap-4">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
-                                      >
-                                        <EmailIcon className="text-gray-hint_text" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      Select this field to add your email
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                <Input
-                                  id="email"
-                                  name="email"
-                                  value={formData.email}
-                                  placeholder="Enter your email here"
-                                  readOnly={!editableFields.email}
-                                  onClick={() => toggleEditable("email")}
-                                  onBlur={() => toggleEditable("email")}
-                                  onChange={handleInputChange}
-                                  className={
-                                    editableFields.email
-                                      ? ""
-                                      : "border-none outline-none shadow-none text-gray-hint_text"
+                              <div className="flex items-center gap-4 py-2 cursor-default">
+                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                  <EmailIcon className="text-gray-hint_text" />
+                                </div>
+                                <span
+                                  className="text-gray-hint_text truncate max-w-[180px]"
+                                  title={
+                                    formData.email || "Email not available"
                                   }
-                                />
+                                >
+                                  {formData.email || "Email not available"}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -578,43 +430,19 @@ const ProfilePage = () => {
                               Subscription Type
                             </h3>
                             <div className="space-y-2">
-                              <div className="flex items-center gap-4">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
-                                      >
-                                        <SubscriptionIcon className="text-gray-hint_text" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      Here is your current subscription
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                <Input
-                                  id="productName"
-                                  value={formData.productName}
-                                  placeholder="Enter Product Name"
-                                  readOnly={!editableFields.productName}
-                                  onClick={() => toggleEditable("productName")}
-                                  onChange={handleInputChange}
-                                  onBlur={() => toggleEditable("productName")}
-                                  name="productName"
-                                  className={
-                                    editableFields.productName
-                                      ? ""
-                                      : "border-none outline-none shadow-none text-gray-hint_text"
-                                  }
-                                />
+                              <div className="flex items-center gap-4 py-2 cursor-default">
+                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                  <SubscriptionIcon className="text-gray-hint_text" />
+                                </div>
+                                <span className="text-gray-hint_text">
+                                  {formData.productName ||
+                                    "Subscription not available"}
+                                </span>
                               </div>
                             </div>
                             <div className="space-y-4">
                               <div
-                                className="flex items-center gap-4 cursor-pointer hover:bg-gray-50 py-2 -2rounded-md transition-colors"
+                                className="flex items-center gap-4 cursor-pointer hover:bg-gray-50 py-2 rounded-md transition-colors"
                                 onClick={() =>
                                   window.open(
                                     "https://billing.stripe.com/p/login/00g6p52WPfRG22I8ww",
@@ -647,7 +475,7 @@ const ProfilePage = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="text-right">
+                          {/* <div className="text-right">
                             <Button
                               type="submit"
                               disabled={profileSaveState === "loading"}
@@ -663,7 +491,7 @@ const ProfilePage = () => {
                                 "Save Changes"
                               )}
                             </Button>
-                          </div>
+                          </div> */}
                         </form>
                       </CardContent>
                     </Card>
@@ -750,16 +578,10 @@ const ProfilePage = () => {
                             )}
                           </Button>
                         </div>
-                        <Textarea
-                          id="companyObjectives"
-                          name="companyObjectives"
-                          value={formData.companyObjectives}
-                          onChange={(e: React.ChangeEvent<HTMLElement>) =>
-                            handleInputChange(e)
-                          }
-                          placeholder="Outline your company's overall mission..."
-                          className="min-h-[150px]"
-                        />
+                        <div className="min-h-[150px] p-3 bg-gray-50 rounded-md overflow-auto">
+                          {formData.companyObjectives ||
+                            "No company objectives available."}
+                        </div>
                       </form>
                       <form
                         id="toneOfVoiceForm"
@@ -787,16 +609,10 @@ const ProfilePage = () => {
                             )}
                           </Button>
                         </div>
-                        <Textarea
-                          id="toneOfVoice"
-                          name="toneOfVoice"
-                          value={formData.toneOfVoice}
-                          onChange={(e: React.ChangeEvent<HTMLElement>) =>
-                            handleInputChange(e)
-                          }
-                          placeholder="Define the preferred tone..."
-                          className="min-h-[100px]"
-                        />
+                        <div className="min-h-[100px] p-3 bg-gray-50 rounded-md overflow-auto">
+                          {formData.toneOfVoice ||
+                            "No tone of voice information available."}
+                        </div>
                       </form>
                     </div>
                   </div>
