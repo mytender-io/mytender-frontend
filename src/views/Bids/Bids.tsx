@@ -77,16 +77,16 @@ const Bids = () => {
   const [viewType, setViewType] = useState("table"); // or 'kanban'
 
   // Function to check if a bid was edited less than 20 minutes ago and has empty win themes
-// Function to check if a bid was recently created and new_bid_completed is false
-const isRecentlyCreatedWithEmptyThemes = (bid: Bid): boolean => {
-  // Check if timestamp exists
+  // Function to check if a bid was recently created and new_bid_completed is false
+  const isRecentlyCreatedWithEmptyThemes = (bid: Bid): boolean => {
+    // Check if timestamp exists
 
-  // Check if new_bid_completed is false or undefined (treating undefined as false)
-  const isNewBidIncomplete = bid.new_bid_completed === false
+    // Check if new_bid_completed is false or undefined (treating undefined as false)
+    const isNewBidIncomplete = bid.new_bid_completed === false;
 
-  // Return true if edited less than 20 minutes ago and new_bid_completed is false
-  return isNewBidIncomplete;
-};
+    // Return true if edited less than 20 minutes ago and new_bid_completed is false
+    return isNewBidIncomplete;
+  };
   // Modify the ViewToggle button click handler
   const handleViewChange = (view: "table" | "kanban") => {
     setViewType(view);
@@ -192,7 +192,7 @@ const isRecentlyCreatedWithEmptyThemes = (bid: Bid): boolean => {
   };
 
   const headers = [
-    { key: "bid_title", label: "Tender Name", width: "400px" },
+    { key: "bid_title", label: "Tender Name", width: "300px" },
     { key: "timestamp", label: "Last edited" },
     { key: "value", label: "Value" },
     { key: "submission_deadline", label: "Deadline" },
@@ -548,7 +548,6 @@ const isRecentlyCreatedWithEmptyThemes = (bid: Bid): boolean => {
                             <TableCell className="w-[100px] text-right px-4">
                               <EllipsisMenuDashboard
                                 onClick={() => handleDeleteClick(bid._id)}
-                              
                               />
                             </TableCell>
                           </TableRow>

@@ -304,13 +304,15 @@ const SelectFolder: React.FC<SelectFolderProps> = ({
               setActiveFolder={setActiveFolder}
             />
             {activeFolder && (
-              <div
-                className="cursor-pointer px-2.5 py-1.5 rounded-md text-lg hover:bg-gray-100"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => handleBackClick()}
+                className="flex items-center"
               >
                 <ReplyIcon className="inline h-4 w-4" />
-                <span className="text-sm ml-2.5">Back</span>
-              </div>
+                Back
+              </Button>
             )}
           </div>
           {isLoading ? (

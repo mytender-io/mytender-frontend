@@ -36,14 +36,14 @@ const SelectFile: React.FC<SelectFileProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [activeFolder, setActiveFolder] = useState(null);
-  
+
   // Track selected files as a state
   const [selectedFiles, setSelectedFiles] = useState(() => {
     console.log("Initializing selectedFiles with:", initialSelectedFiles);
     const initialSelection = new Set([...initialSelectedFiles]);
     return Array.from(initialSelection);
   });
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [folderStructure, setFolderStructure] = useState({});
   const [updateTrigger, setUpdateTrigger] = useState(0);
@@ -51,25 +51,29 @@ const SelectFile: React.FC<SelectFileProps> = ({
   // Pagination states
   const itemsPerPage = 10;
 
-
   const getTopLevelFolders = () => {
     // For case studies, we don't exclude FORWARDSLASH if apiEndpoint is get_case_studies
     const isCaseStudies = apiEndpoint === "get_case_studies";
-    
+
     if (isCaseStudies) {
       // For case studies endpoint, only include direct children of case_studies_collection
       const caseStudyFolders = availableCollections
         .filter((collection: string) => {
           const parts = collection.split("FORWARDSLASH");
-          return parts.length === 2 && collection.startsWith("case_studies_collection");
+          return (
+            parts.length === 2 &&
+            collection.startsWith("case_studies_collection")
+          );
         })
         .map((collection: string) => {
           const parts = collection.split("FORWARDSLASH");
           // Return full path for navigation
           return collection;
         });
-      
-      return caseStudyFolders.sort((a: string, b: string) => a.localeCompare(b));
+
+      return caseStudyFolders.sort((a: string, b: string) =>
+        a.localeCompare(b)
+      );
     } else {
       // Original behavior for regular collections
       const folders = availableCollections.filter(
@@ -104,10 +108,11 @@ const SelectFile: React.FC<SelectFileProps> = ({
 
       // Build the folder structure regardless of the endpoint
       const structure = {};
-      const collections = apiEndpoint === "get_case_studies" 
-        ? response.data.case_studies || []
-        : response.data.collections || [];
-        
+      const collections =
+        apiEndpoint === "get_case_studies"
+          ? response.data.case_studies || []
+          : response.data.collections || [];
+
       collections.forEach((collectionName) => {
         const parts = collectionName.split("FORWARDSLASH");
         let currentLevel = structure;
@@ -121,7 +126,10 @@ const SelectFile: React.FC<SelectFileProps> = ({
 
       setFolderStructure(structure);
     } catch (error) {
-      console.error(`Error fetching folder structure from ${apiEndpoint}:`, error);
+      console.error(
+        `Error fetching folder structure from ${apiEndpoint}:`,
+        error
+      );
     } finally {
       setIsLoading(false);
     }
@@ -156,7 +164,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
         });
 
       const allContents = [...subfolders, ...filesWithIds];
-      
+
       // Log folder contents for debugging
       console.log(`Folder contents for ${folderPath}:`, allContents);
 
@@ -195,7 +203,9 @@ const SelectFile: React.FC<SelectFileProps> = ({
     // Get the current folder path - needed for tracking which folder the file belongs to
     const currentFolder = activeFolder || "default";
 
-    console.log(`File selection toggled: ID=${fileId}, Name=${filename}, Folder=${currentFolder}`);
+    console.log(
+      `File selection toggled: ID=${fileId}, Name=${filename}, Folder=${currentFolder}`
+    );
     console.log(`Current selectedFiles:`, selectedFiles);
     console.log(`Is file already selected? ${selectedFiles.includes(fileId)}`);
 
@@ -221,7 +231,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
         // Look for the file in all available folder contents
         let foundFileInfo = null;
         let foundFolder = null;
-        
+
         // Search in the current folder first
         if (folderContents[currentFolder]) {
           foundFileInfo = folderContents[currentFolder].find(
@@ -231,7 +241,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
             foundFolder = currentFolder;
           }
         }
-        
+
         // If not found in current folder, search in all folders
         if (!foundFileInfo) {
           Object.entries(folderContents).forEach(([folderName, contents]) => {
@@ -244,7 +254,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
             }
           });
         }
-        
+
         // Add to the selected files metadata if found
         if (foundFileInfo && foundFolder) {
           selectedFilesWithMetadata.push({
@@ -293,7 +303,13 @@ const SelectFile: React.FC<SelectFileProps> = ({
       const pages = Math.ceil(itemsCount / itemsPerPage);
       setTotalPages(pages);
     }
-  }, [activeFolder, folderContents, availableCollections, itemsPerPage, apiEndpoint]);
+  }, [
+    activeFolder,
+    folderContents,
+    availableCollections,
+    itemsPerPage,
+    apiEndpoint
+  ]);
 
   const formatDisplayName = (name) => {
     if (typeof name !== "string") return "";
@@ -335,9 +351,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
             onClick={() => handleFolderClick(folder)}
           >
             <FolderIcon className="h-4 w-4" />
-            <span className="text-sm">
-              {getDisplayName(folder)}
-            </span>
+            <span className="text-sm">{getDisplayName(folder)}</span>
           </TableCell>
         </TableRow>
       ));
@@ -346,8 +360,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
       return currentItems.map((item, index) => {
         const { filename, unique_id, isFolder } = item;
         const isSelected = selectedFiles.includes(unique_id);
-        
-    
+
         return (
           <TableRow key={`${unique_id}-${index}`} className="hover:bg-gray-50">
             <TableCell className="flex items-center gap-2">
@@ -396,16 +409,22 @@ const SelectFile: React.FC<SelectFileProps> = ({
             <BreadCrumbs
               activeFolder={activeFolder}
               setActiveFolder={setActiveFolder}
-              rootFolderName={apiEndpoint === "get_case_studies" ? "Case Studies" : rootFolderName}
+              rootFolderName={
+                apiEndpoint === "get_case_studies"
+                  ? "Case Studies"
+                  : rootFolderName
+              }
             />
             {activeFolder && (
-              <div
-                className="cursor-pointer px-2.5 py-1.5 rounded-md text-lg hover:bg-gray-100"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => handleBackClick()}
+                className="flex items-center"
               >
                 <ReplyIcon className="inline h-4 w-4" />
-                <span className="text-sm ml-2.5">Back</span>
-              </div>
+                Back
+              </Button>
             )}
           </div>
           {isLoading ? (

@@ -1070,12 +1070,12 @@ const CaseStudies = () => {
                     </div>
                     {activeFolder && (
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
                         onClick={() => handleBackClick()}
                         className="flex items-center"
                       >
-                        <ArrowLeftIcon className="h-4 w-4 mr-2" />
+                        <ArrowLeftIcon className="h-4 w-4" />
                         Back
                       </Button>
                     )}
