@@ -274,7 +274,7 @@ const GenerateProposalModal = ({
             className="animate-[slideUp_0.5s_ease-out]"
             onClick={() => {
               setShow(false);
-              navigate(`/proposal-preview`);
+              // navigate(`/proposal-preview`);
             }}
           >
             Preview Your Masterpiece

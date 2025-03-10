@@ -263,7 +263,7 @@ const BidManagement: React.FC = () => {
       } = stateCopy;
 
       if (!bidInfo || bidInfo.trim() === "") {
-        toast.error("Please type in a bid name...");
+        // toast.error("Please type in a bid name...");
         return;
       }
 

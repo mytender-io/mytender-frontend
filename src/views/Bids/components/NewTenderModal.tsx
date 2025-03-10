@@ -319,7 +319,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   const handleFinalSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (currentStep === "questions" && !selectedFolders.length) {
-      toast.error("Please select at least one content folder");
+      // toast.error("Please select at least one content folder");
       return;
     }
 

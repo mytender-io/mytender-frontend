@@ -246,7 +246,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       const failCount = results.filter((result) => result.error).length;
 
       if (successCount > 0) {
-        toast.success(`Successfully uploaded ${successCount} file(s)`);
+        // toast.success(`Successfully uploaded ${successCount} file(s)`);
         posthog.capture("pdf_upload_batch_completed", {
           successCount,
           failCount,
