@@ -4,7 +4,7 @@ import withAuth from "../../routes/withAuth";
 import handleGAEvent from "../../utilities/handleGAEvent";
 import { HTTP_PREFIX, API_URL } from "../../helper/Constants";
 import axios from "axios";
-import { Send } from "lucide-react";
+import { Send, Trash2 } from "lucide-react";
 import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -148,6 +148,16 @@ const ChatbotResponse = () => {
       sendQuestion(inputValue);
       setInputValue("");
     }
+  };
+
+  const handleClearMessages = () => {
+    setMessages([
+      {
+        type: "bot",
+        text: "Ask questions here about your Tender Library documents"
+      }
+    ]);
+    localStorage.removeItem("chatResponseMessages");
   };
 
   const handleKeyDown = (e) => {
@@ -471,6 +481,21 @@ const ChatbotResponse = () => {
                 onKeyDown={handleKeyDown}
                 className="flex-1 border-none outline-none pr-0 bg-transparent placeholder:text-muted-foreground focus-visible:ring-0 shadow-none"
               />
+                 <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={handleClearMessages}
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 rounded-full"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Clear messages</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               <Button
                 onClick={handleSendMessage}
                 disabled={isLoading}
