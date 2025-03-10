@@ -2,6 +2,7 @@ name: Website Deployment
 on:
   push:
     branches: ["main"]
+  workflow_dispatch: # Add this to enable manual triggering
 jobs:
   deploy:
     name: Deploy
