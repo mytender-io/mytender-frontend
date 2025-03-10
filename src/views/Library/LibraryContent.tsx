@@ -1108,7 +1108,7 @@ const LibraryContent = () => {
                     </div>
                     {activeFolder && (
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => handleBackClick()}
                         className="flex items-center"

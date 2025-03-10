@@ -417,7 +417,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
             />
             {activeFolder && (
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => handleBackClick()}
                 className="flex items-center"
