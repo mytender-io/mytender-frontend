@@ -21,7 +21,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
-import UserIcon from "@/components/icons/UserIcon";
+import ProfilePhoto from "@/layout/ProfilePhoto";
 
 const TenderLibraryChatDialog = ({
   bid_id,
@@ -350,11 +350,7 @@ const TenderLibraryChatDialog = ({
                                     className="w-6 h-6 rounded-full object-cover"
                                   />
                                 ) : (
-                                  <UserIcon
-                                    className={cn(
-                                      "w-5 h-5 min-w-5 min-h-5 text-gray-hint_text"
-                                    )}
-                                  />
+                                  <ProfilePhoto size="sm" />
                                 )}
                               </div>
                             )}

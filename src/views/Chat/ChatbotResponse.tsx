@@ -16,9 +16,9 @@ import { TooltipContent } from "@/components/ui/tooltip";
 import { Tooltip } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
-import UserIcon from "@/components/icons/UserIcon";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import ProfilePhoto from "@/layout/ProfilePhoto";
 
 // Create a global state for chat processing
 const globalChatState = {
@@ -383,13 +383,7 @@ const ChatbotResponse = () => {
                                   className="w-6 h-6 rounded-full object-cover"
                                 />
                               ) : (
-                                <UserIcon
-                                  className={cn(
-                                    "min-w-5 min-h-5 text-gray-hint_text"
-                                  )}
-                                  width={20}
-                                  height={20}
-                                />
+                                <ProfilePhoto size="sm" />
                               )}
                             </div>
                           )}
@@ -481,21 +475,21 @@ const ChatbotResponse = () => {
                 onKeyDown={handleKeyDown}
                 className="flex-1 border-none outline-none pr-0 bg-transparent placeholder:text-muted-foreground focus-visible:ring-0 shadow-none"
               />
-                 <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={handleClearMessages}
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 rounded-full"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Clear messages</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={handleClearMessages}
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 rounded-full"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Clear messages</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <Button
                 onClick={handleSendMessage}
                 disabled={isLoading}
