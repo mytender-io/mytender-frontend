@@ -67,9 +67,6 @@ const TenderLibraryChatDialog = ({
 
   const [inputValue, setInputValue] = useState("");
 
-  const [choice, setChoice] = useState("2");
-  const [broadness, setBroadness] = useState("4");
-
   const [isLoading, setIsLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
   const [startTime, setStartTime] = useState(null);
@@ -150,7 +147,7 @@ const TenderLibraryChatDialog = ({
     }
   };
 
-  // Modify the typeMessage function to scroll while typing
+  // Modify the typeMessage function to not force scroll while typing
   const typeMessage = (message) => {
     setIsTyping(true);
     setTypingText("");
@@ -160,25 +157,46 @@ const TenderLibraryChatDialog = ({
       if (index < message.length) {
         setTypingText((prev) => prev + message[index]);
         index++;
-        scrollToBottom(); // Add scroll after each character
         setTimeout(typeChar, 1);
       } else {
         setIsTyping(false);
+        scrollToBottom(); // Only scroll at the end of typing
       }
     };
 
     typeChar();
   };
 
-  // Add useEffect to scroll on new messages
+  // Modify useEffect to only scroll on new messages when appropriate
   useEffect(() => {
-    scrollToBottom();
+    // Only auto-scroll if user is already at the bottom
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      const isAtBottom =
+        container.scrollHeight - container.scrollTop <=
+        container.clientHeight + 100;
+
+      if (isAtBottom) {
+        scrollToBottom();
+      }
+    }
   }, [messages]);
 
-  // Scroll when dialog opens
+  // Scroll when dialog opens, but only if at bottom
   useEffect(() => {
     if (open) {
-      setTimeout(scrollToBottom, 100); // Small delay to ensure dialog is fully rendered
+      setTimeout(() => {
+        if (messagesContainerRef.current) {
+          const container = messagesContainerRef.current;
+          const isAtBottom =
+            container.scrollHeight - container.scrollTop <=
+            container.clientHeight + 100;
+
+          if (isAtBottom) {
+            scrollToBottom();
+          }
+        }
+      }, 100); // Small delay to ensure dialog is fully rendered
     }
   }, [open]);
 
