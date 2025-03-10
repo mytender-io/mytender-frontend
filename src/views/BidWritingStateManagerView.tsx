@@ -93,6 +93,7 @@ export interface SharedState {
   solution: Solution;
   selectedCaseStudies: HighlightedDocument[]; // Array of highlighted document objects
   tone_of_voice: string;
+  new_bid_completed: boolean;
 }
 export interface BidContextType {
   sharedState: SharedState;
@@ -135,7 +136,8 @@ const defaultState: BidContextType = {
       approach: ""
     },
     selectedCaseStudies: [], // Initialize with an empty array
-    tone_of_voice: "" // Initialize tone_of_voice with empty string
+    tone_of_voice: "", // Initialize tone_of_voice with empty string
+    new_bid_completed: true
   },
   setSharedState: () => {},
   saveProposal: () => {},
@@ -173,7 +175,8 @@ const BidManagement: React.FC = () => {
           object_id: parsedState.object_id || null,
           selectedFolders: parsedState.selectedFolders || ["default"],
           selectedCaseStudies: parsedState.selectedCaseStudies || [], // Ensure selectedCaseStudies exists
-          tone_of_voice: parsedState.tone_of_voice || "" // Ensure tone_of_voice exists
+          tone_of_voice: parsedState.tone_of_voice || "",
+          new_bid_completed: parsedState.new_bid_completed || true
         };
       }
       return defaultState.sharedState;
@@ -259,7 +262,8 @@ const BidManagement: React.FC = () => {
         differentiating_factors,
         solution,
         selectedCaseStudies, // Include the selectedCaseStudies
-        tone_of_voice // Include tone_of_voice
+        tone_of_voice, // Include tone_of_voice
+        new_bid_completed
       } = stateCopy;
 
       if (!bidInfo || bidInfo.trim() === "") {
@@ -301,6 +305,7 @@ const BidManagement: React.FC = () => {
       appendFormData("questions", questions);
       appendFormData("original_creator", original_creator);
       appendFormData("tone_of_voice", tone_of_voice); // Add tone_of_voice to form data
+      formData.append("new_bid_completed", new_bid_completed);
 
       formData.append("contributors", JSON.stringify(contributors || []));
       formData.append(
@@ -402,6 +407,7 @@ const BidManagement: React.FC = () => {
       selectedFolders: sharedState.selectedFolders,
       selectedCaseStudies: sharedState.selectedCaseStudies,
       tone_of_voice: sharedState.tone_of_voice, // Log tone_of_voice changes
+      new_bid_completed: sharedState.new_bid_completed,
       canSave: canUserSave()
     });
 
@@ -450,6 +456,7 @@ const BidManagement: React.FC = () => {
     sharedState.differentiating_factors,
     sharedState.customer_pain_points,
     sharedState.tone_of_voice, // Add tone_of_voice as a dependency
+    sharedState.new_bid_completed,
     JSON.stringify(sharedState.solution),
     JSON.stringify(sharedState.selectedCaseStudies),
     JSON.stringify(

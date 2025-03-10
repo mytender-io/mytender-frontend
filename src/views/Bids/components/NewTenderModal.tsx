@@ -298,6 +298,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         submission_deadline: deadline,
         original_creator: auth.email,
         contributors: auth.email ? { [auth.email]: "admin" } : {},
+        new_bid_completed: false,
         lastUpdated: Date.now()
       }));
       setCurrentStep("documents");
@@ -335,7 +336,8 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
           bid_id: sharedState.object_id,
           extra_instructions: "",
           datasets: sharedState.selectedFolders,
-          file_names: selectedFiles
+          file_names: selectedFiles,
+          newbid: true
         },
         {
           headers: {
@@ -361,6 +363,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       console.log(response.data.evaluation_criteria);
       console.log(response.data.pain_points);
       console.log(response.data.differentiation_opportunities);
+      console.log(response.data?.newbid_completed);
 
       // Update shared state with outline data
       setSharedState((prevState) => ({
@@ -374,7 +377,8 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         customer_pain_points: response.data?.relevant_pain_points || [],
         win_themes: response.data?.relevant_win_themes || [],
         differentiating_factors:
-          response.data?.relevant_differentiation_opportunities || []
+          response.data?.relevant_differentiation_opportunities || [],
+        new_bid_completed: response.data?.newbid_completed || true
       }));
 
       // Navigate after updating shared state
@@ -464,10 +468,41 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   };
 
   // Handle confirmed close
-  const handleConfirmedClose = () => {
-    setShowConfirmClose(false);
-    resetForm();
-    onHide();
+  // Handle confirmed close with bid deletion
+  const handleConfirmedClose = async () => {
+    try {
+      // Only attempt to delete if we have an object_id (bid has been created)
+      if (sharedState.object_id) {
+        const formData = new FormData();
+        formData.append("bid_id", sharedState.object_id);
+
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/delete_bid/`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`,
+              "Content-Type": "multipart/form-data"
+            }
+          }
+        );
+
+        // Log success or handle response if needed
+        console.log("Bid deleted successfully:", response.data);
+
+        // Refresh the bids list to reflect the deletion
+        fetchBids();
+      }
+    } catch (error) {
+      // Handle any errors
+      console.error("Error deleting bid:", error);
+      toast.error("Failed to delete the bid. Please try again.");
+    } finally {
+      // Close the modal and reset form regardless of success/failure
+      setShowConfirmClose(false);
+      resetForm();
+      onHide();
+    }
   };
 
   // const renderStepContent = () => {
