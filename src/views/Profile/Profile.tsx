@@ -41,6 +41,7 @@ import { Spinner } from "@/components/ui/spinner";
 import MeshGradient from "@/components/mesh-gradient/MeshGradient";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
+import ToneOfVoiceLibrary from "../BidInputs/ToneOfVoiceLibrary.tsx";
 
 const ProfilePage = () => {
   const getAuth = useAuthUser();
@@ -583,37 +584,10 @@ const ProfilePage = () => {
                             "No company objectives available."}
                         </div>
                       </form>
-                      <form
-                        id="toneOfVoiceForm"
-                        onSubmit={(e) => handleSubmit(e, "toneOfVoice")}
-                        className="space-y-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-base font-bold">
-                            Tone of Voice Library
-                          </h3>
-                          <Button
-                            type="submit"
-                            disabled={toneOfVoiceSaveState === "loading"}
-                            form="toneOfVoiceForm"
-                          >
-                            {toneOfVoiceSaveState === "loading" && (
-                              <Spinner className="text-white" />
-                            )}
-                            {toneOfVoiceSaveState === "success" ? (
-                              <>
-                                Saved <CheckCircle className="ml-2 h-4 w-4" />
-                              </>
-                            ) : (
-                              "Save Changes"
-                            )}
-                          </Button>
-                        </div>
-                        <div className="min-h-[100px] p-3 bg-gray-50 rounded-md overflow-auto">
-                          {formData.toneOfVoice ||
-                            "No tone of voice information available."}
-                        </div>
-                      </form>
+
+                      <div className="flex items-center justify-between">
+                        <ToneOfVoiceLibrary selectable={false} />
+                      </div>
                     </div>
                   </div>
                 </div>

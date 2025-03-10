@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuthUser } from "react-auth-kit";
@@ -18,11 +18,16 @@ import { Plus } from "lucide-react";
 import { BidContext } from "../BidWritingStateManagerView.tsx";
 import CreateToneOfVoiceDialog from "./components/CreateToneOfVoiceDialog.tsx";
 
-const ToneOfVoiceLibrary = () => {
+interface ToneOfVoiceLibraryProps {
+  selectable?: boolean;
+}
+
+const ToneOfVoiceLibrary = ({ selectable = true }: ToneOfVoiceLibraryProps) => {
   const [tones, setTones] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedTone, setSelectedTone] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const isInitialMount = useRef(true);
 
   const { sharedState, setSharedState } = useContext(BidContext);
   const auth = useAuthUser()();
@@ -33,22 +38,28 @@ const ToneOfVoiceLibrary = () => {
     fetchTones();
   }, []);
 
-  // Set initial selected tone from shared state
+  // Set initial selected tone from shared state - only on initial mount
   useEffect(() => {
-    // Initialize from shared state if available
-    if (sharedState.tone_of_voice) {
-      setSelectedTone(sharedState.tone_of_voice);
+    if (isInitialMount.current) {
+      if (sharedState.tone_of_voice) {
+        setSelectedTone(sharedState.tone_of_voice);
+      }
+      isInitialMount.current = false;
     }
-  }, []);
+  }, [sharedState.tone_of_voice]);
 
-  // Update selected tone when tones are loaded or shared state changes
+  // Update selected tone when tones are loaded - using a separate effect to avoid duplicate state updates
   useEffect(() => {
-    if (tones.length > 0 && sharedState.tone_of_voice) {
+    if (
+      tones.length > 0 &&
+      sharedState.tone_of_voice &&
+      !isInitialMount.current
+    ) {
       if (tones.includes(sharedState.tone_of_voice)) {
         setSelectedTone(sharedState.tone_of_voice);
       }
     }
-  }, [tones, sharedState.tone_of_voice]);
+  }, [tones]);
 
   const fetchTones = async () => {
     setIsLoading(true);
@@ -73,8 +84,10 @@ const ToneOfVoiceLibrary = () => {
         setSelectedTone(sharedState.tone_of_voice);
       }
     } catch (err) {
+      // Use toast.error with toastId to prevent duplicate toasts
       toast.error(
-        "Failed to load tone of voice library. Please try again later."
+        "Failed to load tone of voice library. Please try again later.",
+        { toastId: "fetch-tones-error" }
       );
       console.error("Error fetching tones:", err);
     } finally {
@@ -83,13 +96,16 @@ const ToneOfVoiceLibrary = () => {
   };
 
   const handleToneSelection = (tone: string) => {
+    if (!selectable) return;
+
     if (selectedTone === tone) {
       setSelectedTone(null);
       setSharedState({
         ...sharedState,
         tone_of_voice: ""
       });
-      toast.success("Tone of voice cleared");
+      // Add toastId to prevent duplicates
+      toast.success("Tone of voice cleared", { toastId: "tone-cleared" });
     } else {
       setSelectedTone(tone);
       setSharedState({
@@ -97,7 +113,10 @@ const ToneOfVoiceLibrary = () => {
         tone_of_voice: tone
       });
 
-      toast.success(`Tone of voice set to: ${tone}`);
+      // Add toastId to prevent duplicates
+      toast.success(`Tone of voice set to: ${tone}`, {
+        toastId: `tone-set-${tone}`
+      });
     }
   };
 
@@ -108,17 +127,20 @@ const ToneOfVoiceLibrary = () => {
     setIsDialogOpen(false);
   };
 
+  // Function to determine if we should show the selected tone notification
+  const shouldShowSelectedTone = () => {
+    return selectable && selectedTone && selectedTone.trim() !== "";
+  };
+
   return (
     <div className="p-4 mb-8">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-semibold">
-          Select a tone of voice for the bid
-        </h2>
+        <h2 className="text-lg font-semibold">Tone of Voice Library</h2>
         <Button
           onClick={() => setIsDialogOpen(true)}
           className="bg-orange-500 hover:bg-orange-600"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4" />
           Add Tone Of Voice
         </Button>
       </div>
@@ -136,43 +158,64 @@ const ToneOfVoiceLibrary = () => {
             </div>
           ) : (
             <div className="rounded-md border overflow-hidden mb-6">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="px-4 ">Select</TableHead>
-                    <TableHead>Tone Name</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {tones.map((tone) => (
-                    <TableRow
-                      key={tone}
-                      className={selectedTone === tone ? "bg-blue-50" : ""}
-                    >
-                      <TableCell className="text-center px-4">
-                        <Checkbox
-                          id={`tone-${tone}`}
-                          checked={selectedTone === tone}
-                          onCheckedChange={() => handleToneSelection(tone)}
-                          className="ms-2"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        <label
-                          htmlFor={`tone-${tone}`}
-                          className="cursor-pointer"
-                        >
-                          {tone}
-                        </label>
-                      </TableCell>
+              {/* Table wrapper with fixed height and overflow */}
+              <div className="max-h-60 overflow-y-auto">
+                <Table>
+                  <TableHeader className="sticky top-0 bg-white z-10">
+                    <TableRow>
+                      {selectable && (
+                        <TableHead className="px-4">Select</TableHead>
+                      )}
+                      <TableHead>Tone Name</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {tones.map((tone) => (
+                      <TableRow
+                        key={tone}
+                        className={
+                          selectable && selectedTone === tone
+                            ? "bg-blue-50"
+                            : ""
+                        }
+                        onClick={
+                          selectable
+                            ? () => handleToneSelection(tone)
+                            : undefined
+                        }
+                        style={selectable ? { cursor: "pointer" } : undefined}
+                      >
+                        {selectable && (
+                          <TableCell className="text-center px-4">
+                            <Checkbox
+                              id={`tone-${tone}`}
+                              checked={selectedTone === tone}
+                              onCheckedChange={() => handleToneSelection(tone)}
+                              className="ms-2"
+                            />
+                          </TableCell>
+                        )}
+                        <TableCell className="font-medium">
+                          {selectable ? (
+                            <label
+                              htmlFor={`tone-${tone}`}
+                              className="cursor-pointer"
+                            >
+                              {tone}
+                            </label>
+                          ) : (
+                            tone
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           )}
 
-          {selectedTone && (
+          {shouldShowSelectedTone() && (
             <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md">
               <p>
                 Currently selected tone:
