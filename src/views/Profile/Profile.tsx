@@ -462,7 +462,7 @@ const ProfilePage = () => {
                                         >
                                           <DownloadIcon className="text-gray-hint_text" />
                                         </Button>
-                                        <span className="text-sm select-none px-3 text-gray-hint_text">
+                                        <span className="select-none text-gray-hint_text">
                                           Download Invoices
                                         </span>
                                       </div>
