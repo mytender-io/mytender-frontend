@@ -74,6 +74,9 @@ const ProfilePage = () => {
   const [toneOfVoiceSaveState, setToneOfVoiceSaveState] = useState("normal");
   const [profileSaveState, setProfileSaveState] = useState("normal");
 
+  const [companyObjectives, setCompanyObjectives] = useState("");
+  const [isEditingObjectives, setIsEditingObjectives] = useState(false);
+
   const [refreshImage, setRefreshImage] = useState(false);
 
   useEffect(() => {
@@ -101,6 +104,10 @@ const ProfilePage = () => {
           toneOfVoice: response.data.tone_of_voice || "",
           profilePicture: response.data.company_logo || ""
         });
+
+        // Fetch company objectives using the new endpoint
+        fetchCompanyObjectives();
+
         setLoading(false);
       } catch (err) {
         console.log(err);
@@ -111,6 +118,30 @@ const ProfilePage = () => {
 
     fetchUserData();
   }, [tokenRef]);
+
+  // New function to fetch company objectives using the dedicated endpoint
+  const fetchCompanyObjectives = async () => {
+    try {
+      const response = await axios.get(
+        `http${HTTP_PREFIX}://${API_URL}/get_company_objectives`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+
+      setCompanyObjectives(response.data.company_objectives || "");
+      // Also update the form data to keep everything in sync
+      setFormData((prev) => ({
+        ...prev,
+        companyObjectives: response.data.company_objectives || ""
+      }));
+    } catch (err) {
+      console.error("Failed to fetch company objectives:", err);
+      toast.error("Failed to load company objectives");
+    }
+  };
 
   // Keeping the function for textarea changes but removing it for input fields
   const handleInputChange = (
@@ -123,6 +154,47 @@ const ProfilePage = () => {
         ...prevData,
         [name]: value
       }));
+
+      // If editing company objectives, update that state too
+      if (name === "companyObjectives") {
+        setCompanyObjectives(value);
+      }
+    }
+  };
+
+  // New function to handle saving company objectives using the dedicated endpoint
+  const handleSaveCompanyObjectives = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    setCompanyObjectivesSaveState("loading");
+
+    try {
+      // Create FormData and append the objectives
+      const formData = new FormData();
+      formData.append("objectives", companyObjectives);
+
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/set_company_objectives`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      setCompanyObjectivesSaveState("success");
+      toast.success("Company objectives updated successfully");
+      setIsEditingObjectives(false);
+
+      // Reset the state after showing success
+      setTimeout(() => setCompanyObjectivesSaveState("normal"), 2000);
+    } catch (err) {
+      console.error("Failed to save company objectives:", err);
+      toast.error("Failed to update company objectives");
+      setCompanyObjectivesSaveState("normal");
     }
   };
 
@@ -133,10 +205,13 @@ const ProfilePage = () => {
   ) => {
     e.preventDefault();
 
-    let setSaveState;
     if (formType === "companyObjectives") {
-      setSaveState = setCompanyObjectivesSaveState;
-    } else if (formType === "toneOfVoice") {
+      await handleSaveCompanyObjectives(e);
+      return;
+    }
+
+    let setSaveState;
+    if (formType === "toneOfVoice") {
       setSaveState = setToneOfVoiceSaveState;
     } else {
       setSaveState = setProfileSaveState;
@@ -476,23 +551,6 @@ const ProfilePage = () => {
                               </div>
                             </div>
                           </div>
-                          {/* <div className="text-right">
-                            <Button
-                              type="submit"
-                              disabled={profileSaveState === "loading"}
-                            >
-                              {profileSaveState === "loading" && (
-                                <Spinner className="text-white" />
-                              )}
-                              {profileSaveState === "success" ? (
-                                <>
-                                  Saved <CheckCircle className="ml-2 h-4 w-4" />
-                                </>
-                              ) : (
-                                "Save Changes"
-                              )}
-                            </Button>
-                          </div> */}
                         </form>
                       </CardContent>
                     </Card>
@@ -562,27 +620,68 @@ const ProfilePage = () => {
                           <h3 className="text-base font-bold">
                             Company Objectives
                           </h3>
-                          <Button
-                            type="submit"
-                            disabled={companyObjectivesSaveState === "loading"}
-                            form="companyObjectivesForm"
-                          >
-                            {companyObjectivesSaveState === "loading" && (
-                              <Spinner className="text-white" />
-                            )}
-                            {companyObjectivesSaveState === "success" ? (
+                          <div className="flex gap-2">
+                            {isEditingObjectives ? (
                               <>
-                                Saved <CheckCircle className="ml-2 h-4 w-4" />
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setIsEditingObjectives(false);
+                                    // Reset to the last saved value
+                                    setCompanyObjectives(
+                                      formData.companyObjectives
+                                    );
+                                  }}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  type="submit"
+                                  disabled={
+                                    companyObjectivesSaveState === "loading"
+                                  }
+                                  form="companyObjectivesForm"
+                                >
+                                  {companyObjectivesSaveState === "loading" && (
+                                    <Spinner className="text-white mr-2" />
+                                  )}
+                                  {companyObjectivesSaveState === "success" ? (
+                                    <>
+                                      Saved{" "}
+                                      <CheckCircle className="ml-2 h-4 w-4" />
+                                    </>
+                                  ) : (
+                                    "Save Changes"
+                                  )}
+                                </Button>
                               </>
                             ) : (
-                              "Save Changes"
+                              <Button
+                                type="button"
+                                onClick={() => setIsEditingObjectives(true)}
+                              >
+                                Edit Objectives
+                              </Button>
                             )}
-                          </Button>
+                          </div>
                         </div>
-                        <div className="min-h-[150px] p-3 bg-gray-50 rounded-md overflow-auto">
-                          {formData.companyObjectives ||
-                            "No company objectives available."}
-                        </div>
+                        {isEditingObjectives ? (
+                          <Textarea
+                            name="companyObjectives"
+                            value={companyObjectives}
+                            onChange={(e) =>
+                              setCompanyObjectives(e.target.value)
+                            }
+                            className="min-h-[150px]"
+                            placeholder="Enter your company objectives here..."
+                          />
+                        ) : (
+                          <div className="min-h-[150px] p-3 bg-gray-50 rounded-md overflow-auto">
+                            {companyObjectives ||
+                              "No company objectives available."}
+                          </div>
+                        )}
                       </form>
 
                       <div>
