@@ -181,12 +181,12 @@ const SubheadingCards = ({
           >
             <PlusIcon className="w-4 h-4" />
           </Button>
-          <RegenerateButton
+          {/* <RegenerateButton
             section={section}
             index={index}
             onRegenerate={handleRegenerate}
             isLoading={isLoading}
-          />
+          /> */}
         </div>
       </div>
 

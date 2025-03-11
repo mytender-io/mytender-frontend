@@ -341,13 +341,13 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   placeholder="Add in the question here"
                 />
               </div>
-              {/* <SubheadingCards
+               <SubheadingCards
                 section={section}
                 index={index}
                 handleSectionChange={handleSectionChange}
                 handleDeleteSubheading={handleDeleteSubheading}
                 RegenerateButton={RegenerateButton}
-              /> */}
+              /> 
               <div className="space-y-6">
                 <div className="space-y-2 min-h-10">
                   <span

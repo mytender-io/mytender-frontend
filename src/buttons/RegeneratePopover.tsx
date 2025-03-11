@@ -32,13 +32,13 @@ const RegeneratePopover = ({
         onOpenChange={(open) => onOpenChange(open, subIndex)}
       >
         <PopoverTrigger asChild>
-          <Button variant="ghost" className="[&_svg]:w-6 [&_svg]:h-6">
+          <Button variant="ghost">
             <Sparkles className="text-gray-hint_text" />
             <span className="text-gray-hint_text">Modify</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[450px] z-[9999] relative text-lg"
+          className="w-[450px] z-[9999] relative text-md"
           side="top"
           align="end"
           sideOffset={5}
@@ -49,7 +49,7 @@ const RegeneratePopover = ({
               placeholder="Type instructions to adjust subsection"
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
-              className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-lg h-12 px-4 placeholder:text-lg"
+              className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-md placeholder:text-md"
               disabled={isLoading}
             />
             {isLoading ? (
