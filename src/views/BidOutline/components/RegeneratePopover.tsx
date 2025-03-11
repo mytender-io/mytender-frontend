@@ -1,6 +1,5 @@
-import * as React from "react";
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -63,15 +62,7 @@ const RegeneratePopover = ({
                 variant="ghost"
                 className="px-4 h-12"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-6 w-6 rotate-90"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M12 5v14M19 12l-7 7-7-7" />
-                </svg>
+                <Send className="h-6 w-6" />
               </Button>
             )}
           </form>

@@ -7,10 +7,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import DebouncedTextArea from "./DebouncedTextArea";
 import SubheadingCards from "./SubheadingCards";
-import RegenerateButton from "./RegenerateButton";
 import { Contributor, Section } from "../../BidWritingStateManagerView";
 import StatusMenu from "@/buttons/StatusMenu";
-import ReviewerDropdown from "@/views/BidOutline/components/ReviewerDropdown";
+// import ReviewerDropdown from "@/views/BidOutline/components/ReviewerDropdown";
 import QuestionTypeDropdown from "@/views/BidOutline/components/QuestionTypeDropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -305,7 +304,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-             
                   <QuestionTypeDropdown
                     value={section.choice}
                     onChange={(value) =>
@@ -341,13 +339,12 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   placeholder="Add in the question here"
                 />
               </div>
-               <SubheadingCards
+              <SubheadingCards
                 section={section}
                 index={index}
                 handleSectionChange={handleSectionChange}
                 handleDeleteSubheading={handleDeleteSubheading}
-                RegenerateButton={RegenerateButton}
-              /> 
+              />
               <div className="space-y-6">
                 <div className="space-y-2 min-h-10">
                   <span

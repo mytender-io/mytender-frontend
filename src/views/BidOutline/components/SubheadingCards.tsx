@@ -5,7 +5,7 @@ import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import DebouncedTextArea from "./DebouncedTextArea";
 import { PlusIcon, Trash } from "lucide-react";
-import RegeneratePopover from "@/buttons/RegeneratePopover";
+import RegeneratePopover from "./RegeneratePopover";
 import RegenerateButton from "./RegenerateButton";
 import { Button } from "@/components/ui/button";
 import { BidContext } from "@/views/BidWritingStateManagerView";
@@ -201,7 +201,7 @@ const SubheadingCards = ({
                     onChange={(value) => handleTitleChange(subIndex, value)}
                     className="w-full bg-transparent resize-none focus:outline-none min-h-6 p-1"
                     placeholder="Write the name of the subtopic..."
-                    rows={1}
+                    rows={2}
                   />
                 </div>
                 <div className="flex items-center space-x-2">
