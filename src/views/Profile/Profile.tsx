@@ -585,7 +585,7 @@ const ProfilePage = () => {
                         </div>
                       </form>
 
-                      <div className="flex items-center justify-between">
+                      <div>
                         <ToneOfVoiceLibrary selectable={false} />
                       </div>
                     </div>

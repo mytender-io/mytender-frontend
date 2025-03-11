@@ -38,6 +38,7 @@ const SelectTenderLibraryFile: React.FC<{
 
   const fetchDocuments = async () => {
     try {
+      console.log("tender library docs");
       if (bid_id) {
         const response = await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/get_tender_library_doc_filenames`,
@@ -49,7 +50,7 @@ const SelectTenderLibraryFile: React.FC<{
             }
           }
         );
-        console.log("tender library docs", response);
+        console.log("tender library docs", response.data);
         setDocuments(response.data.filenames);
         setIsLoading(false);
       }

@@ -218,12 +218,12 @@ const BidManagement: React.FC = () => {
     }
 
     // Check user permissions before proceeding
-    if (!canUserSave()) {
-      console.log(
-        "User does not have permission to save. Skipping save operation."
-      );
-      return;
-    }
+    // if (!canUserSave()) {
+    //   console.log(
+    //     "User does not have permission to save. Skipping save operation."
+    //   );
+    //   return;
+    // }
 
     try {
       isSavingRef.current = true;
@@ -428,7 +428,7 @@ const BidManagement: React.FC = () => {
     // Set new timer for auto-save
     setTypingTimeout(
       setTimeout(() => {
-        if (canUserSave() && !isSavingRef.current) {
+        if (!isSavingRef.current) {
           saveProposal();
         }
       }, 2000)
