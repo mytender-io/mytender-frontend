@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,7 +10,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import posthog from "posthog-js";
 import { cn } from "@/utils";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import UploadIcon from "@/components/icons/UploadIcon";
 import FileIcon from "@/components/icons/FileIcon";
@@ -28,6 +27,9 @@ interface UploadPDFProps {
   onUploadComplete?: (files: File[]) => void;
   apiUrl: string;
   descriptionText?: string;
+  uploadedDocuments?: File[];
+  isUploadingDocuments?: boolean;
+  setUploadingDocuments?: (isUploadingDocuments: boolean) => void;
 }
 
 interface UploadProgress {
@@ -41,18 +43,21 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
   onClose,
   onUploadComplete,
   apiUrl,
-  descriptionText
+  descriptionText,
+  uploadedDocuments,
+  isUploadingDocuments,
+  setUploadingDocuments
 }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const [selectedFiles, setSelectedFiles] = useState([]);
-  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [uploadProgress, setUploadProgress] = useState<UploadProgress>({});
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
 
   const getFileMode = (fileType: string) => {
     switch (fileType) {
@@ -71,7 +76,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     e.preventDefault();
     e.stopPropagation();
     // Only handle drag events if not currently uploading
-    if (!isUploading) {
+    if (!isUploadingDocuments) {
       if (e.type === "dragenter" || e.type === "dragover") {
         setDragActive(true);
       } else if (e.type === "dragleave") {
@@ -86,7 +91,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     setDragActive(false);
     // Only handle drop if not currently uploading
     if (
-      !isUploading &&
+      !isUploadingDocuments &&
       e.dataTransfer.files &&
       e.dataTransfer.files.length > 0
     ) {
@@ -96,7 +101,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
 
   const handleFileSelect = (e) => {
     // Only handle file selection if not currently uploading
-    if (!isUploading && e.target.files && e.target.files.length > 0) {
+    if (!isUploadingDocuments && e.target.files && e.target.files.length > 0) {
       handleFiles(Array.from(e.target.files));
     }
   };
@@ -210,12 +215,6 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         [file.name]: 100
       }));
 
-      // Wait for 2 seconds before removing the file
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Remove the completed file from selectedFiles
-      setSelectedFiles((prev) => prev.filter((f) => f.name !== file.name));
-
       return { data: response.data, fileName: file.name };
     } catch (error) {
       clearInterval(progressInterval);
@@ -224,16 +223,41 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }
   };
 
-  const handleUpload = async () => {
-    if (selectedFiles.length === 0) {
+  useEffect(() => {
+    if (selectedFiles.length > 0) {
+      const newFiles = selectedFiles.filter(
+        (file) => !uploadedFiles.includes(file.name)
+      );
+      if (newFiles.length > 0) {
+        handleUpload(newFiles);
+      }
+    }
+  }, [selectedFiles]);
+
+  useEffect(() => {
+    if (uploadedDocuments && uploadedDocuments.length > 0) {
+      console.log("uploadedDocuments", uploadedDocuments);
+      setSelectedFiles(uploadedDocuments);
+      setUploadedFiles(uploadedDocuments.map((file) => file.name));
+      setUploadProgress(
+        uploadedDocuments.reduce((acc, file) => {
+          acc[file.name] = 100;
+          return acc;
+        }, {})
+      );
+    }
+  }, [uploadedDocuments]);
+
+  const handleUpload = async (filesToUpload = selectedFiles) => {
+    if (filesToUpload.length === 0) {
       toast.error("No files selected");
       return;
     }
 
-    setIsUploading(true);
+    setUploadingDocuments?.(true);
 
     try {
-      const uploadPromises = selectedFiles.map((file) => uploadFile(file));
+      const uploadPromises = filesToUpload.map((file) => uploadFile(file));
       const results: UploadResult[] = await Promise.all(
         uploadPromises.map((p) =>
           p
@@ -245,17 +269,24 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       const successCount = results.filter((result) => !result.error).length;
       const failCount = results.filter((result) => result.error).length;
 
+      // Track successfully uploaded files
+      const successfulFileNames = results
+        .filter((result) => !result.error)
+        .map((result) => result.fileName);
+
+      setUploadedFiles((prev) => [...prev, ...successfulFileNames]);
+
       if (successCount > 0) {
         // toast.success(`Successfully uploaded ${successCount} file(s)`);
         posthog.capture("pdf_upload_batch_completed", {
           successCount,
           failCount,
-          totalFiles: selectedFiles.length
+          totalFiles: filesToUpload.length
         });
 
         // Call onUploadComplete with successfully uploaded files
         if (onUploadComplete) {
-          const successfulFiles = selectedFiles.filter((file) =>
+          const successfulFiles = filesToUpload.filter((file) =>
             results.some(
               (result) => !result.error && result.fileName === file.name
             )
@@ -267,14 +298,11 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       if (failCount > 0) {
         toast.error(`Failed to upload ${failCount} file(s)`);
       }
-
-      // Clear progress for completed uploads
-      setUploadProgress({});
     } catch (error) {
       console.error("Error in batch upload:", error);
       toast.error("Error uploading files");
     } finally {
-      setIsUploading(false);
+      setUploadingDocuments?.(false);
       if (get_collections) {
         get_collections();
       }
@@ -338,14 +366,16 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         className={cn(
           "border-2 border-dashed border-gray-300 rounded-lg p-5 text-center relative",
           dragActive ? "bg-gray-50" : "bg-white",
-          isUploading ? "opacity-60 cursor-not-allowed" : "cursor-pointer",
+          isUploadingDocuments
+            ? "opacity-60 cursor-not-allowed"
+            : "cursor-pointer",
           "transition-all duration-300"
         )}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        onClick={() => !isUploading && fileInputRef.current.click()}
+        onClick={() => !isUploadingDocuments && fileInputRef.current.click()}
       >
         <div className="relative flex flex-col items-center">
           <input
@@ -355,7 +385,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
             onChange={handleFileSelect}
             className="hidden"
             multiple
-            disabled={isUploading}
+            disabled={isUploadingDocuments}
           />
           <div className="relative flex items-center justify-center mb-2.5 w-20 h-20">
             <FileIcon className="w-full h-full text-gray-hint_text" />
@@ -364,7 +394,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
             </div>
           </div>
           <span className="font-bold">
-            {isUploading
+            {isUploadingDocuments
               ? "Upload in progress..."
               : "Click to Upload or drag and drop"}
           </span>
@@ -372,25 +402,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         </div>
       </div>
 
-      <div className="space-y-4">
-        {renderSelectedFiles()}
-
-        {selectedFiles.length > 0 && (
-          <div className="text-right">
-            <Button
-              variant="secondary"
-              onClick={handleUpload}
-              disabled={isUploading}
-            >
-              {isUploading
-                ? "Uploading..."
-                : `Upload ${selectedFiles.length} File${
-                    selectedFiles.length !== 1 ? "s" : ""
-                  }`}
-            </Button>
-          </div>
-        )}
-      </div>
+      <div className="space-y-4">{renderSelectedFiles()}</div>
     </div>
   );
 };

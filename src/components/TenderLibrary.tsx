@@ -258,7 +258,7 @@ const TenderLibrary = ({ object_id }) => {
   const renderFileContent = () => {
     if (isLoading) {
       return (
-        <div className="flex h-[400px] items-center justify-center">
+        <div className="flex h-[500px] items-center justify-center">
           <Spinner />
         </div>
       );
@@ -309,7 +309,7 @@ const TenderLibrary = ({ object_id }) => {
     }
 
     return (
-      <div className="h-[400px] overflow-auto">
+      <div className="h-[500px] overflow-auto">
         {/* Fixed height container with scroll */}
         <div className="space-y-6 px-4">
           {/* Added padding to prevent content touching edges */}

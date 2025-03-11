@@ -144,6 +144,9 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   // Add new state for error message
   const [errorMessage, setErrorMessage] = useState<string>("");
 
+  const [isUploadingDocuments, setIsUploadingDocuments] =
+    useState<boolean>(false);
+
   const initialModalState = {
     bidInfo: "",
     opportunity_information: "",
@@ -171,13 +174,6 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     customer_pain_points: [],
     differentiating_factors: []
   };
-
-  useEffect(() => {
-    // When documents state changes and there are documents
-    if (currentStep === "documents" && documents.length > 0) {
-      handleNextStep();
-    }
-  }, [documents]); // Add other dependencies if needed
 
   const loadingMessages = [
     "Looking at the tender docs...",
@@ -797,8 +793,11 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                     bid_id={sharedState.object_id}
                     apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
                     onUploadComplete={(uploadedFiles) => {
-                      setDocuments(uploadedFiles);
+                      setDocuments([...documents, ...uploadedFiles]);
                     }}
+                    uploadedDocuments={documents}
+                    isUploadingDocuments={isUploadingDocuments}
+                    setUploadingDocuments={setIsUploadingDocuments}
                   />
                 )}
 
@@ -835,8 +834,12 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                   {isGeneratingOutline ? "Creating..." : "Create Tender"}
                 </Button>
               ) : (
-                <Button type="button" onClick={handleNextStep}>
-                  Next Step →
+                <Button
+                  type="button"
+                  onClick={handleNextStep}
+                  disabled={isUploadingDocuments}
+                >
+                  {isUploadingDocuments ? "Uploading..." : "Next Step →"}
                 </Button>
               )}
             </DialogFooter>
