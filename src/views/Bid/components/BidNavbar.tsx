@@ -74,7 +74,7 @@ const BidNavbar: React.FC<{
       "/bid-extractor": 120, // Width for "Tender Insights"
       "/bid-intel": 90, // Width for "Bid Inputs"
       "/proposal-planner": 85, // Width for "Bid Outline"
-      "/proposal-preview": 95 // Width for "Bid Review"
+      "/proposal-preview": 110 // Width for "Bid Enhancer"
     };
 
     // Define positions (cumulative widths plus margins)
@@ -152,7 +152,7 @@ const BidNavbar: React.FC<{
               )}
               onClick={() => handleTabClick("/proposal-preview")}
             >
-              Bid Review
+              Bid Enhancer
             </span>
             <SaveStatus
               isLoading={sharedState.isLoading}
