@@ -8,7 +8,7 @@ import StatusMenu from "../../buttons/StatusMenu";
 import SectionMenu from "../../buttons/SectionMenu";
 import posthog from "posthog-js";
 import ProposalSidepane from "./components/SlidingSidepane";
-import ReviewerDropdown from "./components/ReviewerDropdown";
+// import ReviewerDropdown from "./components/ReviewerDropdown";
 import QuestionTypeDropdown from "./components/QuestionTypeDropdown";
 import SectionControls from "./components/SectionControls";
 import BulkControls from "./components/BulkControls";
@@ -1029,7 +1029,7 @@ const ProposalPlan = () => {
             {isOrganizationUsersLoading ? (
               <div className="flex items-center justify-center w-full h-64">
                 <div className="flex flex-col items-center gap-4">
-                  <Spinner size="lg" />
+                  <Spinner />
                   <p className="text-muted-foreground">
                     Loading organization data...
                   </p>
@@ -1141,9 +1141,9 @@ const ProposalPlan = () => {
                 handleDeleteSubheading={handleDeleteSubheading}
                 totalSections={outline.length}
                 onNavigate={handleSectionNavigation}
-                organizationUsers={
-                  organizationUsers
-                } /* Pass org users to the sidepane if needed */
+                // organizationUsers={
+                //   organizationUsers
+                // }
               />
             )}
 
@@ -1156,9 +1156,9 @@ const ProposalPlan = () => {
                 contributors={contributors}
                 onRevert={handleRevert}
                 canRevert={canRevert}
-                organizationUsers={
-                  organizationUsers
-                } /* Pass org users to bulk controls if needed */
+                // organizationUsers={
+                //   organizationUsers
+                // }
               />
             )}
 

@@ -26,11 +26,6 @@ const BulkControls = ({
   const [openMenu, setOpenMenu] = useState(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  useEffect(() => {
-    // Apply initial word count
-    handleUpdate("word_count", wordCount);
-  }, []);
-
   const handleUpdate = (field, value) => {
     const updates = {};
     if (field === "word_count") {
