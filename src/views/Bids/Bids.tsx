@@ -13,6 +13,7 @@ import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
 import PaginationRow from "@/components/PaginationRow.tsx";
 import EllipsisMenuDashboard from "./components/EllipsisMenuDashboard.tsx";
 import BidStatusMenu from "./components/BidStatusMenu.tsx";
+import BidResultDropdown from "@/components/BidResultDropdown.tsx";
 import KanbanView from "./components/KanbanView.tsx";
 import { Button } from "@/components/ui/button";
 import PlusIcon from "@/components/icons/PlusIcon.tsx";
@@ -30,6 +31,7 @@ import { customLocale, cn } from "@/utils";
 import { toast } from "react-toastify";
 import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
 import { formatDistanceToNow } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 interface Bid {
   _id: string;
@@ -138,6 +140,7 @@ const Bids = () => {
           break;
 
         case "status":
+        case "bid_qualification_result":
           comparison = String(aValue)
             .toLowerCase()
             .localeCompare(String(bValue).toLowerCase());
@@ -164,7 +167,8 @@ const Bids = () => {
         bid.bid_title?.toLowerCase().includes(lowercaseSearch) ||
         bid.client_name?.toLowerCase().includes(lowercaseSearch) ||
         bid.value?.toLowerCase().includes(lowercaseSearch) ||
-        bid.status?.toLowerCase().includes(lowercaseSearch)
+        bid.status?.toLowerCase().includes(lowercaseSearch) ||
+        bid.bid_qualification_result?.toLowerCase().includes(lowercaseSearch)
       );
     });
   };
@@ -196,12 +200,33 @@ const Bids = () => {
     { key: "timestamp", label: "Last edited" },
     { key: "value", label: "Value" },
     { key: "submission_deadline", label: "Deadline" },
-    { key: "status", label: "Status" }
+    { key: "status", label: "Status" },
+    { key: "bid_qualification_result", label: "Won/Lost" }
     // { key: "client_name", label: "Client" },
     // { key: "bid_manager", label: "Bid Manager", width: "15%" },
     // { key: "opportunity_owner", label: "Opportunity Owner", width: "15%" },
-    // { key: "bid_qualification_result", label: "Result" }
   ];
+
+  // Helper function to render Won/Lost status with appropriate styling
+  const renderWonLostStatus = (result: string | undefined) => {
+    if (!result) return <span className="text-gray-400">--</span>;
+    
+    if (result.toLowerCase() === "won") {
+      return (
+        <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+          Won
+        </Badge>
+      );
+    } else if (result.toLowerCase() === "lost") {
+      return (
+        <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">
+          Lost
+        </Badge>
+      );
+    } else {
+      return <span>{result}</span>;
+    }
+  };
 
   useEffect(() => {
     setFilteredBids(filterBids(bids, searchTerm));
@@ -329,6 +354,68 @@ const Bids = () => {
     setBidToDelete(bidId);
     setShowDeleteModal(true);
   };
+  
+  // Function to update the bid qualification result
+  const updateBidQualificationResult = async (
+    bidId: string,
+    newResult: string
+  ): Promise<void> => {
+    try {
+      const formData = new FormData();
+      formData.append("bid_id", bidId);
+      formData.append("bid_qualification_result", newResult);
+
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/update_bid_qualification_result/`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      if (response.data && response.data.status === "success") {
+        // Update local state instead of fetching all bids
+        setBids((prevBids) =>
+          prevBids.map((bid) =>
+            bid._id === bidId ? { ...bid, bid_qualification_result: newResult } : bid
+          )
+        );
+
+        handleGAEvent(
+          "Bid Tracker",
+          "Change Bid Result",
+          "Bid Result Dropdown"
+        );
+      } else {
+        toast.error("Failed to update bid result");
+      }
+    } catch (err) {
+      console.error("Error updating bid result:", err);
+
+      if (axios.isAxiosError(err)) {
+        if (err.response) {
+          if (err.response.status === 403) {
+            toast.error(
+              "You don't have permission to update this bid's result"
+            );
+          } else if (err.response.status === 404) {
+            toast.error("Bid not found");
+          } else {
+            toast.error(
+              `Error: ${err.response.data?.detail || "Failed to update bid result"}`
+            );
+          }
+        } else if (err.request) {
+          toast.error("No response received from server. Please try again.");
+        }
+      } else {
+        toast.error("Error updating bid result. Please try again.");
+      }
+    }
+  };
 
   const updateBidStatus = async (
     bidId: string,
@@ -403,6 +490,9 @@ const Bids = () => {
 
   const SkeletonRow = () => (
     <TableRow>
+      <TableCell className="px-4">
+        <Skeleton variant="text" width="100%" />
+      </TableCell>
       <TableCell className="px-4">
         <Skeleton variant="text" width="100%" />
       </TableCell>
@@ -545,6 +635,15 @@ const Bids = () => {
                                 disabled={isDisabled}
                               />
                             </TableCell>
+                            <TableCell className="px-4">
+                            <BidResultDropdown
+                                value={bid.bid_qualification_result}
+                                onChange={(value) => {
+                                  updateBidQualificationResult(bid._id, value);
+                                }}
+                                disabled={isDisabled}
+                              />
+                            </TableCell>
                             <TableCell className="w-[100px] text-right px-4">
                               <EllipsisMenuDashboard
                                 onClick={() => handleDeleteClick(bid._id)}
@@ -555,7 +654,7 @@ const Bids = () => {
                       })
                     ) : (
                       <TableRow>
-                        <TableCell className="text-center py-4" colSpan={6}>
+                        <TableCell className="text-center py-4" colSpan={7}>
                           No matching tenders found
                         </TableCell>
                       </TableRow>

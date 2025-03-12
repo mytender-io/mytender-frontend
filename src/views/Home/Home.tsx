@@ -136,15 +136,17 @@ const Home = () => {
 
   const parentPages = [] as Array<{ name: string; path: string }>;
 
-  // Calculate estimated value of all bids
-  const calculateTotalBidValue = () => {
+  // Calculate estimated value of won bids
+  const calculateTotalWonValue = () => {
     if (!bids.length) return 0;
 
     return bids.reduce((total, bid) => {
-      const value = bid.estimated_value
-        ? parseFloat(bid.estimated_value.toString())
-        : 0;
-      return total + value;
+      // Only include bids that have been won
+      if (bid.bid_qualification_result === "won") {
+        const value = bid.value ? parseFloat(bid.value.toString()) : 0;
+        return total + value;
+      }
+      return total;
     }, 0);
   };
 
@@ -195,8 +197,8 @@ const Home = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="grid grid-cols-2 font-medium text-sm py-2 border-b">
-                  <div>Tender Name</div>
+                <div className="grid grid-cols-4 font-medium text-sm py-2 border-b">
+                  <div className="col-span-3">Tender Name</div>
                   <div>Status</div>
                 </div>
 
@@ -216,9 +218,9 @@ const Home = () => {
                     return (
                       <div
                         key={bid._id}
-                        className="grid grid-cols-2 text-sm py-2"
+                        className="grid grid-cols-4 text-sm py-2"
                       >
-                        <div className="truncate">
+                        <div className="truncate col-span-3">
                           <Button
                             variant="link"
                             className="p-0 h-auto text-left font-normal"
@@ -229,7 +231,7 @@ const Home = () => {
                             {bid.bid_title || bid.client_name || "Unnamed Bid"}
                           </Button>
                         </div>
-                        <div>
+                        <div className="text-right">
                           <BidStatusMenu
                             value={bid.status}
                             onChange={() => {}}
@@ -331,10 +333,10 @@ const Home = () => {
               <div className="space-y-6">
                 <div className="flex flex-col items-center justify-center py-4">
                   <div className="text-3xl font-bold text-green-600">
-                    ${calculateTotalBidValue().toLocaleString()}
+                    £{calculateTotalWonValue().toLocaleString()}
                   </div>
                   <div className="text-sm text-gray-500 mt-2">
-                    Estimated total value
+                    Estimated total value won
                   </div>
                 </div>
 
@@ -350,17 +352,17 @@ const Home = () => {
                   </div>
 
                   <div className="grid grid-cols-2 text-sm py-2">
-                    <div>High probability</div>
+                    <div>Bids won</div>
                     <div className="text-right">
-                      {bids.filter((b) => b.win_probability === "high")
+                      {bids.filter((b) => b.bid_qualification_result === "won")
                         .length || 0}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 text-sm py-2">
-                    <div>Medium probability</div>
+                    <div>Bids lost</div>
                     <div className="text-right">
-                      {bids.filter((b) => b.win_probability === "medium")
+                      {bids.filter((b) => b.bid_qualification_result === "lost")
                         .length || 0}
                     </div>
                   </div>
