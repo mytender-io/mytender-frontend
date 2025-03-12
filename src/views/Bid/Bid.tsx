@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 import withAuth from "../../routes/withAuth";
 import BidNavbar from "@/views/Bid/components/BidNavbar";
 import { BidContext } from "../BidWritingStateManagerView";
@@ -9,21 +9,54 @@ import BidIntel from "../BidInputs/BidIntel";
 import ProposalPlan from "../BidOutline/ProposalPlan";
 import ProposalPreview from "../ProposalPreview/ProposalPreview";
 import OutlineInstructionsModal from "../BidOutline/components/OutlineInstructionsModal";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+
 const Bid = () => {
   const { sharedState, setSharedState } = useContext(BidContext);
   const { bidInfo, object_id, outline } = sharedState;
   const initialBidName = bidInfo;
+  const navigate = useNavigate();
 
   const parentPages = [{ name: "Tender Dashboard", path: "/bids" }];
 
   const location = useLocation();
   const bidData = location.state?.bid || null;
 
+  // Parse query parameters
+  const queryParams = new URLSearchParams(location.search);
+  const bidId = queryParams.get("id");
+  const shouldOpenTask = queryParams.get("openTask") === "true";
+  const taskId = queryParams.get("taskId");
+  const sectionIndex = queryParams.get("sectionIndex");
+
   const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem("lastActiveTab") || "/bid-extractor";
+    // If we're being asked to open a task, default to proposal planner tab
+    if (shouldOpenTask) {
+      return "/proposal-planner";
+    }
+    return "/bid-extractor";
   });
+
   const [showModal, setShowModal] = useState(false);
+
+  // Function to handle opening a task
+  const openTask = useCallback(
+    (taskId, sectionIndex) => {
+      console.log(`Opening task ${taskId} at section index ${sectionIndex}`);
+
+      // Remove query parameters from URL to avoid reopening on refresh
+      navigate(`/bid?id=${bidId}`, { replace: true });
+    },
+    [object_id, navigate, bidId]
+  );
+
+  // Handle task opening when component mounts
+  useEffect(() => {
+    if (shouldOpenTask && taskId && sectionIndex) {
+      // Make sure we're on the proposal planner tab
+      setActiveTab("/proposal-planner");
+    }
+  }, [shouldOpenTask, taskId, sectionIndex]);
 
   const showViewOnlyMessage = () => {
     toast.error("You only have permission to view this bid.");
@@ -41,7 +74,6 @@ const Bid = () => {
   };
 
   useEffect(() => {
-    localStorage.setItem("lastActiveTab", activeTab);
     if (
       object_id &&
       outline.length === 0 &&
@@ -54,10 +86,8 @@ const Bid = () => {
   useEffect(() => {
     if (bidData) {
       console.log(bidData);
-      console.log(bidData);
       setSharedState((prevState) => {
         // Filter out single-character entries from selectedFolders
-
         let selectedFolders = Array.isArray(bidData?.selectedFolders)
           ? bidData.selectedFolders
           : ["default"];
@@ -110,7 +140,7 @@ const Bid = () => {
       console.log(bidData?.solution);
       localStorage.setItem("navigatedFromBidsTable", "false");
     }
-  }, []);
+  }, [bidData, setSharedState]);
 
   return (
     <div className="flex flex-col h-full">
@@ -144,7 +174,13 @@ const Bid = () => {
           {activeTab === "/bid-intel" && (
             <BidIntel showViewOnlyMessage={showViewOnlyMessage} />
           )}
-          {activeTab === "/proposal-planner" && <ProposalPlan />}
+          {activeTab === "/proposal-planner" && (
+            <ProposalPlan
+              openTask={openTask}
+              taskToOpen={shouldOpenTask ? taskId : null}
+              sectionIndex={shouldOpenTask ? sectionIndex : null}
+            />
+          )}
           {activeTab === "/proposal-preview" && (
             <ProposalPreview showViewOnlyMessage={showViewOnlyMessage} />
           )}

@@ -48,7 +48,9 @@ import SelectOrganisationUserButton from "@/buttons/SelectOrganisationUserButton
 import { Spinner } from "@/components/ui/spinner";
 import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 
-const ProposalPlan = () => {
+const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
+  const outlineSectionsRef = useRef({});
+
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -122,6 +124,43 @@ const ProposalPlan = () => {
 
     fetchOrganizationUsers();
   }, [tokenRef]);
+
+  useEffect(() => {
+    if (taskToOpen && sectionIndex && openTask) {
+      // First, register a slight delay to ensure sections are rendered
+      setTimeout(() => {
+        // Call the openTask function from props
+        openTask(taskToOpen, sectionIndex);
+
+        // Scroll to the section
+        scrollToSection(sectionIndex);
+      }, 500); // Short delay to ensure components are rendered
+    }
+  }, [taskToOpen, sectionIndex, openTask]);
+
+  // Function to scroll to a specific section
+  const scrollToSection = (index) => {
+    // Get the section element (this will depend on your implementation)
+    const sectionElement = outlineSectionsRef.current[index];
+
+    if (sectionElement) {
+      // Scroll to the element
+      sectionElement.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      // Highlight the section
+      sectionElement.classList.add("highlight-section");
+
+      // Remove the highlight after an animation
+      setTimeout(() => {
+        sectionElement.classList.remove("highlight-section");
+      }, 3000);
+    }
+  };
+
+  // Register section refs
+  const registerSectionRef = (index, element) => {
+    outlineSectionsRef.current[index] = element;
+  };
 
   // Bulk Update functions
   const handleSelectSection = (index) => {
@@ -922,7 +961,10 @@ const ProposalPlan = () => {
 
     return (
       <TableRow
-        ref={setNodeRef}
+        ref={(el) => {
+          setNodeRef(el);
+          registerSectionRef(index, el);
+        }}
         style={style}
         className={cn(
           "cursor-pointer hover:bg-muted/50",

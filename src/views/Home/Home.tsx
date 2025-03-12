@@ -7,9 +7,9 @@ import withAuth from "@/routes/withAuth.tsx";
 import BidStatusMenu from "../Bids/components/BidStatusMenu.tsx";
 import { Spinner } from "@/components/ui/spinner";
 import { useNavigate } from "react-router-dom";
-import {formatDistanceToNow, parseISO } from "date-fns";
+import { formatDistanceToNow, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
-import {  CheckCircle, Clock, FileText, X } from "lucide-react";
+import { CheckCircle, Clock, FileText, X } from "lucide-react";
 import { toast } from "react-toastify";
 
 interface Bid {
@@ -29,6 +29,7 @@ interface Bid {
   bid_qualification_result?: string;
   win_themes?: string[];
   [key: string]: string | string[] | undefined; // Index signature for dynamic access
+  new_bid_completed?: boolean;
 }
 
 interface Task {
@@ -112,9 +113,9 @@ const Home = () => {
             bid._id === bidId ? { ...bid, status: newStatus } : bid
           )
         );
-        
+
         // Also update in the map
-        setBidMap(prevMap => ({
+        setBidMap((prevMap) => ({
           ...prevMap,
           [bidId]: { ...prevMap[bidId], status: newStatus }
         }));
@@ -152,10 +153,28 @@ const Home = () => {
   };
 
   const handleTaskClick = (task) => {
-    // Navigate to the specific bid and store the index to open the correct section
-    // We'll use localStorage to pass the index to the ProposalPlan component
-    localStorage.setItem("openSectionIndex", task.index.toString());
-    navigate(`/bid/${task.bid_id}/proposal-plan`);
+    // Get the corresponding bid for this task
+    const bid = bidMap[task.bid_id];
+
+    if (!bid) {
+      console.error(
+        `Bid not found for task: ${task.name}, bid_id: ${task.bid_id}`
+      );
+      toast.error("Could not find the associated bid for this task");
+      return;
+    }
+
+    // Clean up any existing state
+    localStorage.removeItem("bidState");
+    localStorage.removeItem("tenderLibChatMessages");
+
+    // Navigate with both query parameters and state
+    navigate(
+      `/bid?id=${task.bid_id}&openTask=true&taskId=${task._id}&sectionIndex=${task.index}`,
+      {
+        state: { bid: bid, fromBidsTable: true }
+      }
+    );
   };
 
   const handleDeleteTask = async (taskId) => {
@@ -209,6 +228,26 @@ const Home = () => {
     return bid
       ? bid.bid_title || bid.client_name || "Unnamed Bid"
       : "Unknown Bid";
+  };
+
+  const isRecentlyCreatedWithEmptyThemes = (bid: Bid): boolean => {
+    const isNewBidIncomplete = bid.new_bid_completed === false;
+    return isNewBidIncomplete;
+  };
+
+  const navigateToChatbot = (bid: Bid) => {
+    // Check if bid is disabled
+    if (isRecentlyCreatedWithEmptyThemes(bid)) {
+      toast.info("This tender is still being created. Please try again later.");
+      return;
+    }
+
+    localStorage.setItem("navigatedFromBidsTable", "true");
+    localStorage.removeItem("bidState");
+    localStorage.removeItem("tenderLibChatMessages");
+    navigate(`/bid?id=${bid._id}`, {
+      state: { bid: bid, fromBidsTable: true }
+    });
   };
 
   return (
@@ -267,9 +306,7 @@ const Home = () => {
                           <Button
                             variant="link"
                             className="p-0 h-auto text-left font-normal"
-                            onClick={() =>
-                              navigate(`/bid/${bid._id}/proposal-plan`)
-                            }
+                            onClick={() => navigateToChatbot(bid)}
                           >
                             {bid.bid_title || bid.client_name || "Unnamed Bid"}
                           </Button>
@@ -277,13 +314,13 @@ const Home = () => {
                         <div className="text-right">
                           <BidStatusMenu
                             value={bid.status}
-                            onChange={(value) => updateBidStatus(bid._id, value)}
+                            onChange={(value) =>
+                              updateBidStatus(bid._id, value)
+                            }
                             disabled={false}
                           />
                         </div>
-                      
                       </div>
-                      
                     );
                   })}
 
