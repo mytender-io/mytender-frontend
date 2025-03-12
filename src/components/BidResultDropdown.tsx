@@ -35,17 +35,6 @@ const BidResultDropdown = ({
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "won":
-        return "bg-status-success border-status-success";
-      case "lost":
-        return "bg-status-draft border-status-draft";
-      default:
-        return "bg-status-planning border-status-planning";
-    }
-  };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "won":

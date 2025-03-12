@@ -7,10 +7,9 @@ import withAuth from "@/routes/withAuth.tsx";
 import BidStatusMenu from "../Bids/components/BidStatusMenu.tsx";
 import { Spinner } from "@/components/ui/spinner";
 import { useNavigate } from "react-router-dom";
-import { format, formatDistanceToNow, parseISO } from "date-fns";
-import { Badge } from "@/components/ui/badge";
+import {formatDistanceToNow, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, CheckCircle, Clock, FileText, X } from "lucide-react";
+import {  CheckCircle, Clock, FileText, X } from "lucide-react";
 import { toast } from "react-toastify";
 
 interface Bid {
@@ -85,6 +84,50 @@ const Home = () => {
     fetchBids();
     fetchTasks();
   }, []);
+
+  const updateBidStatus = async (
+    bidId: string,
+    newStatus: string
+  ): Promise<void> => {
+    try {
+      const formData = new FormData();
+      formData.append("bid_id", bidId);
+      formData.append("status", newStatus);
+
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/update_bid_status/`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      if (response.data && response.data.status === "success") {
+        // Update local state instead of fetching all bids
+        setBids((prevBids) =>
+          prevBids.map((bid) =>
+            bid._id === bidId ? { ...bid, status: newStatus } : bid
+          )
+        );
+        
+        // Also update in the map
+        setBidMap(prevMap => ({
+          ...prevMap,
+          [bidId]: { ...prevMap[bidId], status: newStatus }
+        }));
+
+        toast.success("Bid status updated successfully");
+      } else {
+        toast.error("Failed to update bid status");
+      }
+    } catch (err) {
+      console.error("Error updating bid status:", err);
+      toast.error("Error updating bid status. Please try again.");
+    }
+  };
 
   const fetchTasks = async () => {
     setTasksLoading(true);
@@ -234,11 +277,13 @@ const Home = () => {
                         <div className="text-right">
                           <BidStatusMenu
                             value={bid.status}
-                            onChange={() => {}}
-                            disabled={true}
+                            onChange={(value) => updateBidStatus(bid._id, value)}
+                            disabled={false}
                           />
                         </div>
+                      
                       </div>
+                      
                     );
                   })}
 
