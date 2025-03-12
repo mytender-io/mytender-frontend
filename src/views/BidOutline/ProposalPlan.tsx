@@ -134,9 +134,27 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
 
         // Scroll to the section
         scrollToSection(sectionIndex);
+
+        // Also open the sidepane by triggering handleRowClick programmatically
+        // We need to convert sectionIndex to a number since it might be a string from query params
+        const index = parseInt(sectionIndex, 10);
+        if (!isNaN(index) && index >= 0 && index < outline.length) {
+          // Create a synthetic event object with preventDefault method
+          // to avoid errors in handleRowClick
+          const syntheticEvent = {
+            preventDefault: () => {},
+            target: document.createElement("div") // Create a dummy element
+          };
+
+          // Call handleRowClick with our synthetic event
+          handleRowClick(syntheticEvent, index);
+
+          // Set the sidepane to be open
+          setIsSidepaneOpen(true);
+        }
       }, 500); // Short delay to ensure components are rendered
     }
-  }, [taskToOpen, sectionIndex, openTask]);
+  }, [taskToOpen, sectionIndex, openTask, outline.length]);
 
   // Function to scroll to a specific section
   const scrollToSection = (index) => {

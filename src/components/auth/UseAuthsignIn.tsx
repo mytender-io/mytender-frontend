@@ -45,7 +45,7 @@ const useAuthSignIn = () => {
         localStorage.removeItem("bidState");
         localStorage.removeItem("lastActiveTab");
 
-        navigate("/bids");
+        navigate("/home");
 
         //localStorage.clear();
 

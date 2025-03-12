@@ -44,7 +44,6 @@ const Home = () => {
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [tasksLoading, setTasksLoading] = useState(true);
   const [bidMap, setBidMap] = useState<Record<string, Bid>>({});
   const navigate = useNavigate();
   const getAuth = useAuthUser();
@@ -52,7 +51,6 @@ const Home = () => {
   const tokenRef = useRef(auth?.token || "default");
 
   const fetchBids = async () => {
-    setLoading(true);
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
@@ -76,14 +74,41 @@ const Home = () => {
       }
     } catch (error) {
       console.error("Error fetching bids:", error);
-    } finally {
-      setLoading(false);
+      toast.error("Failed to load bids");
+    }
+  };
+
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get(
+        `http${HTTP_PREFIX}://${API_URL}/get_user_tasks`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+      if (response.data && response.data.tasks) {
+        setTasks(response.data.tasks);
+      }
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      toast.error("Failed to load tasks");
     }
   };
 
   useEffect(() => {
-    fetchBids();
-    fetchTasks();
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        // Fetch both in parallel
+        await Promise.all([fetchBids(), fetchTasks()]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
   }, []);
 
   const updateBidStatus = async (
@@ -127,28 +152,6 @@ const Home = () => {
     } catch (err) {
       console.error("Error updating bid status:", err);
       toast.error("Error updating bid status. Please try again.");
-    }
-  };
-
-  const fetchTasks = async () => {
-    setTasksLoading(true);
-    try {
-      const response = await axios.get(
-        `http${HTTP_PREFIX}://${API_URL}/get_user_tasks`,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`
-          }
-        }
-      );
-      console.log("fetched tasks", response.data);
-      if (response.data && response.data.tasks) {
-        setTasks(response.data.tasks);
-      }
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-    } finally {
-      setTasksLoading(false);
     }
   };
 
@@ -250,6 +253,22 @@ const Home = () => {
     });
   };
 
+  if (loading) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
+          <BreadcrumbNavigation currentPage="Home" parentPages={parentPages} />
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Spinner size="lg" />
+            <p className="text-muted-foreground">Loading your dashboard...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
@@ -273,64 +292,58 @@ const Home = () => {
               Last {Math.min(5, bids.length)} bids by timestamp.
             </p>
 
-            {loading ? (
-              <div className="flex justify-center py-4">
-                <Spinner />
+            <div className="space-y-3">
+              <div className="grid grid-cols-4 font-medium text-sm py-2 border-b">
+                <div className="col-span-3">Tender Name</div>
+                <div>Status</div>
               </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="grid grid-cols-4 font-medium text-sm py-2 border-b">
-                  <div className="col-span-3">Tender Name</div>
-                  <div>Status</div>
-                </div>
 
-                {bids
-                  .sort((a, b) => {
-                    // Sort by timestamp in descending order (newest first)
-                    const timeA = a.timestamp
-                      ? new Date(a.timestamp).getTime()
-                      : 0;
-                    const timeB = b.timestamp
-                      ? new Date(b.timestamp).getTime()
-                      : 0;
-                    return timeB - timeA;
-                  })
-                  .slice(0, 5)
-                  .map((bid) => {
-                    return (
-                      <div
-                        key={bid._id}
-                        className="grid grid-cols-4 text-sm py-2"
-                      >
-                        <div className="truncate col-span-3">
-                          <Button
-                            variant="link"
-                            className="p-0 h-auto text-left font-normal"
-                            onClick={() => navigateToChatbot(bid)}
-                          >
-                            {bid.bid_title || bid.client_name || "Unnamed Bid"}
-                          </Button>
-                        </div>
-                        <div className="text-right">
-                          <BidStatusMenu
-                            value={bid.status}
-                            onChange={(value) =>
-                              updateBidStatus(bid._id, value)
-                            }
-                            disabled={false}
-                          />
-                        </div>
+              {bids
+                .sort((a, b) => {
+                  // Sort by timestamp in descending order (newest first)
+                  const timeA = a.timestamp
+                    ? new Date(a.timestamp).getTime()
+                    : 0;
+                  const timeB = b.timestamp
+                    ? new Date(b.timestamp).getTime()
+                    : 0;
+                  return timeB - timeA;
+                })
+                .slice(0, 5)
+                .map((bid) => {
+                  return (
+                    <div
+                      key={bid._id}
+                      className="grid grid-cols-4 text-sm py-2"
+                    >
+                      <div className="truncate col-span-3">
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto text-left font-normal"
+                          onClick={() => navigateToChatbot(bid)}
+                        >
+                          {bid.bid_title || bid.client_name || "Unnamed Bid"}
+                        </Button>
                       </div>
-                    );
-                  })}
+                      <div className="text-right">
+                        <BidStatusMenu
+                          value={bid.status}
+                          onChange={(value) =>
+                            updateBidStatus(bid._id, value)
+                          }
+                          disabled={false}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
 
-                {bids.length === 0 && (
-                  <div className="text-center py-4 text-gray-500">
-                    No bids available
-                  </div>
-                )}
-              </div>
-            )}
+              {bids.length === 0 && (
+                <div className="text-center py-4 text-gray-500">
+                  No bids available
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Tasks Card */}
@@ -340,62 +353,56 @@ const Home = () => {
               Review and complete your assigned tasks
             </p>
 
-            {tasksLoading ? (
-              <div className="flex justify-center py-4">
-                <Spinner />
-              </div>
-            ) : (
-              <div className="h-96 overflow-y-auto pr-1">
-                <div className="space-y-3">
-                  {tasks.length > 0 ? (
-                    tasks.map((task) => (
-                      <div
-                        key={task._id}
-                        className="p-3 border rounded-md hover:bg-gray-50 relative group"
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div
-                              className="text-sm font-medium text-blue-600 cursor-pointer mb-1"
-                              onClick={() => handleTaskClick(task)}
-                            >
-                              {task.name}
-                            </div>
-                            <div className="text-xs text-gray-500 flex items-center gap-1">
-                              <FileText size={12} />
-                              <span className="truncate max-w-[180px]">
-                                {getBidTitle(task.bid_id)}
-                              </span>
-                            </div>
-                            <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                              <Clock size={12} />
-                              <span>
-                                Created {getRelativeTime(task.created_at)}
-                              </span>
-                            </div>
-                          </div>
-                          <button
-                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
-                            onClick={() => handleDeleteTask(task._id)}
-                            title="Remove task"
+            <div className="h-96 overflow-y-auto pr-1">
+              <div className="space-y-3">
+                {tasks.length > 0 ? (
+                  tasks.map((task) => (
+                    <div
+                      key={task._id}
+                      className="p-3 border rounded-md hover:bg-gray-50 relative group"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div
+                            className="text-sm font-medium text-blue-600 cursor-pointer mb-1"
+                            onClick={() => handleTaskClick(task)}
                           >
-                            <X
-                              size={16}
-                              className="text-gray-400 hover:text-red-500"
-                            />
-                          </button>
+                            {task.name}
+                          </div>
+                          <div className="text-xs text-gray-500 flex items-center gap-1">
+                            <FileText size={12} />
+                            <span className="truncate max-w-[180px]">
+                              {getBidTitle(task.bid_id)}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                            <Clock size={12} />
+                            <span>
+                              Created {getRelativeTime(task.created_at)}
+                            </span>
+                          </div>
                         </div>
+                        <button
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                          onClick={() => handleDeleteTask(task._id)}
+                          title="Remove task"
+                        >
+                          <X
+                            size={16}
+                            className="text-gray-400 hover:text-red-500"
+                          />
+                        </button>
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-8 text-gray-500 flex flex-col items-center">
-                      <CheckCircle className="mb-2" size={24} />
-                      <div>No pending tasks</div>
                     </div>
-                  )}
-                </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500 flex flex-col items-center">
+                    <CheckCircle className="mb-2" size={24} />
+                    <div>No pending tasks</div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Potential Revenue Opportunities Card */}
@@ -407,50 +414,44 @@ const Home = () => {
               Overview of financial potential
             </p>
 
-            {loading ? (
-              <div className="flex justify-center py-4">
-                <Spinner />
+            <div className="space-y-6">
+              <div className="flex flex-col items-center justify-center py-4">
+                <div className="text-3xl font-bold text-green-600">
+                  £{calculateTotalWonValue().toLocaleString()}
+                </div>
+                <div className="text-sm text-gray-500 mt-2">
+                  Estimated total value won
+                </div>
               </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="flex flex-col items-center justify-center py-4">
-                  <div className="text-3xl font-bold text-green-600">
-                    £{calculateTotalWonValue().toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-500 mt-2">
-                    Estimated total value won
+
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 font-medium text-sm py-2 border-b">
+                  <div>Category</div>
+                  <div className="text-right">Count</div>
+                </div>
+
+                <div className="grid grid-cols-2 text-sm py-2">
+                  <div>Active bids</div>
+                  <div className="text-right">{bids.length}</div>
+                </div>
+
+                <div className="grid grid-cols-2 text-sm py-2">
+                  <div>Bids won</div>
+                  <div className="text-right">
+                    {bids.filter((b) => b.bid_qualification_result === "won")
+                      .length || 0}
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 font-medium text-sm py-2 border-b">
-                    <div>Category</div>
-                    <div className="text-right">Count</div>
-                  </div>
-
-                  <div className="grid grid-cols-2 text-sm py-2">
-                    <div>Active bids</div>
-                    <div className="text-right">{bids.length}</div>
-                  </div>
-
-                  <div className="grid grid-cols-2 text-sm py-2">
-                    <div>Bids won</div>
-                    <div className="text-right">
-                      {bids.filter((b) => b.bid_qualification_result === "won")
-                        .length || 0}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 text-sm py-2">
-                    <div>Bids lost</div>
-                    <div className="text-right">
-                      {bids.filter((b) => b.bid_qualification_result === "lost")
-                        .length || 0}
-                    </div>
+                <div className="grid grid-cols-2 text-sm py-2">
+                  <div>Bids lost</div>
+                  <div className="text-right">
+                    {bids.filter((b) => b.bid_qualification_result === "lost")
+                      .length || 0}
                   </div>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
