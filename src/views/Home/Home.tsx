@@ -107,7 +107,7 @@ const Home = () => {
         setLoading(false);
       }
     };
-    
+
     loadData();
   }, []);
 
@@ -180,16 +180,21 @@ const Home = () => {
     );
   };
 
-  const handleDeleteTask = async (taskId) => {
+  const handleDeleteTask = async (taskId: string) => {
     try {
-      await axios.delete(
-        `http${HTTP_PREFIX}://${API_URL}/delete_user_task/${taskId}`,
+      const formData = new FormData();
+      formData.append("task_id", taskId);
+
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/delete_user_task?task_id=${taskId}`,
+        {}, // Empty body since we're using URL parameter
         {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`
           }
         }
       );
+
       // Remove the task from local state
       setTasks(tasks.filter((t) => t._id !== taskId));
       toast.success("Task removed successfully");
@@ -328,9 +333,7 @@ const Home = () => {
                       <div className="text-right">
                         <BidStatusMenu
                           value={bid.status}
-                          onChange={(value) =>
-                            updateBidStatus(bid._id, value)
-                          }
+                          onChange={(value) => updateBidStatus(bid._id, value)}
                           disabled={false}
                         />
                       </div>
