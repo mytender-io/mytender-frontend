@@ -882,10 +882,82 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       over
     } = useSortable({ id: section.section_id });
 
-    const handleAnswererSelect = (user) => {
-      // Extract the username from the user object
+    const handleAnswererSelect = async (user) => {
+      // Extract the username and email from the user object
       const username = user.username || "";
-      handleSectionChange(index, "answerer", username);
+      const email = user.email || "";
+
+      // Skip if no email is provided
+      if (!email) {
+        handleSectionChange(index, "answerer", username);
+        return;
+      }
+
+      // First update the section with the new reviewer
+      const success = await handleSectionChange(index, "answerer", username);
+
+      if (success) {
+        // After successfully setting the reviewer, create a task for them
+        try {
+          const taskData = {
+            name: `Answer section: ${section.heading}`,
+            bid_id: object_id,
+            index: index
+          };
+
+          // Create the task
+          const response = await axios.post(
+            `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
+            taskData,
+            {
+              headers: {
+                Authorization: `Bearer ${tokenRef.current}`
+              }
+            }
+          );
+
+          if (response.data.success) {
+            // Task created successfully, now send email notification
+            const bidTitle = sharedState.bidInfo || "Untitled Bid";
+            const message = `You have been assigned to answer the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
+            const subject = `New Answer Task: ${section.heading}`;
+
+            // Send the email notification
+            await sendOrganizationEmail({
+              recipient: email,
+              message,
+              subject,
+              token: tokenRef.current,
+              onSuccess: () => {
+                toast.success(
+                  `Task assigned to ${username} with email notification`
+                );
+              },
+              onError: (error) => {
+                // The task was created but email notification failed
+                toast.warning(
+                  `Task assigned to ${username}, but email notification failed: ${error}`
+                );
+              }
+            });
+
+            // Track task creation with posthog
+            posthog.capture("answerer_task_created", {
+              bidId: object_id,
+              sectionId: section.section_id,
+              sectionHeading: section.heading,
+              reviewer: username,
+              emailSent: true
+            });
+          } else {
+            console.error("Error creating answer task:", response.data.error);
+            toast.error("Failed to assign task to answerer");
+          }
+        } catch (error) {
+          console.error("Error creating task for answerer:", error);
+          toast.error("Failed to assign task to answerer");
+        }
+      }
     };
 
     const handleReviewerSelect = async (user) => {
@@ -924,7 +996,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
 
           if (response.data.success) {
             // Task created successfully, now send email notification
-            const bidTitle = sharedState.bid_title || "Untitled Bid";
+            const bidTitle = sharedState.bidInfo || "Untitled Bid";
             const message = `You have been assigned to review the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
             const subject = `New Review Task: ${section.heading}`;
 
