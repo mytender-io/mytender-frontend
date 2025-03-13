@@ -219,10 +219,25 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     } catch (error) {
       clearInterval(progressInterval);
       console.error("Error uploading file:", error);
+
+      // Extract the error message from the response if available
+      let errorMessage = "Error uploading file";
+      if (error.response && error.response.data && error.response.data.detail) {
+        errorMessage = error.response.data.detail;
+      }
+
+      // Set upload progress to indicate failure
+      setUploadProgress((prev) => ({
+        ...prev,
+        [file.name]: -1 // Use a negative value to indicate error
+      }));
+
+      // Show error toast with the specific message from backend
+      toast.error(errorMessage);
+
       throw error;
     }
   };
-
   useEffect(() => {
     if (selectedFiles.length > 0) {
       const newFiles = selectedFiles.filter(
@@ -262,7 +277,12 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         uploadPromises.map((p) =>
           p
             .then((data) => ({ data, fileName: data.fileName }))
-            .catch((error) => ({ error: error as Error }))
+            .catch((error) => ({
+              error: error as Error,
+              fileName: error.fileName || "Unknown file",
+              message:
+                error.response?.data?.detail || error.message || "Unknown error"
+            }))
         )
       );
 
@@ -295,9 +315,8 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         }
       }
 
-      if (failCount > 0) {
-        toast.error(`Failed to upload ${failCount} file(s)`);
-      }
+      // We don't need a generic error message here because specific errors are shown per file
+      // in the uploadFile function with their specific messages from the backend
     } catch (error) {
       console.error("Error in batch upload:", error);
       toast.error("Error uploading files");
@@ -306,40 +325,59 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       if (get_collections) {
         get_collections();
       }
-      if (onClose) {
+      if (onClose && successCount === filesToUpload.length) {
         onClose();
       }
     }
   };
-
   const renderSelectedFiles = () => {
     if (selectedFiles.length === 0) return null;
 
     return (
       <div className="w-full max-h-80 overflow-y-auto mt-4">
-        {selectedFiles.map((file, index) => (
-          <div
-            key={index}
-            className="flex items-center p-3.5 bg-white rounded-lg mb-2.5 border-2 border-gray-200"
-          >
-            <div className="flex items-center flex-1 mr-4">
-              <FontAwesomeIcon
-                icon={getFileIcon(file.type)}
-                className="mr-3 text-gray-700 text-xl"
-              />
-              <span className="flex-1 text-gray-700 text-sm truncate max-w-52">
-                {file.name}
+        {selectedFiles.map((file, index) => {
+          const progress = uploadProgress[file.name] || 0;
+          const hasError = progress < 0;
+
+          return (
+            <div
+              key={index}
+              className={cn(
+                "flex items-center p-3.5 bg-white rounded-lg mb-2.5 border-2",
+                hasError ? "border-red-300" : "border-gray-200"
+              )}
+            >
+              <div className="flex items-center flex-1 mr-4">
+                <FontAwesomeIcon
+                  icon={getFileIcon(file.type)}
+                  className={cn(
+                    "mr-3 text-xl",
+                    hasError ? "text-red-500" : "text-gray-700"
+                  )}
+                />
+                <span className="flex-1 text-gray-700 text-sm truncate max-w-52">
+                  {file.name}
+                </span>
+              </div>
+
+              <div className="flex-1">
+                <Progress
+                  value={hasError ? 100 : progress}
+                  className={hasError ? "bg-red-200" : ""}
+                  indicatorClassName={hasError ? "bg-red-500" : ""}
+                />
+              </div>
+              <span
+                className={cn(
+                  "min-w-[45px] text-right ml-2.5 text-sm",
+                  hasError ? "text-red-500" : "text-gray-600"
+                )}
+              >
+                {hasError ? "Error" : `${progress}%`}
               </span>
             </div>
-
-            <div className="flex-1">
-              <Progress value={uploadProgress[file.name] || 0} />
-            </div>
-            <span className="min-w-[45px] text-right ml-2.5 text-gray-600 text-sm">
-              {uploadProgress[file.name] || 0}%
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   };

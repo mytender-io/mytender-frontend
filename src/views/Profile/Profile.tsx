@@ -42,6 +42,13 @@ import MeshGradient from "@/components/mesh-gradient/MeshGradient";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
 import ToneOfVoiceLibrary from "../BidInputs/ToneOfVoiceLibrary.tsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select.tsx";
 
 const ProfilePage = () => {
   const getAuth = useAuthUser();
@@ -76,6 +83,9 @@ const ProfilePage = () => {
 
   const [companyObjectives, setCompanyObjectives] = useState("");
   const [isEditingObjectives, setIsEditingObjectives] = useState(false);
+
+  // For permission management
+  const [permissionChangeLoading, setPermissionChangeLoading] = useState({});
 
   const [refreshImage, setRefreshImage] = useState(false);
 
@@ -143,25 +153,6 @@ const ProfilePage = () => {
     }
   };
 
-  // Keeping the function for textarea changes but removing it for input fields
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    // Only allow changes to textareas
-    if (e.target instanceof HTMLTextAreaElement) {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value
-      }));
-
-      // If editing company objectives, update that state too
-      if (name === "companyObjectives") {
-        setCompanyObjectives(value);
-      }
-    }
-  };
-
   // New function to handle saving company objectives using the dedicated endpoint
   const handleSaveCompanyObjectives = async (
     e: React.FormEvent<HTMLFormElement>
@@ -195,6 +186,59 @@ const ProfilePage = () => {
       console.error("Failed to save company objectives:", err);
       toast.error("Failed to update company objectives");
       setCompanyObjectivesSaveState("normal");
+    }
+  };
+
+  // Function to handle permission changes
+  const handleChangePermission = async (username, newRole) => {
+    // Show loading for this specific user
+    setPermissionChangeLoading((prev) => ({ ...prev, [username]: true }));
+
+    try {
+      const formData = new FormData();
+      formData.append("target_user", username);
+      formData.append("new_user_type", newRole);
+
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/change_user_permissions`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      toast.success(`User role updated to ${newRole}`);
+
+      // Refresh the user list
+      const refreshFormData = new FormData();
+      refreshFormData.append("include_pending", "true");
+
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_organization_users`,
+        refreshFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      setOrganizationUsers(response.data);
+    } catch (err) {
+      console.error("Error changing user permissions:", err);
+      if (err.response && err.response.data && err.response.data.detail) {
+        toast.error(
+          `Failed to change permissions: ${err.response.data.detail}`
+        );
+      } else {
+        toast.error("Failed to change user permissions");
+      }
+    } finally {
+      setPermissionChangeLoading((prev) => ({ ...prev, [username]: false }));
     }
   };
 
@@ -601,7 +645,53 @@ const ProfilePage = () => {
                                         <TableCell>
                                           {user.username || "Request Pending"}
                                         </TableCell>
-                                        <TableCell>{user.role}</TableCell>
+                                        <TableCell>
+                                          {user.role === "Pending" ? (
+                                            "Pending"
+                                          ) : formData.username ===
+                                            user.username ? (
+                                            user.role // Current user can't change their own role
+                                          ) : (
+                                            <div className="flex items-center gap-2">
+                                              {permissionChangeLoading[
+                                                user.username
+                                              ] ? (
+                                                <Spinner className="h-4 w-4" />
+                                              ) : null}
+                                              <Select
+                                                defaultValue={user.role}
+                                                onValueChange={(value) =>
+                                                  handleChangePermission(
+                                                    user.username,
+                                                    value
+                                                  )
+                                                }
+                                                disabled={
+                                                  permissionChangeLoading[
+                                                    user.username
+                                                  ]
+                                                }
+                                              >
+                                                <SelectTrigger className="h-8 w-32">
+                                                  <SelectValue
+                                                    placeholder={user.role}
+                                                  />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="member">
+                                                    Member
+                                                  </SelectItem>
+                                                  <SelectItem value="reviewer">
+                                                    Reviewer
+                                                  </SelectItem>
+                                                  <SelectItem value="owner">
+                                                    Owner
+                                                  </SelectItem>
+                                                </SelectContent>
+                                              </Select>
+                                            </div>
+                                          )}
+                                        </TableCell>
                                       </TableRow>
                                     )
                                   )}
