@@ -95,7 +95,8 @@ export default {
       },
       boxShadow: {
         card: "0 15px 35px 0 rgba( 60,66,87, .08),0 5px 15px 0 rgba(0,0,0, .12)",
-        button_hover: "0px 3px 3px 0px rgba(0, 0, 0, 0.25)"
+        button_hover: "0px 3px 3px 0px rgba(0, 0, 0, 0.25)",
+        tooltip: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)"
       },
       keyframes: {
         shimmer: {

@@ -46,6 +46,9 @@ import { cn } from "@/utils";
 import { toast } from "react-toastify";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
+import CheckDocumentIcon from "@/components/icons/CheckDocumentIcon";
+import ConsultIcon from "@/components/icons/ConsultIcon";
+import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -392,7 +395,6 @@ const ProposalPreview = () => {
 
   // Add comment handler
   const handleAddComment = () => {
-    setShowSelectionMenu(false);
     setShowCommentInput(true);
 
     // Highlight the selected text in orange
@@ -461,6 +463,7 @@ const ProposalPreview = () => {
       setComments([...comments, newComment]);
       setCommentText("");
     }
+    setShowSelectionMenu(false);
     setShowCommentInput(false);
   };
 
@@ -497,6 +500,7 @@ const ProposalPreview = () => {
     }
 
     setCommentText("");
+    setShowSelectionMenu(false);
     setShowCommentInput(false);
   };
 
@@ -541,7 +545,6 @@ const ProposalPreview = () => {
 
   // Evidence prompt handler
   const handleEvidencePrompt = () => {
-    setShowSelectionMenu(false);
     setShowEvidencePrompt(true);
     // Simulate API call with dummy data
     setTimeout(() => {
@@ -585,8 +588,6 @@ const ProposalPreview = () => {
 
       if (editorContainsSelection) {
         handleTextSelection();
-      } else {
-        setShowSelectionMenu(false);
       }
     };
 
@@ -646,26 +647,21 @@ const ProposalPreview = () => {
   };
 
   return (
-    <div className="proposal-preview-container">
-      <div className="flex justify-end mb-4">
-        <Button
-          variant="outline"
-          className="flex items-center gap-2"
-          onClick={toggleSidepane}
-        >
-          <MessageSquare className="h-5 w-5" />
-          <span>Tender Library Chat</span>
-        </Button>
-      </div>
-      <div className="editor-sidepane-container">
-        <div className="editor-container">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-full">
-              <Spinner className="w-8 h-8" />
-            </div>
-          ) : (
-            <div className="w-full max-w-5xl mx-auto border border-gray-line rounded-lg bg-white overflow-hidden">
-              <div className="bg-gray-50 p-2 border-b border-gray-200 rounded flex flex-wrap gap-2 sticky top-0 z-10 shadow-sm">
+    <div className="proposal-preview-container pb-8">
+      <div>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-full">
+            <Spinner className="w-8 h-8" />
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "w-full h-full relative flex justify-center gap-4",
+              sidepaneOpen ? "pr-60" : ""
+            )}
+          >
+            <div className="border-t-0 border border-gray-line rounded-md bg-white w-full max-w-4xl">
+              <div className="bg-gray-50 p-2 border-y border-gray-line rounded-t-md flex flex-wrap gap-2 sticky -top-4 z-10 shadow-sm">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -845,7 +841,7 @@ const ProposalPreview = () => {
                   sections.slice(1).map((section, index) => (
                     <div
                       key={section.id}
-                      className="border-b border-gray-line last:border-none relative"
+                      className="border-b border-gray-line last:border-none relative last:rounded-b-md"
                     >
                       <div className="bg-white p-8 relative">
                         <div
@@ -939,11 +935,16 @@ const ProposalPreview = () => {
                     </div>
                   </div>
                 )}
-
+              </div>
+            </div>
+            {showCommentInput ||
+            showEvidencePrompt ||
+            filterResolvedComments().length > 0 ? (
+              <div className="h-auto w-64 relative">
                 {/* Comment Input */}
                 {showCommentInput && (
                   <div
-                    className="absolute right-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-64"
+                    className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-64"
                     style={{
                       top: `${selectionMenuPosition.top}px`
                     }}
@@ -977,7 +978,7 @@ const ProposalPreview = () => {
                 {/* Evidence Prompt Result */}
                 {showEvidencePrompt && (
                   <div
-                    className="absolute right-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-80"
+                    className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-80"
                     style={{
                       top: `${selectionMenuPosition.top}px`
                     }}
@@ -1012,44 +1013,28 @@ const ProposalPreview = () => {
                     </div>
                   </div>
                 )}
-              </div>
 
-              {/* Comments Display */}
-              <div
-                className="comments-container"
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  right: sidepaneOpen ? "-220px" : "0",
-                  zIndex: 30,
-                  pointerEvents: "none",
-                  height: "100%", // Add this
-                  width: "220px" // Add this
-                }}
-              >
+                {/* Comments Display */}
                 {filterResolvedComments().map((comment) => (
                   <div
                     key={comment.id}
                     className={cn(
-                      "transition-all duration-300 w-fit absolute right-0 pointer-events-auto", // Fix typo: pointerEvents-auto -> pointer-events-auto
+                      "transition-all duration-300 w-fit absolute left-0",
                       activeComment === comment.id &&
                         "p-2 rounded-md border bg-white border-gray-line shadow-md"
                     )}
                     data-comment-id={comment.id}
                     style={{
-                      top: `${comment.position}px`,
-                      right: 0
+                      top: `${comment.position}px`
                     }}
                   >
                     <div className="flex justify-between items-start w-40">
-                      <div className="space-y-1">
+                      <div
+                        className="space-y-1"
+                        onClick={() => highlightCommentAndText(comment.id)}
+                      >
                         <ProfilePhoto size="sm" showName={true} />
-                        <p
-                          className="text-sm cursor-pointer"
-                          onClick={() => highlightCommentAndText(comment.id)}
-                        >
-                          {comment.text}
-                        </p>
+                        <p className="text-sm cursor-pointer">{comment.text}</p>
                       </div>
                       {activeComment === comment.id && (
                         <TooltipProvider>
@@ -1078,24 +1063,108 @@ const ProposalPreview = () => {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-        </div>
+            ) : null}
+          </div>
+        )}
+      </div>
+      <div className="fixed top-0 right-0 z-50 border-l border-gray-line h-screen">
+        <div className="flex flex-col gap-2 p-2 bg-white h-full">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleSidepane}
+                  className="[&_svg]:w-5 [&_svg]:h-5"
+                >
+                  <ToolSparkIcon
+                    className={cn(sidepaneOpen ? "text-orange" : "")}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="left"
+                className="border-[0.5px] border-gray-line rounded-md p-2 px-1.5 py-1 shadow-tooltip bg-white"
+              >
+                <div className="flex flex-col gap-1">
+                  <span className="text-gray-hint_text font-medium text-sm">
+                    AI Chat
+                  </span>
+                  <span className="text-gray-border text-xs">
+                    Chat, brainstorm, research
+                  </span>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
-        <div
-          className={`sidepane-container ${sidepaneOpen ? "sidepane-open" : "sidepane-closed"}`}
-          style={{
-            position: "relative",
-            right: 0,
-            display: sidepaneOpen ? "block" : "none" // Hide completely when closed
-          }}
-        >
-          <ProposalPreviewSidepane
-            bid_id={sharedState.object_id}
-            open={sidepaneOpen}
-            onOpenChange={setSidepaneOpen}
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="[&_svg]:w-5 [&_svg]:h-5"
+                >
+                  <ConsultIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="left"
+                className="border-[0.5px] border-gray-line rounded-md p-2 px-1.5 py-1 shadow-tooltip bg-white"
+              >
+                <div className="flex flex-col gap-1">
+                  <span className="text-gray-hint_text font-medium text-sm">
+                    Consult
+                  </span>
+                  <span className="text-gray-border text-xs">
+                    Polish your writing
+                  </span>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="[&_svg]:w-5 [&_svg]:h-5"
+                >
+                  <CheckDocumentIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="left"
+                className="border-[0.5px] border-gray-line rounded-md p-2 px-1.5 py-1 shadow-tooltip bg-white"
+              >
+                <div className="flex flex-col gap-1">
+                  <span className="text-gray-hint_text font-medium text-sm">
+                    Checks
+                  </span>
+                  <span className="text-gray-border text-xs">
+                    Use ready made prompts
+                  </span>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
+      </div>
+      <div
+        className={cn(
+          "fixed top-0 right-14 h-screen z-50",
+          sidepaneOpen ? "block" : "none"
+        )}
+      >
+        <ProposalPreviewSidepane
+          bid_id={sharedState.object_id}
+          open={sidepaneOpen}
+          onOpenChange={setSidepaneOpen}
+        />
       </div>
     </div>
   );

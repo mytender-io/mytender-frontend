@@ -49,7 +49,7 @@ const Library = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-[3.43785rem]">
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-14">
         <BreadcrumbNavigation
           currentPage="Content Library"
           parentPages={parentPages}
