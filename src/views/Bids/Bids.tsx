@@ -6,18 +6,18 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import handleGAEvent from "../../utilities/handleGAEvent.tsx";
 import { Skeleton } from "@mui/material";
-import SearchInput from "@/components/SearchInput.tsx";
 import withAuth from "../../routes/withAuth.tsx";
 import NewTenderModal from "./components/NewTenderModal.tsx";
 import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
-import PaginationRow from "@/components/PaginationRow.tsx";
 import EllipsisMenuDashboard from "./components/EllipsisMenuDashboard.tsx";
 import BidStatusMenu from "./components/BidStatusMenu.tsx";
-import BidResultDropdown from "@/components/BidResultDropdown.tsx";
+import BidResultDropdown from "./components/BidResultDropdown.tsx";
 import KanbanView from "./components/KanbanView.tsx";
+import ViewToggle from "./components/ViewToggle.tsx";
+import PaginationRow from "@/components/PaginationRow.tsx";
+import SearchInput from "@/components/SearchInput.tsx";
 import { Button } from "@/components/ui/button";
 import PlusIcon from "@/components/icons/PlusIcon.tsx";
-import ViewToggle from "@/views/Bids/components/ViewToggle.tsx";
 import {
   Table,
   TableBody,
@@ -27,12 +27,11 @@ import {
   TableRow
 } from "@/components/ui/table";
 import SortUpIcon from "@/components/icons/SortUpIcon.tsx";
-import { customLocale, cn } from "@/utils";
-import { toast } from "react-toastify";
 import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
-import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-
+import { customLocale, cn } from "@/utils";
+import { formatDistanceToNow } from "date-fns";
+import { toast } from "react-toastify";
 interface Bid {
   _id: string;
   bid_title: string;
@@ -210,16 +209,22 @@ const Bids = () => {
   // Helper function to render Won/Lost status with appropriate styling
   const renderWonLostStatus = (result: string | undefined) => {
     if (!result) return <span className="text-gray-400">--</span>;
-    
+
     if (result.toLowerCase() === "won") {
       return (
-        <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+        <Badge
+          variant="outline"
+          className="bg-green-100 text-green-800 border-green-200"
+        >
           Won
         </Badge>
       );
     } else if (result.toLowerCase() === "lost") {
       return (
-        <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">
+        <Badge
+          variant="outline"
+          className="bg-red-100 text-red-800 border-red-200"
+        >
           Lost
         </Badge>
       );
@@ -354,7 +359,7 @@ const Bids = () => {
     setBidToDelete(bidId);
     setShowDeleteModal(true);
   };
-  
+
   // Function to update the bid qualification result
   const updateBidQualificationResult = async (
     bidId: string,
@@ -380,7 +385,9 @@ const Bids = () => {
         // Update local state instead of fetching all bids
         setBids((prevBids) =>
           prevBids.map((bid) =>
-            bid._id === bidId ? { ...bid, bid_qualification_result: newResult } : bid
+            bid._id === bidId
+              ? { ...bid, bid_qualification_result: newResult }
+              : bid
           )
         );
 
@@ -636,7 +643,7 @@ const Bids = () => {
                               />
                             </TableCell>
                             <TableCell className="px-4">
-                            <BidResultDropdown
+                              <BidResultDropdown
                                 value={bid.bid_qualification_result}
                                 onChange={(value) => {
                                   updateBidQualificationResult(bid._id, value);

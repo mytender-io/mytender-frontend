@@ -51,3 +51,9 @@
 .proposal-preview-container h4 {
   margin: 0.4em 0;
 }
+
+/* Style for commented text spans */
+span.commented-text {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
