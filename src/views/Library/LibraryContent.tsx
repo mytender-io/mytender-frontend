@@ -1008,7 +1008,7 @@ const LibraryContent = () => {
                   Build your knowledge base
                 </span>
                 <span className="block text-base text-muted-foreground">
-                  Upload documents in PDF, word or excel to so responses are
+                  Upload documents in PDF, word or excel so responses are
                   grounded in your information.
                 </span>
               </div>
