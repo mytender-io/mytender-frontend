@@ -26,11 +26,8 @@ import {
   StrikethroughIcon,
   Quote,
   Link,
-  MessageSquare,
-  FileText,
   Save,
-  Check,
-  Copy
+  Check
 } from "lucide-react";
 import {
   Popover,
@@ -49,6 +46,11 @@ import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
 import CheckDocumentIcon from "@/components/icons/CheckDocumentIcon";
 import ConsultIcon from "@/components/icons/ConsultIcon";
 import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
+import CopyIcon from "@/components/icons/CopyIcon";
+import RedoSparkIcon from "@/components/icons/RedoSparkIcon";
+import PencilEditCheckIcon from "@/components/icons/PencilEditCheckIcon";
+import CommentIcon from "@/components/icons/CommentIcon";
+import UpscaleSparkIcon from "@/components/icons/UpscaleSparkIcon";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -660,8 +662,8 @@ const ProposalPreview = () => {
               sidepaneOpen ? "pr-60" : ""
             )}
           >
-            <div className="border-t-0 border border-gray-line rounded-md bg-white w-full max-w-4xl">
-              <div className="bg-gray-50 p-2 border-y border-gray-line rounded-t-md flex flex-wrap gap-2 sticky -top-4 z-10 shadow-sm">
+            <div className="rounded-md bg-white w-full max-w-4xl">
+              <div className="border border-gray-line bg-gray-50 p-2 rounded-t-md flex flex-wrap gap-2 sticky -top-4 z-10">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -835,13 +837,16 @@ const ProposalPreview = () => {
                   </Button>
                 </div>
               </div>
-              <div className="h-auto relative" ref={editorContainerRef}>
+              <div
+                className="h-auto relative border-x border-gray-line"
+                ref={editorContainerRef}
+              >
                 {sections.length > 0 ? (
                   // Display sections as separate editable cards, skip the first (title) section
                   sections.slice(1).map((section, index) => (
                     <div
                       key={section.id}
-                      className="border-b border-gray-line last:border-none relative last:rounded-b-md"
+                      className="border-b border-gray-line relative last:rounded-b-md"
                     >
                       <div className="bg-white p-8 relative">
                         <div
@@ -861,24 +866,25 @@ const ProposalPreview = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => handleCopySection(section.id)}
-                            className="text-xs"
+                            className="text-xs text-gray-hint_text"
                           >
-                            <Copy size={14} className="mr-1" /> Copy
+                            <CopyIcon /> Copy
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-xs"
+                            className="text-xs text-gray-hint_text"
                           >
-                            <FileText size={14} className="mr-1" /> Rewrite
+                            <RedoSparkIcon />
+                            Rewrite
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-xs"
+                            className="text-xs text-gray-hint_text"
                           >
-                            <Check size={14} className="mr-1" /> Mark as Review
-                            Ready
+                            <PencilEditCheckIcon />
+                            Mark as Review Ready
                           </Button>
                         </div>
                       </div>
@@ -911,10 +917,12 @@ const ProposalPreview = () => {
                               onClick={handleAddComment}
                               className="p-2 flex flex-col items-center text-xs"
                             >
-                              <MessageSquare size={16} />
+                              <CommentIcon />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent>Add Comment</TooltipContent>
+                          <TooltipContent side="left">
+                            Add Comment
+                          </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                       <TooltipProvider>
@@ -926,10 +934,10 @@ const ProposalPreview = () => {
                               onClick={handleEvidencePrompt}
                               className="p-2 flex flex-col items-center text-xs"
                             >
-                              <FileText size={16} />
+                              <UpscaleSparkIcon />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent>Evidence</TooltipContent>
+                          <TooltipContent side="left">Evidence</TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </div>
@@ -940,11 +948,11 @@ const ProposalPreview = () => {
             {showCommentInput ||
             showEvidencePrompt ||
             filterResolvedComments().length > 0 ? (
-              <div className="h-auto w-64 relative">
+              <div className="h-auto w-72 relative">
                 {/* Comment Input */}
                 {showCommentInput && (
                   <div
-                    className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-64"
+                    className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-72"
                     style={{
                       top: `${selectionMenuPosition.top}px`
                     }}
@@ -978,7 +986,7 @@ const ProposalPreview = () => {
                 {/* Evidence Prompt Result */}
                 {showEvidencePrompt && (
                   <div
-                    className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-80"
+                    className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-72"
                     style={{
                       top: `${selectionMenuPosition.top}px`
                     }}
@@ -1028,7 +1036,7 @@ const ProposalPreview = () => {
                       top: `${comment.position}px`
                     }}
                   >
-                    <div className="flex justify-between items-start w-40">
+                    <div className="flex justify-between items-start w-72">
                       <div
                         className="space-y-1"
                         onClick={() => highlightCommentAndText(comment.id)}
