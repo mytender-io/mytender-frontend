@@ -15,7 +15,7 @@ const UpscaleSparkIcon: React.FC<IconProps> = ({
       fill="none"
       className={className}
     >
-      <g clip-path="url(#clip0_4577_1834)">
+      <g clipPath="url(#clip0_4577_1834)">
         <path
           d="M7.1822 13.0289C3.90836 13.0289 1.25439 10.375 1.25439 7.10113C1.25439 3.82731 3.90836 1.17334 7.1822 1.17334C10.456 1.17334 13.11 3.82731 13.11 7.10113C13.11 10.375 10.456 13.0289 7.1822 13.0289Z"
           stroke="currentColor"

@@ -15,7 +15,7 @@ const RedoSparkIcon: React.FC<IconProps> = ({
       fill="none"
       className={className}
     >
-      <g clip-path="url(#clip0_4513_1701)">
+      <g clipPath="url(#clip0_4513_1701)">
         <path
           d="M4.32861 7.999C6.15875 7.63108 7.63226 6.13968 8.00069 4.26221C8.36919 6.13968 9.84233 7.63108 11.6725 7.999M11.6725 8.0011C9.84233 8.36902 8.36887 9.86044 8.00037 11.7379C7.63188 9.86044 6.15875 8.36902 4.32861 8.0011"
           stroke="currentColor"

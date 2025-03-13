@@ -72,13 +72,20 @@ const ProposalPreview = () => {
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState<
-    { id: string; text: string; resolved: boolean; position: number }[]
+    {
+      id: string;
+      text: string;
+      resolved: boolean;
+      position: number;
+      replies: { id: string; text: string; author?: string }[];
+    }[]
   >([]);
   const [showEvidencePrompt, setShowEvidencePrompt] = useState(false);
   const [promptResult, setPromptResult] = useState("");
   const [selectedRange, setSelectedRange] = useState<Range | null>(null);
   const [activeComment, setActiveComment] = useState<string | null>(null);
   const [sidepaneOpen, setSidepaneOpen] = useState(false);
+  const [replyText, setReplyText] = useState("");
 
   // Function to toggle the sidepane
   const toggleSidepane = () => {
@@ -460,7 +467,8 @@ const ProposalPreview = () => {
         id: commentId,
         text: commentText,
         resolved: false,
-        position: position
+        position: position,
+        replies: [] // Initialize with empty replies array
       };
       setComments([...comments, newComment]);
       setCommentText("");
@@ -646,6 +654,42 @@ const ProposalPreview = () => {
         toast.success("Copied to clipboard");
       }
     }
+  };
+
+  // Add this new function to handle submitting a reply
+  const handleSubmitReply = (commentId: string) => {
+    if (replyText.trim() && commentId) {
+      // Create a new reply object
+      const newReply = {
+        id: `reply-${Date.now()}`,
+        text: replyText,
+        author: auth?.name || "You" // Use authenticated user name if available
+      };
+
+      // Add the reply to the comment's replies array
+      setComments(
+        comments.map((comment) => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              replies: [...comment.replies, newReply]
+            };
+          }
+          return comment;
+        })
+      );
+
+      // Reset the reply state
+      setReplyText("");
+
+      toast.success("Reply added");
+    }
+  };
+
+  // Add this new function to handle canceling a reply
+  const handleCancelReply = () => {
+    setReplyText("");
+    setActiveComment(null);
   };
 
   return (
@@ -908,7 +952,7 @@ const ProposalPreview = () => {
                     }}
                   >
                     <div className="flex flex-col bg-white shadow-lg rounded-2xl border border-gray-200 z-50 overflow-hidden gap-1 py-2">
-                      <TooltipProvider>
+                      <TooltipProvider delayDuration={0}>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -925,7 +969,7 @@ const ProposalPreview = () => {
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                      <TooltipProvider>
+                      <TooltipProvider delayDuration={0}>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -1043,31 +1087,96 @@ const ProposalPreview = () => {
                       >
                         <ProfilePhoto size="sm" showName={true} />
                         <p className="text-sm cursor-pointer">{comment.text}</p>
+
+                        {/* Show reply count when comment is not active */}
+                        {activeComment !== comment.id &&
+                          comment.replies?.length > 0 && (
+                            <p className="text-xs text-gray-hint_text mt-1">
+                              {comment.replies.length === 1
+                                ? "1 reply"
+                                : `${comment.replies.length} replies`}
+                            </p>
+                          )}
                       </div>
                       {activeComment === comment.id && (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleToggleResolution(comment.id);
-                                }}
-                                className="group p-0 hover:bg-transparent border-none"
-                              >
-                                <Check
-                                  size={16}
-                                  className="group-hover:text-orange"
-                                />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Resolve and hide</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <div className="flex">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleResolution(comment.id);
+                                  }}
+                                  className="group p-0 hover:bg-transparent border-none"
+                                >
+                                  <Check
+                                    size={16}
+                                    className="group-hover:text-orange"
+                                  />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Resolve and hide</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                       )}
                     </div>
+
+                    {/* Show replies when comment is active */}
+                    {activeComment === comment.id &&
+                      comment.replies.length > 0 && (
+                        <div className="mt-2 border-t border-gray-200 pt-2">
+                          <p className="text-xs font-medium text-gray-hint_text mb-2">
+                            Replies
+                          </p>
+                          <div className="space-y-3">
+                            {comment.replies.map((reply) => (
+                              <div
+                                key={reply.id}
+                                className="pl-3 border-l-2 border-gray-200"
+                              >
+                                <div className="flex flex-col gap-2">
+                                  <ProfilePhoto size="sm" showName={true} />
+                                  <div>
+                                    <p className="text-xs">{reply.text}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {activeComment === comment.id ? (
+                      <div className="mt-2 w-full">
+                        <textarea
+                          className="w-full border border-gray-300 rounded p-2 mb-2 text-sm"
+                          rows={2}
+                          placeholder="Add your reply..."
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                        />
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleCancelReply}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => handleSubmitReply(comment.id)}
+                          >
+                            Reply
+                          </Button>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 ))}
               </div>

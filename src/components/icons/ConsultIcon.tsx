@@ -15,7 +15,7 @@ const ConsultIcon: React.FC<IconProps> = ({
       fill="none"
       className={className}
     >
-      <g clip-path="url(#clip0_4520_1981)">
+      <g clipPath="url(#clip0_4520_1981)">
         <path
           d="M11.4491 10.2358H10.2993"
           stroke="currentColor"

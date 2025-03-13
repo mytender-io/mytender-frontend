@@ -15,7 +15,7 @@ const PencilEditCheckIcon: React.FC<IconProps> = ({
       fill="none"
       className={className}
     >
-      <g clip-path="url(#clip0_4522_2211)">
+      <g clipPath="url(#clip0_4522_2211)">
         <path
           d="M15.186 11.3535C15.186 13.4614 13.4614 15.186 11.3535 15.186C9.24562 15.186 7.521 13.4614 7.521 11.3535C7.521 9.24562 9.24562 7.521 11.3535 7.521"
           stroke="currentColor"
