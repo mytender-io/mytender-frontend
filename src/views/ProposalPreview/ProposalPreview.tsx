@@ -45,6 +45,7 @@ import { TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
 import ProfilePhoto from "@/layout/ProfilePhoto";
+import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -72,6 +73,13 @@ const ProposalPreview = () => {
   const [promptResult, setPromptResult] = useState("");
   const [selectedRange, setSelectedRange] = useState<Range | null>(null);
   const [activeComment, setActiveComment] = useState<string | null>(null);
+  const [sidepaneOpen, setSidepaneOpen] = useState(false);
+
+  // Function to toggle the sidepane
+  const toggleSidepane = () => {
+    setSidepaneOpen((prevState) => !prevState);
+  };
+
   const loadPreview = async () => {
     try {
       const response = await axios.post(
@@ -638,21 +646,19 @@ const ProposalPreview = () => {
   };
 
   return (
-    <div className="proposal-preview-container overflow-y-auto">
-      <div className="flex flex-col flex-1 overflow-hidden pb-8">
-        {/* <div className="flex justify-between items-center mb-6">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handleWordDownload}
-              className="flex items-center gap-2 text-orange border-orange hover:text-orange-light hover:bg-orange-light/10"
-            >
-              <DocIcon />
-              Download Word
-            </Button>
-          </div>
-        </div> */}
-        <div className="flex-1 relative">
+    <div className="proposal-preview-container">
+      <div className="flex justify-end mb-4">
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={toggleSidepane}
+        >
+          <MessageSquare className="h-5 w-5" />
+          <span>Tender Library Chat</span>
+        </Button>
+      </div>
+      <div className="editor-sidepane-container">
+        <div className="editor-container">
           {isLoading ? (
             <div className="flex justify-center items-center h-full">
               <Spinner className="w-8 h-8" />
@@ -1009,18 +1015,30 @@ const ProposalPreview = () => {
               </div>
 
               {/* Comments Display */}
-              <div>
+              <div
+                className="comments-container"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: sidepaneOpen ? "-220px" : "0",
+                  zIndex: 30,
+                  pointerEvents: "none",
+                  height: "100%", // Add this
+                  width: "220px" // Add this
+                }}
+              >
                 {filterResolvedComments().map((comment) => (
                   <div
                     key={comment.id}
                     className={cn(
-                      "transition-all duration-300 w-fit absolute right-0",
+                      "transition-all duration-300 w-fit absolute right-0 pointer-events-auto", // Fix typo: pointerEvents-auto -> pointer-events-auto
                       activeComment === comment.id &&
                         "p-2 rounded-md border bg-white border-gray-line shadow-md"
                     )}
                     data-comment-id={comment.id}
                     style={{
-                      top: `${comment.position}px`
+                      top: `${comment.position}px`,
+                      right: 0
                     }}
                   >
                     <div className="flex justify-between items-start w-40">
@@ -1062,6 +1080,21 @@ const ProposalPreview = () => {
               </div>
             </div>
           )}
+        </div>
+
+        <div
+          className={`sidepane-container ${sidepaneOpen ? "sidepane-open" : "sidepane-closed"}`}
+          style={{
+            position: "relative",
+            right: 0,
+            display: sidepaneOpen ? "block" : "none" // Hide completely when closed
+          }}
+        >
+          <ProposalPreviewSidepane
+            bid_id={sharedState.object_id}
+            open={sidepaneOpen}
+            onOpenChange={setSidepaneOpen}
+          />
         </div>
       </div>
     </div>

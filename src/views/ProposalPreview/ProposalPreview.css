@@ -1,59 +1,132 @@
 .proposal-preview-container blockquote {
-  margin: 1em 0;
-  padding-left: 1em;
-  border-left: 4px solid #e5e7eb;
-  color: #4b5563;
-  font-style: italic;
+    margin: 1em 0;
+    padding-left: 1em;
+    border-left: 4px solid #e5e7eb;
+    color: #4b5563;
+    font-style: italic;
 }
 
 .proposal-preview-container ul {
-  margin: 1em 0;
-  padding-left: 2em;
-  list-style-type: disc !important;
+    margin: 1em 0;
+    padding-left: 2em;
+    list-style-type: disc !important;
 }
 
 .proposal-preview-container ol {
-  margin: 1em 0;
-  padding-left: 2em;
-  list-style-type: decimal !important;
+    margin: 1em 0;
+    padding-left: 2em;
+    list-style-type: decimal !important;
 }
 
 .proposal-preview-container ul li {
-  display: list-item !important;
-  list-style-type: disc !important;
-  margin: 0.5em 0;
-  position: relative;
+    display: list-item !important;
+    list-style-type: disc !important;
+    margin: 0.5em 0;
+    position: relative;
 }
 
 .proposal-preview-container ol li {
-  display: list-item !important;
-  list-style-type: decimal !important;
-  margin: 0.5em 0;
-  position: relative;
+    display: list-item !important;
+    list-style-type: decimal !important;
+    margin: 0.5em 0;
+    position: relative;
 }
 
 .proposal-preview-container ol {
-  counter-reset: item;
+    counter-reset: item;
 }
 
 .proposal-preview-container h1 {
-  margin: 0.75em 0;
+    margin: 0.75em 0;
 }
 
 .proposal-preview-container h2 {
-  margin: 0.6em 0;
+    margin: 0.6em 0;
 }
 
 .proposal-preview-container h3 {
-  margin: 0.5em 0;
+    margin: 0.5em 0;
 }
 
 .proposal-preview-container h4 {
-  margin: 0.4em 0;
+    margin: 0.4em 0;
 }
 
-/* Style for commented text spans */
 span.commented-text {
-  cursor: pointer;
-  transition: color 0.2s ease;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.comments-container {
+    pointer-events: none;
+}
+
+.comments-container>div {
+    pointer-events: auto;
+}
+
+.editor-container {
+    position: relative;
+}
+
+.editor-sidepane-container {
+    display: flex;
+    position: relative;
+}
+
+.sidepane-container {
+    flex-shrink: 0;
+}
+
+
+/* New styles for improved layout */
+
+.proposal-preview-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: hidden;
+}
+
+
+/* Add/modify these CSS rules in ProposalPreview.css */
+
+.editor-sidepane-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    height: calc(100vh - 60px);
+    /* Adjust height to account for the button area */
+    overflow: hidden;
+    padding-bottom: 20px;
+}
+
+.editor-container {
+    flex: 1;
+    overflow-y: auto;
+    height: 100%;
+    min-width: 0;
+    /* This prevents flex items from overflowing */
+    transition: width 0.3s ease;
+    margin-right: 20px;
+}
+
+.sidepane-container {
+    position: sticky;
+    top: 0;
+    height: 100%;
+    transition: width 0.3s ease, opacity 0.3s ease;
+    flex-shrink: 0;
+    /* Prevent sidebar from shrinking */
+}
+
+.sidepane-closed {
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.sidepane-open {
+    width: 336px;
+    opacity: 1;
 }
