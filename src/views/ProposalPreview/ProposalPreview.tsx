@@ -406,11 +406,10 @@ const ProposalPreview = () => {
   const handleAddComment = () => {
     setShowCommentInput(true);
 
-    // Highlight the selected text in orange
+    // Highlight the selected text in grey instead of orange
     if (selectedRange) {
       // Create a span to wrap the selected content
       const span = document.createElement("span");
-      span.style.color = "rgba(255, 165, 0, 0.5)"; // Light orange background
       span.className = "commented-text";
       span.dataset.commentId = `pending-${Date.now()}`;
 
@@ -454,8 +453,8 @@ const ProposalPreview = () => {
       if (pendingSpans.length > 0) {
         const span = pendingSpans[pendingSpans.length - 1];
         span.dataset.commentId = commentId;
-        // Make the highlight a little brighter for saved comments
-        span.style.color = "rgba(255, 165, 0, 0.5)";
+        // Make the highlight a darker grey instead of orange
+        span.style.color = "rgba(100, 100, 100, 0.5)";
 
         // Add click event to highlight when clicked
         span.addEventListener("click", () => {
@@ -482,9 +481,13 @@ const ProposalPreview = () => {
     setActiveComment(commentId);
 
     // First reset all comments and spans to default state
-    document.querySelectorAll("span.commented-text").forEach((span) => {
-      (span as HTMLElement).style.color = "rgba(255, 165, 0, 0.5)";
-    });
+    document
+      .querySelectorAll(
+        "span.commented-text[data-comment-id]:not([data-comment-id^='pending-'])"
+      )
+      .forEach((span) => {
+        (span as HTMLElement).style.color = "rgba(100, 100, 100, 0.5)";
+      });
 
     // Then highlight the selected comment and text
     const commentSpan = document.querySelector(
@@ -492,7 +495,7 @@ const ProposalPreview = () => {
     );
 
     if (commentSpan) {
-      (commentSpan as HTMLElement).style.color = "rgb(255, 165, 0)";
+      (commentSpan as HTMLElement).style.color = "#FF8019";
     }
   };
 
@@ -516,7 +519,6 @@ const ProposalPreview = () => {
 
   // Toggle comment resolution
   const handleToggleResolution = (id: string) => {
-    console.log("123");
     setComments(
       comments.map((comment) => {
         if (comment.id === id) {
@@ -624,9 +626,13 @@ const ProposalPreview = () => {
       // Only reset if click is outside comments
       if (!isClickInsideComment) {
         setActiveComment(null);
-        document.querySelectorAll("span.commented-text").forEach((span) => {
-          (span as HTMLElement).style.color = "rgba(255, 165, 0, 0.5)";
-        });
+        document
+          .querySelectorAll(
+            "span.commented-text[data-comment-id]:not([data-comment-id^='pending-'])"
+          )
+          .forEach((span) => {
+            (span as HTMLElement).style.color = "rgba(100, 100, 100, 0.5)";
+          });
       }
     };
 
