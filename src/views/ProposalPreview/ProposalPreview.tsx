@@ -44,6 +44,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
+import ProfilePhoto from "@/layout/ProfilePhoto";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -1015,31 +1016,45 @@ const ProposalPreview = () => {
                     className={cn(
                       "transition-all duration-300 w-fit absolute right-0",
                       activeComment === comment.id &&
-                        "p-2 rounded-md border bg-white border-gray-line"
+                        "p-2 rounded-md border bg-white border-gray-line shadow-md"
                     )}
                     data-comment-id={comment.id}
                     style={{
                       top: `${comment.position}px`
                     }}
                   >
-                    <div className="flex justify-between items-center">
-                      <p
-                        className="text-sm cursor-pointer"
-                        onClick={() => highlightCommentAndText(comment.id)}
-                      >
-                        {comment.text}
-                      </p>
-                      {activeComment === comment.id && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleToggleResolution(comment.id);
-                          }}
+                    <div className="flex justify-between items-start w-40">
+                      <div className="space-y-1">
+                        <ProfilePhoto size="sm" showName={true} />
+                        <p
+                          className="text-sm cursor-pointer"
+                          onClick={() => highlightCommentAndText(comment.id)}
                         >
-                          <Check size={16} />
-                        </Button>
+                          {comment.text}
+                        </p>
+                      </div>
+                      {activeComment === comment.id && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleResolution(comment.id);
+                                }}
+                                className="group p-0 hover:bg-transparent border-none"
+                              >
+                                <Check
+                                  size={16}
+                                  className="group-hover:text-orange"
+                                />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Resolve and hide</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
                     </div>
                   </div>

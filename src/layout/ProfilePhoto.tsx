@@ -16,17 +16,19 @@ interface ProfilePhotoProps {
   className?: string;
   refreshImage?: boolean;
   showTeamMembers?: boolean;
+  showName?: boolean;
 }
 
 const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
   size = "md",
   className = "",
   showTeamMembers = false,
-  refreshImage = false
+  refreshImage = false,
+  showName = false
 }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
-   const tokenRef = useRef(auth?.token || "default");
+  const tokenRef = useRef(auth?.token || "default");
 
   const [profile, setProfile] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -111,7 +113,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
   const displayedUsers = organizationUsers.slice(0, 3);
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-2">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -218,6 +220,9 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
             </div>
           )}
       </TooltipProvider>
+      {showName && (
+        <span className="font-medium text-gray-600">{profile.login}</span>
+      )}
     </div>
   );
 };
