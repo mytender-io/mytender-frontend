@@ -6,7 +6,6 @@ import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import axios from "axios";
 import mammoth from "mammoth";
 import { Button } from "@/components/ui/button";
-import DocIcon from "@/components/icons/DocIcon";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Bold,
@@ -30,7 +29,8 @@ import {
   MessageSquare,
   FileText,
   Save,
-  Check
+  Check,
+  Copy
 } from "lucide-react";
 import {
   Popover,
@@ -43,6 +43,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/utils";
+import { toast } from "react-toastify";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -616,6 +617,25 @@ const ProposalPreview = () => {
     };
   }, []);
 
+  // Copy section handler
+  const handleCopySection = (sectionId?: string) => {
+    if (sectionId) {
+      const section = sections.find((s) => s.id === sectionId);
+      if (section) {
+        // Create a temporary div to extract text content from HTML
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = section.content;
+        const textContent = tempDiv.textContent || tempDiv.innerText || "";
+
+        navigator.clipboard.writeText(textContent).catch((err) => {
+          console.error("Failed to copy section: ", err);
+          toast.error("Failed to copy section");
+        });
+        toast.success("Copied to clipboard");
+      }
+    }
+  };
+
   return (
     <div className="proposal-preview-container overflow-y-auto">
       <div className="flex flex-col flex-1 overflow-hidden pb-8">
@@ -831,6 +851,33 @@ const ProposalPreview = () => {
                           suppressContentEditableWarning={true}
                           onFocus={() => setEditingSectionId(section.id)}
                         />
+
+                        {/* Section action buttons */}
+                        <div className="flex gap-2 mt-4">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleCopySection(section.id)}
+                            className="text-xs"
+                          >
+                            <Copy size={14} className="mr-1" /> Copy
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs"
+                          >
+                            <FileText size={14} className="mr-1" /> Rewrite
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs"
+                          >
+                            <Check size={14} className="mr-1" /> Mark as Review
+                            Ready
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))
