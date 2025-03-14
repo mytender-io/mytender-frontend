@@ -61,6 +61,8 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
+import posthog from "posthog-js";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -107,6 +109,35 @@ const ProposalPreview = () => {
 
   // Get sections from shared state
   const { outline } = sharedState;
+
+  const [organizationUsers, setOrganizationUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchOrganizationUsers = async () => {
+      try {
+        // Create form data
+        const formData = new FormData();
+        formData.append("include_pending", "false");
+
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/get_organization_users`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`,
+              "Content-Type": "multipart/form-data"
+            }
+          }
+        );
+
+        setOrganizationUsers(response.data);
+      } catch (err) {
+        console.error("Error fetching organization users:", err);
+      }
+    };
+
+    fetchOrganizationUsers();
+  }, [tokenRef]);
 
   // Function to toggle the sidepane
   const toggleSidepane = () => {
@@ -179,12 +210,105 @@ const ProposalPreview = () => {
     }
   };
 
-  // 4. Add this function to handle rewrite button click
   const handleRewriteClick = (index: number) => {
     setRewritingSectionIndex(index);
     setRewriteDialogOpen(true);
   };
 
+  const handleMarkAsReviewReady = async (index: number) => {
+    try {
+      const section = outline[index];
+
+      // If no reviewer has been assigned, show a toast and return
+      if (!section.reviewer) {
+        toast.warning(
+          "Please assign a reviewer before marking as review ready"
+        );
+        return;
+      }
+
+      // Find the reviewer in the organization users to get their email
+      const reviewerUser = organizationUsers.find(
+        (user) => user.username === section.reviewer
+      );
+
+      if (!reviewerUser || !reviewerUser.email) {
+        toast.error(
+          "Could not find reviewer's email. Please reassign the reviewer."
+        );
+        return;
+      }
+
+      // After successfully updating the status, create a task for the reviewer
+      try {
+        const taskData = {
+          name: `Review section: ${section.heading} (Ready for Review)`,
+          bid_id: sharedState.object_id,
+          index: index,
+          priority: "high", // Optionally set higher priority for review tasks
+          target_user:
+            reviewerUser.username// Use login if available, fall back to email or username
+        };
+
+        console.log(reviewerUser.username)
+
+        // Create the task
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
+          taskData,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`
+            }
+          }
+        );
+
+        if (response.data.success) {
+          // Task created successfully, now send email notification
+          const bidTitle = sharedState.bidInfo || "Untitled Bid";
+          const message = `The section "${section.heading}" in bid "${bidTitle}" is now ready for your review. This section has been marked as "Review Ready" and requires your attention. You can access this task from your dashboard.`;
+          const subject = `Section Ready for Review: ${section.heading}`;
+
+          // Send the email notification
+          await sendOrganizationEmail({
+            recipient: reviewerUser.email,
+            message,
+            subject,
+            token: tokenRef.current,
+            onSuccess: () => {
+              toast.success(
+                `Section marked as "Review Ready" and notification sent to ${section.reviewer}`
+              );
+            },
+            onError: (error) => {
+              // The task was created but email notification failed
+              toast.warning(
+                `Section marked as "Review Ready", but email notification failed: ${error}`
+              );
+            }
+          });
+
+          // Track review ready action with posthog
+          posthog.capture("section_marked_review_ready", {
+            bidId: sharedState.object_id,
+            sectionId: section.section_id,
+            sectionHeading: section.heading,
+            reviewer: section.reviewer,
+            emailSent: true
+          });
+        } else {
+          console.error("Error creating review task:", response.data.error);
+          toast.error("Failed to assign review task");
+        }
+      } catch (error) {
+        console.error("Error creating task for review:", error);
+        toast.error("Failed to create review task");
+      }
+    } catch (error) {
+      console.error("Error marking section as review ready:", error);
+      toast.error("Failed to mark section as review ready");
+    }
+  };
   // Rich text editor functions
   const execCommand = (command: string, value: string = "") => {
     document.execCommand(command, false, value);
@@ -981,6 +1105,7 @@ const ProposalPreview = () => {
                             variant="outline"
                             size="sm"
                             className="text-xs text-gray-hint_text"
+                            onClick={() => handleMarkAsReviewReady(index)}
                           >
                             <PencilEditCheckIcon className="mr-1" />
                             Mark as Review Ready
