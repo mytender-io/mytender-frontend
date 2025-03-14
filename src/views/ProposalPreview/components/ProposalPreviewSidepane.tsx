@@ -19,6 +19,7 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
   const [messageFeedback, setMessageFeedback] = useState({});
+  const [activeChatPrompt, setActiveChatPrompt] = useState("library");
 
   const [messages, setMessages] = useState(() => {
     const savedMessages = localStorage.getItem("previewSidepaneMessages");
@@ -408,14 +409,26 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
             <Button
               variant="outline"
               size="sm"
-              className="text-gray-hint_text rounded-2xl"
+              className={cn(
+                "text-gray-hint_text rounded-2xl",
+                activeChatPrompt === "library" && "bg-gray text-white"
+              )}
+              onClick={() => {
+                setActiveChatPrompt("library");
+              }}
             >
               Library
             </Button>
             <Button
               variant="outline"
               size="sm"
-              className="text-gray-hint_text rounded-2xl"
+              className={cn(
+                "text-gray-hint_text rounded-2xl",
+                activeChatPrompt === "tender_docs" && "bg-gray text-white"
+              )}
+              onClick={() => {
+                setActiveChatPrompt("tender_docs");
+              }}
             >
               <FileSearchIcon />
               Tender Docs
@@ -423,7 +436,13 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
             <Button
               variant="outline"
               size="sm"
-              className="text-gray-hint_text rounded-2xl"
+              className={cn(
+                "text-gray-hint_text rounded-2xl",
+                activeChatPrompt === "internet" && "bg-gray text-white"
+              )}
+              onClick={() => {
+                setActiveChatPrompt("internet");
+              }}
             >
               <InternetSparkIcon />
               Internet

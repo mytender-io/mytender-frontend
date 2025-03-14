@@ -65,6 +65,9 @@ import { cn, getSectionHeading } from "@/utils";
 import { toast } from "react-toastify";
 import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 import posthog from "posthog-js";
+import ShortenHorizontalIcon from "@/components/icons/ShortenHorizontalIcon";
+import ExpandVerticalIcon from "@/components/icons/ExpandVerticalIcon";
+import PencilIcon from "@/components/icons/PencilIcon";
 
 const ProposalPreview = () => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -747,21 +750,30 @@ const ProposalPreview = () => {
         }
       );
 
-      if (response.data.success && response.data.evidence && response.data.evidence.length > 0) {
+      if (
+        response.data.success &&
+        response.data.evidence &&
+        response.data.evidence.length > 0
+      ) {
         // Check if enhanced_text is available
         if (response.data.enhanced_text) {
           setPromptResult(response.data.enhanced_text);
         } else {
           // Format the evidence results manually if enhanced_text is not available
-          const formattedEvidence = response.data.evidence.map((item, index) => {
-            return `Evidence ${index + 1} [Source: ${item.source}]:\n${item.content}`;
-          }).join("\n\n");
-          
+          const formattedEvidence = response.data.evidence
+            .map((item, index) => {
+              return `Evidence ${index + 1} [Source: ${item.source}]:\n${item.content}`;
+            })
+            .join("\n\n");
+
           setPromptResult(formattedEvidence);
         }
       } else {
         // Show the error message from the API if available
-        setPromptResult(response.data.message || "No relevant evidence found in your company library.");
+        setPromptResult(
+          response.data.message ||
+            "No relevant evidence found in your company library."
+        );
       }
     } catch (error) {
       console.error("Error fetching evidence:", error);
@@ -780,13 +792,13 @@ const ProposalPreview = () => {
     }
 
     // Create a styled blockquote element for the evidence
-    const blockquoteElement = document.createElement('blockquote');
-    blockquoteElement.className = 'evidence-blockquote';
-    blockquoteElement.style.borderLeft = '3px solid #FF8019';
-    blockquoteElement.style.paddingLeft = '10px';
-    blockquoteElement.style.margin = '10px 0';
-    blockquoteElement.style.fontStyle = 'italic';
-    blockquoteElement.style.color = '#555';
+    const blockquoteElement = document.createElement("blockquote");
+    blockquoteElement.className = "evidence-blockquote";
+    blockquoteElement.style.borderLeft = "3px solid #FF8019";
+    blockquoteElement.style.paddingLeft = "10px";
+    blockquoteElement.style.margin = "10px 0";
+    blockquoteElement.style.fontStyle = "italic";
+    blockquoteElement.style.color = "#555";
 
     // Insert the evidence text into the blockquote
     blockquoteElement.textContent = promptResult;
@@ -797,11 +809,11 @@ const ProposalPreview = () => {
       selectedRange.deleteContents();
       // Then insert the blockquote
       selectedRange.insertNode(blockquoteElement);
-      
+
       // Close the evidence prompt modal
       setShowEvidencePrompt(false);
       setPromptResult("");
-      
+
       toast.success("Evidence inserted successfully");
     } catch (error) {
       console.error("Error inserting evidence:", error);
@@ -1224,7 +1236,7 @@ const ProposalPreview = () => {
                             onClick={() => handleCopySection(index)}
                             className="text-xs text-gray-hint_text"
                           >
-                            <CopyIcon className="mr-1" /> Copy
+                            <CopyIcon /> Copy
                           </Button>
                           <Button
                             variant="outline"
@@ -1240,7 +1252,7 @@ const ProposalPreview = () => {
                               </>
                             ) : (
                               <>
-                                <RedoSparkIcon className="mr-1" /> Rewrite
+                                <RedoSparkIcon /> Rewrite
                               </>
                             )}
                           </Button>
@@ -1250,7 +1262,7 @@ const ProposalPreview = () => {
                             className="text-xs text-gray-hint_text"
                             onClick={() => handleMarkAsReviewReady(index)}
                           >
-                            <PencilEditCheckIcon className="mr-1" />
+                            <PencilEditCheckIcon />
                             Mark as Review Ready
                           </Button>
 
@@ -1263,7 +1275,7 @@ const ProposalPreview = () => {
                               onClick={handleSaveEdit}
                               className="text-xs ml-auto"
                             >
-                              <Save size={16} className="mr-1" /> Save
+                              <Save size={16} /> Save
                             </Button>
                           ) : (
                             <Button
@@ -1353,6 +1365,51 @@ const ProposalPreview = () => {
                           <TooltipContent side="left">Evidence</TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
+                      <TooltipProvider delayDuration={0}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={handleEvidencePrompt}
+                              className="p-2 flex flex-col items-center text-xs"
+                            >
+                              <PencilIcon />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="left">Custom</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider delayDuration={0}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={handleEvidencePrompt}
+                              className="p-2 flex flex-col items-center text-xs"
+                            >
+                              <ExpandVerticalIcon />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="left">Expand</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider delayDuration={0}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={handleEvidencePrompt}
+                              className="p-2 flex flex-col items-center text-xs"
+                            >
+                              <ShortenHorizontalIcon />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="left">Summarise</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   </div>
                 )}
@@ -1405,14 +1462,18 @@ const ProposalPreview = () => {
                       top: `${selectionMenuPosition.top}px`
                     }}
                   >
-                    <h3 className="font-medium mb-2">Evidence from Company Library</h3>
+                    <h3 className="font-medium mb-2">
+                      Evidence from Company Library
+                    </h3>
                     {isLoadingEvidence ? (
                       <div className="flex justify-center items-center h-20">
                         <Spinner className="w-6 h-6" />
                       </div>
                     ) : promptResult ? (
                       <div className="border border-gray-200 rounded p-2 mb-3 text-sm bg-gray-50 max-h-60 overflow-y-auto">
-                        <pre className="whitespace-pre-wrap">{promptResult}</pre>
+                        <pre className="whitespace-pre-wrap">
+                          {promptResult}
+                        </pre>
                       </div>
                     ) : (
                       <div className="flex justify-center items-center h-20 text-sm text-gray-500">
@@ -1456,7 +1517,7 @@ const ProposalPreview = () => {
                   >
                     <div className="flex justify-between items-start w-72">
                       <div
-                        className="space-y-1"
+                        className="space-y-1 w-full"
                         onClick={() => highlightCommentAndText(comment.id)}
                       >
                         <ProfilePhoto size="sm" showName={true} />
