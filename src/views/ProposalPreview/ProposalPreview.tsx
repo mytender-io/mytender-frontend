@@ -8,9 +8,6 @@ import mammoth from "mammoth";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
-  Bold,
-  Italic,
-  Underline,
   Heading1,
   Heading2,
   Heading3,
@@ -21,11 +18,6 @@ import {
   AlignCenter,
   AlignRight,
   Type,
-  Undo2,
-  Redo2,
-  StrikethroughIcon,
-  Quote,
-  Link,
   Save,
   Check
 } from "lucide-react";
@@ -39,8 +31,6 @@ import { TooltipContent } from "@/components/ui/tooltip";
 import { Tooltip } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/utils";
-import { toast } from "react-toastify";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
 import CheckDocumentIcon from "@/components/icons/CheckDocumentIcon";
@@ -51,6 +41,17 @@ import RedoSparkIcon from "@/components/icons/RedoSparkIcon";
 import PencilEditCheckIcon from "@/components/icons/PencilEditCheckIcon";
 import CommentIcon from "@/components/icons/CommentIcon";
 import UpscaleSparkIcon from "@/components/icons/UpscaleSparkIcon";
+import RedoIcon from "@/components/icons/RedoIcon";
+import UndoIcon from "@/components/icons/UndoIcon";
+import QuoteIcon from "@/components/icons/QuoteIcon";
+import StrikeThroughIcon from "@/components/icons/StrikeThroughIcon";
+import HyperlinkIcon from "@/components/icons/HyperlinkIcon";
+import UnderlineIcon from "@/components/icons/UnderlineIcon";
+import ItalicIcon from "@/components/icons/ItalicIcon";
+import BoldIcon from "@/components/icons/BoldIcon";
+import ParagraphIcon from "@/components/icons/ParagraphIcon";
+import { cn } from "@/utils";
+import { toast } from "react-toastify";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -741,170 +742,173 @@ const ProposalPreview = () => {
             )}
           >
             <div className="rounded-md bg-white w-full max-w-4xl">
-              <div className="border border-gray-line bg-gray-50 p-2 rounded-t-md flex flex-wrap gap-2 sticky -top-4 z-10">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => execCommand("undo")}
-                  className="p-1 h-8"
-                >
-                  <Undo2 size={16} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => execCommand("redo")}
-                  className="p-1 h-8"
-                >
-                  <Redo2 size={16} />
-                </Button>
-                <div className="h-6 w-px bg-gray-300 mx-1"></div>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="p-1 h-8 flex items-center gap-1"
-                    >
-                      <Type size={16} />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-56 p-2">
-                    <div className="grid gap-1">
+              <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-between gap-2 sticky -top-4 z-10">
+                <span>Question 1</span>
+                <div className="flex gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => execCommand("formatBlock", "<h1>")}
-                        className="justify-start"
+                        className="p-1 h-8 flex items-center gap-1"
                       >
-                        <Heading1 size={16} className="mr-2" /> Heading 1
+                        <ParagraphIcon />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("formatBlock", "<h2>")}
-                        className="justify-start"
-                      >
-                        <Heading2 size={16} className="mr-2" /> Heading 2
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("formatBlock", "<h3>")}
-                        className="justify-start"
-                      >
-                        <Heading3 size={16} className="mr-2" /> Heading 3
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("formatBlock", "<h4>")}
-                        className="justify-start"
-                      >
-                        <Heading4 size={16} className="mr-2" /> Heading 4
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("formatBlock", "<p>")}
-                        className="justify-start"
-                      >
-                        <Type size={16} className="mr-2" /> Paragraph
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleBulletedList}
-                        className="justify-start"
-                      >
-                        <List size={16} className="mr-2" /> Bulleted List
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleNumberedList}
-                        className="justify-start"
-                      >
-                        <ListOrdered size={16} className="mr-2" /> Numbered List
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => execCommand("bold")}
-                  className="p-1 h-8"
-                >
-                  <Bold size={16} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => execCommand("italic")}
-                  className="p-1 h-8"
-                >
-                  <Italic size={16} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => execCommand("underline")}
-                  className="p-1 h-8"
-                >
-                  <Underline size={16} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => execCommand("strikeThrough")}
-                  className="p-1 h-8"
-                >
-                  <StrikethroughIcon size={16} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleBlockquote}
-                  className="p-1 h-8"
-                >
-                  <Quote size={16} />
-                </Button>
-                <div className="h-6 w-px bg-gray-300 mx-1"></div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLink}
-                  className="p-1 h-8"
-                >
-                  <Link size={16} />
-                </Button>
-                <div className="h-6 w-px bg-gray-300 mx-1"></div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => execCommand("justifyLeft")}
-                  className="p-1 h-8"
-                >
-                  <AlignLeft size={16} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => execCommand("justifyCenter")}
-                  className="p-1 h-8"
-                >
-                  <AlignCenter size={16} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => execCommand("justifyRight")}
-                  className="p-1 h-8"
-                >
-                  <AlignRight size={16} />
-                </Button>
-                <div className="ml-auto">
+                    </PopoverTrigger>
+                    <PopoverContent className="w-56 p-2">
+                      <div className="grid gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => execCommand("formatBlock", "<h1>")}
+                          className="justify-start"
+                        >
+                          <Heading1 size={16} className="mr-2" /> Heading 1
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => execCommand("formatBlock", "<h2>")}
+                          className="justify-start"
+                        >
+                          <Heading2 size={16} className="mr-2" /> Heading 2
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => execCommand("formatBlock", "<h3>")}
+                          className="justify-start"
+                        >
+                          <Heading3 size={16} className="mr-2" /> Heading 3
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => execCommand("formatBlock", "<h4>")}
+                          className="justify-start"
+                        >
+                          <Heading4 size={16} className="mr-2" /> Heading 4
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => execCommand("formatBlock", "<p>")}
+                          className="justify-start"
+                        >
+                          <Type size={16} className="mr-2" /> Paragraph
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleBulletedList}
+                          className="justify-start"
+                        >
+                          <List size={16} className="mr-2" /> Bulleted List
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleNumberedList}
+                          className="justify-start"
+                        >
+                          <ListOrdered size={16} className="mr-2" /> Numbered
+                          List
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => execCommand("bold")}
+                    className="p-1 h-8"
+                  >
+                    <BoldIcon />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => execCommand("italic")}
+                    className="p-1 h-8"
+                  >
+                    <ItalicIcon />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => execCommand("underline")}
+                    className="p-1 h-8"
+                  >
+                    <UnderlineIcon />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleLink}
+                    className="p-1 h-8"
+                  >
+                    <HyperlinkIcon />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => execCommand("strikeThrough")}
+                    className="p-1 h-8"
+                  >
+                    <StrikeThroughIcon />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleBlockquote}
+                    className="p-1 h-8"
+                  >
+                    <QuoteIcon />
+                  </Button>
+                  <div className="h-6 w-px bg-gray-300 mx-1"></div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => execCommand("justifyLeft")}
+                    className="p-1 h-8"
+                  >
+                    <AlignLeft size={16} className="text-gray-hint_text" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => execCommand("justifyCenter")}
+                    className="p-1 h-8"
+                  >
+                    <AlignCenter size={16} className="text-gray-hint_text" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => execCommand("justifyRight")}
+                    className="p-1 h-8"
+                  >
+                    <AlignRight size={16} className="text-gray-hint_text" />
+                  </Button>
+                  <div className="h-6 w-px bg-gray-300 mx-1"></div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => execCommand("undo")}
+                    className="p-1 h-8"
+                  >
+                    <UndoIcon />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => execCommand("redo")}
+                    className="p-1 h-8"
+                  >
+                    <RedoIcon />
+                  </Button>
+                </div>
+                <>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -913,7 +917,7 @@ const ProposalPreview = () => {
                   >
                     <Save size={16} />
                   </Button>
-                </div>
+                </>
               </div>
               <div
                 className="h-auto relative border-x border-gray-line"
