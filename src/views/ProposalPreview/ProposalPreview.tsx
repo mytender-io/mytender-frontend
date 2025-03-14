@@ -32,6 +32,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
+import EvidencePanel from "./components/EvidencePanel";
 import CheckDocumentIcon from "@/components/icons/CheckDocumentIcon";
 import ConsultIcon from "@/components/icons/ConsultIcon";
 import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
@@ -93,7 +94,7 @@ const ProposalPreview = () => {
       replies: { id: string; text: string; author?: string }[];
     }[]
   >([]);
-  const [showEvidencePrompt, setShowEvidencePrompt] = useState(false);
+  const [evidencePanelOpen, setEvidencePanelOpen] = useState(false);
   const [promptResult, setPromptResult] = useState("");
   const [selectedRange, setSelectedRange] = useState<Range | null>(null);
   const [activeComment, setActiveComment] = useState<string | null>(null);
@@ -119,7 +120,6 @@ const ProposalPreview = () => {
   const [selectedVersion, setSelectedVersion] = useState<string>("version2");
 
   const [versionPopoverOpen, setVersionPopoverOpen] = useState(false);
-
   const handleSelectVersion = (version: string) => {
     setSelectedVersion(version);
     setVersionPopoverOpen(false); // Close the popover when a version is selected
@@ -716,7 +716,7 @@ const ProposalPreview = () => {
     );
   };
 
-  // Evidence prompt handler
+  // Modify the handleEvidencePrompt function
   const handleEvidencePrompt = async () => {
     if (!selectedRange) {
       toast.error("Please select text to find evidence for");
@@ -730,7 +730,7 @@ const ProposalPreview = () => {
       return;
     }
 
-    setShowEvidencePrompt(true);
+    setEvidencePanelOpen(true); // Open the fixed panel
     setPromptResult(""); // Clear any previous results
     setIsLoadingEvidence(true);
 
@@ -791,39 +791,31 @@ const ProposalPreview = () => {
       return;
     }
 
-    // Create a styled blockquote element for the evidence
-    const blockquoteElement = document.createElement("blockquote");
-    blockquoteElement.className = "evidence-blockquote";
-    blockquoteElement.style.borderLeft = "3px solid #FF8019";
-    blockquoteElement.style.paddingLeft = "10px";
-    blockquoteElement.style.margin = "10px 0";
-    blockquoteElement.style.fontStyle = "italic";
-    blockquoteElement.style.color = "#555";
-
-    // Insert the evidence text into the blockquote
-    blockquoteElement.textContent = promptResult;
-
-    // Insert the blockquote at the current selection
+    // Insert the evidence text directly without creating a blockquote
     try {
       // First try to delete the selected content
       selectedRange.deleteContents();
-      // Then insert the blockquote
-      selectedRange.insertNode(blockquoteElement);
+
+      // Create a text node with the prompt result
+      const textNode = document.createTextNode(promptResult);
+
+      // Insert the text node at the current selection
+      selectedRange.insertNode(textNode);
 
       // Close the evidence prompt modal
-      setShowEvidencePrompt(false);
+      setEvidencePanelOpen(false);
       setPromptResult("");
 
-      toast.success("Evidence inserted successfully");
+      toast.success("Text inserted successfully");
     } catch (error) {
-      console.error("Error inserting evidence:", error);
-      toast.error("Failed to insert evidence");
+      console.error("Error inserting text:", error);
+      toast.error("Failed to insert text");
     }
   };
 
   // Cancel prompt
   const handleCancelPrompt = () => {
-    setShowEvidencePrompt(false);
+    setEvidencePanelOpen(false);
     setPromptResult("");
   };
 
@@ -951,7 +943,7 @@ const ProposalPreview = () => {
           <div
             className={cn(
               "w-full h-full relative flex justify-center gap-4",
-              sidepaneOpen ? "pr-96" : ""
+              sidepaneOpen || evidencePanelOpen ? "pr-96" : ""
             )}
           >
             <div className="rounded-md bg-white w-full max-w-4xl">
@@ -1416,9 +1408,7 @@ const ProposalPreview = () => {
               </div>
             </div>
 
-            {showCommentInput ||
-            showEvidencePrompt ||
-            getCommentsForCurrentSection().length > 0 ? (
+            {showCommentInput || getCommentsForCurrentSection().length > 0 ? (
               <div className="h-auto w-72 relative">
                 {/* Comment Input */}
                 {showCommentInput && (
@@ -1450,53 +1440,6 @@ const ProposalPreview = () => {
                       >
                         Add
                       </Button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Evidence Prompt Result */}
-                {showEvidencePrompt && (
-                  <div
-                    className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-72"
-                    style={{
-                      top: `${selectionMenuPosition.top}px`
-                    }}
-                  >
-                    <h3 className="font-medium mb-2">
-                      Evidence from Company Library
-                    </h3>
-                    {isLoadingEvidence ? (
-                      <div className="flex justify-center items-center h-20">
-                        <Spinner className="w-6 h-6" />
-                      </div>
-                    ) : promptResult ? (
-                      <div className="border border-gray-200 rounded p-2 mb-3 text-sm bg-gray-50 max-h-60 overflow-y-auto">
-                        <pre className="whitespace-pre-wrap">
-                          {promptResult}
-                        </pre>
-                      </div>
-                    ) : (
-                      <div className="flex justify-center items-center h-20 text-sm text-gray-500">
-                        No evidence found
-                      </div>
-                    )}
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleCancelPrompt}
-                      >
-                        Cancel
-                      </Button>
-                      {promptResult && !isLoadingEvidence && (
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={handleReplaceWithPrompt}
-                        >
-                          Insert
-                        </Button>
-                      )}
                     </div>
                   </div>
                 )}
@@ -1712,13 +1655,23 @@ const ProposalPreview = () => {
       <div
         className={cn(
           "fixed top-[58px] right-16 h-[calc(100vh-66px)] z-50",
-          sidepaneOpen ? "block" : "none"
+          sidepaneOpen || evidencePanelOpen ? "block" : "none"
         )}
       >
-        <ProposalPreviewSidepane
-          bid_id={sharedState.object_id}
-          open={sidepaneOpen}
-          onOpenChange={setSidepaneOpen}
+        {sidepaneOpen && (
+          <ProposalPreviewSidepane
+            bid_id={sharedState.object_id}
+            open={sidepaneOpen}
+            onOpenChange={setSidepaneOpen}
+          />
+        )}
+
+        <EvidencePanel
+          open={evidencePanelOpen}
+          onOpenChange={handleCancelPrompt}
+          isLoading={isLoadingEvidence}
+          promptResult={promptResult}
+          onInsert={handleReplaceWithPrompt}
         />
       </div>
       <Dialog open={rewriteDialogOpen} onOpenChange={setRewriteDialogOpen}>
