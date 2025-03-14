@@ -65,7 +65,6 @@ import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 import posthog from "posthog-js";
 
 const ProposalPreview = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const getAuth = useAuthUser();
@@ -108,7 +107,7 @@ const ProposalPreview = () => {
   const [rewritingSection, setRewritingSection] = useState<string | null>(null);
 
   // Get sections from shared state
-  const { outline } = sharedState;
+  const { isLoading, outline } = sharedState;
 
   const [organizationUsers, setOrganizationUsers] = useState([]);
 
@@ -1413,7 +1412,7 @@ const ProposalPreview = () => {
       </div>
 
       {/* Tools sidebar */}
-      <div className="fixed top-0 right-0 z-50 border-l border-gray-line h-screen">
+      <div className="fixed top-[58px] right-[8px] z-50 border-l border-gray-line h-[calc(100vh-66px)] rounded-br-2xl overflow-hidden">
         <div className="flex flex-col gap-2 p-2 bg-white h-full">
           <TooltipProvider>
             <Tooltip>
@@ -1503,7 +1502,7 @@ const ProposalPreview = () => {
 
       <div
         className={cn(
-          "fixed top-0 right-14 h-screen z-50",
+          "fixed top-[58px] right-16 h-[calc(100vh-66px)] z-50",
           sidepaneOpen ? "block" : "none"
         )}
       >
