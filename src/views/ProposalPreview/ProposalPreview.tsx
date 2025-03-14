@@ -54,17 +54,13 @@ import { cn } from "@/utils";
 import { toast } from "react-toastify";
 
 const ProposalPreview = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [docUrl, setDocUrl] = useState<string | null>(null);
-  const [sections, setSections] = useState<
-    { title: string; id: string; content: string }[]
-  >([]);
+  const [isLoading, setIsLoading] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
-  const { sharedState } = useContext(BidContext);
+  const { sharedState, setSharedState } = useContext(BidContext);
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
   const [showSelectionMenu, setShowSelectionMenu] = useState(false);
   const [selectionMenuPosition, setSelectionMenuPosition] = useState({
@@ -78,6 +74,7 @@ const ProposalPreview = () => {
       text: string;
       resolved: boolean;
       position: number;
+      sectionId: string;
       replies: { id: string; text: string; author?: string }[];
     }[]
   >([]);
@@ -87,110 +84,17 @@ const ProposalPreview = () => {
   const [activeComment, setActiveComment] = useState<string | null>(null);
   const [sidepaneOpen, setSidepaneOpen] = useState(false);
   const [replyText, setReplyText] = useState("");
+  const [currentSectionIndex, setCurrentSectionIndex] = useState<number | null>(
+    null
+  );
+ 
+  // Get sections from shared state
+  const { outline } = sharedState;
 
   // Function to toggle the sidepane
   const toggleSidepane = () => {
     setSidepaneOpen((prevState) => !prevState);
   };
-
-  const loadPreview = async () => {
-    try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_proposal`,
-        {
-          bid_id: sharedState.object_id,
-          extra_instructions: "",
-          datasets: []
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`
-          },
-          responseType: "blob"
-        }
-      );
-
-      const arrayBuffer = await response.data.arrayBuffer();
-
-      // Add style mapping options for mammoth
-      const options = {
-        styleMap: [
-          "p[style-name='Title'] => h1.document-title",
-          "p[style-name='Subtitle'] => p.document-subtitle"
-        ]
-      };
-
-      const result = await mammoth.convertToHtml({ arrayBuffer }, options);
-
-      // Parse the HTML to extract sections based on h1 tags
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(result.value, "text/html");
-      const h1Elements = doc.querySelectorAll("h1");
-
-      // Create sections array for internal tracking
-      const extractedSections: {
-        title: string;
-        id: string;
-        content: string;
-      }[] = [];
-
-      if (h1Elements.length > 0) {
-        // Process each h1 element as a section
-        h1Elements.forEach((h1, index) => {
-          const sectionId = `section-${index}`;
-          h1.id = sectionId;
-
-          let sectionContent = h1.outerHTML;
-          let currentNode = h1.nextSibling;
-
-          // Collect all content until the next h1 or end of document
-          while (
-            currentNode &&
-            !(
-              currentNode instanceof HTMLHeadingElement &&
-              currentNode.tagName === "H1"
-            )
-          ) {
-            const tempDiv = document.createElement("div");
-            tempDiv.appendChild(currentNode.cloneNode(true));
-            sectionContent += tempDiv.innerHTML;
-            currentNode = currentNode.nextSibling;
-          }
-
-          extractedSections.push({
-            title: h1.textContent || `Section ${index + 1}`,
-            id: sectionId,
-            content: sectionContent
-          });
-        });
-      } else {
-        // If no h1 elements, treat the whole document as one section
-        extractedSections.push({
-          title: "Document",
-          id: "section-0",
-          content: result.value
-        });
-      }
-
-      setSections(extractedSections);
-
-      const url = URL.createObjectURL(response.data);
-      setDocUrl(url);
-      setIsLoading(false);
-    } catch (err) {
-      console.error("Preview loading error:", err);
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadPreview();
-    return () => {
-      if (docUrl) {
-        URL.revokeObjectURL(docUrl);
-      }
-    };
-  }, [sharedState.object_id]);
 
   // const handleWordDownload = async () => {
   //   if (docUrl) {
@@ -212,21 +116,23 @@ const ProposalPreview = () => {
   };
 
   const handleSaveEdit = () => {
-    if (editorRef.current) {
-      if (editingSectionId) {
-        // Save only the edited section
-        const updatedSections = sections.map((section) => {
-          if (section.id === editingSectionId) {
-            return {
-              ...section,
-              content: editorRef.current!.innerHTML
-            };
-          }
-          return section;
-        });
-        setSections(updatedSections);
-      }
-      // Keep editing mode active after saving
+    if (editorRef.current && editingSectionId && currentSectionIndex !== null) {
+      // Create a copy of the outline
+      const updatedOutline = [...outline];
+
+      // Update the answer field of the current section
+      updatedOutline[currentSectionIndex] = {
+        ...updatedOutline[currentSectionIndex],
+        answer: editorRef.current.innerHTML
+      };
+
+      // Update the shared state with the modified outline
+      setSharedState((prevState) => ({
+        ...prevState,
+        outline: updatedOutline
+      }));
+
+      toast.success("Changes saved successfully");
       setEditingSectionId(null);
     }
   };
@@ -446,7 +352,7 @@ const ProposalPreview = () => {
 
   // Save comment handler
   const handleSaveComment = () => {
-    if (commentText.trim()) {
+    if (commentText.trim() && currentSectionIndex !== null) {
       const commentId = `comment-${Date.now()}`;
       let position = selectionMenuPosition.top;
 
@@ -484,6 +390,7 @@ const ProposalPreview = () => {
         text: commentText,
         resolved: false,
         position: position,
+        sectionId: outline[currentSectionIndex].section_id,
         replies: [] // Initialize with empty replies array
       };
       setComments([...comments, newComment]);
@@ -584,6 +491,15 @@ const ProposalPreview = () => {
     return comments.filter((comment) => !comment.resolved);
   };
 
+  // Filter comments by current section
+  const getCommentsForCurrentSection = () => {
+    if (currentSectionIndex === null) return [];
+    const currentSectionId = outline[currentSectionIndex].section_id;
+    return filterResolvedComments().filter(
+      (comment) => comment.sectionId === currentSectionId
+    );
+  };
+
   // Evidence prompt handler
   const handleEvidencePrompt = () => {
     setShowEvidencePrompt(true);
@@ -673,16 +589,11 @@ const ProposalPreview = () => {
   }, []);
 
   // Copy section handler
-  const handleCopySection = (sectionId?: string) => {
-    if (sectionId) {
-      const section = sections.find((s) => s.id === sectionId);
+  const handleCopySection = (index: number) => {
+    if (index >= 0 && index < outline.length) {
+      const section = outline[index];
       if (section) {
-        // Create a temporary div to extract text content from HTML
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = section.content;
-        const textContent = tempDiv.textContent || tempDiv.innerText || "";
-
-        navigator.clipboard.writeText(textContent).catch((err) => {
+        navigator.clipboard.writeText(section.answer).catch((err) => {
           console.error("Failed to copy section: ", err);
           toast.error("Failed to copy section");
         });
@@ -727,6 +638,11 @@ const ProposalPreview = () => {
     setActiveComment(null);
   };
 
+  const handleSectionSelect = (index: number) => {
+    setCurrentSectionIndex(index);
+    setEditingSectionId(outline[index].section_id);
+  };
+
   return (
     <div className="proposal-preview-container pb-8">
       <div>
@@ -743,7 +659,7 @@ const ProposalPreview = () => {
           >
             <div className="rounded-md bg-white w-full max-w-4xl">
               <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-between gap-2 sticky -top-4 z-10">
-                <span>Question 1</span>
+                <span>Proposal Preview</span>
                 <div className="flex gap-2">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -908,56 +824,74 @@ const ProposalPreview = () => {
                     <RedoIcon />
                   </Button>
                 </div>
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleSaveEdit}
-                    className="p-1 h-8"
-                  >
-                    <Save size={16} />
-                  </Button>
-                </>
               </div>
               <div
                 className="h-auto relative border-x border-gray-line"
                 ref={editorContainerRef}
               >
-                {sections.length > 0 ? (
-                  // Display sections as separate editable cards, skip the first (title) section
-                  sections.slice(1).map((section, index) => (
+                {outline.length > 0 ? (
+                  // Display sections from the outline
+                  outline.map((section, index) => (
                     <div
-                      key={section.id}
-                      className="border-b border-gray-line relative last:rounded-b-md"
+                      key={section.section_id}
+                      className={cn(
+                        "border-b border-gray-line relative last:rounded-b-md",
+                        editingSectionId === section.section_id && "bg-gray-50"
+                      )}
                     >
                       <div className="bg-white p-8 relative">
-                        <div
-                          ref={
-                            editingSectionId === section.id ? editorRef : null
-                          }
-                          dangerouslySetInnerHTML={{ __html: section.content }}
-                          className="font-sans text-base leading-relaxed w-full m-0 outline-none focus:outline-none"
-                          contentEditable={true}
-                          suppressContentEditableWarning={true}
-                          onFocus={() => setEditingSectionId(section.id)}
-                        />
+                        <h2 className="text-xl font-semibold mb-4">
+                          {section.heading}
+                        </h2>
+                        {section.status === "Not Started" ? (
+                          <div className="p-4 bg-gray-50 rounded border border-gray-200 text-gray-500">
+                            This section has not been started yet.
+                          </div>
+                        ) : (
+                          <div
+                            ref={
+                              editingSectionId === section.section_id &&
+                              currentSectionIndex === index
+                                ? editorRef
+                                : null
+                            }
+                            dangerouslySetInnerHTML={{
+                              __html: section.answer || ""
+                            }}
+                            className="font-sans text-base leading-relaxed w-full m-0 outline-none focus:outline-none"
+                            contentEditable={
+                              editingSectionId === section.section_id &&
+                              currentSectionIndex === index
+                            }
+                            suppressContentEditableWarning={true}
+                            onFocus={() => {
+                              setEditingSectionId(section.section_id);
+                              setCurrentSectionIndex(index);
+                            }}
+                            onClick={() => {
+                              if (editingSectionId !== section.section_id) {
+                                handleSectionSelect(index);
+                              }
+                            }}
+                          />
+                        )}
 
                         {/* Section action buttons */}
                         <div className="flex gap-2 mt-4">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleCopySection(section.id)}
+                            onClick={() => handleCopySection(index)}
                             className="text-xs text-gray-hint_text"
                           >
-                            <CopyIcon /> Copy
+                            <CopyIcon className="mr-1" /> Copy
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
                             className="text-xs text-gray-hint_text"
                           >
-                            <RedoSparkIcon />
+                            <RedoSparkIcon className="mr-1" />
                             Rewrite
                           </Button>
                           <Button
@@ -965,18 +899,64 @@ const ProposalPreview = () => {
                             size="sm"
                             className="text-xs text-gray-hint_text"
                           >
-                            <PencilEditCheckIcon />
+                            <PencilEditCheckIcon className="mr-1" />
                             Mark as Review Ready
                           </Button>
+
+                          {/* Toggle between Edit and Save buttons */}
+                          {editingSectionId === section.section_id &&
+                          currentSectionIndex === index ? (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={handleSaveEdit}
+                              className="text-xs ml-auto"
+                            >
+                              <Save size={16} className="mr-1" /> Save
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => handleSectionSelect(index)}
+                              className="text-xs ml-auto"
+                            >
+                              Edit
+                            </Button>
+                          )}
                         </div>
+                      </div>
+
+                      {/* Show a meta info box with section details */}
+                      <div className="bg-gray-50 px-4 py-2 text-xs text-gray-600 flex justify-between border-t border-gray-200">
+                        <div>
+                          <span className="font-medium">Status:</span>{" "}
+                          {section.status}
+                        </div>
+                        <div>
+                          <span className="font-medium">Words:</span>{" "}
+                          {section.word_count || 0}
+                        </div>
+                        {section.reviewer && (
+                          <div>
+                            <span className="font-medium">Reviewer:</span>{" "}
+                            {section.reviewer}
+                          </div>
+                        )}
+                        {section.answerer && (
+                          <div>
+                            <span className="font-medium">Answerer:</span>{" "}
+                            {section.answerer}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))
                 ) : (
                   <div className="flex justify-center items-center h-full bg-muted p-5 text-center">
                     <p>
-                      Generate a Proposal to preview it here. Click on the bid
-                      outline tab, then on the generate proposal button.
+                      No sections found in the outline. Add sections in the bid
+                      outline tab to start building your proposal.
                     </p>
                   </div>
                 )}
@@ -1027,9 +1007,10 @@ const ProposalPreview = () => {
                 )}
               </div>
             </div>
+
             {showCommentInput ||
             showEvidencePrompt ||
-            filterResolvedComments().length > 0 ? (
+            getCommentsForCurrentSection().length > 0 ? (
               <div className="h-auto w-72 relative">
                 {/* Comment Input */}
                 {showCommentInput && (
@@ -1105,7 +1086,7 @@ const ProposalPreview = () => {
                 )}
 
                 {/* Comments Display */}
-                {filterResolvedComments().map((comment) => (
+                {getCommentsForCurrentSection().map((comment) => (
                   <div
                     key={comment.id}
                     className={cn(
@@ -1222,6 +1203,8 @@ const ProposalPreview = () => {
           </div>
         )}
       </div>
+
+      {/* Tools sidebar */}
       <div className="fixed top-0 right-0 z-50 border-l border-gray-line h-screen">
         <div className="flex flex-col gap-2 p-2 bg-white h-full">
           <TooltipProvider>
@@ -1309,6 +1292,7 @@ const ProposalPreview = () => {
           </TooltipProvider>
         </div>
       </div>
+
       <div
         className={cn(
           "fixed top-0 right-14 h-screen z-50",

@@ -158,26 +158,16 @@ const GenerateProposalModal = ({
         {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`
-          },
-          responseType: "blob"
+          }
         }
       );
+      // Update shared state with outline data
+      setSharedState((prevState) => ({
+        ...prevState,
+        outline: response.data?.updated_outline || []
+      }));
 
-      const blob = new Blob([response.data], { type: "application/msword" });
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download =
-        response.headers["content-disposition"]?.split("filename=")[1] ||
-        "proposal.docx";
-      document.body.appendChild(link);
-      link.click();
-
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(link);
       setProgress(100);
-      fetchOutline(bid_id, tokenRef, setSharedState);
       setCurrentStep(2); // Move to success step
     } catch (err) {
       console.error("Error generating proposal:", err);
@@ -189,7 +179,6 @@ const GenerateProposalModal = ({
     }
   };
 
-  const handleShow = () => setShow(true);
   const handleClose = () => {
     setShow(false);
     setCurrentStep(1);
