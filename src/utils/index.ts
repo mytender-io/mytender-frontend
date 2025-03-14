@@ -14,3 +14,9 @@ export const customLocale: Locale = {
     return result.replace("about ", "");
   }
 };
+
+export const getSectionHeading = (heading: string) => {
+  const match = heading.match(/^[\d.]+/);
+  const sectionNumber = match ? match[0] : "";
+  return sectionNumber;
+};

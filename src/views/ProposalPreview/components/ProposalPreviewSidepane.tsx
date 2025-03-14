@@ -250,8 +250,7 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
 
   // Render as a rounded card sidebar
   return (
-    // <div className="fixed right-5 bottom-5 max-h-[80vh] shadow-lg rounded-2xl w-80 flex flex-col bg-white overflow-hidden">
-    <div className="shadow-lg rounded-2xl w-[336px] flex flex-col h-full bg-white overflow-hidden">
+    <div className="shadow-lg rounded-2xl w-[450px] flex flex-col h-full bg-white overflow-hidden">
       <div className="p-3 border-b border-gray-100 flex justify-between items-center">
         <h3 className="font-medium text-center w-full">mytender.io Chat</h3>
         <Button

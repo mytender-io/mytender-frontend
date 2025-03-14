@@ -61,7 +61,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import PlusCircleIcon from "@/components/icons/PlusCircleIcon";
 import ArrowDownIcon from "@/components/icons/ArrowDownIcon";
-import { cn } from "@/utils";
+import { cn, getSectionHeading } from "@/utils";
 import { toast } from "react-toastify";
 import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 import posthog from "posthog-js";
@@ -939,14 +939,14 @@ const ProposalPreview = () => {
           <div
             className={cn(
               "w-full h-full relative flex justify-center gap-4",
-              sidepaneOpen ? "pr-60" : ""
+              sidepaneOpen ? "pr-96" : ""
             )}
           >
             <div className="rounded-md bg-white w-full max-w-4xl">
               <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-between gap-2 sticky -top-4 z-10">
                 <span>
                   {currentSectionIndex !== null
-                    ? `Question ${currentSectionIndex + 1}`
+                    ? `Question ${getSectionHeading(outline[currentSectionIndex].heading)}`
                     : "Proposal Preview"}
                 </span>
                 <div className="flex gap-2">
