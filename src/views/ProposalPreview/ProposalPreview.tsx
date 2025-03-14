@@ -52,6 +52,15 @@ import BoldIcon from "@/components/icons/BoldIcon";
 import ParagraphIcon from "@/components/icons/ParagraphIcon";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -88,6 +97,14 @@ const ProposalPreview = () => {
     null
   );
 
+  const [rewriteDialogOpen, setRewriteDialogOpen] = useState(false);
+  const [rewriteFeedback, setRewriteFeedback] = useState("");
+  const [rewritingSectionIndex, setRewritingSectionIndex] = useState<
+    number | null
+  >(null);
+
+  const [rewritingSection, setRewritingSection] = useState<string | null>(null);
+
   // Get sections from shared state
   const { outline } = sharedState;
 
@@ -106,6 +123,67 @@ const ProposalPreview = () => {
   //     document.body.removeChild(link);
   //   }
   // };
+
+  // 3. Add this function to handle rewrite submission
+
+  // 2. Update the handleRewriteSubmit function to use section-specific loading
+  const handleRewriteSubmit = async () => {
+    if (rewritingSectionIndex !== null && rewriteFeedback.trim()) {
+      try {
+        // Instead of setting the global isLoading, set the specific section as rewriting
+        setRewritingSection(outline[rewritingSectionIndex].section_id);
+
+        const formData = new FormData();
+        formData.append(
+          "section",
+          JSON.stringify(outline[rewritingSectionIndex])
+        );
+        formData.append("user_feedback", rewriteFeedback);
+        formData.append("bid_id", sharedState.object_id);
+
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/rewrite_section`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`
+            }
+          }
+        );
+
+        if (response.data) {
+          // Create a copy of the outline
+          const updatedOutline = [...outline];
+
+          // Update the section with the response data
+          updatedOutline[rewritingSectionIndex] = response.data;
+
+          // Update the shared state with the modified outline
+          setSharedState((prevState) => ({
+            ...prevState,
+            outline: updatedOutline
+          }));
+
+          toast.success("Section rewritten successfully");
+        }
+      } catch (error) {
+        console.error("Error rewriting section:", error);
+        toast.error("Failed to rewrite section");
+      } finally {
+        // Clear the rewriting state
+        setRewritingSection(null);
+        setRewriteDialogOpen(false);
+        setRewriteFeedback("");
+        setRewritingSectionIndex(null);
+      }
+    }
+  };
+
+  // 4. Add this function to handle rewrite button click
+  const handleRewriteClick = (index: number) => {
+    setRewritingSectionIndex(index);
+    setRewriteDialogOpen(true);
+  };
 
   // Rich text editor functions
   const execCommand = (command: string, value: string = "") => {
@@ -884,10 +962,20 @@ const ProposalPreview = () => {
                           <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => handleRewriteClick(index)}
+                            disabled={rewritingSection === section.section_id}
                             className="text-xs text-gray-hint_text"
                           >
-                            <RedoSparkIcon className="mr-1" />
-                            Rewrite
+                            {rewritingSection === section.section_id ? (
+                              <>
+                                <Spinner className="w-3 h-3 mr-1" />{" "}
+                                Rewriting...
+                              </>
+                            ) : (
+                              <>
+                                <RedoSparkIcon className="mr-1" /> Rewrite
+                              </>
+                            )}
                           </Button>
                           <Button
                             variant="outline"
@@ -1300,6 +1388,43 @@ const ProposalPreview = () => {
           onOpenChange={setSidepaneOpen}
         />
       </div>
+      <Dialog open={rewriteDialogOpen} onOpenChange={setRewriteDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Rewrite Section</DialogTitle>
+            <DialogDescription>
+              Provide feedback on how you'd like this section to be rewritten.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Textarea
+              placeholder="What would you like to change about this section? For example: 'Make it more concise' or 'Add more details about our technical approach'"
+              value={rewriteFeedback}
+              onChange={(e) => setRewriteFeedback(e.target.value)}
+              className="min-h-[120px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRewriteDialogOpen(false);
+                setRewriteFeedback("");
+                setRewritingSectionIndex(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRewriteSubmit}
+              disabled={!rewriteFeedback.trim() || rewritingSection !== null}
+            >
+              <RedoSparkIcon className="w-4 h-4 mr-2" />
+              Rewrite
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
