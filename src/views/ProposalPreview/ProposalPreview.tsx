@@ -4,7 +4,6 @@ import withAuth from "../../routes/withAuth";
 import { BidContext } from "../BidWritingStateManagerView";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import axios from "axios";
-import mammoth from "mammoth";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -21,12 +20,12 @@ import {
   Save,
   Check
 } from "lucide-react";
+import "./ProposalPreview.css";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover";
-import "./ProposalPreview.css";
 import { TooltipContent } from "@/components/ui/tooltip";
 import { Tooltip } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -50,8 +49,6 @@ import UnderlineIcon from "@/components/icons/UnderlineIcon";
 import ItalicIcon from "@/components/icons/ItalicIcon";
 import BoldIcon from "@/components/icons/BoldIcon";
 import ParagraphIcon from "@/components/icons/ParagraphIcon";
-import { cn } from "@/utils";
-import { toast } from "react-toastify";
 import {
   Dialog,
   DialogContent,
@@ -61,6 +58,11 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import PlusCircleIcon from "@/components/icons/PlusCircleIcon";
+import ArrowDownIcon from "@/components/icons/ArrowDownIcon";
+import { cn } from "@/utils";
+import { toast } from "react-toastify";
 import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 import posthog from "posthog-js";
 
@@ -110,6 +112,15 @@ const ProposalPreview = () => {
   const { isLoading, outline } = sharedState;
 
   const [organizationUsers, setOrganizationUsers] = useState([]);
+
+  const [selectedVersion, setSelectedVersion] = useState<string>("version2");
+
+  const [versionPopoverOpen, setVersionPopoverOpen] = useState(false);
+
+  const handleSelectVersion = (version: string) => {
+    setSelectedVersion(version);
+    setVersionPopoverOpen(false); // Close the popover when a version is selected
+  };
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
@@ -245,11 +256,10 @@ const ProposalPreview = () => {
           bid_id: sharedState.object_id,
           index: index,
           priority: "high", // Optionally set higher priority for review tasks
-          target_user:
-            reviewerUser.username// Use login if available, fall back to email or username
+          target_user: reviewerUser.username // Use login if available, fall back to email or username
         };
 
-        console.log(reviewerUser.username)
+        console.log(reviewerUser.username);
 
         // Create the task
         const response = await axios.post(
@@ -522,7 +532,7 @@ const ProposalPreview = () => {
       span.dataset.commentId = `pending-${Date.now()}`;
 
       // Make sure the style applies to all child elements
-      span.style.backgroundColor = "#FF8019";
+      span.style.backgroundColor = "#FFE5CC";
 
       // Preserve the original HTML structure by cloning the range contents
       // instead of just wrapping everything in a span
@@ -546,7 +556,7 @@ const ProposalPreview = () => {
       // Apply the style to all child elements
       const childElements = span.querySelectorAll("*");
       childElements.forEach((element) => {
-        (element as HTMLElement).style.backgroundColor = "#FF8019";
+        (element as HTMLElement).style.backgroundColor = "#FFE5CC";
       });
     }
   };
@@ -572,12 +582,12 @@ const ProposalPreview = () => {
         span.dataset.commentId = commentId;
 
         // Make the highlight a darker grey instead of orange
-        span.style.backgroundColor = "#FF8019";
+        span.style.backgroundColor = "#FFE5CC";
 
         // Apply the style to all child elements
         const childElements = span.querySelectorAll("*");
         childElements.forEach((element) => {
-          (element as HTMLElement).style.backgroundColor = "#FF8019";
+          (element as HTMLElement).style.backgroundColor = "#FFE5CC";
         });
 
         // Add click event to highlight when clicked
@@ -611,12 +621,12 @@ const ProposalPreview = () => {
         "span.commented-text[data-comment-id]:not([data-comment-id^='pending-'])"
       )
       .forEach((span) => {
-        (span as HTMLElement).style.backgroundColor = "#FF8019";
+        (span as HTMLElement).style.backgroundColor = "#FFE5CC";
 
         // Reset all child elements
         const childElements = span.querySelectorAll("*");
         childElements.forEach((element) => {
-          (element as HTMLElement).style.backgroundColor = "#FF8019";
+          (element as HTMLElement).style.backgroundColor = "#FFE5CC";
         });
       });
 
@@ -626,12 +636,12 @@ const ProposalPreview = () => {
     );
 
     if (commentSpan) {
-      (commentSpan as HTMLElement).style.backgroundColor = "#FFE5CC";
+      (commentSpan as HTMLElement).style.backgroundColor = "#FF8019";
 
       // Apply highlight to all child elements
       const childElements = commentSpan.querySelectorAll("*");
       childElements.forEach((element) => {
-        (element as HTMLElement).style.backgroundColor = "#FFE5CC";
+        (element as HTMLElement).style.backgroundColor = "#FF8019";
       });
     }
   };
@@ -777,7 +787,7 @@ const ProposalPreview = () => {
             "span.commented-text[data-comment-id]:not([data-comment-id^='pending-'])"
           )
           .forEach((span) => {
-            (span as HTMLElement).style.backgroundColor = "#FF8019";
+            (span as HTMLElement).style.backgroundColor = "#FFE5CC";
           });
       }
     };
@@ -860,7 +870,11 @@ const ProposalPreview = () => {
           >
             <div className="rounded-md bg-white w-full max-w-4xl">
               <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-between gap-2 sticky -top-4 z-10">
-                <span>Proposal Preview</span>
+                <span>
+                  {currentSectionIndex !== null
+                    ? `Question ${currentSectionIndex + 1}`
+                    : "Proposal Preview"}
+                </span>
                 <div className="flex gap-2">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -1024,6 +1038,62 @@ const ProposalPreview = () => {
                   >
                     <RedoIcon />
                   </Button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Popover
+                    open={versionPopoverOpen}
+                    onOpenChange={setVersionPopoverOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="text-gray-hint_text [&_svg]:w-3"
+                      >
+                        <span>
+                          {selectedVersion === "version2"
+                            ? "Version 2"
+                            : "Version 1"}
+                        </span>
+                        <ArrowDownIcon />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-48">
+                      <div className="px-3 py-2 border-b border-gray-line">
+                        <Button
+                          className="w-full rounded-2xl"
+                          onClick={() => {
+                            toast.success("New version saved");
+                          }}
+                        >
+                          <PlusCircleIcon /> Save Version
+                        </Button>
+                      </div>
+                      <RadioGroup
+                        defaultValue="version2"
+                        value={selectedVersion}
+                        onValueChange={handleSelectVersion}
+                      >
+                        {["version2", "version1"].map((version) => (
+                          <div
+                            className="flex items-center space-x-2 px-3 py-2 cursor-pointer border-b last:border-none border-gray-line"
+                            onClick={() => handleSelectVersion(version)}
+                          >
+                            <RadioGroupItem value={version} id={version} />
+                            <div className="flex flex-col gap-1">
+                              <span className="font-medium text-gray-hint_text">
+                                {version === "version2"
+                                  ? "Version 2"
+                                  : "Version 1"}
+                              </span>
+                              <span className="text-xs text-gray">
+                                Created 15 Mar
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
               <div
