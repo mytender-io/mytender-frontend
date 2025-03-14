@@ -122,6 +122,8 @@ const ProposalPreview = () => {
     setVersionPopoverOpen(false); // Close the popover when a version is selected
   };
 
+  const [isLoadingEvidence, setIsLoadingEvidence] = useState(false);
+
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
       try {
@@ -712,27 +714,99 @@ const ProposalPreview = () => {
   };
 
   // Evidence prompt handler
-  const handleEvidencePrompt = () => {
+  const handleEvidencePrompt = async () => {
+    if (!selectedRange) {
+      toast.error("Please select text to find evidence for");
+      return;
+    }
+
+    // Get the selected text
+    const selectedText = selectedRange.toString();
+    if (!selectedText || selectedText.trim() === "") {
+      toast.error("Please select text to find evidence for");
+      return;
+    }
+
     setShowEvidencePrompt(true);
-    // Simulate API call with dummy data
-    setTimeout(() => {
-      setPromptResult(
-        "This is evidence data that would normally come from an API. It provides supporting information for the selected text."
+    setPromptResult(""); // Clear any previous results
+    setIsLoadingEvidence(true);
+
+    try {
+      // Create FormData instead of using JSON
+      const formData = new FormData();
+      formData.append("selected_text", selectedText);
+
+      // Make API call to get evidence using FormData
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_evidence_from_company_lib`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
       );
-    }, 1000);
+
+      if (response.data.success && response.data.evidence && response.data.evidence.length > 0) {
+        // Check if enhanced_text is available
+        if (response.data.enhanced_text) {
+          setPromptResult(response.data.enhanced_text);
+        } else {
+          // Format the evidence results manually if enhanced_text is not available
+          const formattedEvidence = response.data.evidence.map((item, index) => {
+            return `Evidence ${index + 1} [Source: ${item.source}]:\n${item.content}`;
+          }).join("\n\n");
+          
+          setPromptResult(formattedEvidence);
+        }
+      } else {
+        // Show the error message from the API if available
+        setPromptResult(response.data.message || "No relevant evidence found in your company library.");
+      }
+    } catch (error) {
+      console.error("Error fetching evidence:", error);
+      setPromptResult("Error retrieving evidence. Please try again.");
+      toast.error("Failed to retrieve evidence from company library");
+    } finally {
+      setIsLoadingEvidence(false);
+    }
   };
 
   // Replace text with prompt result
   const handleReplaceWithPrompt = () => {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      range.deleteContents();
-      const textNode = document.createTextNode(promptResult);
-      range.insertNode(textNode);
+    if (!selectedRange || !promptResult) {
+      toast.error("No content to insert");
+      return;
     }
-    setShowEvidencePrompt(false);
-    setPromptResult("");
+
+    // Create a styled blockquote element for the evidence
+    const blockquoteElement = document.createElement('blockquote');
+    blockquoteElement.className = 'evidence-blockquote';
+    blockquoteElement.style.borderLeft = '3px solid #FF8019';
+    blockquoteElement.style.paddingLeft = '10px';
+    blockquoteElement.style.margin = '10px 0';
+    blockquoteElement.style.fontStyle = 'italic';
+    blockquoteElement.style.color = '#555';
+
+    // Insert the evidence text into the blockquote
+    blockquoteElement.textContent = promptResult;
+
+    // Insert the blockquote at the current selection
+    try {
+      // First try to delete the selected content
+      selectedRange.deleteContents();
+      // Then insert the blockquote
+      selectedRange.insertNode(blockquoteElement);
+      
+      // Close the evidence prompt modal
+      setShowEvidencePrompt(false);
+      setPromptResult("");
+      
+      toast.success("Evidence inserted successfully");
+    } catch (error) {
+      console.error("Error inserting evidence:", error);
+      toast.error("Failed to insert evidence");
+    }
   };
 
   // Cancel prompt
@@ -1331,14 +1405,18 @@ const ProposalPreview = () => {
                       top: `${selectionMenuPosition.top}px`
                     }}
                   >
-                    <h3 className="font-medium mb-2">Evidence</h3>
-                    {promptResult ? (
-                      <div className="border border-gray-200 rounded p-2 mb-3 text-sm bg-gray-50 max-h-40 overflow-y-auto">
-                        {promptResult}
-                      </div>
-                    ) : (
+                    <h3 className="font-medium mb-2">Evidence from Company Library</h3>
+                    {isLoadingEvidence ? (
                       <div className="flex justify-center items-center h-20">
                         <Spinner className="w-6 h-6" />
+                      </div>
+                    ) : promptResult ? (
+                      <div className="border border-gray-200 rounded p-2 mb-3 text-sm bg-gray-50 max-h-60 overflow-y-auto">
+                        <pre className="whitespace-pre-wrap">{promptResult}</pre>
+                      </div>
+                    ) : (
+                      <div className="flex justify-center items-center h-20 text-sm text-gray-500">
+                        No evidence found
                       </div>
                     )}
                     <div className="flex justify-end gap-2">
@@ -1349,13 +1427,13 @@ const ProposalPreview = () => {
                       >
                         Cancel
                       </Button>
-                      {promptResult && (
+                      {promptResult && !isLoadingEvidence && (
                         <Button
                           variant="default"
                           size="sm"
                           onClick={handleReplaceWithPrompt}
                         >
-                          Replace
+                          Insert
                         </Button>
                       )}
                     </div>
