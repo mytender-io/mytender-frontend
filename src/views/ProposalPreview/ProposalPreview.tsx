@@ -87,7 +87,7 @@ const ProposalPreview = () => {
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number | null>(
     null
   );
- 
+
   // Get sections from shared state
   const { outline } = sharedState;
 
@@ -843,38 +843,33 @@ const ProposalPreview = () => {
                         <h2 className="text-xl font-semibold mb-4">
                           {section.heading}
                         </h2>
-                        {section.status === "Not Started" ? (
-                          <div className="p-4 bg-gray-50 rounded border border-gray-200 text-gray-500">
-                            This section has not been started yet.
-                          </div>
-                        ) : (
-                          <div
-                            ref={
-                              editingSectionId === section.section_id &&
-                              currentSectionIndex === index
-                                ? editorRef
-                                : null
+
+                        <div
+                          ref={
+                            editingSectionId === section.section_id &&
+                            currentSectionIndex === index
+                              ? editorRef
+                              : null
+                          }
+                          dangerouslySetInnerHTML={{
+                            __html: section.answer || ""
+                          }}
+                          className="font-sans text-base leading-relaxed w-full m-0 outline-none focus:outline-none"
+                          contentEditable={
+                            editingSectionId === section.section_id &&
+                            currentSectionIndex === index
+                          }
+                          suppressContentEditableWarning={true}
+                          onFocus={() => {
+                            setEditingSectionId(section.section_id);
+                            setCurrentSectionIndex(index);
+                          }}
+                          onClick={() => {
+                            if (editingSectionId !== section.section_id) {
+                              handleSectionSelect(index);
                             }
-                            dangerouslySetInnerHTML={{
-                              __html: section.answer || ""
-                            }}
-                            className="font-sans text-base leading-relaxed w-full m-0 outline-none focus:outline-none"
-                            contentEditable={
-                              editingSectionId === section.section_id &&
-                              currentSectionIndex === index
-                            }
-                            suppressContentEditableWarning={true}
-                            onFocus={() => {
-                              setEditingSectionId(section.section_id);
-                              setCurrentSectionIndex(index);
-                            }}
-                            onClick={() => {
-                              if (editingSectionId !== section.section_id) {
-                                handleSectionSelect(index);
-                              }
-                            }}
-                          />
-                        )}
+                          }}
+                        />
 
                         {/* Section action buttons */}
                         <div className="flex gap-2 mt-4">
