@@ -11,6 +11,8 @@ import ThumbupIcon from "@/components/icons/ThumbupIcon";
 import ThumbdownIcon from "@/components/icons/ThumbdownIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 import ProfilePhoto from "@/layout/ProfilePhoto";
+import FileSearchIcon from "@/components/icons/FileSearchIcon";
+import InternetSparkIcon from "@/components/icons/InternetSparkIcon";
 
 const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
   const getAuth = useAuthUser();
@@ -263,7 +265,7 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
       </div>
 
       <div className="flex flex-col flex-1 overflow-hidden">
-        <div className="px-6 py-4 flex-1 overflow-y-auto">
+        <div className="p-4 flex-1 overflow-y-auto">
           <div className="relative flex flex-col justify-between space-y-4 h-full">
             <div
               ref={messagesContainerRef}
@@ -273,7 +275,7 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
                 <div
                   key={index}
                   className={cn(
-                    "group flex min-w-[50px] px-4 py-2 rounded-xl items-start gap-3 text-black",
+                    "group flex min-w-[50px] p-2 rounded-xl items-start gap-3 text-black",
                     message.type === "user"
                       ? "bg-gray-light self-end max-w-xl mb-4"
                       : "bg-transparent"
@@ -375,8 +377,8 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
           </div>
         </div>
 
-        <div className="p-3 border-t border-gray-100">
-          <div className="flex items-center bg-gray-50 rounded-full p-2 gap-2">
+        <div className="px-3 pt-2 pb-1 border border-gray-line space-y-2 shadow-tooltip rounded-2xl mx-3 mb-3">
+          <div className="flex items-center rounded-full gap-2">
             <Input
               ref={inputRef}
               type="text"
@@ -403,19 +405,32 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
               <Send className="h-4 w-4 text-white" />
             </Button>
           </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-gray-hint_text rounded-2xl"
+            >
+              Library
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-gray-hint_text rounded-2xl"
+            >
+              <FileSearchIcon />
+              Tender Docs
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-gray-hint_text rounded-2xl"
+            >
+              <InternetSparkIcon />
+              Internet
+            </Button>
+          </div>
         </div>
-      </div>
-
-      <div className="flex border-t border-gray-100 text-xs">
-        <button className="flex-1 p-2 hover:bg-gray-50 text-gray-500 flex items-center justify-center">
-          <span className="mr-1">Library</span>
-        </button>
-        <button className="flex-1 p-2 hover:bg-gray-50 text-gray-500 flex items-center justify-center">
-          <span className="mr-1">Tender Docs</span>
-        </button>
-        <button className="flex-1 p-2 hover:bg-gray-50 text-gray-500 flex items-center justify-center">
-          <span className="mr-1">Internet</span>
-        </button>
       </div>
     </div>
   );
