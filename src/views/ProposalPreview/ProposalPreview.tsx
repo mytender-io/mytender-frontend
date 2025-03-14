@@ -413,6 +413,9 @@ const ProposalPreview = () => {
       span.className = "commented-text";
       span.dataset.commentId = `pending-${Date.now()}`;
 
+      // Make sure the style applies to all child elements
+      span.style.backgroundColor = "#FF8019";
+
       // Preserve the original HTML structure by cloning the range contents
       // instead of just wrapping everything in a span
       try {
@@ -431,6 +434,12 @@ const ProposalPreview = () => {
         // Insert the span
         selectedRange.insertNode(span);
       }
+
+      // Apply the style to all child elements
+      const childElements = span.querySelectorAll("*");
+      childElements.forEach((element) => {
+        (element as HTMLElement).style.backgroundColor = "#FF8019";
+      });
     }
   };
 
@@ -453,8 +462,15 @@ const ProposalPreview = () => {
       if (pendingSpans.length > 0) {
         const span = pendingSpans[pendingSpans.length - 1];
         span.dataset.commentId = commentId;
+
         // Make the highlight a darker grey instead of orange
-        span.style.color = "rgba(100, 100, 100, 0.5)";
+        span.style.backgroundColor = "#FF8019";
+
+        // Apply the style to all child elements
+        const childElements = span.querySelectorAll("*");
+        childElements.forEach((element) => {
+          (element as HTMLElement).style.backgroundColor = "#FF8019";
+        });
 
         // Add click event to highlight when clicked
         span.addEventListener("click", () => {
@@ -486,7 +502,13 @@ const ProposalPreview = () => {
         "span.commented-text[data-comment-id]:not([data-comment-id^='pending-'])"
       )
       .forEach((span) => {
-        (span as HTMLElement).style.color = "rgba(100, 100, 100, 0.5)";
+        (span as HTMLElement).style.backgroundColor = "#FF8019";
+
+        // Reset all child elements
+        const childElements = span.querySelectorAll("*");
+        childElements.forEach((element) => {
+          (element as HTMLElement).style.backgroundColor = "#FF8019";
+        });
       });
 
     // Then highlight the selected comment and text
@@ -495,7 +517,13 @@ const ProposalPreview = () => {
     );
 
     if (commentSpan) {
-      (commentSpan as HTMLElement).style.color = "#FF8019";
+      (commentSpan as HTMLElement).style.backgroundColor = "#FFE5CC";
+
+      // Apply highlight to all child elements
+      const childElements = commentSpan.querySelectorAll("*");
+      childElements.forEach((element) => {
+        (element as HTMLElement).style.backgroundColor = "#FFE5CC";
+      });
     }
   };
 
@@ -631,7 +659,7 @@ const ProposalPreview = () => {
             "span.commented-text[data-comment-id]:not([data-comment-id^='pending-'])"
           )
           .forEach((span) => {
-            (span as HTMLElement).style.color = "rgba(100, 100, 100, 0.5)";
+            (span as HTMLElement).style.backgroundColor = "#FF8019";
           });
       }
     };
@@ -1002,7 +1030,7 @@ const ProposalPreview = () => {
                 {/* Comment Input */}
                 {showCommentInput && (
                   <div
-                    className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-72"
+                    className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-[51] p-3 w-72"
                     style={{
                       top: `${selectionMenuPosition.top}px`
                     }}

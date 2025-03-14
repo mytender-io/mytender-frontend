@@ -64,3 +64,17 @@ span.commented-text {
 .comments-container > div {
   pointer-events: auto;
 }
+
+.commented-text,
+.commented-text * {
+  background-color: inherit;
+  transition: background-color 0.2s ease;
+}
+
+.commented-text h1,
+h2,
+h3,
+h4,
+h5 {
+  width: fit-content;
+}
