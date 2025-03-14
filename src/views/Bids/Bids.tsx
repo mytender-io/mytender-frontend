@@ -267,6 +267,7 @@ const Bids = () => {
     localStorage.setItem("navigatedFromBidsTable", "true");
     localStorage.removeItem("bidState");
     localStorage.removeItem("tenderLibChatMessages");
+    localStorage.removeItem("previewSidepaneMessages");
     navigate(`/bid?id=${bid._id}`, {
       state: { bid: bid, fromBidsTable: true }
     });

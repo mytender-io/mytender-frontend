@@ -170,7 +170,7 @@ const Home = () => {
     // Clean up any existing state
     localStorage.removeItem("bidState");
     localStorage.removeItem("tenderLibChatMessages");
-
+    localStorage.removeItem("previewSidepaneMessages");
     // Navigate with both query parameters and state
     navigate(
       `/bid?id=${task.bid_id}&openTask=true&taskId=${task._id}&sectionIndex=${task.index}`,
@@ -253,6 +253,7 @@ const Home = () => {
     localStorage.setItem("navigatedFromBidsTable", "true");
     localStorage.removeItem("bidState");
     localStorage.removeItem("tenderLibChatMessages");
+    localStorage.removeItem("previewSidepaneMessages");
     navigate(`/bid?id=${bid._id}`, {
       state: { bid: bid, fromBidsTable: true }
     });

@@ -42,6 +42,7 @@ const useAuthSignIn = () => {
         localStorage.removeItem("messages");
         localStorage.removeItem("chatResponseMessages");
         localStorage.removeItem("tenderLibChatMessages");
+        localStorage.removeItem("previewSidepaneMessages");
         localStorage.removeItem("bidState");
         localStorage.removeItem("lastActiveTab");
 
