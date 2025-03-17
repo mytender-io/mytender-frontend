@@ -252,10 +252,10 @@ const GenerateProposalModal = ({
               className="text-green-500 animate-bounce"
             />
           </div>
-          <h4 className="text-3xl font-bold mb-6 animate-[slideIn_0.5s_ease-out]">
+          <h4 className="text-3xl font-bold mb-6 animate-[slideIn_0.5s_ease-out] w-full">
             Fantastic. Your proposal is ready! 🚀
           </h4>
-          <p className="text-xl text-gray-600 mb-6 animate-[fadeIn_0.5s_ease-out]">
+          <p className="text-xl text-gray-600 mb-6 animate-[fadeIn_0.5s_ease-out] w-full">
             Your proposal has been generated & is ready for editing. Time to
             review and make it shine! ✨
           </p>

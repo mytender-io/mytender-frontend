@@ -1341,6 +1341,14 @@ const ProposalPreview = () => {
                                 onChange={(e) =>
                                   setRewriteFeedback(e.target.value)
                                 }
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    if (rewriteFeedback.trim()) {
+                                      handleRewriteSubmit();
+                                    }
+                                  }
+                                }}
                                 className="flex-1 border-none outline-none bg-transparent focus-visible:ring-0 shadow-none text-sm h-8 px-2"
                               />
                               <div className="flex items-center gap-2">
