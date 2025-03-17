@@ -882,162 +882,167 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       over
     } = useSortable({ id: section.section_id });
 
-    const handleAnswererSelect = async (user) => {
-      // Extract the username and email from the user object
-      const username = user.username || "";
-      const email = user.email || "";
+  // 1. Modified handleAnswererSelect function to include the correct user assignment and priority
+const handleAnswererSelect = async (user) => {
+  // Extract the username and email from the user object
+  const username = user.username || "";
+  const email = user.email || "";
 
-      // Skip if no email is provided
-      if (!email) {
-        handleSectionChange(index, "answerer", username);
-        return;
-      }
+  // Skip if no email is provided
+  if (!email) {
+    handleSectionChange(index, "answerer", username);
+    return;
+  }
 
-      // First update the section with the new reviewer
-      const success = await handleSectionChange(index, "answerer", username);
+  // First update the section with the new answerer
+  const success = await handleSectionChange(index, "answerer", username);
 
-      if (success) {
-        // After successfully setting the reviewer, create a task for them
-        try {
-          const taskData = {
-            name: `Answer section: ${section.heading}`,
-            bid_id: object_id,
-            index: index
-          };
+  if (success) {
+    // After successfully setting the answerer, create a task for them
+    try {
+      const taskData = {
+        name: `Answer section: ${section.heading}`,
+        bid_id: object_id,
+        index: index,
+        priority: "medium", // Adding priority parameter
+        target_user: username // Adding explicit target_user parameter
+      };
 
-          // Create the task
-          const response = await axios.post(
-            `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
-            taskData,
-            {
-              headers: {
-                Authorization: `Bearer ${tokenRef.current}`
-              }
-            }
-          );
-
-          if (response.data.success) {
-            // Task created successfully, now send email notification
-            const bidTitle = sharedState.bidInfo || "Untitled Bid";
-            const message = `You have been assigned to answer the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
-            const subject = `New Answer Task: ${section.heading}`;
-
-            // Send the email notification
-            await sendOrganizationEmail({
-              recipient: email,
-              message,
-              subject,
-              token: tokenRef.current,
-              onSuccess: () => {
-                toast.success(
-                  `Task assigned to ${username} with email notification`
-                );
-              },
-              onError: (error) => {
-                // The task was created but email notification failed
-                toast.warning(
-                  `Task assigned to ${username}, but email notification failed: ${error}`
-                );
-              }
-            });
-
-            // Track task creation with posthog
-            posthog.capture("answerer_task_created", {
-              bidId: object_id,
-              sectionId: section.section_id,
-              sectionHeading: section.heading,
-              reviewer: username,
-              emailSent: true
-            });
-          } else {
-            console.error("Error creating answer task:", response.data.error);
-            toast.error("Failed to assign task to answerer");
+      // Create the task
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
+        taskData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
           }
-        } catch (error) {
-          console.error("Error creating task for answerer:", error);
-          toast.error("Failed to assign task to answerer");
         }
-      }
-    };
+      );
 
-    const handleReviewerSelect = async (user) => {
-      // Extract the username and email from the user object
-      const username = user.username || "";
-      const email = user.email || "";
+      if (response.data.success) {
+        // Task created successfully, now send email notification
+        const bidTitle = sharedState.bidInfo || "Untitled Bid";
+        const message = `You have been assigned to answer the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
+        const subject = `New Answer Task: ${section.heading}`;
 
-      // Skip if no email is provided
-      if (!email) {
-        handleSectionChange(index, "reviewer", username);
-        return;
-      }
-
-      // First update the section with the new reviewer
-      const success = await handleSectionChange(index, "reviewer", username);
-
-      if (success) {
-        // After successfully setting the reviewer, create a task for them
-        try {
-          const taskData = {
-            name: `Review section: ${section.heading}`,
-            bid_id: object_id,
-            index: index
-          };
-
-          // Create the task
-          const response = await axios.post(
-            `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
-            taskData,
-            {
-              headers: {
-                Authorization: `Bearer ${tokenRef.current}`
-              }
-            }
-          );
-
-          if (response.data.success) {
-            // Task created successfully, now send email notification
-            const bidTitle = sharedState.bidInfo || "Untitled Bid";
-            const message = `You have been assigned to review the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
-            const subject = `New Review Task: ${section.heading}`;
-
-            // Send the email notification
-            await sendOrganizationEmail({
-              recipient: email,
-              message,
-              subject,
-              token: tokenRef.current,
-              onSuccess: () => {
-                toast.success(
-                  `Task assigned to ${username} with email notification`
-                );
-              },
-              onError: (error) => {
-                // The task was created but email notification failed
-                toast.warning(
-                  `Task assigned to ${username}, but email notification failed: ${error}`
-                );
-              }
-            });
-
-            // Track task creation with posthog
-            posthog.capture("reviewer_task_created", {
-              bidId: object_id,
-              sectionId: section.section_id,
-              sectionHeading: section.heading,
-              reviewer: username,
-              emailSent: true
-            });
-          } else {
-            console.error("Error creating reviewer task:", response.data.error);
-            toast.error("Failed to assign task to reviewer");
+        // Send the email notification
+        await sendOrganizationEmail({
+          recipient: email,
+          message,
+          subject,
+          token: tokenRef.current,
+          onSuccess: () => {
+            toast.success(
+              `Task assigned to ${username} with email notification`
+            );
+          },
+          onError: (error) => {
+            // The task was created but email notification failed
+            toast.warning(
+              `Task assigned to ${username}, but email notification failed: ${error}`
+            );
           }
-        } catch (error) {
-          console.error("Error creating task for reviewer:", error);
-          toast.error("Failed to assign task to reviewer");
-        }
-      }
-    };
+        });
 
+        // Track task creation with posthog
+        posthog.capture("answerer_task_created", {
+          bidId: object_id,
+          sectionId: section.section_id,
+          sectionHeading: section.heading,
+          answerer: username,
+          emailSent: true
+        });
+      } else {
+        console.error("Error creating answer task:", response.data.error);
+        toast.error("Failed to assign task to answerer");
+      }
+    } catch (error) {
+      console.error("Error creating task for answerer:", error);
+      toast.error("Failed to assign task to answerer");
+    }
+  }
+};
+
+// 2. Modified handleReviewerSelect function to include the correct user assignment and priority
+const handleReviewerSelect = async (user) => {
+  // Extract the username and email from the user object
+  const username = user.username || "";
+  const email = user.email || "";
+
+  // Skip if no email is provided
+  if (!email) {
+    handleSectionChange(index, "reviewer", username);
+    return;
+  }
+
+  // First update the section with the new reviewer
+  const success = await handleSectionChange(index, "reviewer", username);
+
+  if (success) {
+    // After successfully setting the reviewer, create a task for them
+    try {
+      const taskData = {
+        name: `Review section: ${section.heading}`,
+        bid_id: object_id,
+        index: index,
+        priority: "high", // Adding priority parameter with higher priority for reviews
+        target_user: username // Adding explicit target_user parameter
+      };
+
+      // Create the task
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
+        taskData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        // Task created successfully, now send email notification
+        const bidTitle = sharedState.bidInfo || "Untitled Bid";
+        const message = `You have been assigned to review the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
+        const subject = `New Review Task: ${section.heading}`;
+
+        // Send the email notification
+        await sendOrganizationEmail({
+          recipient: email,
+          message,
+          subject,
+          token: tokenRef.current,
+          onSuccess: () => {
+            toast.success(
+              `Task assigned to ${username} with email notification`
+            );
+          },
+          onError: (error) => {
+            // The task was created but email notification failed
+            toast.warning(
+              `Task assigned to ${username}, but email notification failed: ${error}`
+            );
+          }
+        });
+
+        // Track task creation with posthog
+        posthog.capture("reviewer_task_created", {
+          bidId: object_id,
+          sectionId: section.section_id,
+          sectionHeading: section.heading,
+          reviewer: username,
+          emailSent: true
+        });
+      } else {
+        console.error("Error creating reviewer task:", response.data.error);
+        toast.error("Failed to assign task to reviewer");
+      }
+    } catch (error) {
+      console.error("Error creating task for reviewer:", error);
+      toast.error("Failed to assign task to reviewer");
+    }
+  }
+};
     const style = {
       transform: CSS.Transform.toString(transform),
       transition,
