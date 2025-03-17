@@ -1011,193 +1011,190 @@ const ProposalPreview = () => {
             <Spinner className="w-8 h-8" />
           </div>
         ) : (
-          <div
-            className={cn(
-              "w-full h-full relative flex justify-center gap-4",
-              sidepaneOpen || evidencePanelOpen ? "pr-96" : ""
-            )}
-          >
-            <div className="rounded-md bg-white w-full max-w-4xl">
-              <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-between gap-2 sticky -top-4 z-10">
-                <span>
-                  {currentSectionIndex !== null
-                    ? `Question ${getSectionHeading(outline[currentSectionIndex].heading)}`
-                    : "Proposal Preview"}
-                </span>
-                <div className="flex gap-2">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="p-1 h-8 flex items-center gap-1"
-                      >
-                        <ParagraphIcon />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-56 p-2">
-                      <div className="grid gap-1">
+          <div className="space-y-2">
+            <div className="flex justify-end pr-8">
+              <Button onClick={handleDownloadDocument}>
+                <Download size={16} />
+                Download
+              </Button>
+            </div>
+            <div
+              className={cn(
+                "w-full h-full relative flex justify-center gap-4",
+                sidepaneOpen || evidencePanelOpen ? "pr-96" : ""
+              )}
+            >
+              <div className="rounded-md bg-white w-full max-w-4xl">
+                <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-between gap-2 sticky -top-4 z-10">
+                  <span>
+                    {currentSectionIndex !== null
+                      ? `Question ${getSectionHeading(outline[currentSectionIndex].heading)}`
+                      : "Proposal Preview"}
+                  </span>
+                  <div className="flex gap-2">
+                    <Popover>
+                      <PopoverTrigger asChild>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => execCommand("formatBlock", "<h1>")}
-                          className="justify-start"
+                          className="p-1 h-8 flex items-center gap-1"
                         >
-                          <Heading1 size={16} className="mr-2" /> Heading 1
+                          <ParagraphIcon />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => execCommand("formatBlock", "<h2>")}
-                          className="justify-start"
-                        >
-                          <Heading2 size={16} className="mr-2" /> Heading 2
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => execCommand("formatBlock", "<h3>")}
-                          className="justify-start"
-                        >
-                          <Heading3 size={16} className="mr-2" /> Heading 3
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => execCommand("formatBlock", "<h4>")}
-                          className="justify-start"
-                        >
-                          <Heading4 size={16} className="mr-2" /> Heading 4
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => execCommand("formatBlock", "<p>")}
-                          className="justify-start"
-                        >
-                          <Type size={16} className="mr-2" /> Paragraph
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleBulletedList}
-                          className="justify-start"
-                        >
-                          <List size={16} className="mr-2" /> Bulleted List
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleNumberedList}
-                          className="justify-start"
-                        >
-                          <ListOrdered size={16} className="mr-2" /> Numbered
-                          List
-                        </Button>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => execCommand("bold")}
-                    className="p-1 h-8"
-                  >
-                    <BoldIcon />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => execCommand("italic")}
-                    className="p-1 h-8"
-                  >
-                    <ItalicIcon />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => execCommand("underline")}
-                    className="p-1 h-8"
-                  >
-                    <UnderlineIcon />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleLink}
-                    className="p-1 h-8"
-                  >
-                    <HyperlinkIcon />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => execCommand("strikeThrough")}
-                    className="p-1 h-8"
-                  >
-                    <StrikeThroughIcon />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleBlockquote}
-                    className="p-1 h-8"
-                  >
-                    <QuoteIcon />
-                  </Button>
-                  <div className="h-6 w-px bg-gray-300 mx-1"></div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => execCommand("justifyLeft")}
-                    className="p-1 h-8"
-                  >
-                    <AlignLeft size={16} className="text-gray-hint_text" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => execCommand("justifyCenter")}
-                    className="p-1 h-8"
-                  >
-                    <AlignCenter size={16} className="text-gray-hint_text" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => execCommand("justifyRight")}
-                    className="p-1 h-8"
-                  >
-                    <AlignRight size={16} className="text-gray-hint_text" />
-                  </Button>
-                  <div className="h-6 w-px bg-gray-300 mx-1"></div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => execCommand("undo")}
-                    className="p-1 h-8"
-                  >
-                    <UndoIcon />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => execCommand("redo")}
-                    className="p-1 h-8"
-                  >
-                    <RedoIcon />
-                  </Button>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleDownloadDocument}
-                    className="text-gray-hint_text flex items-center gap-1"
-                  >
-                    <Download size={16} />
-                    <span>Download</span>
-                  </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-56 p-2">
+                        <div className="grid gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => execCommand("formatBlock", "<h1>")}
+                            className="justify-start"
+                          >
+                            <Heading1 size={16} className="mr-2" /> Heading 1
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => execCommand("formatBlock", "<h2>")}
+                            className="justify-start"
+                          >
+                            <Heading2 size={16} className="mr-2" /> Heading 2
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => execCommand("formatBlock", "<h3>")}
+                            className="justify-start"
+                          >
+                            <Heading3 size={16} className="mr-2" /> Heading 3
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => execCommand("formatBlock", "<h4>")}
+                            className="justify-start"
+                          >
+                            <Heading4 size={16} className="mr-2" /> Heading 4
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => execCommand("formatBlock", "<p>")}
+                            className="justify-start"
+                          >
+                            <Type size={16} className="mr-2" /> Paragraph
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleBulletedList}
+                            className="justify-start"
+                          >
+                            <List size={16} className="mr-2" /> Bulleted List
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleNumberedList}
+                            className="justify-start"
+                          >
+                            <ListOrdered size={16} className="mr-2" /> Numbered
+                            List
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => execCommand("bold")}
+                      className="p-1 h-8"
+                    >
+                      <BoldIcon />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => execCommand("italic")}
+                      className="p-1 h-8"
+                    >
+                      <ItalicIcon />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => execCommand("underline")}
+                      className="p-1 h-8"
+                    >
+                      <UnderlineIcon />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleLink}
+                      className="p-1 h-8"
+                    >
+                      <HyperlinkIcon />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => execCommand("strikeThrough")}
+                      className="p-1 h-8"
+                    >
+                      <StrikeThroughIcon />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleBlockquote}
+                      className="p-1 h-8"
+                    >
+                      <QuoteIcon />
+                    </Button>
+                    <div className="h-6 w-px bg-gray-300 mx-1"></div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => execCommand("justifyLeft")}
+                      className="p-1 h-8"
+                    >
+                      <AlignLeft size={16} className="text-gray-hint_text" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => execCommand("justifyCenter")}
+                      className="p-1 h-8"
+                    >
+                      <AlignCenter size={16} className="text-gray-hint_text" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => execCommand("justifyRight")}
+                      className="p-1 h-8"
+                    >
+                      <AlignRight size={16} className="text-gray-hint_text" />
+                    </Button>
+                    <div className="h-6 w-px bg-gray-300 mx-1"></div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => execCommand("undo")}
+                      className="p-1 h-8"
+                    >
+                      <UndoIcon />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => execCommand("redo")}
+                      className="p-1 h-8"
+                    >
+                      <RedoIcon />
+                    </Button>
+                  </div>
                   <Popover
                     open={versionPopoverOpen}
                     onOpenChange={setVersionPopoverOpen}
@@ -1253,413 +1250,423 @@ const ProposalPreview = () => {
                     </PopoverContent>
                   </Popover>
                 </div>
-              </div>
-              <div
-                className="h-auto relative border-x border-gray-line"
-                ref={editorContainerRef}
-              >
-                {outline.length > 0 ? (
-                  // Display sections from the outline
-                  outline.map((section, index) => (
-                    <div
-                      key={section.section_id}
-                      className={cn(
-                        "border-b border-gray-line relative last:rounded-b-md"
-                      )}
-                    >
-                      <div className="bg-white p-8 relative">
-                        <h2 className="text-xl font-semibold mb-4">
-                          {section.heading}
-                        </h2>
+                <div
+                  className="h-auto relative border-x border-gray-line"
+                  ref={editorContainerRef}
+                >
+                  {outline.length > 0 ? (
+                    // Display sections from the outline
+                    outline.map((section, index) => (
+                      <div
+                        key={section.section_id}
+                        className={cn(
+                          "border-b border-gray-line relative last:rounded-b-md"
+                        )}
+                      >
+                        <div className="bg-white p-8 relative">
+                          <h2 className="text-xl font-semibold mb-4">
+                            {section.heading}
+                          </h2>
 
-                        <div
-                          ref={currentSectionIndex === index ? editorRef : null}
-                          dangerouslySetInnerHTML={{
-                            __html: section.answer || ""
-                          }}
-                          className="font-sans text-base leading-relaxed w-full m-0 outline-none focus:outline-none"
-                          contentEditable={true}
-                          suppressContentEditableWarning={true}
-                          onFocus={() => {
-                            setCurrentSectionIndex(index);
-                          }}
-                          onClick={() => {
-                            if (currentSectionIndex !== index) {
-                              setCurrentSectionIndex(index);
+                          <div
+                            ref={
+                              currentSectionIndex === index ? editorRef : null
                             }
-                          }}
-                        />
-
-                        {/* Inline rewrite feedback section */}
-                        {rewritingSectionIndex === index && (
-                          <div className="flex items-center gap-2 relative border border-gray-200 rounded-md p-2 bg-white shadow-tooltip my-2">
-                            <Input
-                              placeholder="Please type your instructions in here..."
-                              value={rewriteFeedback}
-                              onChange={(e) =>
-                                setRewriteFeedback(e.target.value)
+                            dangerouslySetInnerHTML={{
+                              __html: section.answer || ""
+                            }}
+                            className="font-sans text-base leading-relaxed w-full m-0 outline-none focus:outline-none"
+                            contentEditable={true}
+                            suppressContentEditableWarning={true}
+                            onFocus={() => {
+                              setCurrentSectionIndex(index);
+                            }}
+                            onClick={() => {
+                              if (currentSectionIndex !== index) {
+                                setCurrentSectionIndex(index);
                               }
-                              className="flex-1 border-none outline-none bg-transparent focus-visible:ring-0 shadow-none text-sm h-8 px-2"
-                            />
-                            <div className="flex items-center gap-2">
+                            }}
+                          />
+
+                          {/* Inline rewrite feedback section */}
+                          {rewritingSectionIndex === index && (
+                            <div className="flex items-center gap-2 relative border border-gray-200 rounded-md p-2 bg-white shadow-tooltip my-2">
+                              <Input
+                                placeholder="Please type your instructions in here..."
+                                value={rewriteFeedback}
+                                onChange={(e) =>
+                                  setRewriteFeedback(e.target.value)
+                                }
+                                className="flex-1 border-none outline-none bg-transparent focus-visible:ring-0 shadow-none text-sm h-8 px-2"
+                              />
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    setRewritingSectionIndex(null);
+                                    setRewriteFeedback("");
+                                  }}
+                                >
+                                  <X size={16} />
+                                </Button>
+                                <Button
+                                  onClick={handleRewriteSubmit}
+                                  disabled={
+                                    !rewriteFeedback.trim() ||
+                                    rewritingSection === section.section_id
+                                  }
+                                  size="icon"
+                                  className="h-8 w-8 rounded-full bg-orange-500 hover:bg-orange-600 text-white"
+                                >
+                                  {rewritingSection === section.section_id ? (
+                                    <Spinner />
+                                  ) : (
+                                    <Send />
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Section action buttons */}
+                          <div className="flex gap-2 mt-4">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleCopySection(index)}
+                              className="text-xs text-gray-hint_text"
+                            >
+                              <CopyIcon /> Copy
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleRewriteClick(index)}
+                              disabled={rewritingSection === section.section_id}
+                              className="text-xs text-gray-hint_text"
+                            >
+                              <RedoSparkIcon /> Rewrite
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs text-gray-hint_text"
+                              onClick={() => handleMarkAsReviewReady(index)}
+                            >
+                              <PencilEditCheckIcon />
+                              Mark as Review Ready
+                            </Button>
+
+                            {/* Toggle between Edit and Save buttons */}
+                            {currentSectionIndex === index ? (
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={handleSaveEdit}
+                                className="text-xs ml-auto"
+                              >
+                                <Save size={16} /> Save
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleSectionSelect(index)}
+                                className="text-xs ml-auto"
+                              >
+                                Edit
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Show a meta info box with section details */}
+                        <div className="bg-gray-50 px-4 py-2 text-xs text-gray-600 flex justify-between border-t border-gray-200">
+                          <div>
+                            <span className="font-medium">Status:</span>{" "}
+                            {section.status}
+                          </div>
+                          <div>
+                            <span className="font-medium">Words:</span>{" "}
+                            {section.word_count || 0}
+                          </div>
+                          {section.reviewer && (
+                            <div>
+                              <span className="font-medium">Reviewer:</span>{" "}
+                              {section.reviewer}
+                            </div>
+                          )}
+                          {section.answerer && (
+                            <div>
+                              <span className="font-medium">Answerer:</span>{" "}
+                              {section.answerer}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex justify-center items-center h-full bg-muted p-5 text-center">
+                      <p>
+                        No sections found in the outline. Add sections in the
+                        bid outline tab to start building your proposal.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Selection Menu */}
+                  {showSelectionMenu && (
+                    <div
+                      className="absolute right-1"
+                      style={{
+                        top: `${selectionMenuPosition.top}px`
+                      }}
+                    >
+                      <div className="flex flex-col bg-white shadow-lg rounded-2xl border border-gray-200 z-50 overflow-hidden gap-1 py-2">
+                        <TooltipProvider delayDuration={0}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
                               <Button
                                 variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  setRewritingSectionIndex(null);
-                                  setRewriteFeedback("");
-                                }}
+                                size="sm"
+                                onClick={handleAddComment}
+                                className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
                               >
-                                <X size={16} />
+                                <CommentIcon />
                               </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="left">
+                              Add Comment
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider delayDuration={0}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
                               <Button
-                                onClick={handleRewriteSubmit}
-                                disabled={
-                                  !rewriteFeedback.trim() ||
-                                  rewritingSection === section.section_id
-                                }
-                                size="icon"
-                                className="h-8 w-8 rounded-full bg-orange-500 hover:bg-orange-600 text-white"
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleEvidencePrompt}
+                                className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
                               >
-                                {rewritingSection === section.section_id ? (
-                                  <Spinner />
-                                ) : (
-                                  <Send />
-                                )}
+                                <UpscaleSparkIcon />
                               </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="left">
+                              Evidence
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider delayDuration={0}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleEvidencePrompt}
+                                className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
+                              >
+                                <PencilIcon />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="left">Custom</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider delayDuration={0}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleEvidencePrompt}
+                                className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
+                              >
+                                <ExpandVerticalIcon />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="left">Expand</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider delayDuration={0}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleEvidencePrompt}
+                                className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
+                              >
+                                <ShortenHorizontalIcon />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="left">
+                              Summarise
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {showCommentInput || getCommentsForCurrentSection().length > 0 ? (
+                <div className="h-auto w-72 relative">
+                  {/* Comment Input */}
+                  {showCommentInput && (
+                    <div
+                      className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-[51] p-3 w-72"
+                      style={{
+                        top: `${selectionMenuPosition.top}px`
+                      }}
+                    >
+                      <textarea
+                        className="w-full border border-gray-300 rounded p-2 mb-2 text-sm"
+                        rows={3}
+                        placeholder="Add your comment..."
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                      />
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleCancelComment}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={handleSaveComment}
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Comments Display */}
+                  {getCommentsForCurrentSection().map((comment) => (
+                    <div
+                      key={comment.id}
+                      className={cn(
+                        "transition-all duration-300 w-fit absolute left-0",
+                        activeComment === comment.id &&
+                          "p-2 rounded-md border bg-white border-gray-line shadow-md"
+                      )}
+                      data-comment-id={comment.id}
+                      style={{
+                        top: `${comment.position}px`
+                      }}
+                    >
+                      <div className="flex justify-between items-start w-72">
+                        <div
+                          className="space-y-1 w-full"
+                          onClick={() => highlightCommentAndText(comment.id)}
+                        >
+                          <ProfilePhoto size="sm" showName={true} />
+                          <p className="text-sm cursor-pointer">
+                            {comment.text}
+                          </p>
+
+                          {/* Show reply count when comment is not active */}
+                          {activeComment !== comment.id &&
+                            comment.replies?.length > 0 && (
+                              <p className="text-xs text-gray-hint_text mt-1">
+                                {comment.replies.length === 1
+                                  ? "1 reply"
+                                  : `${comment.replies.length} replies`}
+                              </p>
+                            )}
+                        </div>
+                        {activeComment === comment.id && (
+                          <div className="flex">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleToggleResolution(comment.id);
+                                    }}
+                                    className="group p-0 hover:bg-transparent border-none"
+                                  >
+                                    <Check
+                                      size={16}
+                                      className="group-hover:text-orange"
+                                    />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  Resolve and hide
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Show replies when comment is active */}
+                      {activeComment === comment.id &&
+                        comment.replies.length > 0 && (
+                          <div className="mt-2 border-t border-gray-200 pt-2">
+                            <p className="text-xs font-medium text-gray-hint_text mb-2">
+                              Replies
+                            </p>
+                            <div className="space-y-3">
+                              {comment.replies.map((reply) => (
+                                <div
+                                  key={reply.id}
+                                  className="pl-3 border-l-2 border-gray-200"
+                                >
+                                  <div className="flex flex-col gap-2">
+                                    <ProfilePhoto size="sm" showName={true} />
+                                    <div>
+                                      <p className="text-xs">{reply.text}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           </div>
                         )}
 
-                        {/* Section action buttons */}
-                        <div className="flex gap-2 mt-4">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleCopySection(index)}
-                            className="text-xs text-gray-hint_text"
-                          >
-                            <CopyIcon /> Copy
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleRewriteClick(index)}
-                            disabled={rewritingSection === section.section_id}
-                            className="text-xs text-gray-hint_text"
-                          >
-                            <RedoSparkIcon /> Rewrite
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-xs text-gray-hint_text"
-                            onClick={() => handleMarkAsReviewReady(index)}
-                          >
-                            <PencilEditCheckIcon />
-                            Mark as Review Ready
-                          </Button>
-
-                          {/* Toggle between Edit and Save buttons */}
-                          {currentSectionIndex === index ? (
+                      {activeComment === comment.id ? (
+                        <div className="mt-2 w-full">
+                          <textarea
+                            className="w-full border border-gray-300 rounded p-2 mb-2 text-sm"
+                            rows={2}
+                            placeholder="Add your reply..."
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                          />
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleCancelReply}
+                            >
+                              Cancel
+                            </Button>
                             <Button
                               variant="default"
                               size="sm"
-                              onClick={handleSaveEdit}
-                              className="text-xs ml-auto"
+                              onClick={() => handleSubmitReply(comment.id)}
                             >
-                              <Save size={16} /> Save
+                              Reply
                             </Button>
-                          ) : (
-                            <Button
-                              variant="default"
-                              size="sm"
-                              onClick={() => handleSectionSelect(index)}
-                              className="text-xs ml-auto"
-                            >
-                              Edit
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Show a meta info box with section details */}
-                      <div className="bg-gray-50 px-4 py-2 text-xs text-gray-600 flex justify-between border-t border-gray-200">
-                        <div>
-                          <span className="font-medium">Status:</span>{" "}
-                          {section.status}
-                        </div>
-                        <div>
-                          <span className="font-medium">Words:</span>{" "}
-                          {section.word_count || 0}
-                        </div>
-                        {section.reviewer && (
-                          <div>
-                            <span className="font-medium">Reviewer:</span>{" "}
-                            {section.reviewer}
                           </div>
-                        )}
-                        {section.answerer && (
-                          <div>
-                            <span className="font-medium">Answerer:</span>{" "}
-                            {section.answerer}
-                          </div>
-                        )}
-                      </div>
+                        </div>
+                      ) : null}
                     </div>
-                  ))
-                ) : (
-                  <div className="flex justify-center items-center h-full bg-muted p-5 text-center">
-                    <p>
-                      No sections found in the outline. Add sections in the bid
-                      outline tab to start building your proposal.
-                    </p>
-                  </div>
-                )}
-
-                {/* Selection Menu */}
-                {showSelectionMenu && (
-                  <div
-                    className="absolute right-1"
-                    style={{
-                      top: `${selectionMenuPosition.top}px`
-                    }}
-                  >
-                    <div className="flex flex-col bg-white shadow-lg rounded-2xl border border-gray-200 z-50 overflow-hidden gap-1 py-2">
-                      <TooltipProvider delayDuration={0}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={handleAddComment}
-                              className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
-                            >
-                              <CommentIcon />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="left">
-                            Add Comment
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider delayDuration={0}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={handleEvidencePrompt}
-                              className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
-                            >
-                              <UpscaleSparkIcon />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="left">Evidence</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider delayDuration={0}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={handleEvidencePrompt}
-                              className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
-                            >
-                              <PencilIcon />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="left">Custom</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider delayDuration={0}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={handleEvidencePrompt}
-                              className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
-                            >
-                              <ExpandVerticalIcon />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="left">Expand</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider delayDuration={0}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={handleEvidencePrompt}
-                              className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
-                            >
-                              <ShortenHorizontalIcon />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="left">Summarise</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
-
-            {showCommentInput || getCommentsForCurrentSection().length > 0 ? (
-              <div className="h-auto w-72 relative">
-                {/* Comment Input */}
-                {showCommentInput && (
-                  <div
-                    className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-[51] p-3 w-72"
-                    style={{
-                      top: `${selectionMenuPosition.top}px`
-                    }}
-                  >
-                    <textarea
-                      className="w-full border border-gray-300 rounded p-2 mb-2 text-sm"
-                      rows={3}
-                      placeholder="Add your comment..."
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                    />
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleCancelComment}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={handleSaveComment}
-                      >
-                        Add
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Comments Display */}
-                {getCommentsForCurrentSection().map((comment) => (
-                  <div
-                    key={comment.id}
-                    className={cn(
-                      "transition-all duration-300 w-fit absolute left-0",
-                      activeComment === comment.id &&
-                        "p-2 rounded-md border bg-white border-gray-line shadow-md"
-                    )}
-                    data-comment-id={comment.id}
-                    style={{
-                      top: `${comment.position}px`
-                    }}
-                  >
-                    <div className="flex justify-between items-start w-72">
-                      <div
-                        className="space-y-1 w-full"
-                        onClick={() => highlightCommentAndText(comment.id)}
-                      >
-                        <ProfilePhoto size="sm" showName={true} />
-                        <p className="text-sm cursor-pointer">{comment.text}</p>
-
-                        {/* Show reply count when comment is not active */}
-                        {activeComment !== comment.id &&
-                          comment.replies?.length > 0 && (
-                            <p className="text-xs text-gray-hint_text mt-1">
-                              {comment.replies.length === 1
-                                ? "1 reply"
-                                : `${comment.replies.length} replies`}
-                            </p>
-                          )}
-                      </div>
-                      {activeComment === comment.id && (
-                        <div className="flex">
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleToggleResolution(comment.id);
-                                  }}
-                                  className="group p-0 hover:bg-transparent border-none"
-                                >
-                                  <Check
-                                    size={16}
-                                    className="group-hover:text-orange"
-                                  />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Resolve and hide</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Show replies when comment is active */}
-                    {activeComment === comment.id &&
-                      comment.replies.length > 0 && (
-                        <div className="mt-2 border-t border-gray-200 pt-2">
-                          <p className="text-xs font-medium text-gray-hint_text mb-2">
-                            Replies
-                          </p>
-                          <div className="space-y-3">
-                            {comment.replies.map((reply) => (
-                              <div
-                                key={reply.id}
-                                className="pl-3 border-l-2 border-gray-200"
-                              >
-                                <div className="flex flex-col gap-2">
-                                  <ProfilePhoto size="sm" showName={true} />
-                                  <div>
-                                    <p className="text-xs">{reply.text}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                    {activeComment === comment.id ? (
-                      <div className="mt-2 w-full">
-                        <textarea
-                          className="w-full border border-gray-300 rounded p-2 mb-2 text-sm"
-                          rows={2}
-                          placeholder="Add your reply..."
-                          value={replyText}
-                          onChange={(e) => setReplyText(e.target.value)}
-                        />
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleCancelReply}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => handleSubmitReply(comment.id)}
-                          >
-                            Reply
-                          </Button>
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-            ) : null}
           </div>
         )}
       </div>
@@ -1674,7 +1681,7 @@ const ProposalPreview = () => {
                   variant="ghost"
                   size="icon"
                   onClick={toggleSidepane}
-                  className="[&_svg]:size-6"
+                  className="[&_svg]:size-6 text-gray-hint_text"
                 >
                   <ToolSparkIcon
                     className={cn(sidepaneOpen ? "text-orange" : "")}
@@ -1696,8 +1703,7 @@ const ProposalPreview = () => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" className="[&_svg]:size-6">
@@ -1719,7 +1725,6 @@ const ProposalPreview = () => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -1741,7 +1746,7 @@ const ProposalPreview = () => {
                 </div>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
         </div>
       </div>
 
