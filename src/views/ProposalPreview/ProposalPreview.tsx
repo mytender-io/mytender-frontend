@@ -29,15 +29,17 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover";
-import { TooltipContent } from "@/components/ui/tooltip";
-import { Tooltip } from "@/components/ui/tooltip";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  TooltipContent,
+  Tooltip,
+  TooltipTrigger,
+  TooltipProvider
+} from "@/components/ui/tooltip";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
 import EvidencePanel from "./components/EvidencePanel";
-import CheckDocumentIcon from "@/components/icons/CheckDocumentIcon";
-import ConsultIcon from "@/components/icons/ConsultIcon";
+// import CheckDocumentIcon from "@/components/icons/CheckDocumentIcon";
+// import ConsultIcon from "@/components/icons/ConsultIcon";
 import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 import RedoSparkIcon from "@/components/icons/RedoSparkIcon";
@@ -1195,65 +1197,62 @@ const ProposalPreview = () => {
                       <RedoIcon />
                     </Button>
                   </div>
-                  {true ? (
-                    <div className="w-48"></div>
-                  ) : (
-                    <Popover
-                      open={versionPopoverOpen}
-                      onOpenChange={setVersionPopoverOpen}
-                    >
-                      <PopoverTrigger asChild>
+
+                  <Popover
+                    open={versionPopoverOpen}
+                    onOpenChange={setVersionPopoverOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="text-gray-hint_text [&_svg]:w-3 opacity-0"
+                      >
+                        <span>
+                          {selectedVersion === "version2"
+                            ? "Version 2"
+                            : "Version 1"}
+                        </span>
+                        <ArrowDownIcon />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-48">
+                      <div className="px-3 py-2 border-b border-gray-line">
                         <Button
-                          variant="ghost"
-                          className="text-gray-hint_text [&_svg]:w-3"
+                          className="w-full rounded-2xl"
+                          size="sm"
+                          onClick={() => {
+                            toast.success("New version saved");
+                          }}
                         >
-                          <span>
-                            {selectedVersion === "version2"
-                              ? "Version 2"
-                              : "Version 1"}
-                          </span>
-                          <ArrowDownIcon />
+                          <PlusCircleIcon /> Save Version
                         </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-48">
-                        <div className="px-3 py-2 border-b border-gray-line">
-                          <Button
-                            className="w-full rounded-2xl"
-                            size="sm"
-                            onClick={() => {
-                              toast.success("New version saved");
-                            }}
+                      </div>
+                      <RadioGroup
+                        defaultValue="version2"
+                        value={selectedVersion}
+                        onValueChange={handleSelectVersion}
+                      >
+                        {["version2", "version1"].map((version) => (
+                          <div
+                            className="flex items-center space-x-2 px-3 py-2 cursor-pointer border-b last:border-none border-gray-line"
+                            onClick={() => handleSelectVersion(version)}
                           >
-                            <PlusCircleIcon /> Save Version
-                          </Button>
-                        </div>
-                        <RadioGroup
-                          defaultValue="version2"
-                          value={selectedVersion}
-                          onValueChange={handleSelectVersion}
-                        >
-                          {["version2", "version1"].map((version) => (
-                            <div
-                              className="flex items-center space-x-2 px-3 py-2 cursor-pointer border-b last:border-none border-gray-line"
-                              onClick={() => handleSelectVersion(version)}
-                            >
-                              <RadioGroupItem value={version} id={version} />
-                              <div className="flex flex-col gap-1">
-                                <span className="font-medium text-gray-hint_text">
-                                  {version === "version2"
-                                    ? "Version 2"
-                                    : "Version 1"}
-                                </span>
-                                <span className="text-xs text-gray">
-                                  Created 15 Mar
-                                </span>
-                              </div>
+                            <RadioGroupItem value={version} id={version} />
+                            <div className="flex flex-col gap-1">
+                              <span className="font-medium text-gray-hint_text">
+                                {version === "version2"
+                                  ? "Version 2"
+                                  : "Version 1"}
+                              </span>
+                              <span className="text-xs text-gray">
+                                Created 15 Mar
+                              </span>
                             </div>
-                          ))}
-                        </RadioGroup>
-                      </PopoverContent>
-                    </Popover>
-                  )}
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div
                   className="h-auto relative border-x border-gray-line"

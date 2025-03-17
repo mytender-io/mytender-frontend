@@ -13,6 +13,12 @@ import CopyIcon from "@/components/icons/CopyIcon";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import FileSearchIcon from "@/components/icons/FileSearchIcon";
 import InternetSparkIcon from "@/components/icons/InternetSparkIcon";
+import {
+  TooltipContent,
+  Tooltip,
+  TooltipTrigger,
+  TooltipProvider
+} from "@/components/ui/tooltip";
 
 const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
   const getAuth = useAuthUser();
@@ -253,15 +259,34 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
   return (
     <div className="shadow-lg rounded-2xl w-[450px] flex flex-col h-full bg-white overflow-hidden">
       <div className="p-3 border-b border-gray-100 flex justify-between items-center">
-        <h3 className="font-medium text-center w-full">mytender.io Chat</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 w-6 p-0 absolute right-2"
-          onClick={() => onOpenChange(false)}
-        >
-          <X size={16} />
-        </Button>
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <h3 className="font-medium text-center w-full">
+                mytender.io Chat
+              </h3>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              Get information from your content library, the tender docs or the
+              internet to help when writing
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 absolute right-2"
+                onClick={() => onOpenChange(false)}
+              >
+                <X size={16} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Close</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       <div className="flex flex-col flex-1 overflow-hidden">
@@ -406,47 +431,68 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
             </Button>
           </div>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className={cn(
-                "text-gray-hint_text rounded-2xl",
-                activeChatPrompt === "library" && "bg-gray text-white"
-              )}
-              onClick={() => {
-                setActiveChatPrompt("library");
-              }}
-            >
-              Library
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className={cn(
-                "text-gray-hint_text rounded-2xl",
-                activeChatPrompt === "tender_docs" && "bg-gray text-white"
-              )}
-              onClick={() => {
-                setActiveChatPrompt("tender_docs");
-              }}
-            >
-              <FileSearchIcon />
-              Tender Docs
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className={cn(
-                "text-gray-hint_text rounded-2xl",
-                activeChatPrompt === "internet" && "bg-gray text-white"
-              )}
-              onClick={() => {
-                setActiveChatPrompt("internet");
-              }}
-            >
-              <InternetSparkIcon />
-              Internet
-            </Button>
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "text-gray-hint_text rounded-2xl",
+                      activeChatPrompt === "library" && "bg-gray text-white"
+                    )}
+                    onClick={() => {
+                      setActiveChatPrompt("library");
+                    }}
+                  >
+                    Library
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Search your library</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "text-gray-hint_text rounded-2xl",
+                      activeChatPrompt === "tender_docs" && "bg-gray text-white"
+                    )}
+                    onClick={() => {
+                      setActiveChatPrompt("tender_docs");
+                    }}
+                  >
+                    <FileSearchIcon />
+                    Tender Docs
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Search tender docs</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "text-gray-hint_text rounded-2xl",
+                      activeChatPrompt === "internet" && "bg-gray text-white"
+                    )}
+                    onClick={() => {
+                      setActiveChatPrompt("internet");
+                    }}
+                  >
+                    <InternetSparkIcon />
+                    Internet
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Search the internet</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </div>
