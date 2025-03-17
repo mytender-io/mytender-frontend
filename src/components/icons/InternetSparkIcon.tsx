@@ -41,7 +41,7 @@ const InternetSparkIcon: React.FC<IconProps> = ({
           d="M0.696289 7.07617H9.08136"
           stroke="currentColor"
           strokeWidth="0.67"
-          stroke-miterlimit="10"
+          strokeMiterlimit="10"
           strokeLinecap="round"
           strokeLinejoin="round"
         />

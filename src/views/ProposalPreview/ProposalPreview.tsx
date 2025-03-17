@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/tooltip";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
-import EvidencePanel from "./components/EvidencePanel";
 // import CheckDocumentIcon from "@/components/icons/CheckDocumentIcon";
 // import ConsultIcon from "@/components/icons/ConsultIcon";
 import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
@@ -90,7 +89,7 @@ const ProposalPreview = () => {
       replies: { id: string; text: string; author?: string }[];
     }[]
   >([]);
-  const [evidencePanelOpen, setEvidencePanelOpen] = useState(false);
+  const [promptTarget, setPromptTarget] = useState("");
   const [promptResult, setPromptResult] = useState("");
   const [selectedRange, setSelectedRange] = useState<Range | null>(null);
   const [activeComment, setActiveComment] = useState<string | null>(null);
@@ -99,29 +98,24 @@ const ProposalPreview = () => {
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number | null>(
     null
   );
-
-  const [rewriteDialogOpen, setRewriteDialogOpen] = useState(false);
   const [rewriteFeedback, setRewriteFeedback] = useState("");
   const [rewritingSectionIndex, setRewritingSectionIndex] = useState<
     number | null
   >(null);
-
   const [rewritingSection, setRewritingSection] = useState<string | null>(null);
 
   // Get sections from shared state
   const { isLoading, outline } = sharedState;
 
   const [organizationUsers, setOrganizationUsers] = useState([]);
-
   const [selectedVersion, setSelectedVersion] = useState<string>("version2");
-
   const [versionPopoverOpen, setVersionPopoverOpen] = useState(false);
+  const [isLoadingEvidence, setIsLoadingEvidence] = useState(false);
+
   const handleSelectVersion = (version: string) => {
     setSelectedVersion(version);
     setVersionPopoverOpen(false); // Close the popover when a version is selected
   };
-
-  const [isLoadingEvidence, setIsLoadingEvidence] = useState(false);
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
@@ -203,7 +197,6 @@ const ProposalPreview = () => {
       } finally {
         // Clear the rewriting state
         setRewritingSection(null);
-        setRewriteDialogOpen(false);
         setRewriteFeedback("");
         setRewritingSectionIndex(null);
       }
@@ -707,7 +700,7 @@ const ProposalPreview = () => {
     );
   };
 
-  // Modify the handleEvidencePrompt function
+  // Modify the handleEvidencePrompt function to store the range more reliably
   const handleEvidencePrompt = async () => {
     if (!selectedRange) {
       toast.error("Please select text to find evidence for");
@@ -721,8 +714,41 @@ const ProposalPreview = () => {
       return;
     }
 
-    setEvidencePanelOpen(true); // Open the fixed panel
-    setPromptResult(""); // Clear any previous results
+    setPromptTarget(selectedText);
+    // Store a deep clone of the range for later use
+    const storedRange = selectedRange.cloneRange();
+    setSelectedRange(storedRange);
+
+    // Highlight the selected text with a different color
+    const span = document.createElement("span");
+    span.className = "evidence-text";
+    span.dataset.evidenceId = `evidence-${Date.now()}`;
+    span.style.backgroundColor = "#FFE5CC"; // Light blue background
+
+    try {
+      selectedRange.surroundContents(span);
+    } catch (e) {
+      // If surroundContents fails (which can happen with complex selections),
+      // use a more robust approach that preserves the structure
+      console.log("Using alternative evidence highlighting method");
+
+      // Extract the content
+      const fragment = selectedRange.extractContents();
+
+      // Add the content to our span
+      span.appendChild(fragment);
+
+      // Insert the span
+      selectedRange.insertNode(span);
+    }
+
+    // Apply the style to all child elements
+    const childElements = span.querySelectorAll("*");
+    childElements.forEach((element) => {
+      (element as HTMLElement).style.backgroundColor = "#FFE5CC";
+    });
+
+    setSidepaneOpen(true); // Open the sidepane instead of evidence panel
     setIsLoadingEvidence(true);
 
     try {
@@ -775,29 +801,43 @@ const ProposalPreview = () => {
     }
   };
 
-  // Replace text with prompt result
+  // Update the handleReplaceWithPrompt function to find the evidence span
   const handleReplaceWithPrompt = () => {
-    if (!selectedRange || !promptResult) {
+    if (!promptResult) {
       toast.error("No content to insert");
       return;
     }
 
-    // Insert the evidence text directly without creating a blockquote
     try {
-      // First try to delete the selected content
-      selectedRange.deleteContents();
+      // Find the evidence span that was created
+      const evidenceSpan = document.querySelector("span.evidence-text");
 
-      // Create a text node with the prompt result
-      const textNode = document.createTextNode(promptResult);
+      if (evidenceSpan) {
+        // Create a new range targeting the evidence span
+        const range = document.createRange();
+        range.selectNode(evidenceSpan);
 
-      // Insert the text node at the current selection
-      selectedRange.insertNode(textNode);
+        // Delete the span and its contents
+        range.deleteContents();
 
-      // Close the evidence prompt modal
-      setEvidencePanelOpen(false);
-      setPromptResult("");
+        // Insert the prompt result
+        const textNode = document.createTextNode(promptResult);
+        range.insertNode(textNode);
 
-      toast.success("Text inserted successfully");
+        // Clear the prompt result
+        setPromptResult("");
+
+        toast.success("Text inserted successfully");
+      } else if (selectedRange) {
+        // Fall back to using the stored selectedRange if span not found
+        selectedRange.deleteContents();
+        const textNode = document.createTextNode(promptResult);
+        selectedRange.insertNode(textNode);
+        setPromptResult("");
+        toast.success("Text inserted successfully");
+      } else {
+        toast.error("Could not find the location to insert text");
+      }
     } catch (error) {
       console.error("Error inserting text:", error);
       toast.error("Failed to insert text");
@@ -806,7 +846,6 @@ const ProposalPreview = () => {
 
   // Cancel prompt
   const handleCancelPrompt = () => {
-    setEvidencePanelOpen(false);
     setPromptResult("");
   };
 
@@ -1023,7 +1062,7 @@ const ProposalPreview = () => {
             <div
               className={cn(
                 "w-full h-full relative flex justify-center gap-4",
-                sidepaneOpen || evidencePanelOpen ? "pr-96" : ""
+                sidepaneOpen ? "pr-96" : ""
               )}
             >
               <div className="rounded-md bg-white w-full max-w-4xl">
@@ -1234,6 +1273,7 @@ const ProposalPreview = () => {
                       >
                         {["version2", "version1"].map((version) => (
                           <div
+                            key={version}
                             className="flex items-center space-x-2 px-3 py-2 cursor-pointer border-b last:border-none border-gray-line"
                             onClick={() => handleSelectVersion(version)}
                           >
@@ -1757,7 +1797,7 @@ const ProposalPreview = () => {
       <div
         className={cn(
           "fixed top-[58px] right-16 h-[calc(100vh-66px)] z-50",
-          sidepaneOpen || evidencePanelOpen ? "block" : "none"
+          sidepaneOpen ? "block" : "none"
         )}
       >
         {sidepaneOpen && (
@@ -1765,16 +1805,13 @@ const ProposalPreview = () => {
             bid_id={sharedState.object_id}
             open={sidepaneOpen}
             onOpenChange={setSidepaneOpen}
+            promptTarget={promptTarget}
+            promptResult={promptResult}
+            isLoadingEvidence={isLoadingEvidence}
+            onInsert={handleReplaceWithPrompt}
+            onCancelPrompt={handleCancelPrompt}
           />
         )}
-
-        <EvidencePanel
-          open={evidencePanelOpen}
-          onOpenChange={handleCancelPrompt}
-          isLoading={isLoadingEvidence}
-          promptResult={promptResult}
-          onInsert={handleReplaceWithPrompt}
-        />
       </div>
     </div>
   );

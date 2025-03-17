@@ -20,7 +20,16 @@ import {
   TooltipProvider
 } from "@/components/ui/tooltip";
 
-const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
+const ProposalPreviewSidepane = ({
+  bid_id,
+  open,
+  onOpenChange,
+  promptTarget,
+  promptResult,
+  isLoadingEvidence,
+  onInsert,
+  onCancelPrompt
+}) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -54,6 +63,8 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
 
   const messagesContainerRef = useRef(null);
   const inputRef = useRef(null);
+
+  const [insertedEvidenceIndices, setInsertedEvidenceIndices] = useState([]);
 
   // Focus the input field when the sidepane opens
   useEffect(() => {
@@ -252,6 +263,60 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
     });
   };
 
+  useEffect(() => {
+    if (promptTarget) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { type: "evidence-target", text: promptTarget }
+      ]);
+    }
+  }, [promptTarget]);
+
+  useEffect(() => {
+    if (isLoadingEvidence) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { type: "loading", text: "loading" }
+      ]);
+    }
+    // When loading finishes and we have a result
+    else if (promptResult) {
+      // First remove any loading messages
+      const messagesWithoutLoading = messages.filter(
+        (msg) => msg.text !== "loading"
+      );
+      // Then add the evidence message
+      setMessages([
+        ...messagesWithoutLoading,
+        { type: "evidence", text: promptResult }
+      ]);
+    }
+  }, [isLoadingEvidence, promptResult, promptTarget]);
+
+  // Modify the handleCancelEvidence function
+  const handleCancelEvidence = (messageIndex) => {
+    // Find the index of the evidence-target message that corresponds to this evidence
+    const targetIndex = messages.findIndex(
+      (msg, idx) => idx < messageIndex && msg.type === "evidence-target"
+    );
+
+    // Remove both the evidence message and its corresponding evidence-target
+    setMessages((prevMessages) =>
+      prevMessages.filter(
+        (_, index) => index !== messageIndex && index !== targetIndex
+      )
+    );
+
+    // Call the parent component's cancel handler
+    onCancelPrompt();
+  };
+
+  // Add a new function to handle insert and track the inserted evidence
+  const handleInsertEvidence = (index) => {
+    setInsertedEvidenceIndices((prev) => [...prev, index]);
+    onInsert();
+  };
+
   // If not open, return null
   if (!open) return null;
 
@@ -294,28 +359,29 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
           <div className="relative flex flex-col justify-between space-y-4 h-full">
             <div
               ref={messagesContainerRef}
-              className="flex flex-col flex-1 w-full max-w-4xl mx-auto overflow-y-auto scrollbar-none"
+              className="flex flex-col flex-1 w-full max-w-4xl mx-auto overflow-y-auto space-y-4"
             >
               {messages.map((message, index) => (
                 <div
                   key={index}
                   className={cn(
                     "group flex min-w-[50px] p-2 rounded-xl items-start gap-3 text-black",
-                    message.type === "user"
-                      ? "bg-gray-light self-end max-w-xl mb-4"
+                    message.type === "user" ||
+                      message.type === "evidence-target"
+                      ? "bg-gray-light self-end max-w-xl w-5/6"
                       : "bg-transparent"
                   )}
                 >
                   <div className="flex-1 flex flex-col">
                     {message.text === "loading" ? (
                       <div className="flex justify-start items-center h-full text-2xl tracking-wider leading-none font-semibold">
-                        <span className="animate-[blink_1.4s_infinite] text-black">
+                        <span className="animate-[blink_1.4s_infinite] text-orange">
                           .
                         </span>
-                        <span className="animate-[blink_1.4s_infinite_0.2s] text-black">
+                        <span className="animate-[blink_1.4s_infinite_0.2s] text-orange">
                           .
                         </span>
-                        <span className="animate-[blink_1.4s_infinite_0.4s] text-black">
+                        <span className="animate-[blink_1.4s_infinite_0.4s] text-orange">
                           .
                         </span>
                       </div>
@@ -323,6 +389,11 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
                       <>
                         <div className="flex items-center gap-2">
                           <div
+                            className={
+                              message.type === "evidence-target"
+                                ? "italic border-l-2 border-orange pl-2"
+                                : ""
+                            }
                             dangerouslySetInnerHTML={{
                               __html:
                                 isTyping && index === messages.length - 1
@@ -390,6 +461,36 @@ const ProposalPreviewSidepane = ({ bid_id, open, onOpenChange }) => {
                               onClick={() => handleFeedback(index, "negative")}
                             >
                               <ThumbdownIcon />
+                            </Button>
+                          </div>
+                        )}
+                        {message.type === "evidence-target" && (
+                          <span className="text-gray-hint_text mt-2">
+                            Evidence
+                          </span>
+                        )}
+                        {/* Add insert button for evidence messages */}
+                        {message.type === "evidence" && (
+                          <div className="flex gap-1 mt-3">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleCancelEvidence(index)}
+                              className="text-gray-hint_text"
+                              disabled={insertedEvidenceIndices.includes(index)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => handleInsertEvidence(index)}
+                              className="bg-orange-500 hover:bg-orange-600 text-white"
+                              disabled={insertedEvidenceIndices.includes(index)}
+                            >
+                              {insertedEvidenceIndices.includes(index)
+                                ? "Inserted"
+                                : "Insert"}
                             </Button>
                           </div>
                         )}
