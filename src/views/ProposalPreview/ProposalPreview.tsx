@@ -18,7 +18,10 @@ import {
   AlignRight,
   Type,
   Save,
-  Check
+  Check,
+  Download,
+  X,
+  Send
 } from "lucide-react";
 import "./ProposalPreview.css";
 import {
@@ -50,15 +53,7 @@ import UnderlineIcon from "@/components/icons/UnderlineIcon";
 import ItalicIcon from "@/components/icons/ItalicIcon";
 import BoldIcon from "@/components/icons/BoldIcon";
 import ParagraphIcon from "@/components/icons/ParagraphIcon";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import PlusCircleIcon from "@/components/icons/PlusCircleIcon";
 import ArrowDownIcon from "@/components/icons/ArrowDownIcon";
@@ -77,7 +72,6 @@ const ProposalPreview = () => {
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState, setSharedState } = useContext(BidContext);
-  const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
   const [showSelectionMenu, setShowSelectionMenu] = useState(false);
   const [selectionMenuPosition, setSelectionMenuPosition] = useState({
     top: 0
@@ -159,17 +153,6 @@ const ProposalPreview = () => {
     setSidepaneOpen((prevState) => !prevState);
   };
 
-  // const handleWordDownload = async () => {
-  //   if (docUrl) {
-  //     const link = document.createElement("a");
-  //     link.href = docUrl;
-  //     link.download = `proposal_${sharedState.bidInfo || "document"}.docx`;
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //   }
-  // };
-
   // 3. Add this function to handle rewrite submission
 
   // 2. Update the handleRewriteSubmit function to use section-specific loading
@@ -226,8 +209,14 @@ const ProposalPreview = () => {
   };
 
   const handleRewriteClick = (index: number) => {
-    setRewritingSectionIndex(index);
-    setRewriteDialogOpen(true);
+    // Toggle the rewrite section if clicking on the same section
+    if (rewritingSectionIndex === index) {
+      setRewritingSectionIndex(null);
+      setRewriteFeedback("");
+    } else {
+      setRewritingSectionIndex(index);
+      setRewriteFeedback("");
+    }
   };
 
   const handleMarkAsReviewReady = async (index: number) => {
@@ -332,7 +321,7 @@ const ProposalPreview = () => {
   };
 
   const handleSaveEdit = () => {
-    if (editorRef.current && editingSectionId && currentSectionIndex !== null) {
+    if (editorRef.current && currentSectionIndex !== null) {
       // Create a copy of the outline
       const updatedOutline = [...outline];
 
@@ -349,7 +338,7 @@ const ProposalPreview = () => {
       }));
 
       toast.success("Changes saved successfully");
-      setEditingSectionId(null);
+      setCurrentSectionIndex(null);
     }
   };
 
@@ -929,7 +918,89 @@ const ProposalPreview = () => {
 
   const handleSectionSelect = (index: number) => {
     setCurrentSectionIndex(index);
-    setEditingSectionId(outline[index].section_id);
+  };
+
+  // Add this function to handle document download
+  const handleDownloadDocument = () => {
+    if (!outline || outline.length === 0) {
+      toast.error("No content to download");
+      return;
+    }
+
+    try {
+      // Create a temporary div to hold the formatted document
+      const tempDiv = document.createElement("div");
+      tempDiv.className = "proposal-document";
+
+      // Add some basic styling to the container
+      tempDiv.style.fontFamily = "Arial, sans-serif";
+
+      // Add a title to the document
+      const title = document.createElement("h1");
+      title.textContent = sharedState.bidInfo || "Proposal Document";
+      title.style.textAlign = "center";
+      title.style.marginBottom = "30px";
+      tempDiv.appendChild(title);
+
+      // Add each section to the document
+      outline.forEach((section) => {
+        // Add section heading
+        const heading = document.createElement("h2");
+        heading.textContent = section.heading;
+        heading.style.marginTop = "30px";
+        heading.style.marginBottom = "15px";
+        heading.style.borderBottom = "1px solid #ddd";
+        heading.style.paddingBottom = "10px";
+        tempDiv.appendChild(heading);
+
+        // Add section content
+        const content = document.createElement("div");
+        content.innerHTML = section.answer || "";
+        tempDiv.appendChild(content);
+      });
+
+      // Get the HTML content
+      const htmlContent = tempDiv.outerHTML;
+
+      // Create a Blob with the HTML content
+      const blob = new Blob(
+        [
+          "<html><head><title>" +
+            (sharedState.bidInfo || "Proposal Document") +
+            "</title></head><body>" +
+            htmlContent +
+            "</body></html>"
+        ],
+        { type: "text/html" }
+      );
+
+      // Create a download link
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${sharedState.bidInfo || "proposal"}.docx`;
+
+      // Trigger the download
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+
+      toast.success("Downloading document...");
+
+      // Track download with posthog
+      posthog.capture("proposal_document_downloaded", {
+        bidId: sharedState.object_id,
+        format: "html"
+      });
+    } catch (error) {
+      console.error("Error downloading document:", error);
+      toast.error("Failed to download document");
+    }
   };
 
   return (
@@ -1118,6 +1189,15 @@ const ProposalPreview = () => {
                   </Button>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleDownloadDocument}
+                    className="text-gray-hint_text flex items-center gap-1"
+                  >
+                    <Download size={16} />
+                    <span>Download</span>
+                  </Button>
                   <Popover
                     open={versionPopoverOpen}
                     onOpenChange={setVersionPopoverOpen}
@@ -1184,8 +1264,7 @@ const ProposalPreview = () => {
                     <div
                       key={section.section_id}
                       className={cn(
-                        "border-b border-gray-line relative last:rounded-b-md",
-                        editingSectionId === section.section_id && "bg-gray-50"
+                        "border-b border-gray-line relative last:rounded-b-md"
                       )}
                     >
                       <div className="bg-white p-8 relative">
@@ -1194,31 +1273,63 @@ const ProposalPreview = () => {
                         </h2>
 
                         <div
-                          ref={
-                            editingSectionId === section.section_id &&
-                            currentSectionIndex === index
-                              ? editorRef
-                              : null
-                          }
+                          ref={currentSectionIndex === index ? editorRef : null}
                           dangerouslySetInnerHTML={{
                             __html: section.answer || ""
                           }}
                           className="font-sans text-base leading-relaxed w-full m-0 outline-none focus:outline-none"
-                          contentEditable={
-                            editingSectionId === section.section_id &&
-                            currentSectionIndex === index
-                          }
+                          contentEditable={true}
                           suppressContentEditableWarning={true}
                           onFocus={() => {
-                            setEditingSectionId(section.section_id);
                             setCurrentSectionIndex(index);
                           }}
                           onClick={() => {
-                            if (editingSectionId !== section.section_id) {
-                              handleSectionSelect(index);
+                            if (currentSectionIndex !== index) {
+                              setCurrentSectionIndex(index);
                             }
                           }}
                         />
+
+                        {/* Inline rewrite feedback section */}
+                        {rewritingSectionIndex === index && (
+                          <div className="flex items-center gap-2 relative border border-gray-200 rounded-md p-2 bg-white shadow-tooltip my-2">
+                            <Input
+                              placeholder="Please type your instructions in here..."
+                              value={rewriteFeedback}
+                              onChange={(e) =>
+                                setRewriteFeedback(e.target.value)
+                              }
+                              className="flex-1 border-none outline-none bg-transparent focus-visible:ring-0 shadow-none text-sm h-8 px-2"
+                            />
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  setRewritingSectionIndex(null);
+                                  setRewriteFeedback("");
+                                }}
+                              >
+                                <X size={16} />
+                              </Button>
+                              <Button
+                                onClick={handleRewriteSubmit}
+                                disabled={
+                                  !rewriteFeedback.trim() ||
+                                  rewritingSection === section.section_id
+                                }
+                                size="icon"
+                                className="h-8 w-8 rounded-full bg-orange-500 hover:bg-orange-600 text-white"
+                              >
+                                {rewritingSection === section.section_id ? (
+                                  <Spinner />
+                                ) : (
+                                  <Send />
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                        )}
 
                         {/* Section action buttons */}
                         <div className="flex gap-2 mt-4">
@@ -1237,16 +1348,7 @@ const ProposalPreview = () => {
                             disabled={rewritingSection === section.section_id}
                             className="text-xs text-gray-hint_text"
                           >
-                            {rewritingSection === section.section_id ? (
-                              <>
-                                <Spinner className="w-3 h-3 mr-1" />{" "}
-                                Rewriting...
-                              </>
-                            ) : (
-                              <>
-                                <RedoSparkIcon /> Rewrite
-                              </>
-                            )}
+                            <RedoSparkIcon /> Rewrite
                           </Button>
                           <Button
                             variant="outline"
@@ -1259,8 +1361,7 @@ const ProposalPreview = () => {
                           </Button>
 
                           {/* Toggle between Edit and Save buttons */}
-                          {editingSectionId === section.section_id &&
-                          currentSectionIndex === index ? (
+                          {currentSectionIndex === index ? (
                             <Button
                               variant="default"
                               size="sm"
@@ -1332,7 +1433,7 @@ const ProposalPreview = () => {
                               variant="ghost"
                               size="sm"
                               onClick={handleAddComment}
-                              className="p-2 flex flex-col items-center text-xs"
+                              className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
                             >
                               <CommentIcon />
                             </Button>
@@ -1349,7 +1450,7 @@ const ProposalPreview = () => {
                               variant="ghost"
                               size="sm"
                               onClick={handleEvidencePrompt}
-                              className="p-2 flex flex-col items-center text-xs"
+                              className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
                             >
                               <UpscaleSparkIcon />
                             </Button>
@@ -1364,7 +1465,7 @@ const ProposalPreview = () => {
                               variant="ghost"
                               size="sm"
                               onClick={handleEvidencePrompt}
-                              className="p-2 flex flex-col items-center text-xs"
+                              className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
                             >
                               <PencilIcon />
                             </Button>
@@ -1379,7 +1480,7 @@ const ProposalPreview = () => {
                               variant="ghost"
                               size="sm"
                               onClick={handleEvidencePrompt}
-                              className="p-2 flex flex-col items-center text-xs"
+                              className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
                             >
                               <ExpandVerticalIcon />
                             </Button>
@@ -1394,7 +1495,7 @@ const ProposalPreview = () => {
                               variant="ghost"
                               size="sm"
                               onClick={handleEvidencePrompt}
-                              className="p-2 flex flex-col items-center text-xs"
+                              className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
                             >
                               <ShortenHorizontalIcon />
                             </Button>
@@ -1573,7 +1674,7 @@ const ProposalPreview = () => {
                   variant="ghost"
                   size="icon"
                   onClick={toggleSidepane}
-                  className="[&_svg]:w-5 [&_svg]:h-5"
+                  className="[&_svg]:size-6"
                 >
                   <ToolSparkIcon
                     className={cn(sidepaneOpen ? "text-orange" : "")}
@@ -1599,11 +1700,7 @@ const ProposalPreview = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="[&_svg]:w-5 [&_svg]:h-5"
-                >
+                <Button variant="ghost" size="icon" className="[&_svg]:size-6">
                   <ConsultIcon />
                 </Button>
               </TooltipTrigger>
@@ -1626,11 +1723,7 @@ const ProposalPreview = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="[&_svg]:w-5 [&_svg]:h-5"
-                >
+                <Button variant="ghost" size="icon" className="[&_svg]:size-6">
                   <CheckDocumentIcon />
                 </Button>
               </TooltipTrigger>
@@ -1674,43 +1767,6 @@ const ProposalPreview = () => {
           onInsert={handleReplaceWithPrompt}
         />
       </div>
-      <Dialog open={rewriteDialogOpen} onOpenChange={setRewriteDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Rewrite Section</DialogTitle>
-            <DialogDescription>
-              Provide feedback on how you'd like this section to be rewritten.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <Textarea
-              placeholder="What would you like to change about this section? For example: 'Make it more concise' or 'Add more details about our technical approach'"
-              value={rewriteFeedback}
-              onChange={(e) => setRewriteFeedback(e.target.value)}
-              className="min-h-[120px]"
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setRewriteDialogOpen(false);
-                setRewriteFeedback("");
-                setRewritingSectionIndex(null);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleRewriteSubmit}
-              disabled={!rewriteFeedback.trim() || rewritingSection !== null}
-            >
-              <RedoSparkIcon className="w-4 h-4 mr-2" />
-              Rewrite
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
