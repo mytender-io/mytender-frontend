@@ -846,6 +846,20 @@ const ProposalPreview = () => {
 
   // Cancel prompt
   const handleCancelPrompt = () => {
+    // Find the evidence span that was created
+    const evidenceSpan = document.querySelector("span.evidence-text");
+
+    if (evidenceSpan) {
+      // Get the text content
+      const textContent = evidenceSpan.textContent || "";
+
+      // Create a text node to replace the span
+      const textNode = document.createTextNode(textContent);
+
+      // Replace the span with its text content
+      evidenceSpan.parentNode?.replaceChild(textNode, evidenceSpan);
+    }
+
     setPromptResult("");
   };
 
