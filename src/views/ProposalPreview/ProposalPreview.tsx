@@ -1475,7 +1475,7 @@ const ProposalPreview = () => {
                         top: `${selectionMenuPosition.top}px`
                       }}
                     >
-                      <div className="flex flex-col bg-white shadow-lg rounded-2xl border border-gray-200 z-50 overflow-hidden gap-1 py-2">
+                      <div className="flex flex-col bg-white shadow-lg rounded-2xl border border-gray-200 z-50 overflow-hidden gap-2 py-2">
                         <TooltipProvider delayDuration={0}>
                           <Tooltip>
                             <TooltipTrigger asChild>
