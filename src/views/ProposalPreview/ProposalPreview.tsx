@@ -1195,60 +1195,65 @@ const ProposalPreview = () => {
                       <RedoIcon />
                     </Button>
                   </div>
-                  <Popover
-                    open={versionPopoverOpen}
-                    onOpenChange={setVersionPopoverOpen}
-                  >
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="text-gray-hint_text [&_svg]:w-3"
-                      >
-                        <span>
-                          {selectedVersion === "version2"
-                            ? "Version 2"
-                            : "Version 1"}
-                        </span>
-                        <ArrowDownIcon />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-48">
-                      <div className="px-3 py-2 border-b border-gray-line">
+                  {true ? (
+                    <div className="w-48"></div>
+                  ) : (
+                    <Popover
+                      open={versionPopoverOpen}
+                      onOpenChange={setVersionPopoverOpen}
+                    >
+                      <PopoverTrigger asChild>
                         <Button
-                          className="w-full rounded-2xl"
-                          onClick={() => {
-                            toast.success("New version saved");
-                          }}
+                          variant="ghost"
+                          className="text-gray-hint_text [&_svg]:w-3"
                         >
-                          <PlusCircleIcon /> Save Version
+                          <span>
+                            {selectedVersion === "version2"
+                              ? "Version 2"
+                              : "Version 1"}
+                          </span>
+                          <ArrowDownIcon />
                         </Button>
-                      </div>
-                      <RadioGroup
-                        defaultValue="version2"
-                        value={selectedVersion}
-                        onValueChange={handleSelectVersion}
-                      >
-                        {["version2", "version1"].map((version) => (
-                          <div
-                            className="flex items-center space-x-2 px-3 py-2 cursor-pointer border-b last:border-none border-gray-line"
-                            onClick={() => handleSelectVersion(version)}
+                      </PopoverTrigger>
+                      <PopoverContent className="w-48">
+                        <div className="px-3 py-2 border-b border-gray-line">
+                          <Button
+                            className="w-full rounded-2xl"
+                            size="sm"
+                            onClick={() => {
+                              toast.success("New version saved");
+                            }}
                           >
-                            <RadioGroupItem value={version} id={version} />
-                            <div className="flex flex-col gap-1">
-                              <span className="font-medium text-gray-hint_text">
-                                {version === "version2"
-                                  ? "Version 2"
-                                  : "Version 1"}
-                              </span>
-                              <span className="text-xs text-gray">
-                                Created 15 Mar
-                              </span>
+                            <PlusCircleIcon /> Save Version
+                          </Button>
+                        </div>
+                        <RadioGroup
+                          defaultValue="version2"
+                          value={selectedVersion}
+                          onValueChange={handleSelectVersion}
+                        >
+                          {["version2", "version1"].map((version) => (
+                            <div
+                              className="flex items-center space-x-2 px-3 py-2 cursor-pointer border-b last:border-none border-gray-line"
+                              onClick={() => handleSelectVersion(version)}
+                            >
+                              <RadioGroupItem value={version} id={version} />
+                              <div className="flex flex-col gap-1">
+                                <span className="font-medium text-gray-hint_text">
+                                  {version === "version2"
+                                    ? "Version 2"
+                                    : "Version 1"}
+                                </span>
+                                <span className="text-xs text-gray">
+                                  Created 15 Mar
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                    </PopoverContent>
-                  </Popover>
+                          ))}
+                        </RadioGroup>
+                      </PopoverContent>
+                    </Popover>
+                  )}
                 </div>
                 <div
                   className="h-auto relative border-x border-gray-line"
