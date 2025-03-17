@@ -148,7 +148,7 @@ const Bid = () => {
       <div
         className={cn(
           "flex items-center justify-between w-full border-b border-typo-200 pl-6 py-2 min-h-14",
-          activeTab === "/proposal-preview" ? "pr-16" : "pr-6"
+          "pr-6"
         )}
       >
         <BreadcrumbNavigation

@@ -1361,12 +1361,12 @@ const ProposalPreview = () => {
                                     rewritingSection === section.section_id
                                   }
                                   size="icon"
-                                  className="h-8 w-8 rounded-full bg-orange-500 hover:bg-orange-600 text-white"
+                                  className="h-8 w-8 rounded-full"
                                 >
                                   {rewritingSection === section.section_id ? (
-                                    <Spinner />
+                                    <Spinner className="text-white" />
                                   ) : (
-                                    <Send />
+                                    <Send className="text-white" />
                                   )}
                                 </Button>
                               </div>
