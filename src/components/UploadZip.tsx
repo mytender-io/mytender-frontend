@@ -44,6 +44,7 @@ const UploadZip: React.FC<UploadZipProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -95,6 +96,9 @@ const UploadZip: React.FC<UploadZipProps> = ({
   };
 
   const handleFile = (newFile: File) => {
+    // Clear any previous error messages when selecting a new file
+    setErrorMessage(null);
+
     if (isZipFile(newFile)) {
       setSelectedFile(newFile);
       posthog.capture("zip_upload_file_selected", {
@@ -109,7 +113,6 @@ const UploadZip: React.FC<UploadZipProps> = ({
     }
   };
 
-  // Update the uploadFile function in the UploadZip component to handle the specific error
   const uploadFile = async (): Promise<UploadResult> => {
     if (!selectedFile) {
       throw new Error("No file selected");
@@ -169,15 +172,30 @@ const UploadZip: React.FC<UploadZipProps> = ({
       return { data: response.data };
     } catch (error) {
       clearInterval(progressInterval);
+      setUploadProgress(0); // Reset progress on error
       console.error("Error uploading zip file:", error);
 
       // Extract the specific error message from the backend response
       let errorMessage = "Error uploading ZIP file";
 
       if (error.response) {
-        if (error.response.data && error.response.data.detail) {
-          // Extract error details from the response
+        // Handle specific error status codes
+        if (error.response.status === 403) {
+          // Permission error (non-owner trying to upload)
+          errorMessage =
+            error.response.data?.detail ||
+            "Permission denied: Only owners can upload to content library";
+
+          // Track specific permission errors in analytics
+          posthog.capture("zip_upload_permission_error", {
+            fileName: selectedFile.name,
+            errorDetail: errorMessage
+          });
+        } else if (error.response.data?.detail) {
+          // Other errors with detail messages from backend
           errorMessage = error.response.data.detail;
+        } else if (error.response.status === 413) {
+          errorMessage = "File too large. Please upload a smaller ZIP file.";
         }
       }
 
@@ -187,13 +205,14 @@ const UploadZip: React.FC<UploadZipProps> = ({
     }
   };
 
-  // Update the handleUpload function to display the specific error message
   const handleUpload = async () => {
     if (!selectedFile) {
       toast.error("No ZIP file selected");
       return;
     }
 
+    // Clear any previous error message
+    setErrorMessage(null);
     setIsUploading(true);
 
     try {
@@ -226,15 +245,23 @@ const UploadZip: React.FC<UploadZipProps> = ({
     } catch (error) {
       console.error("Error in upload:", error);
       setUploadProgress(0);
-      setSelectedFile(null);
 
-      // Display the specific error message from the backend
+      // Set the error message for display in the UI
+      setErrorMessage(error.message || "Error uploading ZIP file");
+
+      // Display the specific error message from the backend as a toast notification
       toast.error(error.message || "Error uploading ZIP file");
 
       posthog.capture("zip_upload_failed", {
         fileName: selectedFile?.name,
         error: error.message
       });
+
+      // Keep the selected file so the user can try again if needed
+      // Only clear the selection for permission errors as they won't be resolvable by retrying
+      if (error.message === "Only owners can upload to content library") {
+        setSelectedFile(null);
+      }
     } finally {
       setIsUploading(false);
     }
@@ -268,10 +295,23 @@ const UploadZip: React.FC<UploadZipProps> = ({
   };
 
   return (
-    <div className="bg-white rounded shadow-sm ">
+    <div className="bg-white rounded shadow-sm">
       {descriptionText ? (
         <p className="font-medium my-4 mt-0">{descriptionText}</p>
       ) : null}
+
+      {/* Display error message with additional guidance for permission errors */}
+      {errorMessage && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600">
+          <p className="text-sm font-medium">{errorMessage}</p>
+          {errorMessage === "Only owners can upload to content library" && (
+            <p className="text-xs mt-1">
+              Please contact your organization owner to get upload permissions.
+            </p>
+          )}
+        </div>
+      )}
+
       <div
         className={cn(
           "border-2 border-dashed border-gray-300 rounded-lg p-5 text-center relative",

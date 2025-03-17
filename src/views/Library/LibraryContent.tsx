@@ -348,14 +348,47 @@ const LibraryContent = () => {
           `Error creating ${parentFolder ? "subfolder" : "folder"}:`,
           error
         );
-        toast.error(
-          `Error, ${parentFolder ? "subfolder" : "folder"} limit reached. Try using a shorter folder name...`
-        );
+
+        // Extract the error message
+        let errorMessage = "";
+
+        // Check for specific permission error
+        if (error.response) {
+          if (error.response.status === 403) {
+            // Get the detail message from the error response
+            errorMessage =
+              error.response.data?.detail ||
+              "Permission denied: Only owners can upload to content library";
+
+            // Display the permission error message
+            toast.error(errorMessage);
+          } else if (error.response.data?.detail) {
+            // Get other error details from the response
+            errorMessage = error.response.data.detail;
+            toast.error(errorMessage);
+          } else {
+            // Generic error message as fallback
+            toast.error(
+              `Failed to create ${parentFolder ? "subfolder" : "folder"}`
+            );
+          }
+        } else {
+          // Network or other error without response
+          toast.error(
+            `Failed to create ${parentFolder ? "subfolder" : "folder"}`
+          );
+        }
+
+        // Only display the folder limit error for non-permission errors
+        if (errorMessage && !errorMessage.includes("Only owners can upload")) {
+          toast.error(
+            `Error, ${parentFolder ? "subfolder" : "folder"} limit reached. Try using a shorter folder name...`
+          );
+        }
       }
     },
     [tokenRef, fetchFolderStructure, fetchFolderContents, setActiveFolder]
   );
-
   const handleOnClose = () => {
     setShowPDFModal(false);
     fetchFolderStructure();
@@ -595,7 +628,7 @@ const LibraryContent = () => {
       formData.append("profile_name", folderTitle);
 
       try {
-        await axios.post(
+        const response = await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/delete_template/`,
           formData,
           {
@@ -608,21 +641,48 @@ const LibraryContent = () => {
 
         handleGAEvent("Library", "Delete Folder", "Delete Folder Button");
         setUpdateTrigger((prev) => prev + 1);
-        //console.log("folder deleted");
+
+        // Refresh folder structure and contents
         await fetchFolderStructure();
 
-        // If we're creating a subfolder, refresh the contents of the parent folder
+        // If we're deleting a subfolder, refresh the contents of the parent folder
         if (parentFolder) {
           await fetchFolderContents(parentFolder);
         } else {
-          // If we're creating a top-level folder, refresh the root folder contents
+          // If we're deleting a top-level folder, refresh the root folder contents
           setActiveFolder(null);
           await fetchFolderContents("");
         }
 
         setUpdateTrigger((prev) => prev + 1);
+        toast.success("Folder deleted successfully");
       } catch (error) {
         console.error("Error deleting folder:", error);
+
+        // Extract specific error message if available
+        let errorMessage = "Failed to delete folder";
+
+        if (error.response) {
+          if (error.response.status === 403) {
+            // Permission error
+            errorMessage =
+              error.response.data?.detail ||
+              "Only owners can delete folders from content library";
+
+            // Track permission error
+            posthog.capture("folder_deletion_permission_error", {
+              folderTitle,
+              parentFolder,
+              errorDetail: errorMessage
+            });
+          } else if (error.response.data?.detail) {
+            // Other error with details
+            errorMessage = error.response.data.detail;
+          }
+        }
+
+        // Display the error message to the user
+        toast.error(errorMessage);
       }
     },
     [tokenRef, fetchFolderStructure, fetchFolderContents, setActiveFolder]

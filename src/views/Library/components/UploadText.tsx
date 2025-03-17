@@ -82,16 +82,30 @@ const UploadText = ({ folder, get_collections, onClose }) => {
     } catch (error) {
       console.error("Error saving strategy:", error);
 
-      if (error.response && error.response.status === 409) {
-        toast.error("A file with this name already exists in this folder");
+      if (error.response) {
+        // Check for specific error status codes and messages
+        if (error.response.status === 409) {
+          toast.error("A file with this name already exists in this folder");
+        } else if (error.response.status === 403) {
+          // Handle the permission error for non-owners
+          toast.error(
+            error.response.data.detail ||
+              "Only owners can upload to content library"
+          );
+        } else {
+          // For any other HTTP error, try to use the server message if available
+          toast.error(error.response.data.detail || "Failed to save");
+        }
       } else {
-        toast.error("Failed to save");
+        // For network errors or other issues
+        toast.error(
+          "Failed to save. Please check your connection and try again."
+        );
       }
     } finally {
       setIsUploading(false); // Set isUploading to false when the upload ends
     }
   };
-
   const formatDisplayName = (name) => {
     return name.replace(/_/g, " ").replace(/FORWARDSLASH/g, "/");
   };
