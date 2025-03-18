@@ -313,7 +313,6 @@ const CaseStudies = () => {
         if (parentFolder) {
           formData.append("parent_folder", parentFolder);
         }
-
         const response = await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/create_upload_folder_case_studies`,
           formData,
@@ -324,15 +323,12 @@ const CaseStudies = () => {
             }
           }
         );
-
         if (response.data.message === "Folder created successfully") {
           toast.success(
             `${parentFolder ? "Subfolder" : "Folder"} created successfully`
           );
-
           // Refresh the folder structure
           await fetchFolderStructure();
-
           // If we're creating a subfolder, refresh the contents of the parent folder
           if (parentFolder) {
             await fetchFolderContents(parentFolder);
@@ -341,7 +337,6 @@ const CaseStudies = () => {
             setActiveFolder(null);
             await fetchFolderContents("");
           }
-
           setUpdateTrigger((prev) => prev + 1);
           setShowNewFolderModal(false);
         } else {
@@ -354,9 +349,10 @@ const CaseStudies = () => {
           `Error creating ${parentFolder ? "subfolder" : "folder"}:`,
           error
         );
-        toast.error(
-          `Error, ${parentFolder ? "subfolder" : "folder"} limit reached. Try using a shorter folder name...`
-        );
+        // Extract the detailed error message from the response
+        const errorMessage = error.response?.data?.detail || 
+          `Error creating ${parentFolder ? "subfolder" : "folder"}`;
+        toast.error(errorMessage);
       }
     },
     [tokenRef, fetchFolderStructure, fetchFolderContents, setActiveFolder]
@@ -575,7 +571,6 @@ const CaseStudies = () => {
   const deleteDocument = async (uniqueId) => {
     const formData = new FormData();
     formData.append("unique_id", uniqueId);
-
     try {
       await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/delete_template_entry/`,
@@ -587,19 +582,21 @@ const CaseStudies = () => {
           }
         }
       );
-
       handleGAEvent("Library", "Delete Document", "Delete Document Button");
       setUpdateTrigger((prev) => prev + 1);
+      toast.success("Document deleted successfully");
     } catch (error) {
       console.error("Error deleting document:", error);
+      // Extract the detail error message from the response
+      const errorMessage = error.response?.data?.detail || "Error deleting document";
+      toast.error(errorMessage);
     }
   };
-
+  
   const deleteFolder = useCallback(
     async (folderTitle, parentFolder = null) => {
       const formData = new FormData();
       formData.append("profile_name", folderTitle);
-
       try {
         await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/delete_template/`,
@@ -611,24 +608,24 @@ const CaseStudies = () => {
             }
           }
         );
-
         handleGAEvent("Library", "Delete Folder", "Delete Folder Button");
         setUpdateTrigger((prev) => prev + 1);
-        //console.log("folder deleted");
         await fetchFolderStructure();
-
-        // If we're creating a subfolder, refresh the contents of the parent folder
+        // If we're deleting a subfolder, refresh the contents of the parent folder
         if (parentFolder) {
           await fetchFolderContents(parentFolder);
         } else {
-          // If we're creating a top-level folder, refresh the root folder contents
+          // If we're deleting a top-level folder, refresh the root folder contents
           setActiveFolder(null);
           await fetchFolderContents("");
         }
-
         setUpdateTrigger((prev) => prev + 1);
+        toast.success("Folder deleted successfully");
       } catch (error) {
         console.error("Error deleting folder:", error);
+        // Extract the detail error message from the response
+        const errorMessage = error.response?.data?.detail || "Error deleting folder";
+        toast.error(errorMessage);
       }
     },
     [tokenRef, fetchFolderStructure, fetchFolderContents, setActiveFolder]
@@ -805,7 +802,6 @@ const CaseStudies = () => {
                     const formData = new FormData();
                     formData.append("unique_id", unique_id);
                     formData.append("new_folder", newFolder);
-
                     await axios.post(
                       `http${HTTP_PREFIX}://${API_URL}/move_file`,
                       formData,
@@ -820,7 +816,9 @@ const CaseStudies = () => {
                     toast.success("File moved successfully");
                   } catch (error) {
                     console.error("Error moving file:", error);
-                    toast.error(`Error moving file`);
+                    // Extract the detail error message from the response
+                    const errorMessage = error.response?.data?.detail || "Error moving file";
+                    toast.error(errorMessage);
                   } finally {
                     setMovingFiles((prev) => ({ ...prev, [unique_id]: false }));
                   }

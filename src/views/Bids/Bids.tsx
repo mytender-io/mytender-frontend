@@ -4,7 +4,6 @@ import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import handleGAEvent from "../../utilities/handleGAEvent.tsx";
 import { Skeleton } from "@mui/material";
 import withAuth from "../../routes/withAuth.tsx";
 import NewTenderModal from "./components/NewTenderModal.tsx";
@@ -271,7 +270,6 @@ const Bids = () => {
     navigate(`/bid?id=${bid._id}`, {
       state: { bid: bid, fromBidsTable: true }
     });
-    handleGAEvent("Bid Tracker", "Navigate to Bid", "Bid Table Link");
   };
 
   const fetchBids = async () => {
@@ -321,7 +319,7 @@ const Bids = () => {
           setBids((prevBids) =>
             prevBids.filter((bid) => bid._id !== bidToDelete)
           );
-          handleGAEvent("Bid Tracker", "Delete Bid", "Delete Bid Button");
+          toast.success("Bid deleted successfully");
         } else {
           toast.error("Failed to delete bid");
         }
@@ -329,19 +327,11 @@ const Bids = () => {
         // Type guard to check if error is AxiosError
         if (axios.isAxiosError(err)) {
           console.error("Error deleting bid:", err);
-
           if (err.response) {
-            if (err.response.status === 403) {
-              toast.error(
-                "Only admins can delete bids. You don't have permission to delete this bid"
-              );
-            } else if (err.response.status === 404) {
-              toast.error("Bid not found");
-            } else {
-              toast.error(
-                `Error: ${err.response.data.detail || "Failed to delete bid"}`
-              );
-            }
+            // Display the exact error message from the backend
+            const errorMessage =
+              err.response.data?.detail || "Failed to delete bid";
+            toast.error(errorMessage);
           } else if (err.request) {
             toast.error("No response received from server. Please try again.");
           }
@@ -370,7 +360,6 @@ const Bids = () => {
       const formData = new FormData();
       formData.append("bid_id", bidId);
       formData.append("bid_qualification_result", newResult);
-
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/update_bid_qualification_result/`,
         formData,
@@ -381,7 +370,6 @@ const Bids = () => {
           }
         }
       );
-
       if (response.data && response.data.status === "success") {
         // Update local state instead of fetching all bids
         setBids((prevBids) =>
@@ -392,30 +380,18 @@ const Bids = () => {
           )
         );
 
-        handleGAEvent(
-          "Bid Tracker",
-          "Change Bid Result",
-          "Bid Result Dropdown"
-        );
+        toast.success("Bid result updated successfully");
       } else {
         toast.error("Failed to update bid result");
       }
     } catch (err) {
       console.error("Error updating bid result:", err);
-
       if (axios.isAxiosError(err)) {
         if (err.response) {
-          if (err.response.status === 403) {
-            toast.error(
-              "You don't have permission to update this bid's result"
-            );
-          } else if (err.response.status === 404) {
-            toast.error("Bid not found");
-          } else {
-            toast.error(
-              `Error: ${err.response.data?.detail || "Failed to update bid result"}`
-            );
-          }
+          // Display the exact error message from the backend
+          const errorMessage =
+            err.response.data?.detail || "Failed to update bid result";
+          toast.error(errorMessage);
         } else if (err.request) {
           toast.error("No response received from server. Please try again.");
         }
@@ -433,7 +409,6 @@ const Bids = () => {
       const formData = new FormData();
       formData.append("bid_id", bidId);
       formData.append("status", newStatus);
-
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/update_bid_status/`,
         formData,
@@ -444,7 +419,6 @@ const Bids = () => {
           }
         }
       );
-
       if (response.data && response.data.status === "success") {
         // Update local state instead of fetching all bids
         setBids((prevBids) =>
@@ -453,30 +427,18 @@ const Bids = () => {
           )
         );
 
-        handleGAEvent(
-          "Bid Tracker",
-          "Change Bid Status",
-          "Bid Status Dropdown"
-        );
+        toast.success("Bid status updated successfully");
       } else {
         toast.error("Failed to update bid status");
       }
     } catch (err) {
       console.error("Error updating bid status:", err);
-
       if (axios.isAxiosError(err)) {
         if (err.response) {
-          if (err.response.status === 403) {
-            toast.error(
-              "You are a viewer. You don't have permission to update this bid's status"
-            );
-          } else if (err.response.status === 404) {
-            toast.error("Bid not found");
-          } else {
-            toast.error(
-              `Error: ${err.response.data?.detail || "Failed to update bid status"}`
-            );
-          }
+          // Display the exact error message from the backend
+          const errorMessage =
+            err.response.data?.detail || "Failed to update bid status";
+          toast.error(errorMessage);
         } else if (err.request) {
           toast.error("No response received from server. Please try again.");
         }

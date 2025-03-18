@@ -679,10 +679,10 @@ const ProfilePage = () => {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="member">
-                                                    Member
+                                                    Manager
                                                   </SelectItem>
                                                   <SelectItem value="reviewer">
-                                                    Reviewer
+                                                    Writer
                                                   </SelectItem>
                                                   <SelectItem value="owner">
                                                     Owner

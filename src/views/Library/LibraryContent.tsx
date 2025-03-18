@@ -602,7 +602,6 @@ const LibraryContent = () => {
   const deleteDocument = async (uniqueId) => {
     const formData = new FormData();
     formData.append("unique_id", uniqueId);
-
     try {
       await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/delete_template_entry/`,
@@ -614,11 +613,17 @@ const LibraryContent = () => {
           }
         }
       );
-
       handleGAEvent("Library", "Delete Document", "Delete Document Button");
       setUpdateTrigger((prev) => prev + 1);
     } catch (error) {
+      // Extract the detail error message from the response
+      const errorMessage =
+        error.response?.data?.detail || "Error deleting document";
       console.error("Error deleting document:", error);
+
+      // Display the error message in a toast notification
+      // Replace with your toast implementation (e.g., toast.error, showToast)
+      toast.error(errorMessage);
     }
   };
 
@@ -668,13 +673,6 @@ const LibraryContent = () => {
             errorMessage =
               error.response.data?.detail ||
               "Only owners can delete folders from content library";
-
-            // Track permission error
-            posthog.capture("folder_deletion_permission_error", {
-              folderTitle,
-              parentFolder,
-              errorDetail: errorMessage
-            });
           } else if (error.response.data?.detail) {
             // Other error with details
             errorMessage = error.response.data.detail;
@@ -907,7 +905,6 @@ const LibraryContent = () => {
                     const formData = new FormData();
                     formData.append("unique_id", unique_id);
                     formData.append("new_folder", newFolder);
-
                     await axios.post(
                       `http${HTTP_PREFIX}://${API_URL}/move_file`,
                       formData,
@@ -922,7 +919,10 @@ const LibraryContent = () => {
                     toast.success("File moved successfully");
                   } catch (error) {
                     console.error("Error moving file:", error);
-                    toast.error(`Error moving file`);
+                    // Extract the detail error message from the response
+                    const errorMessage =
+                      error.response?.data?.detail || "Error moving file";
+                    toast.error(errorMessage);
                   } finally {
                     setMovingFiles((prev) => ({ ...prev, [unique_id]: false }));
                   }
