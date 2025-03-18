@@ -58,17 +58,16 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import PlusCircleIcon from "@/components/icons/PlusCircleIcon";
 import ArrowDownIcon from "@/components/icons/ArrowDownIcon";
-import { cn, getSectionHeading } from "@/utils";
-import { toast } from "react-toastify";
-import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
-import posthog from "posthog-js";
 import ShortenHorizontalIcon from "@/components/icons/ShortenHorizontalIcon";
 import ExpandVerticalIcon from "@/components/icons/ExpandVerticalIcon";
 import PencilIcon from "@/components/icons/PencilIcon";
+import { cn, getSectionHeading } from "@/utils";
 import {
   addTailwindClasses,
   formatSectionText
-} from "@/utilityfunctions/formatSectionText";
+} from "@/utils/formatSectionText";
+import { toast } from "react-toastify";
+import posthog from "posthog-js";
 
 const ProposalPreview = () => {
   const editorRef = useRef<HTMLDivElement>(null);

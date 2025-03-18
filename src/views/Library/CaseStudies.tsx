@@ -5,7 +5,7 @@ import withAuth from "../../routes/withAuth.tsx";
 import { useAuthUser } from "react-auth-kit";
 import { Button } from "@/components/ui/button";
 import UploadPDF from "@/components/UploadPDF.tsx";
-import handleGAEvent from "@/utilities/handleGAEvent.tsx";
+import handleGAEvent from "@/utils/handleGAEvent.tsx";
 import { UploadButtonWithDropdown } from "./components/UploadButtonWithDropdown.tsx";
 import FileContentModal from "./components/FileContentModal.tsx";
 import EllipsisMenu from "./components/EllipsisMenu.tsx";
@@ -350,7 +350,8 @@ const CaseStudies = () => {
           error
         );
         // Extract the detailed error message from the response
-        const errorMessage = error.response?.data?.detail || 
+        const errorMessage =
+          error.response?.data?.detail ||
           `Error creating ${parentFolder ? "subfolder" : "folder"}`;
         toast.error(errorMessage);
       }
@@ -588,11 +589,12 @@ const CaseStudies = () => {
     } catch (error) {
       console.error("Error deleting document:", error);
       // Extract the detail error message from the response
-      const errorMessage = error.response?.data?.detail || "Error deleting document";
+      const errorMessage =
+        error.response?.data?.detail || "Error deleting document";
       toast.error(errorMessage);
     }
   };
-  
+
   const deleteFolder = useCallback(
     async (folderTitle, parentFolder = null) => {
       const formData = new FormData();
@@ -624,7 +626,8 @@ const CaseStudies = () => {
       } catch (error) {
         console.error("Error deleting folder:", error);
         // Extract the detail error message from the response
-        const errorMessage = error.response?.data?.detail || "Error deleting folder";
+        const errorMessage =
+          error.response?.data?.detail || "Error deleting folder";
         toast.error(errorMessage);
       }
     },
@@ -817,7 +820,8 @@ const CaseStudies = () => {
                   } catch (error) {
                     console.error("Error moving file:", error);
                     // Extract the detail error message from the response
-                    const errorMessage = error.response?.data?.detail || "Error moving file";
+                    const errorMessage =
+                      error.response?.data?.detail || "Error moving file";
                     toast.error(errorMessage);
                   } finally {
                     setMovingFiles((prev) => ({ ...prev, [unique_id]: false }));

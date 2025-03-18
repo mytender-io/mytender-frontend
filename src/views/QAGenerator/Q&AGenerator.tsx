@@ -4,7 +4,7 @@ import axios from "axios";
 import withAuth from "../../routes/withAuth.tsx";
 import { useAuthUser } from "react-auth-kit";
 // import SideBarSmall from "../routes/SidebarSmall.tsx";
-import handleGAEvent from "../../utilities/handleGAEvent.tsx";
+import handleGAEvent from "../../utils/handleGAEvent.tsx";
 // import "./QuestionsCrafter.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";

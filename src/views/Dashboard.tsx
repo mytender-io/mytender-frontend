@@ -8,7 +8,7 @@ import { faEye, faBook } from "@fortawesome/free-solid-svg-icons";
 import DashboardCard from "../components/DashboardCard.tsx";
 import { faFileSignature, faComments } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
-import handleGAEvent from "../utilities/handleGAEvent";
+import handleGAEvent from "../utils/handleGAEvent.tsx";
 import BidCard from "../components/BidCard.tsx";
 import { Card, Col, Row, Modal, Button, Alert, Spinner } from "react-bootstrap";
 import "./Dashboard.css";

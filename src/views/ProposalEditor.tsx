@@ -12,7 +12,7 @@ import CustomEditor from "../components/TextEditor.tsx";
 import withAuth from "../routes/withAuth.tsx";
 import TemplateLoader from "../components/TemplateLoader.tsx";
 import { useAuthUser } from "react-auth-kit";
-import handleGAEvent from "../utilities/handleGAEvent.tsx";
+import handleGAEvent from "../utils/handleGAEvent.tsx";
 import { BidContext } from "../views/BidWritingStateManagerView.tsx";
 import "./Proposal.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

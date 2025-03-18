@@ -5,7 +5,7 @@ import withAuth from "../../routes/withAuth.tsx";
 import { useAuthUser } from "react-auth-kit";
 import { Button } from "@/components/ui/button";
 import UploadPDF from "@/components/UploadPDF.tsx";
-import handleGAEvent from "@/utilities/handleGAEvent.tsx";
+import handleGAEvent from "@/utils/handleGAEvent.tsx";
 import { UploadButtonWithDropdown } from "./components/UploadButtonWithDropdown.tsx";
 import FileContentModal from "./components/FileContentModal.tsx";
 // import LibraryContextMenu from "./components/LibraryContextMenu.tsx";

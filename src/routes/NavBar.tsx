@@ -5,7 +5,7 @@ import { useAuthUser, useSignOut } from "react-auth-kit";
 import { Link, useNavigate } from "react-router-dom";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import "./Navbar.css";
-import handleGAEvent from "../utilities/handleGAEvent";
+import handleGAEvent from "../utils/handleGAEvent";
 
 const NavBar = () => {
   const getAuth = useAuthUser();

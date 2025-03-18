@@ -7,7 +7,7 @@ import "../views/Upload.css";
 import { displayAlert } from "../helper/Alert.tsx";
 import TextField from "@mui/material/TextField";
 import CustomTextField from "./CustomTextField.tsx";
-import handleGAEvent from "../utilities/handleGAEvent.tsx";
+import handleGAEvent from "../utils/handleGAEvent.tsx";
 const UploadTemplateText = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();

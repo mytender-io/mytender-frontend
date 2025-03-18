@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useAuthUser } from "react-auth-kit";
 import withAuth from "../../routes/withAuth";
-import handleGAEvent from "../../utilities/handleGAEvent";
+import handleGAEvent from "../../utils/handleGAEvent";
 import { HTTP_PREFIX, API_URL } from "../../helper/Constants";
 import axios from "axios";
 import { Send, Trash2 } from "lucide-react";

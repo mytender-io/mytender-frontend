@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from "react";
 import { useAuthUser } from "react-auth-kit";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import withAuth from "@/routes/withAuth";
-import handleGAEvent from "@/utilities/handleGAEvent";
+import handleGAEvent from "@/utils/handleGAEvent";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
