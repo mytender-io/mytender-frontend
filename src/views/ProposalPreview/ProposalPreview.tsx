@@ -265,10 +265,6 @@ const ProposalPreview = () => {
         );
 
         if (response.data.success) {
-          // Task created successfully, now send email notification
-          const bidTitle = sharedState.bidInfo || "Untitled Bid";
-          const message = `The section "${section.heading}" in bid "${bidTitle}" is now ready for your review. This section has been marked as "Review Ready" and requires your attention. You can access this task from your dashboard.`;
-          const subject = `Section Ready for Review: ${section.heading}`;
           // Track review ready action with posthog
           posthog.capture("section_marked_review_ready", {
             bidId: sharedState.object_id,
@@ -277,6 +273,7 @@ const ProposalPreview = () => {
             reviewer: section.reviewer,
             emailSent: true
           });
+          toast.success(`Section "${section.heading}" marked as Review Ready and notification sent to ${reviewerUser.username}`);
         } else {
           console.error("Error creating review task:", response.data.error);
           toast.error("Failed to assign review task");

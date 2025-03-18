@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from "react";
 import { useAuthUser } from "react-auth-kit";
-import handleGAEvent from "../../../utils/handleGAEvent";
 import { HTTP_PREFIX, API_URL } from "../../../helper/Constants";
 import axios from "axios";
 import { Send, Trash2, X } from "lucide-react";
@@ -81,7 +80,16 @@ const ProposalPreviewSidepane = ({
   const handleSendMessage = () => {
     if (inputValue.trim() !== "") {
       setMessages([...messages, { type: "user", text: inputValue }]);
-      sendQuestion(inputValue);
+
+      // Call the appropriate endpoint based on the active chat mode
+      if (activeChatPrompt === "library") {
+        sendLibraryQuestion(inputValue);
+      } else if (activeChatPrompt === "tender_docs") {
+        sendTenderDocsQuestion(inputValue);
+      } else if (activeChatPrompt === "internet") {
+        sendInternetQuestion(inputValue);
+      }
+
       setInputValue("");
     }
   };
@@ -184,11 +192,72 @@ const ProposalPreviewSidepane = ({
     }
   }, [open]);
 
-  const sendQuestion = async (question) => {
-    handleGAEvent("Chatbot", "Submit Question", "Submit Button");
+  // Function to send library questions (uses /ask_tender_library_question endpoint)
+  const sendLibraryQuestion = async (question) => {
+    console.log("library question");
     setQuestionAsked(true);
     setIsLoading(true);
-    setStartTime(Date.now()); // Set start time for the timer
+    setStartTime(Date.now());
+
+    // Add a temporary bot message with loading dots
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { type: "bot", text: "loading" }
+    ]);
+
+    const backgroundInfo = messages
+      .map((msg) => `${msg.type}: ${msg.text}`)
+      .join("\n");
+
+    try {
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/question`,
+        {
+          choice: "2", // Default choice for tender docs questions
+          broadness: "8", // Default broadness
+          input_text: question,
+          extra_instructions: backgroundInfo,
+          datasets: ["default"]
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+
+      // Replace the temporary loading message with the actual response
+      const formattedResponse = formatResponse(result.data);
+
+      setMessages((prevMessages) => [
+        ...prevMessages.slice(0, -1),
+        { type: "bot", text: formattedResponse }
+      ]);
+      typeMessage(formattedResponse); // Start typing animation
+    } catch (error) {
+      console.error("Error sending library question:", error);
+
+      // Replace the temporary loading message with the error message
+      setMessages((prevMessages) => [
+        ...prevMessages.slice(0, -1),
+        {
+          type: "bot",
+          text:
+            error.response?.status === 400
+              ? "Message failed, please contact support..."
+              : error.message
+        }
+      ]);
+    }
+    setIsLoading(false);
+  };
+
+  // Function to send tender questions (uses /question endpoint)
+  const sendTenderDocsQuestion = async (question) => {
+    console.log("tender library question");
+    setQuestionAsked(true);
+    setIsLoading(true);
+    setStartTime(Date.now());
 
     // Add a temporary bot message with loading dots
     setMessages((prevMessages) => [
@@ -215,8 +284,6 @@ const ProposalPreviewSidepane = ({
         }
       );
 
-      console.log(result);
-
       // Replace the temporary loading message with the actual response
       const formattedResponse = formatResponse(result.data);
 
@@ -224,9 +291,9 @@ const ProposalPreviewSidepane = ({
         ...prevMessages.slice(0, -1),
         { type: "bot", text: formattedResponse }
       ]);
-      typeMessage(formattedResponse); // Start typing animation
+      typeMessage(formattedResponse);
     } catch (error) {
-      console.error("Error sending question:", error);
+      console.error("Error sending tender docs question:", error);
 
       // Replace the temporary loading message with the error message
       setMessages((prevMessages) => [
@@ -243,12 +310,65 @@ const ProposalPreviewSidepane = ({
     setIsLoading(false);
   };
 
-  const handleCopyText = (text: string) => {
+  // New function to send questions to the internet search endpoint
+  const sendInternetQuestion = async (question) => {
+    console.log("internet search");
+    setQuestionAsked(true);
+    setIsLoading(true);
+    setStartTime(Date.now());
+
+    // Add a temporary bot message with loading dots
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { type: "bot", text: "loading" }
+    ]);
+
+    try {
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/perplexity`,
+        {
+          input_text: question + " Respond in a full sentence format.",
+          dataset: "default"
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+
+      // Replace the temporary loading message with the actual response
+      const formattedResponse = formatResponse(result.data);
+
+      setMessages((prevMessages) => [
+        ...prevMessages.slice(0, -1),
+        { type: "bot", text: formattedResponse }
+      ]);
+      typeMessage(formattedResponse);
+    } catch (error) {
+      console.error("Error sending internet question:", error);
+
+      // Replace the temporary loading message with the error message
+      setMessages((prevMessages) => [
+        ...prevMessages.slice(0, -1),
+        {
+          type: "bot",
+          text:
+            error.response?.status === 400
+              ? "Message failed, please contact support..."
+              : error.message
+        }
+      ]);
+    }
+    setIsLoading(false);
+  };
+
+  const handleCopyText = (text) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard");
   };
 
-  const handleFeedback = (messageIndex: number, feedbackType) => {
+  const handleFeedback = (messageIndex, feedbackType) => {
     setMessageFeedback((prev) => {
       const currentFeedback = prev[messageIndex];
 
@@ -298,16 +418,16 @@ const ProposalPreviewSidepane = ({
   }, [isLoadingEvidence, promptResult, promptTarget]);
 
   // Modify the handleCancelEvidence function
-  const handleCancelEvidence = (messageIndex: number) => {
+  const handleCancelEvidence = (messageIndex) => {
     // Find the index of the evidence-target message that corresponds to this evidence
     const targetIndex = messages.findIndex(
-      (msg, idx: number) => idx < messageIndex && msg.type === "evidence-target"
+      (msg, idx) => idx < messageIndex && msg.type === "evidence-target"
     );
 
     // Remove both the evidence message and its corresponding evidence-target
     setMessages((prevMessages) =>
       prevMessages.filter(
-        (_, index: number) => index !== messageIndex && index !== targetIndex
+        (_, index) => index !== messageIndex && index !== targetIndex
       )
     );
 
@@ -316,7 +436,7 @@ const ProposalPreviewSidepane = ({
   };
 
   // Add a new function to handle insert and track the inserted evidence
-  const handleInsertEvidence = (index: number) => {
+  const handleInsertEvidence = (index) => {
     setInsertedEvidenceIndices((prev) => [...prev, index]);
     onInsert();
   };
@@ -502,7 +622,6 @@ const ProposalPreviewSidepane = ({
                               size="sm"
                               onClick={() => {
                                 handleCopyText(message.text);
-                                // handleCancelEvidence(index);
                               }}
                               className="text-gray-hint_text"
                             >
