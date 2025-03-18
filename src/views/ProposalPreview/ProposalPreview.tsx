@@ -60,12 +60,9 @@ import PlusCircleIcon from "@/components/icons/PlusCircleIcon";
 import ArrowDownIcon from "@/components/icons/ArrowDownIcon";
 import ShortenHorizontalIcon from "@/components/icons/ShortenHorizontalIcon";
 import ExpandVerticalIcon from "@/components/icons/ExpandVerticalIcon";
-import PencilIcon from "@/components/icons/PencilIcon";
+// import PencilIcon from "@/components/icons/PencilIcon";
 import { cn, getSectionHeading } from "@/utils";
-import {
-  addTailwindClasses,
-  formatSectionText
-} from "@/utils/formatSectionText";
+import { formatSectionText } from "@/utils/formatSectionText";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
 import { debounce } from "lodash";
@@ -365,34 +362,6 @@ const ProposalPreview = () => {
       };
     }
   }, [currentSectionIndex, editorRef.current]);
-
-  // Then update the handleSaveEdit function to properly format the content before saving
-  const handleSaveEdit = () => {
-    if (editorRef.current && currentSectionIndex !== null) {
-      // Get the HTML content from the editor
-      const rawContent = editorRef.current.innerHTML;
-
-      // Apply any formatting if needed
-      const formattedContent = addTailwindClasses(rawContent);
-
-      // Update just the specific section
-      setSharedState((prevState) => {
-        const newOutline = [...prevState.outline];
-        newOutline[currentSectionIndex] = {
-          ...newOutline[currentSectionIndex],
-          answer: formattedContent
-        };
-
-        return {
-          ...prevState,
-          outline: newOutline
-        };
-      });
-
-      toast.success("Changes saved successfully");
-      setCurrentSectionIndex(null);
-    }
-  };
 
   // Add this function to handle hyperlinks
   const handleLink = () => {
@@ -1289,10 +1258,6 @@ const ProposalPreview = () => {
     setActiveComment(null);
   };
 
-  const handleSectionSelect = (index: number) => {
-    setCurrentSectionIndex(index);
-  };
-
   // Add this function to handle document download
   const handleDownloadDocument = () => {
     if (!outline || outline.length === 0) {
@@ -1823,27 +1788,6 @@ const ProposalPreview = () => {
                                 <PencilEditCheckIcon />
                                 Mark as Review Ready
                               </Button>
-
-                              {/* Toggle between Edit and Save buttons */}
-                              {currentSectionIndex === index ? (
-                                <Button
-                                  variant="default"
-                                  size="sm"
-                                  onClick={handleSaveEdit}
-                                  className="text-xs ml-auto"
-                                >
-                                  <Save size={16} /> Save
-                                </Button>
-                              ) : (
-                                <Button
-                                  variant="default"
-                                  size="sm"
-                                  onClick={() => handleSectionSelect(index)}
-                                  className="text-xs ml-auto"
-                                >
-                                  Edit
-                                </Button>
-                              )}
                             </div>
                           </div>
 
