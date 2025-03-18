@@ -1027,8 +1027,8 @@ const ProposalPreview = () => {
     }
   };
 
-  const handleReplaceWithPrompt = () => {
-    if (!promptResult) {
+  const handleReplaceWithPrompt = (text: string) => {
+    if (!text) {
       toast.error("No content to replace");
       return;
     }
@@ -1048,8 +1048,8 @@ const ProposalPreview = () => {
         // Delete the span and its contents
         range.deleteContents();
 
-        // Insert the prompt result
-        const textNode = document.createTextNode(promptResult);
+        // Insert the text parameter instead of promptResult
+        const textNode = document.createTextNode(text);
         range.insertNode(textNode);
 
         // Clear the prompt result
@@ -1071,12 +1071,10 @@ const ProposalPreview = () => {
             };
           });
         }
-
-        toast.success("Text replaced successfully");
       } else if (selectedRange) {
         // Fall back to using the stored selectedRange if span not found
         selectedRange.deleteContents();
-        const textNode = document.createTextNode(promptResult);
+        const textNode = document.createTextNode(text);
         selectedRange.insertNode(textNode);
         setPromptResult("");
 
@@ -1096,10 +1094,66 @@ const ProposalPreview = () => {
             };
           });
         }
-
-        toast.success("Text replaced successfully");
       } else {
-        toast.error("Could not find the location to insert text");
+        // If no specific location found, insert at current cursor position or end of editor
+        if (currentSectionIndex !== null && editorRef.current) {
+          const selection = window.getSelection();
+          if (selection && selection.rangeCount > 0) {
+            // Get the range at the current cursor position
+            const range = selection.getRangeAt(0);
+
+            // Check if the cursor is within the editor
+            if (editorRef.current.contains(range.commonAncestorContainer)) {
+              // Insert text at current cursor position
+              document.execCommand("insertText", false, text);
+            } else {
+              // If cursor is not in the editor, place it at the end of editor content
+              const endRange = document.createRange();
+              endRange.selectNodeContents(editorRef.current);
+              endRange.collapse(false); // Collapse to end
+
+              selection.removeAllRanges();
+              selection.addRange(endRange);
+
+              // Now insert at the end
+              document.execCommand("insertText", false, text);
+            }
+          } else {
+            // If no selection exists, append to the end of the editor
+            editorRef.current.focus();
+            const endRange = document.createRange();
+            endRange.selectNodeContents(editorRef.current);
+            endRange.collapse(false); // Collapse to end
+
+            const sel = window.getSelection();
+            if (sel) {
+              sel.removeAllRanges();
+              sel.addRange(endRange);
+              document.execCommand("insertText", false, text);
+            }
+          }
+
+          // Clear the prompt result
+          setPromptResult("");
+
+          // Update the shared state with the new content
+          const newContent = editorRef.current.innerHTML;
+          setSharedState((prevState) => {
+            const newOutline = [...prevState.outline];
+            newOutline[currentSectionIndex] = {
+              ...newOutline[currentSectionIndex],
+              answer: newContent
+            };
+            return {
+              ...prevState,
+              outline: newOutline
+            };
+          });
+
+          toast.success("Text inserted at cursor position");
+        } else {
+          toast.error("Please select a section to edit first");
+        }
       }
     } catch (error) {
       console.error("Error replacing text:", error);
@@ -1322,89 +1376,68 @@ const ProposalPreview = () => {
     }
   };
 
-  // Update this function to insert text at current cursor position
-  const handleInsertFromSidepane = (text: string) => {
-    if (!text) {
-      toast.error("No content to insert");
-      return;
-    }
+  // Add this new effect to handle clicks outside of highlighted text
+  useEffect(() => {
+    // Handler for clicks outside of highlighted text
+    const handleClickOutsideHighlight = (event: MouseEvent) => {
+      // Check if we have any of the special highlight spans
+      const evidenceSpans = document.querySelectorAll("span.evidence-text");
+      const expandSpans = document.querySelectorAll("span.expand-text");
+      const summariseSpans = document.querySelectorAll("span.summarise-text");
 
-    try {
-      // Check if we have a currently selected section
-      if (currentSectionIndex !== null && editorRef.current) {
-        const selection = window.getSelection();
-
-        // Insert at cursor position if there's a valid selection within the editor
-        if (selection && selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-
-          // Check if the selection is within our editor
-          const isSelectionInEditor = editorRef.current.contains(
-            range.commonAncestorContainer
-          );
-
-          if (isSelectionInEditor) {
-            // Create a wrapper div for the text to maintain formatting
-            const wrapper = document.createElement("div");
-            wrapper.innerHTML = text;
-
-            // Insert the formatted content at cursor position
-            range.deleteContents();
-
-            // Insert each child node individually to preserve formatting
-            while (wrapper.firstChild) {
-              range.insertNode(wrapper.firstChild);
-              range.collapse(false); // Move cursor to end of inserted content
-            }
-
-            // Create a copy of the outline
-            const updatedOutline = [...outline];
-
-            // Update the answer field with the new content
-            updatedOutline[currentSectionIndex] = {
-              ...updatedOutline[currentSectionIndex],
-              answer: editorRef.current.innerHTML
-            };
-
-            // Update the shared state with the modified outline
-            setSharedState((prevState) => ({
-              ...prevState,
-              outline: updatedOutline
-            }));
-
-            toast.success("Content inserted successfully");
-            return;
-          }
-        }
-
-        // Fallback: If no valid selection in editor, append to the end
-        const currentContent = editorRef.current.innerHTML;
-        editorRef.current.innerHTML = currentContent + `<div>${text}</div>`;
-
-        // Create a copy of the outline
-        const updatedOutline = [...outline];
-
-        // Update the answer field with the new content
-        updatedOutline[currentSectionIndex] = {
-          ...updatedOutline[currentSectionIndex],
-          answer: editorRef.current.innerHTML
-        };
-
-        // Update the shared state with the modified outline
-        setSharedState((prevState) => ({
-          ...prevState,
-          outline: updatedOutline
-        }));
-
-        toast.success("Content inserted successfully");
-      } else {
-        toast.error("Please select a section to insert into");
+      // Only proceed if we have at least one highlighted span
+      if (
+        evidenceSpans.length === 0 &&
+        expandSpans.length === 0 &&
+        summariseSpans.length === 0
+      ) {
+        return;
       }
-    } catch (error) {
-      console.error("Error inserting text:", error);
-      toast.error("Failed to insert text");
-    }
-  };
+
+      // Check if the click is inside any of these spans
+      let isClickInsideHighlight = false;
+
+      // Check evidence spans
+      evidenceSpans.forEach((span) => {
+        if (span.contains(event.target as Node)) {
+          isClickInsideHighlight = true;
+        }
+      });
+
+      // Check expand spans
+      expandSpans.forEach((span) => {
+        if (span.contains(event.target as Node)) {
+          isClickInsideHighlight = true;
+        }
+      });
+
+      // Check summarise spans
+      summariseSpans.forEach((span) => {
+        if (span.contains(event.target as Node)) {
+          isClickInsideHighlight = true;
+        }
+      });
+
+      // Check if the click is inside the sidepane
+      const sidepane = document.querySelector(".proposal-preview-sidepane");
+      if (sidepane && sidepane.contains(event.target as Node)) {
+        isClickInsideHighlight = true;
+      }
+
+      // If click is outside, remove the highlighting by calling handleCancelPrompt
+      if (!isClickInsideHighlight && !isLoadingEvidence) {
+        handleCancelPrompt();
+      }
+    };
+
+    // Add event listener for mousedown
+    document.addEventListener("mousedown", handleClickOutsideHighlight);
+
+    // Clean up
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideHighlight);
+    };
+  }, [isLoadingEvidence]); // Re-attach when loading state changes
 
   return (
     <div className="proposal-preview-container pb-8">
@@ -2118,7 +2151,6 @@ const ProposalPreview = () => {
                     promptTarget={promptTarget}
                     promptResult={promptResult}
                     isLoadingEvidence={isLoadingEvidence}
-                    onInsert={handleInsertFromSidepane}
                     onReplace={handleReplaceWithPrompt}
                     onCancelPrompt={handleCancelPrompt}
                     actionType={actionType} // Add this line

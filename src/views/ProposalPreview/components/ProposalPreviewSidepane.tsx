@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/tooltip";
 import DataTransferHorizontalIcon from "@/components/icons/DataTransferHorizontalIcon";
 import RefreshArrowIcon from "@/components/icons/RefreshArrowIcon";
-import { toast } from "react-toastify";
 
 const ProposalPreviewSidepane = ({
   bid_id,
@@ -27,7 +26,6 @@ const ProposalPreviewSidepane = ({
   promptTarget,
   promptResult,
   isLoadingEvidence,
-  onInsert,
   onReplace,
   onCancelPrompt,
   actionType
@@ -35,7 +33,6 @@ const ProposalPreviewSidepane = ({
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
-  const [messageFeedback, setMessageFeedback] = useState({});
   const [activeChatPrompt, setActiveChatPrompt] = useState("library");
 
   const [messages, setMessages] = useState(() => {
@@ -65,8 +62,6 @@ const ProposalPreviewSidepane = ({
 
   const messagesContainerRef = useRef(null);
   const inputRef = useRef(null);
-
-  const [insertedEvidenceIndices, setInsertedEvidenceIndices] = useState([]);
 
   // Focus the input field when the sidepane opens
   useEffect(() => {
@@ -377,9 +372,20 @@ const ProposalPreviewSidepane = ({
     setIsLoading(false);
   };
 
-  const handleCopyText = (text) => {
+  const handleCopyText = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard");
+
+    // Get the target button element and store original text
+    const copyButton = document.activeElement;
+    if (copyButton instanceof HTMLButtonElement) {
+      const originalText = copyButton.innerHTML;
+      copyButton.innerHTML = "<span>Copied</span>";
+
+      // Revert back after 1.5 seconds
+      setTimeout(() => {
+        copyButton.innerHTML = originalText;
+      }, 1500);
+    }
   };
 
   useEffect(() => {
@@ -412,14 +418,21 @@ const ProposalPreviewSidepane = ({
     }
   }, [isLoadingEvidence, promptResult]);
 
-  const handleInsertEvidence = (text: string) => {
-    onInsert(text);
-  };
+  // Add a new function to handle insert and track the replaced evidence
+  const handleReplaceEvidence = (text: string) => {
+    // Get the target button element and store original text
+    const insertButton = document.activeElement;
+    if (insertButton instanceof HTMLButtonElement) {
+      const originalText = insertButton.innerHTML;
+      insertButton.innerHTML = "<span>Inserted</span>";
 
-  // Add a new function to handle insert and track the inserted evidence
-  const handleReplaceEvidence = (index: number) => {
-    setInsertedEvidenceIndices((prev) => [...prev, index]);
-    onReplace();
+      // Revert back after 1.5 seconds
+      setTimeout(() => {
+        insertButton.innerHTML = originalText;
+      }, 1500);
+    }
+
+    onReplace(text);
   };
 
   // If not open, return null
@@ -538,7 +551,9 @@ const ProposalPreviewSidepane = ({
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleInsertEvidence(message.text)}
+                              onClick={() =>
+                                handleReplaceEvidence(message.text)
+                              }
                               className="text-gray-hint_text"
                             >
                               <DataTransferHorizontalIcon />
@@ -579,14 +594,13 @@ const ProposalPreviewSidepane = ({
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleReplaceEvidence(index)}
-                              disabled={insertedEvidenceIndices.includes(index)}
+                              onClick={() =>
+                                handleReplaceEvidence(message.text)
+                              }
                               className="text-gray-hint_text"
                             >
                               <DataTransferHorizontalIcon />
-                              {insertedEvidenceIndices.includes(index)
-                                ? "Replaced"
-                                : "Replace"}
+                              Insert
                             </Button>
                             <Button
                               variant="outline"
