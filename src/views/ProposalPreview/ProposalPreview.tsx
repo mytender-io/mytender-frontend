@@ -266,26 +266,6 @@ const ProposalPreview = () => {
           const bidTitle = sharedState.bidInfo || "Untitled Bid";
           const message = `The section "${section.heading}" in bid "${bidTitle}" is now ready for your review. This section has been marked as "Review Ready" and requires your attention. You can access this task from your dashboard.`;
           const subject = `Section Ready for Review: ${section.heading}`;
-
-          // Send the email notification
-          await sendOrganizationEmail({
-            recipient: reviewerUser.email,
-            message,
-            subject,
-            token: tokenRef.current,
-            onSuccess: () => {
-              toast.success(
-                `Section marked as "Review Ready" and notification sent to ${section.reviewer}`
-              );
-            },
-            onError: (error) => {
-              // The task was created but email notification failed
-              toast.warning(
-                `Section marked as "Review Ready", but email notification failed: ${error}`
-              );
-            }
-          });
-
           // Track review ready action with posthog
           posthog.capture("section_marked_review_ready", {
             bidId: sharedState.object_id,
