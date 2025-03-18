@@ -273,7 +273,9 @@ const ProposalPreview = () => {
             reviewer: section.reviewer,
             emailSent: true
           });
-          toast.success(`Section "${section.heading}" marked as Review Ready and notification sent to ${reviewerUser.username}`);
+          toast.success(
+            `Section "${section.heading}" marked as Review Ready and notification sent to ${reviewerUser.username}`
+          );
         } else {
           console.error("Error creating review task:", response.data.error);
           toast.error("Failed to assign review task");
@@ -848,6 +850,7 @@ const ProposalPreview = () => {
     }
 
     setPromptResult("");
+    setPromptTarget("");
   };
 
   // Add event listeners for selection

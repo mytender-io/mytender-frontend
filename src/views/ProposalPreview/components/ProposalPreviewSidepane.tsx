@@ -415,10 +415,10 @@ const ProposalPreviewSidepane = ({
         { type: "evidence", text: promptResult }
       ]);
     }
-  }, [isLoadingEvidence, promptResult, promptTarget]);
+  }, [isLoadingEvidence, promptResult]);
 
   // Modify the handleCancelEvidence function
-  const handleCancelEvidence = (messageIndex) => {
+  const handleCancelEvidence = (messageIndex: number) => {
     // Find the index of the evidence-target message that corresponds to this evidence
     const targetIndex = messages.findIndex(
       (msg, idx) => idx < messageIndex && msg.type === "evidence-target"
@@ -427,12 +427,13 @@ const ProposalPreviewSidepane = ({
     // Remove both the evidence message and its corresponding evidence-target
     setMessages((prevMessages) =>
       prevMessages.filter(
-        (_, index) => index !== messageIndex && index !== targetIndex
+        (_, index: number) => index !== messageIndex && index !== targetIndex
       )
     );
 
     // Call the parent component's cancel handler
     onCancelPrompt();
+    onOpenChange(false);
   };
 
   // Add a new function to handle insert and track the inserted evidence
@@ -468,7 +469,19 @@ const ProposalPreviewSidepane = ({
                 variant="ghost"
                 size="sm"
                 className="h-6 w-6 p-0 absolute right-2"
-                onClick={() => onOpenChange(false)}
+                onClick={() => {
+                  // Find the last evidence message index
+                  const lastEvidenceIndex = messages.findLastIndex(
+                    (msg) => msg.type === "evidence"
+                  );
+                  if (lastEvidenceIndex !== -1) {
+                    handleCancelEvidence(lastEvidenceIndex);
+                  } else {
+                    onCancelPrompt();
+                    onOpenChange(false);
+                  }
+                  // onOpenChange(false);
+                }}
               >
                 <X size={16} />
               </Button>
@@ -597,6 +610,7 @@ const ProposalPreviewSidepane = ({
                         {/* Add insert button for evidence messages */}
                         {message.type === "evidence" && (
                           <div className="flex gap-1 mt-3">
+                            {index}
                             <Button
                               variant="outline"
                               size="sm"
