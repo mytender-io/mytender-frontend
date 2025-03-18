@@ -65,6 +65,10 @@ import posthog from "posthog-js";
 import ShortenHorizontalIcon from "@/components/icons/ShortenHorizontalIcon";
 import ExpandVerticalIcon from "@/components/icons/ExpandVerticalIcon";
 import PencilIcon from "@/components/icons/PencilIcon";
+import {
+  addTailwindClasses,
+  formatSectionText
+} from "@/utilityfunctions/formatSectionText";
 
 const ProposalPreview = () => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -295,15 +299,22 @@ const ProposalPreview = () => {
     }
   };
 
+  // Then update the handleSaveEdit function to properly format the content before saving
   const handleSaveEdit = () => {
     if (editorRef.current && currentSectionIndex !== null) {
       // Create a copy of the outline
       const updatedOutline = [...outline];
 
+      // Get the HTML content from the editor
+      const rawContent = editorRef.current.innerHTML;
+
+      // Ensure content has proper Tailwind classes
+      const formattedContent = addTailwindClasses(rawContent);
+
       // Update the answer field of the current section
       updatedOutline[currentSectionIndex] = {
         ...updatedOutline[currentSectionIndex],
-        answer: editorRef.current.innerHTML
+        answer: formattedContent
       };
 
       // Update the shared state with the modified outline
@@ -1309,12 +1320,26 @@ const ProposalPreview = () => {
                               {section.heading}
                             </h2>
 
+                            {/* Display section question if it exists */}
+                            {section.question && (
+                              <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                                <p className="font-medium text-gray-700 mb-1">
+                                  Question:
+                                </p>
+                                <p className="text-gray-600">
+                                  {section.question}
+                                </p>
+                              </div>
+                            )}
+
                             <div
                               ref={
                                 currentSectionIndex === index ? editorRef : null
                               }
                               dangerouslySetInnerHTML={{
-                                __html: section.answer || ""
+                                __html: section.answer
+                                  ? formatSectionText(section.answer)
+                                  : ""
                               }}
                               className="font-sans text-base leading-relaxed w-full m-0 outline-none focus:outline-none"
                               contentEditable={true}
