@@ -3,7 +3,7 @@ import { useAuthUser } from "react-auth-kit";
 import handleGAEvent from "../../../utilities/handleGAEvent";
 import { HTTP_PREFIX, API_URL } from "../../../helper/Constants";
 import axios from "axios";
-import { Send, Trash2, MessageSquare, X } from "lucide-react";
+import { Send, Trash2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
@@ -19,6 +19,9 @@ import {
   TooltipTrigger,
   TooltipProvider
 } from "@/components/ui/tooltip";
+import DataTransferHorizontalIcon from "@/components/icons/DataTransferHorizontalIcon";
+import RefreshArrowIcon from "@/components/icons/RefreshArrowIcon";
+import { toast } from "react-toastify";
 
 const ProposalPreviewSidepane = ({
   bid_id,
@@ -240,11 +243,12 @@ const ProposalPreviewSidepane = ({
     setIsLoading(false);
   };
 
-  const handleCopyText = (text) => {
+  const handleCopyText = (text: string) => {
     navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
   };
 
-  const handleFeedback = (messageIndex, feedbackType) => {
+  const handleFeedback = (messageIndex: number, feedbackType) => {
     setMessageFeedback((prev) => {
       const currentFeedback = prev[messageIndex];
 
@@ -294,16 +298,16 @@ const ProposalPreviewSidepane = ({
   }, [isLoadingEvidence, promptResult, promptTarget]);
 
   // Modify the handleCancelEvidence function
-  const handleCancelEvidence = (messageIndex) => {
+  const handleCancelEvidence = (messageIndex: number) => {
     // Find the index of the evidence-target message that corresponds to this evidence
     const targetIndex = messages.findIndex(
-      (msg, idx) => idx < messageIndex && msg.type === "evidence-target"
+      (msg, idx: number) => idx < messageIndex && msg.type === "evidence-target"
     );
 
     // Remove both the evidence message and its corresponding evidence-target
     setMessages((prevMessages) =>
       prevMessages.filter(
-        (_, index) => index !== messageIndex && index !== targetIndex
+        (_, index: number) => index !== messageIndex && index !== targetIndex
       )
     );
 
@@ -312,7 +316,7 @@ const ProposalPreviewSidepane = ({
   };
 
   // Add a new function to handle insert and track the inserted evidence
-  const handleInsertEvidence = (index) => {
+  const handleInsertEvidence = (index: number) => {
     setInsertedEvidenceIndices((prev) => [...prev, index]);
     onInsert();
   };
@@ -476,22 +480,33 @@ const ProposalPreviewSidepane = ({
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleCancelEvidence(index)}
-                              className="text-gray-hint_text"
+                              onClick={() => handleInsertEvidence(index)}
                               disabled={insertedEvidenceIndices.includes(index)}
+                              className="text-gray-hint_text"
                             >
-                              Cancel
+                              <DataTransferHorizontalIcon />
+                              {insertedEvidenceIndices.includes(index)
+                                ? "Replaced"
+                                : "Replace"}
                             </Button>
                             <Button
-                              variant="default"
+                              variant="outline"
                               size="sm"
-                              onClick={() => handleInsertEvidence(index)}
-                              className="bg-orange-500 hover:bg-orange-600 text-white"
-                              disabled={insertedEvidenceIndices.includes(index)}
+                              className="text-gray-hint_text"
                             >
-                              {insertedEvidenceIndices.includes(index)
-                                ? "Inserted"
-                                : "Insert"}
+                              <RefreshArrowIcon />
+                              Refine
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                handleCopyText(message.text);
+                                // handleCancelEvidence(index);
+                              }}
+                              className="text-gray-hint_text"
+                            >
+                              <CopyIcon /> Copy
                             </Button>
                           </div>
                         )}

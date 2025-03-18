@@ -804,7 +804,7 @@ const ProposalPreview = () => {
   // Update the handleReplaceWithPrompt function to find the evidence span
   const handleReplaceWithPrompt = () => {
     if (!promptResult) {
-      toast.error("No content to insert");
+      toast.error("No content to replace");
       return;
     }
 
@@ -827,20 +827,20 @@ const ProposalPreview = () => {
         // Clear the prompt result
         setPromptResult("");
 
-        toast.success("Text inserted successfully");
+        toast.success("Text replaced successfully");
       } else if (selectedRange) {
         // Fall back to using the stored selectedRange if span not found
         selectedRange.deleteContents();
         const textNode = document.createTextNode(promptResult);
         selectedRange.insertNode(textNode);
         setPromptResult("");
-        toast.success("Text inserted successfully");
+        toast.success("Text replaced successfully");
       } else {
         toast.error("Could not find the location to insert text");
       }
     } catch (error) {
-      console.error("Error inserting text:", error);
-      toast.error("Failed to insert text");
+      console.error("Error replacing text:", error);
+      toast.error("Failed to replace text");
     }
   };
 
@@ -1494,7 +1494,7 @@ const ProposalPreview = () => {
                           top: `${selectionMenuPosition.top}px`
                         }}
                       >
-                        <div className="flex flex-col bg-white shadow-lg rounded-2xl border border-gray-200 z-50 overflow-hidden gap-2 py-2">
+                        <div className="flex flex-col bg-white shadow-lg rounded-2xl border border-gray-200 z-50 overflow-hidden gap-1 py-2">
                           <TooltipProvider delayDuration={0}>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -1502,7 +1502,7 @@ const ProposalPreview = () => {
                                   variant="ghost"
                                   size="sm"
                                   onClick={handleAddComment}
-                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
+                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
                                 >
                                   <CommentIcon />
                                 </Button>
@@ -1519,7 +1519,7 @@ const ProposalPreview = () => {
                                   variant="ghost"
                                   size="sm"
                                   onClick={handleEvidencePrompt}
-                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
+                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
                                 >
                                   <UpscaleSparkIcon />
                                 </Button>
@@ -1536,7 +1536,7 @@ const ProposalPreview = () => {
                                   variant="ghost"
                                   size="sm"
                                   onClick={handleEvidencePrompt}
-                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
+                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
                                 >
                                   <PencilIcon />
                                 </Button>
@@ -1553,7 +1553,7 @@ const ProposalPreview = () => {
                                   variant="ghost"
                                   size="sm"
                                   onClick={handleEvidencePrompt}
-                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
+                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
                                 >
                                   <ExpandVerticalIcon />
                                 </Button>
@@ -1570,7 +1570,7 @@ const ProposalPreview = () => {
                                   variant="ghost"
                                   size="sm"
                                   onClick={handleEvidencePrompt}
-                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6"
+                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
                                 >
                                   <ShortenHorizontalIcon />
                                 </Button>
