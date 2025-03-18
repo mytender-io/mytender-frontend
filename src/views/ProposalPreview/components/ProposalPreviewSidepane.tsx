@@ -78,7 +78,12 @@ const ProposalPreviewSidepane = ({
 
   const handleSendMessage = () => {
     if (inputValue.trim() !== "") {
-      setMessages([...messages, { type: "user", text: inputValue }]);
+      setMessages((prev) => {
+        const newMessages = [...prev, { type: "user", text: inputValue }];
+        // Use setTimeout to ensure the DOM updates before scrolling
+        setTimeout(scrollToBottom, 10);
+        return newMessages;
+      });
 
       // Call the appropriate endpoint based on the active chat mode
       if (activeChatPrompt === "library") {
@@ -153,30 +158,33 @@ const ProposalPreviewSidepane = ({
 
     const typeChar = () => {
       if (index < message.length) {
-        setTypingText((prev) => prev + message[index]);
+        setTypingText((prev) => {
+          const newText = prev + message[index];
+          // Scroll down every time a new line character is added
+          if (
+            message[index] === "\n" ||
+            (message[index] === "<" &&
+              message.substring(index, index + 4) === "<br>")
+          ) {
+            setTimeout(scrollToBottom, 10);
+          }
+          return newText;
+        });
         index++;
         setTimeout(typeChar, 1);
       } else {
         setIsTyping(false);
-        scrollToBottom(); // Only scroll at the end of typing
+        scrollToBottom(); // Final scroll at the end of typing
       }
     };
 
     typeChar();
   };
 
-  // Scroll on new messages when appropriate
+  // Scroll on new messages
   useEffect(() => {
-    // Only auto-scroll if user is already at the bottom
-    if (messagesContainerRef.current) {
-      const container = messagesContainerRef.current;
-      const isAtBottom =
-        container.scrollHeight - container.scrollTop <=
-        container.clientHeight + 100;
-
-      if (isAtBottom) {
-        scrollToBottom();
-      }
+    if (messages.length > 0) {
+      scrollToBottom();
     }
   }, [messages]);
 
@@ -199,10 +207,12 @@ const ProposalPreviewSidepane = ({
     setStartTime(Date.now());
 
     // Add a temporary bot message with loading dots
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { type: "bot", text: "loading" }
-    ]);
+    setMessages((prevMessages) => {
+      const newMessages = [...prevMessages, { type: "bot", text: "loading" }];
+      // Use setTimeout to ensure the DOM updates before scrolling
+      setTimeout(scrollToBottom, 10);
+      return newMessages;
+    });
 
     const backgroundInfo = messages
       .map((msg) => `${msg.type}: ${msg.text}`)
@@ -259,10 +269,12 @@ const ProposalPreviewSidepane = ({
     setStartTime(Date.now());
 
     // Add a temporary bot message with loading dots
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { type: "bot", text: "loading" }
-    ]);
+    setMessages((prevMessages) => {
+      const newMessages = [...prevMessages, { type: "bot", text: "loading" }];
+      // Use setTimeout to ensure the DOM updates before scrolling
+      setTimeout(scrollToBottom, 10);
+      return newMessages;
+    });
 
     const backgroundInfo = messages
       .map((msg) => `${msg.type}: ${msg.text}`)
@@ -317,10 +329,12 @@ const ProposalPreviewSidepane = ({
     setStartTime(Date.now());
 
     // Add a temporary bot message with loading dots
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { type: "bot", text: "loading" }
-    ]);
+    setMessages((prevMessages) => {
+      const newMessages = [...prevMessages, { type: "bot", text: "loading" }];
+      // Use setTimeout to ensure the DOM updates before scrolling
+      setTimeout(scrollToBottom, 10);
+      return newMessages;
+    });
 
     try {
       const result = await axios.post(
