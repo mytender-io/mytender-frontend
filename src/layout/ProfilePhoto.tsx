@@ -36,6 +36,13 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 
   useEffect(() => {
     const fetchProfileData = async () => {
+      // Check localStorage first
+      const cachedProfile = localStorage.getItem("userProfile");
+      if (cachedProfile && !refreshImage) {
+        setProfile(JSON.parse(cachedProfile));
+        return;
+      }
+
       setLoading(true);
       try {
         const profileResponse = await axios.get(
@@ -47,6 +54,11 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
           }
         );
         setProfile(profileResponse.data);
+        // Save to localStorage
+        localStorage.setItem(
+          "userProfile",
+          JSON.stringify(profileResponse.data)
+        );
         setLoading(false);
       } catch (err) {
         console.error("Failed to load profile photo:", err);
@@ -59,6 +71,13 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
+      // Check localStorage first
+      const cachedOrgUsers = localStorage.getItem("organizationUsers");
+      if (cachedOrgUsers) {
+        setOrganizationUsers(JSON.parse(cachedOrgUsers));
+        return;
+      }
+
       setLoading(true);
       try {
         const formData = new FormData();
@@ -76,6 +95,11 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
         );
         console.log(response);
         setOrganizationUsers(response.data);
+        // Save to localStorage
+        localStorage.setItem(
+          "organizationUsers",
+          JSON.stringify(response.data)
+        );
         setLoading(false);
       } catch (err) {
         console.error("Error fetching organization users:", err);
