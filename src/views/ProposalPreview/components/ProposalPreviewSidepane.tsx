@@ -322,7 +322,7 @@ const ProposalPreviewSidepane = ({
 
   // Render as a rounded card sidebar
   return (
-    <div className="shadow-lg rounded-2xl w-[450px] flex flex-col h-full bg-white overflow-hidden">
+    <div className="shadow-lg w-[450px] flex flex-col h-full bg-white overflow-hidden border border-gray-line">
       <div className="p-3 border-b border-gray-100 flex justify-between items-center">
         <TooltipProvider delayDuration={0}>
           <Tooltip>
@@ -366,10 +366,11 @@ const ProposalPreviewSidepane = ({
                   key={index}
                   className={cn(
                     "group flex min-w-[50px] p-2 rounded-xl items-start gap-3 text-black",
-                    message.type === "user" ||
-                      message.type === "evidence-target"
-                      ? "bg-gray-light self-end max-w-xl w-5/6"
-                      : "bg-transparent"
+                    message.type === "user"
+                      ? "bg-gray-light self-end max-w-xl"
+                      : message.type === "evidence-target"
+                        ? "bg-gray-light self-end max-w-xl w-5/6"
+                        : "bg-transparent"
                   )}
                 >
                   <div className="flex-1 flex flex-col">
