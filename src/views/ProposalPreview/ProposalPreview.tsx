@@ -1150,7 +1150,7 @@ const ProposalPreview = () => {
             };
           });
 
-          toast.success("Text inserted at cursor position");
+          // toast.success("Text inserted at cursor position");
         } else {
           toast.error("Please select a section to edit first");
         }
