@@ -6,8 +6,6 @@ import { Send, Trash2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
-import ThumbupIcon from "@/components/icons/ThumbupIcon";
-import ThumbdownIcon from "@/components/icons/ThumbdownIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import FileSearchIcon from "@/components/icons/FileSearchIcon";
@@ -30,6 +28,7 @@ const ProposalPreviewSidepane = ({
   promptResult,
   isLoadingEvidence,
   onInsert,
+  onReplace,
   onCancelPrompt
 }) => {
   const getAuth = useAuthUser();
@@ -368,25 +367,6 @@ const ProposalPreviewSidepane = ({
     toast.success("Copied to clipboard");
   };
 
-  const handleFeedback = (messageIndex, feedbackType) => {
-    setMessageFeedback((prev) => {
-      const currentFeedback = prev[messageIndex];
-
-      // If clicking the same button, turn it off
-      if (currentFeedback === feedbackType) {
-        const newFeedback = { ...prev };
-        delete newFeedback[messageIndex];
-        return newFeedback;
-      }
-
-      // If clicking different button, switch to it
-      return {
-        ...prev,
-        [messageIndex]: feedbackType
-      };
-    });
-  };
-
   useEffect(() => {
     if (promptTarget) {
       setMessages((prevMessages) => [
@@ -436,10 +416,14 @@ const ProposalPreviewSidepane = ({
     onOpenChange(false);
   };
 
+  const handleInsertEvidence = (text: string) => {
+    onInsert(text);
+  };
+
   // Add a new function to handle insert and track the inserted evidence
-  const handleInsertEvidence = (index) => {
+  const handleReplaceEvidence = (index: number) => {
     setInsertedEvidenceIndices((prev) => [...prev, index]);
-    onInsert();
+    onReplace();
   };
 
   // If not open, return null
@@ -565,40 +549,31 @@ const ProposalPreviewSidepane = ({
                             )}
                           >
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full border border-gray-border"
-                              onClick={() => handleCopyText(message.text)}
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleInsertEvidence(message.text)}
+                              className="text-gray-hint_text"
                             >
-                              <CopyIcon className="text-gray-hint_text" />
+                              <DataTransferHorizontalIcon />
+                              Insert
                             </Button>
-
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className={cn(
-                                "rounded-full border border-gray-border hover:text-gray-hint_text",
-                                messageFeedback[index] === "positive"
-                                  ? "bg-gray-hint_text text-white"
-                                  : "text-gray-hint_text"
-                              )}
-                              onClick={() => handleFeedback(index, "positive")}
+                              variant="outline"
+                              size="sm"
+                              className="text-gray-hint_text"
                             >
-                              <ThumbupIcon />
+                              <RefreshArrowIcon />
+                              Refine
                             </Button>
-
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className={cn(
-                                "rounded-full border border-gray-border hover:text-gray-hint_text",
-                                messageFeedback[index] === "negative"
-                                  ? "bg-gray-hint_text text-white"
-                                  : "text-gray-hint_text"
-                              )}
-                              onClick={() => handleFeedback(index, "negative")}
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                handleCopyText(message.text);
+                              }}
+                              className="text-gray-hint_text"
                             >
-                              <ThumbdownIcon />
+                              <CopyIcon /> Copy
                             </Button>
                           </div>
                         )}
@@ -608,13 +583,12 @@ const ProposalPreviewSidepane = ({
                           </span>
                         )}
                         {/* Add insert button for evidence messages */}
-                        {message.type === "evidence" && (
+                        {message.type === "evidence" ? (
                           <div className="flex gap-1 mt-3">
-                            {index}
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleInsertEvidence(index)}
+                              onClick={() => handleReplaceEvidence(index)}
                               disabled={insertedEvidenceIndices.includes(index)}
                               className="text-gray-hint_text"
                             >
@@ -642,7 +616,7 @@ const ProposalPreviewSidepane = ({
                               <CopyIcon /> Copy
                             </Button>
                           </div>
-                        )}
+                        ) : null}
                       </>
                     )}
                   </div>

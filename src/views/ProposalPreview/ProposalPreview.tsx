@@ -1115,6 +1115,90 @@ const ProposalPreview = () => {
     }
   };
 
+  // Update this function to insert text at current cursor position
+  const handleInsertFromSidepane = (text: string) => {
+    if (!text) {
+      toast.error("No content to insert");
+      return;
+    }
+
+    try {
+      // Check if we have a currently selected section
+      if (currentSectionIndex !== null && editorRef.current) {
+        const selection = window.getSelection();
+
+        // Insert at cursor position if there's a valid selection within the editor
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+
+          // Check if the selection is within our editor
+          const isSelectionInEditor = editorRef.current.contains(
+            range.commonAncestorContainer
+          );
+
+          if (isSelectionInEditor) {
+            // Create a wrapper div for the text to maintain formatting
+            const wrapper = document.createElement("div");
+            wrapper.innerHTML = text;
+
+            // Insert the formatted content at cursor position
+            range.deleteContents();
+
+            // Insert each child node individually to preserve formatting
+            while (wrapper.firstChild) {
+              range.insertNode(wrapper.firstChild);
+              range.collapse(false); // Move cursor to end of inserted content
+            }
+
+            // Create a copy of the outline
+            const updatedOutline = [...outline];
+
+            // Update the answer field with the new content
+            updatedOutline[currentSectionIndex] = {
+              ...updatedOutline[currentSectionIndex],
+              answer: editorRef.current.innerHTML
+            };
+
+            // Update the shared state with the modified outline
+            setSharedState((prevState) => ({
+              ...prevState,
+              outline: updatedOutline
+            }));
+
+            toast.success("Content inserted successfully");
+            return;
+          }
+        }
+
+        // Fallback: If no valid selection in editor, append to the end
+        const currentContent = editorRef.current.innerHTML;
+        editorRef.current.innerHTML = currentContent + `<div>${text}</div>`;
+
+        // Create a copy of the outline
+        const updatedOutline = [...outline];
+
+        // Update the answer field with the new content
+        updatedOutline[currentSectionIndex] = {
+          ...updatedOutline[currentSectionIndex],
+          answer: editorRef.current.innerHTML
+        };
+
+        // Update the shared state with the modified outline
+        setSharedState((prevState) => ({
+          ...prevState,
+          outline: updatedOutline
+        }));
+
+        toast.success("Content inserted successfully");
+      } else {
+        toast.error("Please select a section to insert into");
+      }
+    } catch (error) {
+      console.error("Error inserting text:", error);
+      toast.error("Failed to insert text");
+    }
+  };
+
   return (
     <div className="proposal-preview-container pb-8">
       <div>
@@ -1827,7 +1911,8 @@ const ProposalPreview = () => {
                     promptTarget={promptTarget}
                     promptResult={promptResult}
                     isLoadingEvidence={isLoadingEvidence}
-                    onInsert={handleReplaceWithPrompt}
+                    onInsert={handleInsertFromSidepane}
+                    onReplace={handleReplaceWithPrompt}
                     onCancelPrompt={handleCancelPrompt}
                   />
                 )}
