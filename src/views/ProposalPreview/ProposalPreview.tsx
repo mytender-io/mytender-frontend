@@ -1891,7 +1891,7 @@ const ProposalPreview = () => {
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
-                          <TooltipProvider delayDuration={0}>
+                          {/* <TooltipProvider delayDuration={0}>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
@@ -1907,7 +1907,7 @@ const ProposalPreview = () => {
                                 Custom
                               </TooltipContent>
                             </Tooltip>
-                          </TooltipProvider>
+                          </TooltipProvider> */}
                           <TooltipProvider delayDuration={0}>
                             <Tooltip>
                               <TooltipTrigger asChild>
