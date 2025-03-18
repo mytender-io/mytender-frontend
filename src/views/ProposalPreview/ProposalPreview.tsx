@@ -68,6 +68,7 @@ import {
 } from "@/utils/formatSectionText";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
+import { debounce } from "lodash";
 
 const ProposalPreview = () => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -108,7 +109,9 @@ const ProposalPreview = () => {
   const [rewritingSection, setRewritingSection] = useState<string | null>(null);
 
   // Get sections from shared state
-  const { isLoading, outline } = sharedState;
+  const { outline } = sharedState;
+  const [localLoading, setLocalLoading] = useState(false);
+
 
   const [organizationUsers, setOrganizationUsers] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState<string>("version2");
@@ -147,6 +150,16 @@ const ProposalPreview = () => {
     fetchOrganizationUsers();
   }, [tokenRef]);
 
+  useEffect(() => {
+    // Set local loading when component mounts
+    setLocalLoading(true);
+    
+    // When outline data is available, turn off loading
+    if (sharedState.outline) {
+      setLocalLoading(false);
+    }
+  }, [sharedState.outline]);
+
   // Function to toggle the sidepane
   const toggleSidepane = () => {
     setSidepaneOpen((prevState) => !prevState);
@@ -180,17 +193,20 @@ const ProposalPreview = () => {
         );
 
         if (response.data) {
-          // Create a copy of the outline
-          const updatedOutline = [...outline];
+          // Update only the specific section in the shared state
+          setSharedState((prevState) => {
+            // Create a shallow copy of the previous outline
+            const newOutline = [...prevState.outline];
 
-          // Update the section with the response data
-          updatedOutline[rewritingSectionIndex] = response.data;
+            // Update only the specific section at the rewritingSectionIndex
+            newOutline[rewritingSectionIndex] = response.data;
 
-          // Update the shared state with the modified outline
-          setSharedState((prevState) => ({
-            ...prevState,
-            outline: updatedOutline
-          }));
+            // Return the new state with only the needed section updated
+            return {
+              ...prevState,
+              outline: newOutline
+            };
+          });
 
           toast.success("Section rewritten successfully");
         }
@@ -297,29 +313,80 @@ const ProposalPreview = () => {
     }
   };
 
+  // Create a debounced version of the save function with useRef to maintain the reference
+  const debouncedSave = useRef(
+    debounce((index, content) => {
+      // Update just the specific section in the shared state without replacing the entire outline
+      setSharedState((prevState) => {
+        // Create a shallow copy of the outline
+        const newOutline = [...prevState.outline];
+
+        // Update only the specific section
+        newOutline[index] = {
+          ...newOutline[index], // Keep all other properties
+          answer: content // Update only the answer field
+        };
+
+        // Return the new state with only the outline updated
+        return {
+          ...prevState,
+          outline: newOutline
+        };
+      });
+    }, 1000) // 1 second delay
+  ).current;
+
+  // 3. Add a cleanup for the debounced function
+  useEffect(() => {
+    return () => {
+      debouncedSave.cancel();
+    };
+  }, [debouncedSave]);
+
+  // 4. Add an event listener to detect content changes and trigger auto-save
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (editor && currentSectionIndex !== null) {
+      const handleInput = () => {
+        // Get the current content
+        const content = editor.innerHTML;
+
+        // Trigger the debounced save
+        debouncedSave(currentSectionIndex, content);
+      };
+
+      // Add input event listener
+      editor.addEventListener("input", handleInput);
+
+      // Clean up
+      return () => {
+        editor.removeEventListener("input", handleInput);
+      };
+    }
+  }, [currentSectionIndex, editorRef.current]);
+
   // Then update the handleSaveEdit function to properly format the content before saving
   const handleSaveEdit = () => {
     if (editorRef.current && currentSectionIndex !== null) {
-      // Create a copy of the outline
-      const updatedOutline = [...outline];
-
       // Get the HTML content from the editor
       const rawContent = editorRef.current.innerHTML;
 
-      // Ensure content has proper Tailwind classes
+      // Apply any formatting if needed
       const formattedContent = addTailwindClasses(rawContent);
 
-      // Update the answer field of the current section
-      updatedOutline[currentSectionIndex] = {
-        ...updatedOutline[currentSectionIndex],
-        answer: formattedContent
-      };
+      // Update just the specific section
+      setSharedState((prevState) => {
+        const newOutline = [...prevState.outline];
+        newOutline[currentSectionIndex] = {
+          ...newOutline[currentSectionIndex],
+          answer: formattedContent
+        };
 
-      // Update the shared state with the modified outline
-      setSharedState((prevState) => ({
-        ...prevState,
-        outline: updatedOutline
-      }));
+        return {
+          ...prevState,
+          outline: newOutline
+        };
+      });
 
       toast.success("Changes saved successfully");
       setCurrentSectionIndex(null);
@@ -1051,7 +1118,7 @@ const ProposalPreview = () => {
   return (
     <div className="proposal-preview-container pb-8">
       <div>
-        {isLoading ? (
+        {localLoading  ? (
           <div className="flex justify-center items-center h-full">
             <Spinner className="w-8 h-8" />
           </div>
