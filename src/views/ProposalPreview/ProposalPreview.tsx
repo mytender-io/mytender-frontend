@@ -942,29 +942,29 @@ const ProposalPreview = () => {
     }
   };
 
-  const handleSummarize = async () => {
+  const handleSummarise = async () => {
     if (!selectedRange) {
-      toast.error("Please select text to summarize");
+      toast.error("Please select text to summarise");
       return;
     }
 
     // Get the selected text
     const selectedText = selectedRange.toString();
     if (!selectedText || selectedText.trim() === "") {
-      toast.error("Please select text to summarize");
+      toast.error("Please select text to summarise");
       return;
     }
 
     setPromptTarget(selectedText);
-    setActionType("summarize");
+    setActionType("summarise");
     // Store a deep clone of the range for later use
     const storedRange = selectedRange.cloneRange();
     setSelectedRange(storedRange);
 
     // Highlight the selected text with a different color
     const span = document.createElement("span");
-    span.className = "summarize-text";
-    span.dataset.summarizeId = `summarize-${Date.now()}`;
+    span.className = "summarise-text";
+    span.dataset.summariseId = `summarise-${Date.now()}`;
     span.style.backgroundColor = "#FFE5CC";
 
     try {
@@ -972,7 +972,7 @@ const ProposalPreview = () => {
     } catch (e) {
       // If surroundContents fails (which can happen with complex selections),
       // use a more robust approach that preserves the structure
-      console.log("Using alternative summarize highlighting method");
+      console.log("Using alternative summarise highlighting method");
 
       // Extract the content
       const fragment = selectedRange.extractContents();
@@ -1037,7 +1037,7 @@ const ProposalPreview = () => {
       // Find any of the special spans
       const span =
         document.querySelector("span.evidence-text") ||
-        document.querySelector("span.summarize-text") ||
+        document.querySelector("span.summarise-text") ||
         document.querySelector("span.expand-text");
 
       if (span) {
@@ -1110,7 +1110,7 @@ const ProposalPreview = () => {
     // Find any of the special spans
     const span =
       document.querySelector("span.evidence-text") ||
-      document.querySelector("span.summarize-text") ||
+      document.querySelector("span.summarise-text") ||
       document.querySelector("span.expand-text");
 
     if (span) {
@@ -1931,7 +1931,7 @@ const ProposalPreview = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={handleSummarize}
+                                  onClick={handleSummarise}
                                   className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
                                 >
                                   <ShortenHorizontalIcon />
