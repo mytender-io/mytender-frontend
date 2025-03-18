@@ -1,6 +1,5 @@
 import axios from "axios";
-import { MutableRefObject, useRef } from "react";
-import { useAuthUser } from "react-auth-kit";
+import { MutableRefObject } from "react";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { Section } from "../views/BidWritingStateManagerView";
 
