@@ -112,11 +112,12 @@ const ProposalPreview = () => {
   const { outline } = sharedState;
   const [localLoading, setLocalLoading] = useState(false);
 
-
   const [organizationUsers, setOrganizationUsers] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState<string>("version2");
   const [versionPopoverOpen, setVersionPopoverOpen] = useState(false);
   const [isLoadingEvidence, setIsLoadingEvidence] = useState(false);
+
+  const [actionType, setActionType] = useState("evidence");
 
   const handleSelectVersion = (version: string) => {
     setSelectedVersion(version);
@@ -153,7 +154,7 @@ const ProposalPreview = () => {
   useEffect(() => {
     // Set local loading when component mounts
     setLocalLoading(true);
-    
+
     // When outline data is available, turn off loading
     if (sharedState.outline) {
       setLocalLoading(false);
@@ -771,6 +772,7 @@ const ProposalPreview = () => {
     }
 
     setPromptTarget(selectedText);
+    setActionType("evidence");
     // Store a deep clone of the range for later use
     const storedRange = selectedRange.cloneRange();
     setSelectedRange(storedRange);
@@ -857,7 +859,174 @@ const ProposalPreview = () => {
     }
   };
 
-  // Update the handleReplaceWithPrompt function to find the evidence span
+  const handleExpand = async () => {
+    if (!selectedRange) {
+      toast.error("Please select text to expand");
+      return;
+    }
+
+    // Get the selected text
+    const selectedText = selectedRange.toString();
+    if (!selectedText || selectedText.trim() === "") {
+      toast.error("Please select text to expand");
+      return;
+    }
+
+    setPromptTarget(selectedText);
+    setActionType("expand");
+    // Store a deep clone of the range for later use
+    const storedRange = selectedRange.cloneRange();
+    setSelectedRange(storedRange);
+
+    // Highlight the selected text with a different color
+    const span = document.createElement("span");
+    span.className = "expand-text";
+    span.dataset.expandId = `expand-${Date.now()}`;
+    span.style.backgroundColor = "#FFE5CC";
+
+    try {
+      selectedRange.surroundContents(span);
+    } catch (e) {
+      // If surroundContents fails (which can happen with complex selections),
+      // use a more robust approach that preserves the structure
+      console.log("Using alternative expand highlighting method");
+
+      // Extract the content
+      const fragment = selectedRange.extractContents();
+
+      // Add the content to our span
+      span.appendChild(fragment);
+
+      // Insert the span
+      selectedRange.insertNode(span);
+    }
+
+    // Apply the style to all child elements
+    const childElements = span.querySelectorAll("*");
+    childElements.forEach((element) => {
+      (element as HTMLElement).style.backgroundColor = "#FFE5CC";
+    });
+
+    setSidepaneOpen(true);
+    setIsLoadingEvidence(true);
+
+    try {
+      // Make API call to expand text using copilot endpoint
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/copilot`,
+        {
+          input_text: selectedText,
+          extra_instructions: "",
+          copilot_mode: "1expand",
+          datasets: [],
+          bid_id: sharedState.object_id
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+
+      if (response.data) {
+        setPromptResult(response.data);
+      } else {
+        setPromptResult("Could not expand text. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error expanding text:", error);
+      setPromptResult("Error expanding text. Please try again.");
+      toast.error("Failed to expand text");
+    } finally {
+      setIsLoadingEvidence(false);
+    }
+  };
+
+  const handleSummarize = async () => {
+    if (!selectedRange) {
+      toast.error("Please select text to summarize");
+      return;
+    }
+
+    // Get the selected text
+    const selectedText = selectedRange.toString();
+    if (!selectedText || selectedText.trim() === "") {
+      toast.error("Please select text to summarize");
+      return;
+    }
+
+    setPromptTarget(selectedText);
+    setActionType("summarize");
+    // Store a deep clone of the range for later use
+    const storedRange = selectedRange.cloneRange();
+    setSelectedRange(storedRange);
+
+    // Highlight the selected text with a different color
+    const span = document.createElement("span");
+    span.className = "summarize-text";
+    span.dataset.summarizeId = `summarize-${Date.now()}`;
+    span.style.backgroundColor = "#FFE5CC";
+
+    try {
+      selectedRange.surroundContents(span);
+    } catch (e) {
+      // If surroundContents fails (which can happen with complex selections),
+      // use a more robust approach that preserves the structure
+      console.log("Using alternative summarize highlighting method");
+
+      // Extract the content
+      const fragment = selectedRange.extractContents();
+
+      // Add the content to our span
+      span.appendChild(fragment);
+
+      // Insert the span
+      selectedRange.insertNode(span);
+    }
+
+    // Apply the style to all child elements
+    const childElements = span.querySelectorAll("*");
+    childElements.forEach((element) => {
+      (element as HTMLElement).style.backgroundColor = "#FFE5CC";
+    });
+
+    setSidepaneOpen(true);
+    setIsLoadingEvidence(true);
+
+    try {
+      // Make API call to get summary using copilot endpoint
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/copilot`,
+        {
+          input_text: selectedText,
+          extra_instructions: "",
+          copilot_mode: "1summarise",
+          datasets: [],
+          bid_id: sharedState.object_id
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+
+      console.log(response.data);
+
+      if (response.data) {
+        setPromptResult(response.data); // Copilot returns an array of options, take the first one
+      } else {
+        setPromptResult("Could not generate summary. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error fetching summary:", error);
+      setPromptResult("Error generating summary. Please try again.");
+      toast.error("Failed to generate summary");
+    } finally {
+      setIsLoadingEvidence(false);
+    }
+  };
+
   const handleReplaceWithPrompt = () => {
     if (!promptResult) {
       toast.error("No content to replace");
@@ -865,13 +1034,16 @@ const ProposalPreview = () => {
     }
 
     try {
-      // Find the evidence span that was created
-      const evidenceSpan = document.querySelector("span.evidence-text");
+      // Find any of the special spans
+      const span =
+        document.querySelector("span.evidence-text") ||
+        document.querySelector("span.summarize-text") ||
+        document.querySelector("span.expand-text");
 
-      if (evidenceSpan) {
-        // Create a new range targeting the evidence span
+      if (span) {
+        // Create a new range targeting the span
         const range = document.createRange();
-        range.selectNode(evidenceSpan);
+        range.selectNode(span);
 
         // Delete the span and its contents
         range.deleteContents();
@@ -883,6 +1055,23 @@ const ProposalPreview = () => {
         // Clear the prompt result
         setPromptResult("");
 
+        // Update the shared state with the new content if we have a current section
+        if (currentSectionIndex !== null && editorRef.current) {
+          const newContent = editorRef.current.innerHTML;
+
+          setSharedState((prevState) => {
+            const newOutline = [...prevState.outline];
+            newOutline[currentSectionIndex] = {
+              ...newOutline[currentSectionIndex],
+              answer: newContent
+            };
+            return {
+              ...prevState,
+              outline: newOutline
+            };
+          });
+        }
+
         toast.success("Text replaced successfully");
       } else if (selectedRange) {
         // Fall back to using the stored selectedRange if span not found
@@ -890,6 +1079,24 @@ const ProposalPreview = () => {
         const textNode = document.createTextNode(promptResult);
         selectedRange.insertNode(textNode);
         setPromptResult("");
+
+        // Update the shared state with the new content if we have a current section
+        if (currentSectionIndex !== null && editorRef.current) {
+          const newContent = editorRef.current.innerHTML;
+
+          setSharedState((prevState) => {
+            const newOutline = [...prevState.outline];
+            newOutline[currentSectionIndex] = {
+              ...newOutline[currentSectionIndex],
+              answer: newContent
+            };
+            return {
+              ...prevState,
+              outline: newOutline
+            };
+          });
+        }
+
         toast.success("Text replaced successfully");
       } else {
         toast.error("Could not find the location to insert text");
@@ -899,27 +1106,27 @@ const ProposalPreview = () => {
       toast.error("Failed to replace text");
     }
   };
-
-  // Cancel prompt
   const handleCancelPrompt = () => {
-    // Find the evidence span that was created
-    const evidenceSpan = document.querySelector("span.evidence-text");
+    // Find any of the special spans
+    const span =
+      document.querySelector("span.evidence-text") ||
+      document.querySelector("span.summarize-text") ||
+      document.querySelector("span.expand-text");
 
-    if (evidenceSpan) {
+    if (span) {
       // Get the text content
-      const textContent = evidenceSpan.textContent || "";
+      const textContent = span.textContent || "";
 
       // Create a text node to replace the span
       const textNode = document.createTextNode(textContent);
 
       // Replace the span with its text content
-      evidenceSpan.parentNode?.replaceChild(textNode, evidenceSpan);
+      span.parentNode?.replaceChild(textNode, span);
     }
 
     setPromptResult("");
     setPromptTarget("");
   };
-
   // Add event listeners for selection
   useEffect(() => {
     // The issue is here - we need to check if the selection is within the editor
@@ -1202,7 +1409,7 @@ const ProposalPreview = () => {
   return (
     <div className="proposal-preview-container pb-8">
       <div>
-        {localLoading  ? (
+        {localLoading ? (
           <div className="flex justify-center items-center h-full">
             <Spinner className="w-8 h-8" />
           </div>
@@ -1707,7 +1914,7 @@ const ProposalPreview = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={handleEvidencePrompt}
+                                  onClick={handleExpand}
                                   className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
                                 >
                                   <ExpandVerticalIcon />
@@ -1724,7 +1931,7 @@ const ProposalPreview = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={handleEvidencePrompt}
+                                  onClick={handleSummarize}
                                   className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
                                 >
                                   <ShortenHorizontalIcon />
@@ -1914,6 +2121,7 @@ const ProposalPreview = () => {
                     onInsert={handleInsertFromSidepane}
                     onReplace={handleReplaceWithPrompt}
                     onCancelPrompt={handleCancelPrompt}
+                    actionType={actionType} // Add this line
                   />
                 )}
               </div>

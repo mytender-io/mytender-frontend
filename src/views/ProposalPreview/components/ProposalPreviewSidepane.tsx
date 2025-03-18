@@ -29,7 +29,8 @@ const ProposalPreviewSidepane = ({
   isLoadingEvidence,
   onInsert,
   onReplace,
-  onCancelPrompt
+  onCancelPrompt,
+  actionType
 }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -593,7 +594,11 @@ const ProposalPreviewSidepane = ({
                         )}
                         {message.type === "evidence-target" && (
                           <span className="text-gray-hint_text mt-2">
-                            Evidence
+                            {actionType === "summarize"
+                              ? "Summarize"
+                              : actionType === "expand"
+                                ? "Expand"
+                                : "Evidence"}
                           </span>
                         )}
                         {/* Add insert button for evidence messages */}
