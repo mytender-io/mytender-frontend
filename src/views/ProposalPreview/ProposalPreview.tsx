@@ -1096,6 +1096,7 @@ const ProposalPreview = () => {
       toast.error("Failed to replace text");
     }
   };
+
   const handleCancelPrompt = () => {
     // Find any of the special spans
     const span =
@@ -1117,63 +1118,6 @@ const ProposalPreview = () => {
     setPromptResult("");
     setPromptTarget("");
   };
-  // Add event listeners for selection
-  useEffect(() => {
-    // The issue is here - we need to check if the selection is within the editor
-    const handleSelectionChange = () => {
-      const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) return;
-
-      // Check if the selection is within the editor
-      const range = selection.getRangeAt(0);
-      const editorContainsSelection = editorRef.current?.contains(
-        range.commonAncestorContainer
-      );
-
-      if (editorContainsSelection) {
-        handleTextSelection();
-      }
-    };
-
-    document.addEventListener("selectionchange", handleSelectionChange);
-
-    return () => {
-      document.removeEventListener("selectionchange", handleSelectionChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Add click handler to document to minimize comments when clicking outside
-    const handleClickOutside = (event: MouseEvent) => {
-      // Check if the click is inside a comment
-      const commentElements = document.querySelectorAll("[data-comment-id]");
-      let isClickInsideComment = false;
-
-      commentElements.forEach((element) => {
-        if (element.contains(event.target as Node)) {
-          isClickInsideComment = true;
-        }
-      });
-
-      // Only reset if click is outside comments
-      if (!isClickInsideComment) {
-        setActiveComment(null);
-        document
-          .querySelectorAll(
-            "span.commented-text[data-comment-id]:not([data-comment-id^='pending-'])"
-          )
-          .forEach((span) => {
-            (span as HTMLElement).style.backgroundColor = "#FFE5CC";
-          });
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   // Copy section handler
   const handleCopySection = (index: number) => {
@@ -1346,6 +1290,98 @@ const ProposalPreview = () => {
       document.removeEventListener("mousedown", handleClickOutsideHighlight);
     };
   }, [isLoadingEvidence]); // Re-attach when loading state changes
+
+  // Add this new useEffect to handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Only process if the editor has focus
+      if (
+        document.activeElement === editorRef.current ||
+        editorRef.current?.contains(document.activeElement)
+      ) {
+        // Undo: Ctrl+Z
+        if (event.ctrlKey && event.key === "z") {
+          event.preventDefault(); // Prevent browser's default undo
+          execCommand("undo");
+        }
+
+        // Redo: Ctrl+Y or Ctrl+Shift+Z
+        if (
+          (event.ctrlKey && event.key === "y") ||
+          (event.ctrlKey && event.shiftKey && event.key === "z")
+        ) {
+          event.preventDefault(); // Prevent browser's default redo
+          execCommand("redo");
+        }
+      }
+    };
+
+    // Add event listener for keydown
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Clean up
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []); // Empty dependency array as we don't need to re-add the listener
+
+  // Add event listeners for selection
+  useEffect(() => {
+    // The issue is here - we need to check if the selection is within the editor
+    const handleSelectionChange = () => {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+
+      // Check if the selection is within the editor
+      const range = selection.getRangeAt(0);
+      const editorContainsSelection = editorRef.current?.contains(
+        range.commonAncestorContainer
+      );
+
+      if (editorContainsSelection) {
+        handleTextSelection();
+      }
+    };
+
+    document.addEventListener("selectionchange", handleSelectionChange);
+
+    return () => {
+      document.removeEventListener("selectionchange", handleSelectionChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Add click handler to document to minimize comments when clicking outside
+    const handleClickOutside = (event: MouseEvent) => {
+      // Check if the click is inside a comment
+      const commentElements = document.querySelectorAll("[data-comment-id]");
+      let isClickInsideComment = false;
+
+      commentElements.forEach((element) => {
+        if (element.contains(event.target as Node)) {
+          isClickInsideComment = true;
+        }
+      });
+
+      // Only reset if click is outside comments
+      if (!isClickInsideComment) {
+        setActiveComment(null);
+        document
+          .querySelectorAll(
+            "span.commented-text[data-comment-id]:not([data-comment-id^='pending-'])"
+          )
+          .forEach((span) => {
+            (span as HTMLElement).style.backgroundColor = "#FFE5CC";
+          });
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="proposal-preview-container pb-8">
