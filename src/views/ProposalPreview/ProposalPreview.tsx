@@ -17,7 +17,6 @@ import {
   AlignCenter,
   AlignRight,
   Type,
-  Save,
   Check,
   Download,
   X,

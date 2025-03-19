@@ -559,14 +559,14 @@ const ProposalPreviewSidepane = ({
                               <DataTransferHorizontalIcon />
                               Insert
                             </Button>
-                            <Button
+                            {/* <Button
                               variant="outline"
                               size="sm"
                               className="text-gray-hint_text"
                             >
                               <RefreshArrowIcon />
                               Refine
-                            </Button>
+                            </Button> */}
                             <Button
                               variant="outline"
                               size="sm"
@@ -602,14 +602,14 @@ const ProposalPreviewSidepane = ({
                               <DataTransferHorizontalIcon />
                               Insert
                             </Button>
-                            <Button
+                            {/* <Button
                               variant="outline"
                               size="sm"
                               className="text-gray-hint_text"
                             >
                               <RefreshArrowIcon />
                               Refine
-                            </Button>
+                            </Button> */}
                             <Button
                               variant="outline"
                               size="sm"
