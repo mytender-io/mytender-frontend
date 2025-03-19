@@ -1258,67 +1258,43 @@ const ProposalPreview = () => {
     setActiveComment(null);
   };
 
-  // Add this function to handle document download
-  const handleDownloadDocument = () => {
-    if (!outline || outline.length === 0) {
-      toast.error("No content to download");
+  const handleDownloadDocument = async () => {
+    if (!sharedState.object_id) {
+      toast.error("No bid ID found");
       return;
     }
-
     try {
-      // Create a temporary div to hold the formatted document
-      const tempDiv = document.createElement("div");
-      tempDiv.className = "proposal-document";
+      toast.info("Preparing document for download...");
 
-      // Add some basic styling to the container
-      tempDiv.style.fontFamily = "Arial, sans-serif";
+      // Create FormData instead of JSON
+      const formData = new FormData();
+      formData.append("bid_id", sharedState.object_id);
 
-      // Add a title to the document
-      const title = document.createElement("h1");
-      title.textContent = sharedState.bidInfo || "Proposal Document";
-      title.style.textAlign = "center";
-      title.style.marginBottom = "30px";
-      tempDiv.appendChild(title);
-
-      // Add each section to the document
-      outline.forEach((section) => {
-        // Add section heading
-        const heading = document.createElement("h2");
-        heading.textContent = section.heading;
-        heading.style.marginTop = "30px";
-        heading.style.marginBottom = "15px";
-        heading.style.borderBottom = "1px solid #ddd";
-        heading.style.paddingBottom = "10px";
-        tempDiv.appendChild(heading);
-
-        // Add section content
-        const content = document.createElement("div");
-        content.innerHTML = section.answer || "";
-        tempDiv.appendChild(content);
+      const response = await axios({
+        method: "post",
+        url: `http${HTTP_PREFIX}://${API_URL}/generate_docx`,
+        data: formData,
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${tokenRef.current}`
+          // Don't set Content-Type - axios will set it correctly with boundaries
+        }
       });
 
-      // Get the HTML content
-      const htmlContent = tempDiv.outerHTML;
+      // Create a blob from the response data
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      });
 
-      // Create a Blob with the HTML content
-      const blob = new Blob(
-        [
-          "<html><head><title>" +
-            (sharedState.bidInfo || "Proposal Document") +
-            "</title></head><body>" +
-            htmlContent +
-            "</body></html>"
-        ],
-        { type: "text/html" }
-      );
-
-      // Create a download link
+      // Create a URL for the blob
       const url = URL.createObjectURL(blob);
+
+      // Create a temporary link element to trigger the download
       const a = document.createElement("a");
       a.href = url;
       a.download = `${sharedState.bidInfo || "proposal"}.docx`;
 
-      // Trigger the download
+      // Append to the DOM, click and then remove
       document.body.appendChild(a);
       a.click();
 
@@ -1328,12 +1304,12 @@ const ProposalPreview = () => {
         URL.revokeObjectURL(url);
       }, 100);
 
-      toast.success("Downloading document...");
+      toast.success("Document downloaded successfully");
 
       // Track download with posthog
       posthog.capture("proposal_document_downloaded", {
         bidId: sharedState.object_id,
-        format: "html"
+        format: "docx"
       });
     } catch (error) {
       console.error("Error downloading document:", error);
