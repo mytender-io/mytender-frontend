@@ -61,10 +61,8 @@ import ShortenHorizontalIcon from "@/components/icons/ShortenHorizontalIcon";
 import ExpandVerticalIcon from "@/components/icons/ExpandVerticalIcon";
 // import PencilIcon from "@/components/icons/PencilIcon";
 import { cn, getSectionHeading } from "@/utils";
-import { formatSectionText } from "@/utils/formatSectionText";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
-import { debounce } from "lodash";
 import DebouncedContentEditable from "./components/DebouncedContentEditable";
 
 const ProposalPreview = () => {
@@ -1347,31 +1345,6 @@ const ProposalPreview = () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []); // Empty dependency array as we don't need to re-add the listener
-
-  // Add event listeners for selection
-  useEffect(() => {
-    // The issue is here - we need to check if the selection is within the editor
-    const handleSelectionChange = () => {
-      const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) return;
-
-      // Check if the selection is within the editor
-      const range = selection.getRangeAt(0);
-      const editorContainsSelection = editorRef.current?.contains(
-        range.commonAncestorContainer
-      );
-
-      if (editorContainsSelection) {
-        handleTextSelection();
-      }
-    };
-
-    document.addEventListener("selectionchange", handleSelectionChange);
-
-    return () => {
-      document.removeEventListener("selectionchange", handleSelectionChange);
-    };
-  }, []);
 
   useEffect(() => {
     // Add click handler to document to minimize comments when clicking outside
