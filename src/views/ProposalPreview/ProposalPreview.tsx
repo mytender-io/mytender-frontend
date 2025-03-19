@@ -66,6 +66,7 @@ import { formatSectionText } from "@/utils/formatSectionText";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
 import { debounce } from "lodash";
+import DebouncedContentEditable from "./components/DebouncedContentEditable";
 
 const ProposalPreview = () => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -310,58 +311,6 @@ const ProposalPreview = () => {
       editorRef.current.focus();
     }
   };
-
-  // Create a debounced version of the save function with useRef to maintain the reference
-  const debouncedSave = useRef(
-    debounce((index, content) => {
-      // Update just the specific section in the shared state without replacing the entire outline
-      setSharedState((prevState) => {
-        // Create a shallow copy of the outline
-        const newOutline = [...prevState.outline];
-
-        // Update only the specific section
-        newOutline[index] = {
-          ...newOutline[index], // Keep all other properties
-          answer: content // Update only the answer field
-        };
-
-        // Return the new state with only the outline updated
-        return {
-          ...prevState,
-          outline: newOutline
-        };
-      });
-    }, 1000) // 1 second delay
-  ).current;
-
-  // 3. Add a cleanup for the debounced function
-  useEffect(() => {
-    return () => {
-      debouncedSave.cancel();
-    };
-  }, [debouncedSave]);
-
-  // 4. Add an event listener to detect content changes and trigger auto-save
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (editor && currentSectionIndex !== null) {
-      const handleInput = () => {
-        // Get the current content
-        const content = editor.innerHTML;
-
-        // Trigger the debounced save
-        debouncedSave(currentSectionIndex, content);
-      };
-
-      // Add input event listener
-      editor.addEventListener("input", handleInput);
-
-      // Clean up
-      return () => {
-        editor.removeEventListener("input", handleInput);
-      };
-    }
-  }, [currentSectionIndex, editorRef.current]);
 
   // Add this function to handle hyperlinks
   const handleLink = () => {
@@ -659,6 +608,25 @@ const ProposalPreview = () => {
         (element as HTMLElement).style.backgroundColor = "#FF8019";
       });
     }
+  };
+
+  const handleContentChange = (index: number, newContent: string) => {
+    setSharedState((prevState) => {
+      // Create a shallow copy of the outline
+      const newOutline = [...prevState.outline];
+
+      // Update only the specific section
+      newOutline[index] = {
+        ...newOutline[index], // Keep all other properties
+        answer: newContent // Update only the answer field
+      };
+
+      // Return the new state with only the outline updated
+      return {
+        ...prevState,
+        outline: newOutline
+      };
+    });
   };
 
   // Add this new function to handle comment cancellation
@@ -1663,18 +1631,11 @@ const ProposalPreview = () => {
                               </div>
                             )}
 
-                            <div
-                              ref={
-                                currentSectionIndex === index ? editorRef : null
+                            <DebouncedContentEditable
+                              content={section.answer || ""}
+                              onChange={(newContent) =>
+                                handleContentChange(index, newContent)
                               }
-                              dangerouslySetInnerHTML={{
-                                __html: section.answer
-                                  ? formatSectionText(section.answer)
-                                  : ""
-                              }}
-                              className="font-sans text-base leading-relaxed w-full m-0 outline-none focus:outline-none"
-                              contentEditable={true}
-                              suppressContentEditableWarning={true}
                               onFocus={() => {
                                 setCurrentSectionIndex(index);
                               }}
@@ -1683,6 +1644,7 @@ const ProposalPreview = () => {
                                   setCurrentSectionIndex(index);
                                 }
                               }}
+                              disabled={false}
                             />
 
                             {/* Inline rewrite feedback section */}
