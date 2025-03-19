@@ -66,7 +66,8 @@ import posthog from "posthog-js";
 import DebouncedContentEditable from "./components/DebouncedContentEditable";
 
 const ProposalPreview = () => {
-  const editorRef = useRef<HTMLDivElement>(null);
+  const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const activeEditorRef = useRef<HTMLDivElement | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null);
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -304,8 +305,8 @@ const ProposalPreview = () => {
   // Rich text editor functions
   const execCommand = (command: string, value: string = "") => {
     document.execCommand(command, false, value);
-    if (editorRef.current) {
-      editorRef.current.focus();
+    if (activeEditorRef.current) {
+      activeEditorRef.current.focus();
     }
   };
 
@@ -370,8 +371,8 @@ const ProposalPreview = () => {
       }
     }
 
-    if (editorRef.current) {
-      editorRef.current.focus();
+    if (activeEditorRef.current) {
+      activeEditorRef.current.focus();
     }
   };
 
@@ -427,8 +428,8 @@ const ProposalPreview = () => {
       }
     }
 
-    if (editorRef.current) {
-      editorRef.current.focus();
+    if (activeEditorRef.current) {
+      activeEditorRef.current.focus();
     }
   };
 
@@ -448,8 +449,8 @@ const ProposalPreview = () => {
         range.insertNode(blockquote);
 
         // Ensure the editor maintains focus
-        if (editorRef.current) {
-          editorRef.current.focus();
+        if (activeEditorRef.current) {
+          activeEditorRef.current.focus();
         }
       }
     }
@@ -975,7 +976,6 @@ const ProposalPreview = () => {
         document.querySelector("span.expand-text");
 
       if (span) {
-        console.log("span");
         // Create a new range targeting the span
         const range = document.createRange();
         range.selectNode(span);
@@ -991,8 +991,8 @@ const ProposalPreview = () => {
         setPromptResult("");
 
         // Update the shared state with the new content if we have a current section
-        if (currentSectionIndex !== null && editorRef.current) {
-          const newContent = editorRef.current.innerHTML;
+        if (currentSectionIndex !== null && activeEditorRef.current) {
+          const newContent = activeEditorRef.current.innerHTML;
 
           setSharedState((prevState) => {
             const newOutline = [...prevState.outline];
@@ -1015,8 +1015,8 @@ const ProposalPreview = () => {
         setPromptResult("");
 
         // Update the shared state with the new content if we have a current section
-        if (currentSectionIndex !== null && editorRef.current) {
-          const newContent = editorRef.current.innerHTML;
+        if (currentSectionIndex !== null && activeEditorRef.current) {
+          const newContent = activeEditorRef.current.innerHTML;
 
           setSharedState((prevState) => {
             const newOutline = [...prevState.outline];
@@ -1031,22 +1031,23 @@ const ProposalPreview = () => {
           });
         }
       } else {
-        console.log(currentSectionIndex, editorRef.current);
         // If no specific location found, insert at current cursor position or end of editor
-        if (currentSectionIndex !== null && editorRef.current) {
+        if (currentSectionIndex !== null && activeEditorRef.current) {
           const selection = window.getSelection();
           if (selection && selection.rangeCount > 0) {
             // Get the range at the current cursor position
             const range = selection.getRangeAt(0);
 
             // Check if the cursor is within the editor
-            if (editorRef.current.contains(range.commonAncestorContainer)) {
+            if (
+              activeEditorRef.current.contains(range.commonAncestorContainer)
+            ) {
               // Insert text at current cursor position
               document.execCommand("insertText", false, text);
             } else {
               // If cursor is not in the editor, place it at the end of editor content
               const endRange = document.createRange();
-              endRange.selectNodeContents(editorRef.current);
+              endRange.selectNodeContents(activeEditorRef.current);
               endRange.collapse(false); // Collapse to end
 
               selection.removeAllRanges();
@@ -1057,9 +1058,9 @@ const ProposalPreview = () => {
             }
           } else {
             // If no selection exists, append to the end of the editor
-            editorRef.current.focus();
+            activeEditorRef.current.focus();
             const endRange = document.createRange();
-            endRange.selectNodeContents(editorRef.current);
+            endRange.selectNodeContents(activeEditorRef.current);
             endRange.collapse(false); // Collapse to end
 
             const sel = window.getSelection();
@@ -1074,7 +1075,7 @@ const ProposalPreview = () => {
           setPromptResult("");
 
           // Update the shared state with the new content
-          const newContent = editorRef.current.innerHTML;
+          const newContent = activeEditorRef.current.innerHTML;
           setSharedState((prevState) => {
             const newOutline = [...prevState.outline];
             newOutline[currentSectionIndex] = {
@@ -1315,10 +1316,11 @@ const ProposalPreview = () => {
   // Add this new useEffect to handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Only process if the editor has focus
+      // Only process if the active editor has focus
       if (
-        document.activeElement === editorRef.current ||
-        editorRef.current?.contains(document.activeElement)
+        activeEditorRef.current &&
+        (document.activeElement === activeEditorRef.current ||
+          activeEditorRef.current.contains(document.activeElement))
       ) {
         // Undo: Ctrl+Z
         if (event.ctrlKey && event.key === "z") {
@@ -1378,6 +1380,12 @@ const ProposalPreview = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Function to set active editor ref when a section is focused
+  const setActiveEditor = (ref: HTMLDivElement | null, index: number) => {
+    activeEditorRef.current = ref;
+    setCurrentSectionIndex(index);
+  };
 
   return (
     <div className="proposal-preview-container pb-8">
@@ -1668,11 +1676,17 @@ const ProposalPreview = () => {
                                 handleContentChange(index, newContent)
                               }
                               onFocus={() => {
-                                setCurrentSectionIndex(index);
+                                setActiveEditor(
+                                  editorRefs.current[index],
+                                  index
+                                );
                               }}
                               onClick={() => {
                                 if (currentSectionIndex !== index) {
-                                  setCurrentSectionIndex(index);
+                                  setActiveEditor(
+                                    editorRefs.current[index],
+                                    index
+                                  );
                                 }
                               }}
                               onSelectionChange={(selection) => {
@@ -1681,6 +1695,12 @@ const ProposalPreview = () => {
                                 }
                               }}
                               disabled={false}
+                              editorRef={(el) => {
+                                editorRefs.current[index] = el;
+                                if (currentSectionIndex === index) {
+                                  activeEditorRef.current = el;
+                                }
+                              }}
                             />
 
                             {/* Inline rewrite feedback section */}

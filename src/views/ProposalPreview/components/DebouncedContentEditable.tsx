@@ -4,13 +4,14 @@ import { formatSectionText } from "@/utils/formatSectionText";
 
 interface DebouncedContentEditableProps {
   content: string;
-  onChange: (content: string) => void;
+  onChange: (newContent: string) => void;
   className?: string;
   disabled?: boolean;
   style?: React.CSSProperties;
   onFocus?: () => void;
   onClick?: () => void;
   onSelectionChange?: (selection: Selection | null) => void;
+  editorRef?: (el: HTMLDivElement | null) => void;
 }
 
 const DebouncedContentEditable: React.FC<DebouncedContentEditableProps> = ({
@@ -21,23 +22,24 @@ const DebouncedContentEditable: React.FC<DebouncedContentEditableProps> = ({
   style,
   onFocus,
   onClick,
-  onSelectionChange
+  onSelectionChange,
+  editorRef
 }) => {
-  const editorRef = useRef<HTMLDivElement>(null);
+  const localRef = useRef<HTMLDivElement>(null);
   const debouncedCallback = useRef<NodeJS.Timeout | null>(null);
   const isInitialMount = useRef(true);
 
   // Only set the initial HTML content on the first render
   useEffect(() => {
-    if (isInitialMount.current && editorRef.current) {
-      editorRef.current.innerHTML = formatSectionText(content || "");
+    if (isInitialMount.current && localRef.current) {
+      localRef.current.innerHTML = formatSectionText(content || "");
       isInitialMount.current = false;
     }
   }, [content]);
 
   // Handle external content updates without losing cursor position
   useEffect(() => {
-    const editor = editorRef.current;
+    const editor = localRef.current;
 
     // Only update if the editor doesn't have focus and the content has changed
     if (
@@ -52,7 +54,7 @@ const DebouncedContentEditable: React.FC<DebouncedContentEditableProps> = ({
 
   // Add input event listener to detect content changes
   useEffect(() => {
-    const editor = editorRef.current;
+    const editor = localRef.current;
     if (editor) {
       const handleInput = () => {
         const newContent = editor.innerHTML;
@@ -88,7 +90,7 @@ const DebouncedContentEditable: React.FC<DebouncedContentEditableProps> = ({
       if (!selection || selection.rangeCount === 0) return;
 
       const range = selection.getRangeAt(0);
-      const editorContainsSelection = editorRef.current?.contains(
+      const editorContainsSelection = localRef.current?.contains(
         range.commonAncestorContainer
       );
 
@@ -104,9 +106,17 @@ const DebouncedContentEditable: React.FC<DebouncedContentEditableProps> = ({
     };
   }, [onSelectionChange]);
 
+  // Use both the callback ref and local ref
+  const setRefs = (el: HTMLDivElement | null) => {
+    localRef.current = el;
+    if (editorRef) {
+      editorRef(el);
+    }
+  };
+
   return (
     <div
-      ref={editorRef}
+      ref={setRefs}
       className={cn(
         "font-sans text-base leading-relaxed w-full m-0 outline-none focus:outline-none",
         className
