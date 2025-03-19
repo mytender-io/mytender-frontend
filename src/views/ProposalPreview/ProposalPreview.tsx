@@ -1369,7 +1369,7 @@ const ProposalPreview = () => {
                   "h-full relative flex justify-center gap-4 flex-1"
                 )}
               >
-                <div className="rounded-md bg-white w-full max-w-4xl">
+                <div className="rounded-md bg-white w-full max-w-4xl flex-1">
                   <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-between gap-2 sticky -top-4 z-10">
                     <span>
                       {currentSectionIndex !== null
