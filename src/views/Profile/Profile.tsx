@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import withAuth from "../../routes/withAuth.tsx";
+import withAuth from "../../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import axios from "axios";
-import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
+import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import { CheckCircle } from "lucide-react";
-import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
+import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import {
@@ -24,13 +24,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import UserProfileIcon from "@/components/icons/UserProfileIcon.tsx";
-import JobResponseIcon from "@/components/icons/JobResponseIcon.tsx";
-import CompanyIcon from "@/components/icons/CompanyIcon.tsx";
-import LocationIcon from "@/components/icons/LocationIcon.tsx";
-import EmailIcon from "@/components/icons/EmailIcon.tsx";
-import DownloadIcon from "@/components/icons/DownloadIcon.tsx";
-import SubscriptionIcon from "@/components/icons/SubscriptionIcon.tsx";
+import UserProfileIcon from "@/components/icons/UserProfileIcon";
+import JobResponseIcon from "@/components/icons/JobResponseIcon";
+import CompanyIcon from "@/components/icons/CompanyIcon";
+import LocationIcon from "@/components/icons/LocationIcon";
+import EmailIcon from "@/components/icons/EmailIcon";
+import DownloadIcon from "@/components/icons/DownloadIcon";
+import SubscriptionIcon from "@/components/icons/SubscriptionIcon";
 import {
   Tooltip,
   TooltipContent,
@@ -41,14 +41,14 @@ import { Spinner } from "@/components/ui/spinner";
 import MeshGradient from "@/components/mesh-gradient/MeshGradient";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
-import ToneOfVoiceLibrary from "../BidInputs/ToneOfVoiceLibrary.tsx";
+import ToneOfVoiceLibrary from "../BidInputs/ToneOfVoiceLibrary";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "@/components/ui/select.tsx";
+} from "@/components/ui/select";
 
 const ProfilePage = () => {
   const getAuth = useAuthUser();

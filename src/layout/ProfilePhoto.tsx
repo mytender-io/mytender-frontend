@@ -36,9 +36,11 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 
   useEffect(() => {
     const fetchProfileData = async () => {
-      // Check localStorage first
+      // Only use localStorage if token hasn't changed and refreshImage is false
       const cachedProfile = localStorage.getItem("userProfile");
-      if (cachedProfile && !refreshImage) {
+      const savedToken = localStorage.getItem("cachedToken");
+
+      if (cachedProfile && savedToken === tokenRef.current && !refreshImage) {
         setProfile(JSON.parse(cachedProfile));
         return;
       }
@@ -54,11 +56,12 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
           }
         );
         setProfile(profileResponse.data);
-        // Save to localStorage
+        // Save to localStorage along with the current token
         localStorage.setItem(
           "userProfile",
           JSON.stringify(profileResponse.data)
         );
+        localStorage.setItem("cachedToken", tokenRef.current);
         setLoading(false);
       } catch (err) {
         console.error("Failed to load profile photo:", err);
@@ -71,9 +74,11 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
-      // Check localStorage first
+      // Only use localStorage if token hasn't changed
       const cachedOrgUsers = localStorage.getItem("organizationUsers");
-      if (cachedOrgUsers) {
+      const savedToken = localStorage.getItem("cachedToken");
+
+      if (cachedOrgUsers && savedToken === tokenRef.current) {
         setOrganizationUsers(JSON.parse(cachedOrgUsers));
         return;
       }
@@ -95,11 +100,14 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
         );
         console.log(response);
         setOrganizationUsers(response.data);
-        // Save to localStorage
+        // Save to localStorage along with current token (if not already saved)
         localStorage.setItem(
           "organizationUsers",
           JSON.stringify(response.data)
         );
+        if (!localStorage.getItem("cachedToken")) {
+          localStorage.setItem("cachedToken", tokenRef.current);
+        }
         setLoading(false);
       } catch (err) {
         console.error("Error fetching organization users:", err);
