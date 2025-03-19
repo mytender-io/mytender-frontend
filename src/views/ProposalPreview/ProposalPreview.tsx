@@ -1679,6 +1679,11 @@ const ProposalPreview = () => {
                                   setCurrentSectionIndex(index);
                                 }
                               }}
+                              onSelectionChange={(selection) => {
+                                if (selection) {
+                                  handleTextSelection();
+                                }
+                              }}
                               disabled={false}
                             />
 

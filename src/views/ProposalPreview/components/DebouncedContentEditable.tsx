@@ -10,6 +10,7 @@ interface DebouncedContentEditableProps {
   style?: React.CSSProperties;
   onFocus?: () => void;
   onClick?: () => void;
+  onSelectionChange?: (selection: Selection | null) => void;
 }
 
 const DebouncedContentEditable: React.FC<DebouncedContentEditableProps> = ({
@@ -19,7 +20,8 @@ const DebouncedContentEditable: React.FC<DebouncedContentEditableProps> = ({
   disabled = false,
   style,
   onFocus,
-  onClick
+  onClick,
+  onSelectionChange
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const debouncedCallback = useRef<NodeJS.Timeout | null>(null);
@@ -36,12 +38,12 @@ const DebouncedContentEditable: React.FC<DebouncedContentEditableProps> = ({
   // Handle external content updates without losing cursor position
   useEffect(() => {
     const editor = editorRef.current;
-    
+
     // Only update if the editor doesn't have focus and the content has changed
     if (
-      !isInitialMount.current && 
-      editor && 
-      document.activeElement !== editor && 
+      !isInitialMount.current &&
+      editor &&
+      document.activeElement !== editor &&
       editor.innerHTML !== formatSectionText(content || "")
     ) {
       editor.innerHTML = formatSectionText(content || "");
@@ -76,6 +78,31 @@ const DebouncedContentEditable: React.FC<DebouncedContentEditableProps> = ({
       };
     }
   }, [onChange]);
+
+  // Add selection change event listener
+  useEffect(() => {
+    if (!onSelectionChange) return;
+
+    const handleSelectionChange = () => {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+
+      const range = selection.getRangeAt(0);
+      const editorContainsSelection = editorRef.current?.contains(
+        range.commonAncestorContainer
+      );
+
+      if (editorContainsSelection) {
+        onSelectionChange(selection);
+      }
+    };
+
+    document.addEventListener("selectionchange", handleSelectionChange);
+
+    return () => {
+      document.removeEventListener("selectionchange", handleSelectionChange);
+    };
+  }, [onSelectionChange]);
 
   return (
     <div
