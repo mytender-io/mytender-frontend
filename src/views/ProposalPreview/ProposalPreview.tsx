@@ -977,6 +977,7 @@ const ProposalPreview = () => {
         document.querySelector("span.expand-text");
 
       if (span) {
+        console.log("span");
         // Create a new range targeting the span
         const range = document.createRange();
         range.selectNode(span);
@@ -1008,6 +1009,7 @@ const ProposalPreview = () => {
           });
         }
       } else if (selectedRange) {
+        console.log("selected range");
         // Fall back to using the stored selectedRange if span not found
         selectedRange.deleteContents();
         const textNode = document.createTextNode(text);
@@ -1031,6 +1033,7 @@ const ProposalPreview = () => {
           });
         }
       } else {
+        console.log(currentSectionIndex, editorRef.current);
         // If no specific location found, insert at current cursor position or end of editor
         if (currentSectionIndex !== null && editorRef.current) {
           const selection = window.getSelection();
@@ -1270,9 +1273,29 @@ const ProposalPreview = () => {
         }
       });
 
-      // Check if the click is inside the sidepane
-      const sidepane = document.querySelector(".proposal-preview-sidepane");
-      if (sidepane && sidepane.contains(event.target as Node)) {
+      // Check if the click is inside the sidepane - use more robust detection methods
+      // Check both by class and by checking the sidepane DOM reference directly
+      const sidepaneElement = document.querySelector(
+        ".proposal-preview-sidepane"
+      );
+
+      // Also check if this is a click within any element inside the sidepane section of our component
+      const sidePane = document.querySelector(
+        '[class*="proposal-preview-sidepane"]'
+      );
+      const isInsideSidepaneElement =
+        sidepaneElement && sidepaneElement.contains(event.target as Node);
+      const isInsideSidePane =
+        sidePane && sidePane.contains(event.target as Node);
+
+      // Also check if we're clicking inside the right sidebar where the sidepane lives
+      const rightSidebar = document.querySelector(
+        ".max-h-\\[calc\\(100vh-66px\\)\\]"
+      );
+      const isInsideRightSidebar =
+        rightSidebar && rightSidebar.contains(event.target as Node);
+
+      if (isInsideSidepaneElement || isInsideSidePane || isInsideRightSidebar) {
         isClickInsideHighlight = true;
       }
 
