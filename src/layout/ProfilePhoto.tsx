@@ -75,10 +75,16 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
       // Only use localStorage if token hasn't changed
+      const cachedProfile = localStorage.getItem("userProfile");
       const cachedOrgUsers = localStorage.getItem("organizationUsers");
       const savedToken = localStorage.getItem("cachedToken");
 
-      if (cachedOrgUsers && savedToken === tokenRef.current) {
+      if (
+        cachedProfile &&
+        cachedOrgUsers &&
+        savedToken === tokenRef.current &&
+        cachedProfile._id === profile._id
+      ) {
         setOrganizationUsers(JSON.parse(cachedOrgUsers));
         return;
       }
@@ -105,9 +111,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
           "organizationUsers",
           JSON.stringify(response.data)
         );
-        if (!localStorage.getItem("cachedToken")) {
-          localStorage.setItem("cachedToken", tokenRef.current);
-        }
+        localStorage.setItem("cachedToken", tokenRef.current);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching organization users:", err);
