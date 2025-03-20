@@ -64,6 +64,7 @@ import { cn, getSectionHeading } from "@/utils";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
 import DebouncedContentEditable from "./components/DebouncedContentEditable";
+import { Textarea } from "@/components/ui/textarea";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -1930,8 +1931,8 @@ const ProposalPreview = () => {
                           top: `${selectionMenuPosition.top}px`
                         }}
                       >
-                        <textarea
-                          className="w-full border border-gray-300 rounded p-2 mb-2 text-sm"
+                        <Textarea
+                          className="w-full mb-2"
                           rows={3}
                           placeholder="Add your comment..."
                           value={commentText}
@@ -2046,8 +2047,8 @@ const ProposalPreview = () => {
 
                         {activeComment === comment.id ? (
                           <div className="mt-2 w-full">
-                            <textarea
-                              className="w-full border border-gray-300 rounded p-2 mb-2 text-sm"
+                            <Textarea
+                              className="w-full mb-2 text-sm"
                               rows={2}
                               placeholder="Add your reply..."
                               value={replyText}
