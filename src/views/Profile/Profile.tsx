@@ -38,7 +38,6 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip";
 import { Spinner } from "@/components/ui/spinner";
-import MeshGradient from "@/components/mesh-gradient/MeshGradient";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
 import ToneOfVoiceLibrary from "../BidInputs/ToneOfVoiceLibrary";
@@ -438,176 +437,128 @@ const ProfilePage = () => {
             To manage all of your company information
           </p>
         </div>
-        <div className="flex-1 overflow-y-auto">
-          <MeshGradient>
-            <Card className="max-w-5xl w-full bg-transparent mx-auto mt-10">
-              <CardContent className="px-0 rounded-lg overflow-hidden">
-                <div>
-                  <div className="relative w-full h-32 bg-gray-bg">
-                    <div className="absolute left-8 top-8 flex items-center justify-center bg-orange-lighter rounded-full w-32 h-32 border border-white overflow-hidden group">
-                      {formData.profilePicture ? (
-                        <img
-                          src={`data:image/jpeg;base64,${formData.profilePicture}`}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <h1 className="text-3xl font-semibold uppercase">
-                          {formData.username.slice(0, 1)}
-                        </h1>
-                      )}
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <label
-                          htmlFor="profile-picture-upload"
-                          className="cursor-pointer text-white text-xs font-medium"
-                        >
-                          {refreshImage ? (
-                            <Spinner className="text-white" />
-                          ) : (
-                            "Change Photo"
-                          )}
-                        </label>
-                        <input
-                          id="profile-picture-upload"
-                          type="file"
-                          accept="image/jpeg,image/png,image/gif"
-                          className="hidden"
-                          onChange={handleProfilePictureUpload}
-                          disabled={refreshImage}
-                        />
-                      </div>
+        <div className="flex-1">
+          <Card className="max-w-5xl w-full bg-transparent mx-auto mt-10">
+            <CardContent className="px-0 rounded-lg overflow-hidden">
+              <div>
+                <div className="relative w-full h-32 bg-orange-gradient">
+                  <div className="absolute left-8 top-8 flex items-center justify-center bg-orange-lighter rounded-full w-32 h-32 border border-white overflow-hidden group">
+                    {formData.profilePicture ? (
+                      <img
+                        src={`data:image/jpeg;base64,${formData.profilePicture}`}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <h1 className="text-3xl font-semibold uppercase">
+                        {formData.username.slice(0, 1)}
+                      </h1>
+                    )}
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <label
+                        htmlFor="profile-picture-upload"
+                        className="cursor-pointer text-white text-xs font-medium"
+                      >
+                        {refreshImage ? (
+                          <Spinner className="text-white" />
+                        ) : (
+                          "Change Photo"
+                        )}
+                      </label>
+                      <input
+                        id="profile-picture-upload"
+                        type="file"
+                        accept="image/jpeg,image/png,image/gif"
+                        className="hidden"
+                        onChange={handleProfilePictureUpload}
+                        disabled={refreshImage}
+                      />
                     </div>
                   </div>
-                  <div className="flex gap-4 w-full px-4 bg-white pt-12">
-                    <Card
-                      className={cn(
-                        "w-[30%] h-fit",
-                        formData.userType === "owner" ? "mt-11" : ""
-                      )}
-                    >
-                      <CardContent>
-                        <form
-                          onSubmit={(e) => handleSubmit(e, "profile")}
-                          className="pt-6 space-y-10"
-                        >
-                          <div className="space-y-3">
-                            <h3 className="text-base font-bold">About</h3>
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-4 py-2 cursor-default">
-                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
-                                  <UserProfileIcon className="text-gray-hint_text" />
-                                </div>
-                                <span className="text-gray-hint_text">
-                                  {formData.username ||
-                                    "Username not available"}
-                                </span>
+                </div>
+                <div className="flex gap-4 w-full px-4 bg-white pt-12">
+                  <Card
+                    className={cn(
+                      "w-[30%] h-fit",
+                      formData.userType === "owner" ? "mt-11" : ""
+                    )}
+                  >
+                    <CardContent>
+                      <form
+                        onSubmit={(e) => handleSubmit(e, "profile")}
+                        className="pt-6 space-y-10"
+                      >
+                        <div className="space-y-3">
+                          <h3 className="text-base font-bold">About</h3>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-4 py-2 cursor-default">
+                              <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                <UserProfileIcon className="text-gray-hint_text" />
                               </div>
-                              <div className="flex items-center gap-4 py-2 cursor-default">
-                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
-                                  <JobResponseIcon className="text-gray-hint_text" />
-                                </div>
-                                <span className="text-gray-hint_text">
-                                  {formData.jobRole || "Job Role not available"}
-                                </span>
+                              <span className="text-gray-hint_text">
+                                {formData.username || "Username not available"}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4 py-2 cursor-default">
+                              <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                <JobResponseIcon className="text-gray-hint_text" />
                               </div>
-                              <div className="flex items-center gap-4 py-2 cursor-default">
-                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
-                                  <CompanyIcon className="text-gray-hint_text" />
-                                </div>
-                                <span className="text-gray-hint_text">
-                                  {formData.company || "Company not available"}
-                                </span>
+                              <span className="text-gray-hint_text">
+                                {formData.jobRole || "Job Role not available"}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4 py-2 cursor-default">
+                              <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                <CompanyIcon className="text-gray-hint_text" />
                               </div>
-                              <div className="flex items-center gap-4 py-2 cursor-default">
-                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
-                                  <LocationIcon className="text-gray-hint_text" />
-                                </div>
-                                <span className="text-gray-hint_text">
-                                  {formData.region || "Location not available"}
-                                </span>
+                              <span className="text-gray-hint_text">
+                                {formData.company || "Company not available"}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4 py-2 cursor-default">
+                              <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                <LocationIcon className="text-gray-hint_text" />
                               </div>
+                              <span className="text-gray-hint_text">
+                                {formData.region || "Location not available"}
+                              </span>
                             </div>
                           </div>
-                          <div className="space-y-3">
-                            <h3 className="text-base font-bold">Contact</h3>
-                            <div className="space-y-4">
-                              <div className="flex items-center gap-4 py-2 cursor-default">
-                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
-                                  <EmailIcon className="text-gray-hint_text" />
-                                </div>
-                                <span
-                                  className="text-gray-hint_text truncate max-w-[180px]"
-                                  title={
-                                    formData.email || "Email not available"
-                                  }
-                                >
-                                  {formData.email || "Email not available"}
-                                </span>
+                        </div>
+                        <div className="space-y-3">
+                          <h3 className="text-base font-bold">Contact</h3>
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-4 py-2 cursor-default">
+                              <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                <EmailIcon className="text-gray-hint_text" />
                               </div>
-                            </div>
-                          </div>
-                          <div className="space-y-3">
-                            <h3 className="text-base font-bold">
-                              Subscription Type
-                            </h3>
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-4 py-2 cursor-default">
-                                <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
-                                  <SubscriptionIcon className="text-gray-hint_text" />
-                                </div>
-                                <span className="text-gray-hint_text">
-                                  {formData.productName ||
-                                    "Subscription not available"}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="space-y-4">
-                              <div
-                                className="flex items-center gap-4 cursor-pointer hover:bg-gray-50 py-2 rounded-md transition-colors"
-                                onClick={() =>
-                                  window.open(
-                                    "https://billing.stripe.com/p/login/00g6p52WPfRG22I8ww",
-                                    "_blank"
-                                  )
-                                }
+                              <span
+                                className="text-gray-hint_text truncate max-w-[180px]"
+                                title={formData.email || "Email not available"}
                               >
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <div className="flex items-center gap-4 w-full">
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
-                                          onClick={(e) => e.stopPropagation()} // Prevent double triggering
-                                        >
-                                          <DownloadIcon className="text-gray-hint_text" />
-                                        </Button>
-                                        <span className="select-none text-gray-hint_text">
-                                          Download Invoices
-                                        </span>
-                                      </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      Download your invoices here
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </div>
+                                {formData.email || "Email not available"}
+                              </span>
                             </div>
                           </div>
-                        </form>
-                      </CardContent>
-                    </Card>
-                    <div className="w-[70%] space-y-6">
-                      {formData.userType === "owner" && (
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-end space-x-2">
-                            <Button onClick={() => setShowModal(true)}>
-                              Add New User
-                            </Button>
-                            <Button
-                              variant="outline"
+                        </div>
+                        <div className="space-y-3">
+                          <h3 className="text-base font-bold">
+                            Subscription Type
+                          </h3>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-4 py-2 cursor-default">
+                              <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                <SubscriptionIcon className="text-gray-hint_text" />
+                              </div>
+                              <span className="text-gray-hint_text">
+                                {formData.productName ||
+                                  "Subscription not available"}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="space-y-4">
+                            <div
+                              className="flex items-center gap-4 cursor-pointer hover:bg-gray-50 py-2 rounded-md transition-colors"
                               onClick={() =>
                                 window.open(
                                   "https://billing.stripe.com/p/login/00g6p52WPfRG22I8ww",
@@ -615,239 +566,279 @@ const ProfilePage = () => {
                                 )
                               }
                             >
-                              Stripe Invoices
-                            </Button>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-4 w-full">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="bg-transparent [&_svg]:size-6 hover:bg-transparent p-0 w-6 h-6"
+                                        onClick={(e) => e.stopPropagation()} // Prevent double triggering
+                                      >
+                                        <DownloadIcon className="text-gray-hint_text" />
+                                      </Button>
+                                      <span className="select-none text-gray-hint_text">
+                                        Download Invoices
+                                      </span>
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    Download your invoices here
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
                           </div>
-                          <Card>
-                            <CardHeader>
-                              <div className="flex items-center justify-between">
-                                <h3 className="text-base font-bold">
-                                  Admin Panel
-                                </h3>
-                                <span>
-                                  Licenses available: {formData.licences}
-                                </span>
-                              </div>
-                            </CardHeader>
-                            <CardContent>
-                              <Table>
-                                <TableHeader>
-                                  <TableRow>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Username</TableHead>
-                                    <TableHead>Role</TableHead>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                  {organizationUsers.map(
-                                    (user: any, index: number) => (
-                                      <TableRow key={index}>
-                                        <TableCell>{user.email}</TableCell>
-                                        <TableCell>
-                                          {user.username || "Request Pending"}
-                                        </TableCell>
-                                        <TableCell>
-                                          {user.role === "Pending" ? (
-                                            "Pending"
-                                          ) : formData.username ===
-                                            user.username ? (
-                                            <TooltipProvider delayDuration={0}>
-                                              <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                  <div className="flex items-center gap-2 w-full capitalize">
-                                                    {user.role}
-                                                    <Info className="size-4" />
-                                                  </div>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                  {user.role === "owner"
-                                                    ? "Full platform control"
-                                                    : user.role === "member"
-                                                      ? "Can create new tenders and bid manage in the tender dahsboard."
-                                                      : " Can create and write bids."}
-                                                </TooltipContent>
-                                              </Tooltip>
-                                            </TooltipProvider>
-                                          ) : (
-                                            <div className="flex items-center gap-2">
-                                              {permissionChangeLoading[
-                                                user.username
-                                              ] ? (
-                                                <Spinner className="h-4 w-4" />
-                                              ) : null}
-                                              <Select
-                                                defaultValue={user.role}
-                                                onValueChange={(value) =>
-                                                  handleChangePermission(
-                                                    user.username,
-                                                    value
-                                                  )
-                                                }
-                                                disabled={
-                                                  permissionChangeLoading[
-                                                    user.username
-                                                  ]
-                                                }
-                                              >
-                                                <SelectTrigger className="h-8 w-32">
-                                                  <SelectValue
-                                                    placeholder={user.role}
-                                                  />
-                                                  <TooltipProvider
-                                                    delayDuration={0}
-                                                  >
-                                                    <Tooltip>
-                                                      <TooltipTrigger asChild>
-                                                        <Info className="size-4" />
-                                                      </TooltipTrigger>
-                                                      <TooltipContent>
-                                                        {user.role === "owner"
-                                                          ? "Full platform control"
-                                                          : user.role ===
-                                                              "member"
-                                                            ? "Can create new tenders and bid manage in the tender dahsboard."
-                                                            : " Can create and write bids."}
-                                                      </TooltipContent>
-                                                    </Tooltip>
-                                                  </TooltipProvider>
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectItem value="member">
-                                                    Manager
-                                                  </SelectItem>
-                                                  <SelectItem value="reviewer">
-                                                    Writer
-                                                  </SelectItem>
-                                                  <SelectItem value="owner">
-                                                    Owner
-                                                  </SelectItem>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                          )}
-                                        </TableCell>
-                                      </TableRow>
-                                    )
-                                  )}
-                                </TableBody>
-                              </Table>
-                            </CardContent>
-                          </Card>
+                        </div>
+                      </form>
+                    </CardContent>
+                  </Card>
+                  <div className="w-[70%] space-y-6">
+                    {formData.userType === "owner" && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-end space-x-2">
+                          <Button onClick={() => setShowModal(true)}>
+                            Add New User
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() =>
+                              window.open(
+                                "https://billing.stripe.com/p/login/00g6p52WPfRG22I8ww",
+                                "_blank"
+                              )
+                            }
+                          >
+                            Stripe Invoices
+                          </Button>
+                        </div>
+                        <Card>
+                          <CardHeader>
+                            <div className="flex items-center justify-between">
+                              <h3 className="text-base font-bold">
+                                Admin Panel
+                              </h3>
+                              <span>
+                                Licenses available: {formData.licences}
+                              </span>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Email</TableHead>
+                                  <TableHead>Username</TableHead>
+                                  <TableHead>Role</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {organizationUsers.map(
+                                  (user: any, index: number) => (
+                                    <TableRow key={index}>
+                                      <TableCell>{user.email}</TableCell>
+                                      <TableCell>
+                                        {user.username || "Request Pending"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {user.role === "Pending" ? (
+                                          "Pending"
+                                        ) : formData.username ===
+                                          user.username ? (
+                                          <TooltipProvider delayDuration={0}>
+                                            <Tooltip>
+                                              <TooltipTrigger asChild>
+                                                <div className="flex items-center gap-2 w-full capitalize">
+                                                  {user.role}
+                                                  <Info className="size-4" />
+                                                </div>
+                                              </TooltipTrigger>
+                                              <TooltipContent>
+                                                {user.role === "owner"
+                                                  ? "Full platform control"
+                                                  : user.role === "member"
+                                                    ? "Can create new tenders and bid manage in the tender dahsboard."
+                                                    : " Can create and write bids."}
+                                              </TooltipContent>
+                                            </Tooltip>
+                                          </TooltipProvider>
+                                        ) : (
+                                          <div className="flex items-center gap-2">
+                                            {permissionChangeLoading[
+                                              user.username
+                                            ] ? (
+                                              <Spinner className="h-4 w-4" />
+                                            ) : null}
+                                            <Select
+                                              defaultValue={user.role}
+                                              onValueChange={(value) =>
+                                                handleChangePermission(
+                                                  user.username,
+                                                  value
+                                                )
+                                              }
+                                              disabled={
+                                                permissionChangeLoading[
+                                                  user.username
+                                                ]
+                                              }
+                                            >
+                                              <SelectTrigger className="h-8 w-32">
+                                                <SelectValue
+                                                  placeholder={user.role}
+                                                />
+                                                <TooltipProvider
+                                                  delayDuration={0}
+                                                >
+                                                  <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                      <Info className="size-4" />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                      {user.role === "owner"
+                                                        ? "Full platform control"
+                                                        : user.role === "member"
+                                                          ? "Can create new tenders and bid manage in the tender dahsboard."
+                                                          : " Can create and write bids."}
+                                                    </TooltipContent>
+                                                  </Tooltip>
+                                                </TooltipProvider>
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectItem value="member">
+                                                  Manager
+                                                </SelectItem>
+                                                <SelectItem value="reviewer">
+                                                  Writer
+                                                </SelectItem>
+                                                <SelectItem value="owner">
+                                                  Owner
+                                                </SelectItem>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                        )}
+                                      </TableCell>
+                                    </TableRow>
+                                  )
+                                )}
+                              </TableBody>
+                            </Table>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )}
+                    <form
+                      id="companyObjectivesForm"
+                      onSubmit={(e) => handleSubmit(e, "companyObjectives")}
+                      className="space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-base font-bold">
+                          Company Objectives
+                        </h3>
+                        <div className="flex gap-2">
+                          {isEditingObjectives ? (
+                            <>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  setIsEditingObjectives(false);
+                                  // Reset to the last saved value
+                                  setCompanyObjectives(
+                                    formData.companyObjectives
+                                  );
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                type="submit"
+                                disabled={
+                                  companyObjectivesSaveState === "loading"
+                                }
+                                form="companyObjectivesForm"
+                              >
+                                {companyObjectivesSaveState === "loading" && (
+                                  <Spinner className="text-white mr-2" />
+                                )}
+                                {companyObjectivesSaveState === "success" ? (
+                                  <>
+                                    Saved{" "}
+                                    <CheckCircle className="ml-2 h-4 w-4" />
+                                  </>
+                                ) : (
+                                  "Save Changes"
+                                )}
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              type="button"
+                              onClick={() => setIsEditingObjectives(true)}
+                            >
+                              Edit Objectives
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      {isEditingObjectives ? (
+                        <Textarea
+                          name="companyObjectives"
+                          value={companyObjectives}
+                          onChange={(e) => setCompanyObjectives(e.target.value)}
+                          className="min-h-[150px]"
+                          placeholder="Enter your company objectives here..."
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center min-h-[150px] p-8 bg-gray-50 text-gray-500 border border-gray-200 rounded-md">
+                          {companyObjectives ||
+                            "No company objectives available."}
                         </div>
                       )}
-                      <form
-                        id="companyObjectivesForm"
-                        onSubmit={(e) => handleSubmit(e, "companyObjectives")}
-                        className="space-y-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-base font-bold">
-                            Company Objectives
-                          </h3>
-                          <div className="flex gap-2">
-                            {isEditingObjectives ? (
-                              <>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  onClick={() => {
-                                    setIsEditingObjectives(false);
-                                    // Reset to the last saved value
-                                    setCompanyObjectives(
-                                      formData.companyObjectives
-                                    );
-                                  }}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  type="submit"
-                                  disabled={
-                                    companyObjectivesSaveState === "loading"
-                                  }
-                                  form="companyObjectivesForm"
-                                >
-                                  {companyObjectivesSaveState === "loading" && (
-                                    <Spinner className="text-white mr-2" />
-                                  )}
-                                  {companyObjectivesSaveState === "success" ? (
-                                    <>
-                                      Saved{" "}
-                                      <CheckCircle className="ml-2 h-4 w-4" />
-                                    </>
-                                  ) : (
-                                    "Save Changes"
-                                  )}
-                                </Button>
-                              </>
-                            ) : (
-                              <Button
-                                variant="outline"
-                                type="button"
-                                onClick={() => setIsEditingObjectives(true)}
-                              >
-                                Edit Objectives
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                        {isEditingObjectives ? (
-                          <Textarea
-                            name="companyObjectives"
-                            value={companyObjectives}
-                            onChange={(e) =>
-                              setCompanyObjectives(e.target.value)
-                            }
-                            className="min-h-[150px]"
-                            placeholder="Enter your company objectives here..."
-                          />
-                        ) : (
-                          <div className="flex items-center justify-center min-h-[150px] p-8 bg-gray-50 text-gray-500 border border-gray-200 rounded-md">
-                            {companyObjectives ||
-                              "No company objectives available."}
-                          </div>
-                        )}
-                      </form>
-                      <ToneOfVoiceLibrary selectable={false} />
-                    </div>
+                    </form>
+                    <ToneOfVoiceLibrary selectable={false} />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            <Dialog open={showModal} onOpenChange={setShowModal}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Invite New User</DialogTitle>
-                </DialogHeader>
-                <div className="p-4 space-y-4">
-                  {inviteError && (
-                    <p className="text-destructive">{inviteError}</p>
-                  )}
-                  {inviteSuccess && (
-                    <p className="text-green-600">{inviteSuccess}</p>
-                  )}
-                  <p>
-                    This will consume a license. Licenses left:{" "}
-                    {formData.licences}
-                  </p>
-                  <form onSubmit={handleInviteSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="inviteEmail">Email address</Label>
-                      <Input
-                        id="inviteEmail"
-                        type="email"
-                        placeholder="Enter email"
-                        value={inviteEmail}
-                        onChange={(e) => setInviteEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <Button type="submit">Send Invite</Button>
-                  </form>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </MeshGradient>
+              </div>
+            </CardContent>
+          </Card>
+          <Dialog open={showModal} onOpenChange={setShowModal}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Invite New User</DialogTitle>
+              </DialogHeader>
+              <div className="p-4 space-y-4">
+                {inviteError && (
+                  <p className="text-destructive">{inviteError}</p>
+                )}
+                {inviteSuccess && (
+                  <p className="text-green-600">{inviteSuccess}</p>
+                )}
+                <p>
+                  This will consume a license. Licenses left:{" "}
+                  {formData.licences}
+                </p>
+                <form onSubmit={handleInviteSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="inviteEmail">Email address</Label>
+                    <Input
+                      id="inviteEmail"
+                      type="email"
+                      placeholder="Enter email"
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <Button type="submit">Send Invite</Button>
+                </form>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>
