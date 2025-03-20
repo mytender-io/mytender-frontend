@@ -69,6 +69,7 @@ span.commented-text {
 .commented-text * {
   background-color: inherit;
   transition: background-color 0.2s ease;
+  width: fit-content;
 }
 
 .commented-text h1,

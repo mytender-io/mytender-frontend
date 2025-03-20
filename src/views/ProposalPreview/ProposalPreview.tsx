@@ -657,11 +657,23 @@ const ProposalPreview = () => {
               `span.commented-text[data-comment-id="${id}"]`
             );
             if (commentedSpan) {
+              // First, remove background color from all child elements
+              const childElements = commentedSpan.querySelectorAll("*");
+              childElements.forEach((element) => {
+                (element as HTMLElement).style.backgroundColor = "";
+              });
+
               // Create a document fragment to hold all the span's contents
               const fragment = document.createDocumentFragment();
 
               // Move all child nodes from the span to the fragment
               while (commentedSpan.firstChild) {
+                // Remove background color from the node if it's an element
+                if (commentedSpan.firstChild.nodeType === Node.ELEMENT_NODE) {
+                  (
+                    commentedSpan.firstChild as HTMLElement
+                  ).style.backgroundColor = "";
+                }
                 fragment.appendChild(commentedSpan.firstChild);
               }
 
@@ -1964,7 +1976,7 @@ const ProposalPreview = () => {
                         className={cn(
                           "transition-all duration-300 w-fit absolute left-0",
                           activeComment === comment.id &&
-                            "p-2 rounded-md border bg-white border-gray-line shadow-md"
+                            "p-2 rounded-md border bg-white border-gray-line shadow-md z-[52]"
                         )}
                         data-comment-id={comment.id}
                         style={{
