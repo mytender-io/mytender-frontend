@@ -443,7 +443,7 @@ const ProfilePage = () => {
             <Card className="max-w-5xl w-full bg-transparent mx-auto mt-10">
               <CardContent className="px-0 rounded-lg overflow-hidden">
                 <div>
-                  <div className="relative w-full h-32 bg-orange-gradient/50">
+                  <div className="relative w-full h-32 bg-gray-bg">
                     <div className="absolute left-8 top-8 flex items-center justify-center bg-orange-lighter rounded-full w-32 h-32 border border-white overflow-hidden group">
                       {formData.profilePicture ? (
                         <img
@@ -607,7 +607,7 @@ const ProfilePage = () => {
                               Add New User
                             </Button>
                             <Button
-                              variant="secondary"
+                              variant="outline"
                               onClick={() =>
                                 window.open(
                                   "https://billing.stripe.com/p/login/00g6p52WPfRG22I8ww",
@@ -782,6 +782,7 @@ const ProfilePage = () => {
                               </>
                             ) : (
                               <Button
+                                variant="outline"
                                 type="button"
                                 onClick={() => setIsEditingObjectives(true)}
                               >
@@ -801,16 +802,13 @@ const ProfilePage = () => {
                             placeholder="Enter your company objectives here..."
                           />
                         ) : (
-                          <div className="min-h-[150px] p-3 bg-gray-50 rounded-md overflow-auto">
+                          <div className="flex items-center justify-center min-h-[150px] p-8 bg-gray-50 text-gray-500 border border-gray-200 rounded-md">
                             {companyObjectives ||
                               "No company objectives available."}
                           </div>
                         )}
                       </form>
-
-                      <div>
-                        <ToneOfVoiceLibrary selectable={false} />
-                      </div>
+                      <ToneOfVoiceLibrary selectable={false} />
                     </div>
                   </div>
                 </div>

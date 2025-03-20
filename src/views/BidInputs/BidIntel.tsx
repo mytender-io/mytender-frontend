@@ -301,7 +301,7 @@ const BidIntel = ({
               <AccordionTrigger className="px-4 py-3 w-full text-lg text-gray-hint_text">
                 Tone of Voice
               </AccordionTrigger>
-              <AccordionContent className="p-0">
+              <AccordionContent className="p-4">
                 <ToneOfVoiceLibrary />
               </AccordionContent>
             </AccordionItem>
