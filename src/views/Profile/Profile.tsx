@@ -49,6 +49,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import { Info } from "lucide-react";
 
 const ProfilePage = () => {
   const getAuth = useAuthUser();
@@ -650,7 +651,23 @@ const ProfilePage = () => {
                                             "Pending"
                                           ) : formData.username ===
                                             user.username ? (
-                                            user.role // Current user can't change their own role
+                                            <TooltipProvider delayDuration={0}>
+                                              <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                  <div className="flex items-center gap-2 w-full capitalize">
+                                                    {user.role}
+                                                    <Info className="size-4" />
+                                                  </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                  {user.role === "owner"
+                                                    ? "Full platform control"
+                                                    : user.role === "member"
+                                                      ? "Can create new tenders and bid manage in the tender dahsboard."
+                                                      : " Can create and write bids."}
+                                                </TooltipContent>
+                                              </Tooltip>
+                                            </TooltipProvider>
                                           ) : (
                                             <div className="flex items-center gap-2">
                                               {permissionChangeLoading[
@@ -676,6 +693,23 @@ const ProfilePage = () => {
                                                   <SelectValue
                                                     placeholder={user.role}
                                                   />
+                                                  <TooltipProvider
+                                                    delayDuration={0}
+                                                  >
+                                                    <Tooltip>
+                                                      <TooltipTrigger asChild>
+                                                        <Info className="size-4" />
+                                                      </TooltipTrigger>
+                                                      <TooltipContent>
+                                                        {user.role === "owner"
+                                                          ? "Full platform control"
+                                                          : user.role ===
+                                                              "member"
+                                                            ? "Can create new tenders and bid manage in the tender dahsboard."
+                                                            : " Can create and write bids."}
+                                                      </TooltipContent>
+                                                    </Tooltip>
+                                                  </TooltipProvider>
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="member">
