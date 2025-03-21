@@ -46,11 +46,28 @@ export interface Section {
   subheadings: Subheading[];
   choice: string;
   writingplan: string;
+  comments: UserComment[];
   compliance_requirements: string;
   relevant_evaluation_criteria: string;
   relevant_derived_insights: string;
   relevant_differentiation_factors: string;
   highlightedDocuments: HighlightedDocument[];
+}
+
+export interface UserComment {
+  id: string;
+  text: string;
+  resolved: boolean;
+  position: number;
+  sectionId: string;
+  author: string; // User who created the comment
+  createdAt: string; // ISO date string
+  replies: {
+    id: string;
+    text: string;
+    author: string;
+    createdAt: string;
+  }[];
 }
 
 export interface Contributor {

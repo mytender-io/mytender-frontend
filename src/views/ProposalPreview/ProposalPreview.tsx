@@ -36,8 +36,6 @@ import {
 } from "@/components/ui/tooltip";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
-// import CheckDocumentIcon from "@/components/icons/CheckDocumentIcon";
-// import ConsultIcon from "@/components/icons/ConsultIcon";
 import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 import RedoSparkIcon from "@/components/icons/RedoSparkIcon";
@@ -64,7 +62,14 @@ import { cn, getSectionHeading } from "@/utils";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
 import DebouncedContentEditable from "./components/DebouncedContentEditable";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  getCommentsForCurrentSection,
+  handleCancelComment,
+  handleCancelReply,
+  handleSaveComment,
+  handleSubmitReply,
+  handleToggleResolution
+} from "./commentFunctions";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -80,16 +85,6 @@ const ProposalPreview = () => {
   });
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState<
-    {
-      id: string;
-      text: string;
-      resolved: boolean;
-      position: number;
-      sectionId: string;
-      replies: { id: string; text: string; author?: string }[];
-    }[]
-  >([]);
   const [promptTarget, setPromptTarget] = useState("");
   const [promptResult, setPromptResult] = useState("");
   const [selectedRange, setSelectedRange] = useState<Range | null>(null);
@@ -524,56 +519,6 @@ const ProposalPreview = () => {
     }
   };
 
-  // Save comment handler
-  const handleSaveComment = () => {
-    if (commentText.trim() && currentSectionIndex !== null) {
-      const commentId = `comment-${Date.now()}`;
-      let position = selectionMenuPosition.top;
-
-      // Check if there's already a comment at this position and adjust if needed
-      const existingCommentPositions = comments.map((c) => c.position);
-      while (existingCommentPositions.includes(position)) {
-        position += 30; // Move down by 30px if position is already taken
-      }
-
-      // Update the pending comment span with the actual comment ID
-      const pendingSpans = document.querySelectorAll(
-        'span.commented-text[data-comment-id^="pending-"]'
-      );
-      if (pendingSpans.length > 0) {
-        const span = pendingSpans[pendingSpans.length - 1];
-        span.dataset.commentId = commentId;
-
-        // Make the highlight a darker grey instead of orange
-        span.style.backgroundColor = "#FFE5CC";
-
-        // Apply the style to all child elements
-        const childElements = span.querySelectorAll("*");
-        childElements.forEach((element) => {
-          (element as HTMLElement).style.backgroundColor = "#FFE5CC";
-        });
-
-        // Add click event to highlight when clicked
-        span.addEventListener("click", () => {
-          highlightCommentAndText(commentId);
-        });
-      }
-
-      const newComment = {
-        id: commentId,
-        text: commentText,
-        resolved: false,
-        position: position,
-        sectionId: outline[currentSectionIndex].section_id,
-        replies: [] // Initialize with empty replies array
-      };
-      setComments([...comments, newComment]);
-      setCommentText("");
-    }
-    setShowSelectionMenu(false);
-    setShowCommentInput(false);
-  };
-
   // Add this new function to highlight comment and text
   const highlightCommentAndText = (commentId: string) => {
     setActiveComment(commentId);
@@ -626,83 +571,6 @@ const ProposalPreview = () => {
         outline: newOutline
       };
     });
-  };
-
-  // Add this new function to handle comment cancellation
-  const handleCancelComment = () => {
-    // Find and remove the pending comment span
-    const pendingSpans = document.querySelectorAll(
-      'span.commented-text[data-comment-id^="pending-"]'
-    );
-    if (pendingSpans.length > 0) {
-      const span = pendingSpans[pendingSpans.length - 1];
-      // Replace the span with its text content
-      const textNode = document.createTextNode(span.textContent || "");
-      span.parentNode?.replaceChild(textNode, span);
-    }
-
-    setCommentText("");
-    setShowSelectionMenu(false);
-    setShowCommentInput(false);
-  };
-
-  // Toggle comment resolution
-  const handleToggleResolution = (id: string) => {
-    setComments(
-      comments.map((comment) => {
-        if (comment.id === id) {
-          // If resolving the comment, remove the highlight but keep the text
-          if (!comment.resolved) {
-            const commentedSpan = document.querySelector(
-              `span.commented-text[data-comment-id="${id}"]`
-            );
-            if (commentedSpan) {
-              // First, remove background color from all child elements
-              const childElements = commentedSpan.querySelectorAll("*");
-              childElements.forEach((element) => {
-                (element as HTMLElement).style.backgroundColor = "";
-              });
-
-              // Create a document fragment to hold all the span's contents
-              const fragment = document.createDocumentFragment();
-
-              // Move all child nodes from the span to the fragment
-              while (commentedSpan.firstChild) {
-                // Remove background color from the node if it's an element
-                if (commentedSpan.firstChild.nodeType === Node.ELEMENT_NODE) {
-                  (
-                    commentedSpan.firstChild as HTMLElement
-                  ).style.backgroundColor = "";
-                }
-                fragment.appendChild(commentedSpan.firstChild);
-              }
-
-              // Insert the fragment before the span
-              commentedSpan.parentNode?.insertBefore(fragment, commentedSpan);
-
-              // Then remove the empty span
-              commentedSpan.parentNode?.removeChild(commentedSpan);
-            }
-          }
-          return { ...comment, resolved: !comment.resolved };
-        }
-        return comment;
-      })
-    );
-  };
-
-  // Add this function to remove resolved comments from the list
-  const filterResolvedComments = () => {
-    return comments.filter((comment) => !comment.resolved);
-  };
-
-  // Filter comments by current section
-  const getCommentsForCurrentSection = () => {
-    if (currentSectionIndex === null) return [];
-    const currentSectionId = outline[currentSectionIndex].section_id;
-    return filterResolvedComments().filter(
-      (comment) => comment.sectionId === currentSectionId
-    );
   };
 
   // Modify the handleEvidencePrompt function to store the range more reliably
@@ -1146,42 +1014,6 @@ const ProposalPreview = () => {
         toast.success("Copied to clipboard");
       }
     }
-  };
-
-  // Add this new function to handle submitting a reply
-  const handleSubmitReply = (commentId: string) => {
-    if (replyText.trim() && commentId) {
-      // Create a new reply object
-      const newReply = {
-        id: `reply-${Date.now()}`,
-        text: replyText,
-        author: auth?.name || "You" // Use authenticated user name if available
-      };
-
-      // Add the reply to the comment's replies array
-      setComments(
-        comments.map((comment) => {
-          if (comment.id === commentId) {
-            return {
-              ...comment,
-              replies: [...comment.replies, newReply]
-            };
-          }
-          return comment;
-        })
-      );
-
-      // Reset the reply state
-      setReplyText("");
-
-      toast.success("Reply added");
-    }
-  };
-
-  // Add this new function to handle canceling a reply
-  const handleCancelReply = () => {
-    setReplyText("");
-    setActiveComment(null);
   };
 
   const handleDownloadDocument = async () => {
@@ -1933,7 +1765,11 @@ const ProposalPreview = () => {
                 </div>
 
                 {showCommentInput ||
-                getCommentsForCurrentSection().length > 0 ? (
+                (currentSectionIndex !== null &&
+                  getCommentsForCurrentSection(
+                    outline,
+                    outline[currentSectionIndex].section_id
+                  ).length > 0) ? (
                   <div className="h-auto w-72 relative">
                     {/* Comment Input */}
                     {showCommentInput && (
@@ -1954,14 +1790,35 @@ const ProposalPreview = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={handleCancelComment}
+                            onClick={() =>
+                              handleCancelComment(
+                                setCommentText,
+                                setShowSelectionMenu,
+                                setShowCommentInput
+                              )
+                            }
                           >
                             Cancel
                           </Button>
                           <Button
                             variant="default"
                             size="sm"
-                            onClick={handleSaveComment}
+                            onClick={() =>
+                              handleSaveComment(
+                                commentText,
+                                currentSectionIndex,
+                                selectionMenuPosition,
+
+                                outline,
+                                auth,
+                                setSharedState,
+
+                                setCommentText,
+                                setShowSelectionMenu,
+                                setShowCommentInput,
+                                highlightCommentAndText
+                              )
+                            }
                           >
                             Add
                           </Button>
@@ -1970,122 +1827,152 @@ const ProposalPreview = () => {
                     )}
 
                     {/* Comments Display */}
-                    {getCommentsForCurrentSection().map((comment) => (
-                      <div
-                        key={comment.id}
-                        className={cn(
-                          "transition-all duration-300 w-fit absolute left-0",
-                          activeComment === comment.id &&
-                            "p-2 rounded-md border bg-white border-gray-line shadow-md z-[52]"
-                        )}
-                        data-comment-id={comment.id}
-                        style={{
-                          top: `${comment.position}px`
-                        }}
-                      >
-                        <div className="flex justify-between items-start w-72">
-                          <div
-                            className="space-y-1 w-full"
-                            onClick={() => highlightCommentAndText(comment.id)}
-                          >
-                            <ProfilePhoto size="sm" showName={true} />
-                            <p className="text-sm cursor-pointer">
-                              {comment.text}
-                            </p>
-
-                            {/* Show reply count when comment is not active */}
-                            {activeComment !== comment.id &&
-                              comment.replies?.length > 0 && (
-                                <p className="text-xs text-gray-hint_text mt-1">
-                                  {comment.replies.length === 1
-                                    ? "1 reply"
-                                    : `${comment.replies.length} replies`}
-                                </p>
-                              )}
-                          </div>
-                          {activeComment === comment.id && (
-                            <div className="flex">
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleToggleResolution(comment.id);
-                                      }}
-                                      className="group p-0 hover:bg-transparent border-none"
-                                    >
-                                      <Check
-                                        size={16}
-                                        className="group-hover:text-orange"
-                                      />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    Resolve and hide
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </div>
+                    {currentSectionIndex !== null &&
+                      getCommentsForCurrentSection(
+                        outline,
+                        outline[currentSectionIndex].section_id
+                      ).map((comment) => (
+                        <div
+                          key={comment.id}
+                          className={cn(
+                            "transition-all duration-300 w-fit absolute left-0",
+                            activeComment === comment.id &&
+                              "p-2 rounded-md border bg-white border-gray-line shadow-md"
                           )}
-                        </div>
-
-                        {/* Show replies when comment is active */}
-                        {activeComment === comment.id &&
-                          comment.replies.length > 0 && (
-                            <div className="mt-2 border-t border-gray-200 pt-2">
-                              <p className="text-xs font-medium text-gray-hint_text mb-2">
-                                Replies
+                          data-comment-id={comment.id}
+                          style={{
+                            top: `${comment.position}px`
+                          }}
+                        >
+                          <div className="flex justify-between items-start w-72">
+                            <div
+                              className="space-y-1 w-full"
+                              onClick={() =>
+                                highlightCommentAndText(comment.id)
+                              }
+                            >
+                              <ProfilePhoto size="sm" showName={true} />
+                              <p className="text-sm cursor-pointer">
+                                {comment.text}
                               </p>
-                              <div className="space-y-3">
-                                {comment.replies.map((reply) => (
-                                  <div
-                                    key={reply.id}
-                                    className="pl-3 border-l-2 border-gray-200"
-                                  >
-                                    <div className="flex flex-col gap-2">
-                                      <ProfilePhoto size="sm" showName={true} />
-                                      <div>
-                                        <p className="text-xs">{reply.text}</p>
+
+                              {/* Show reply count when comment is not active */}
+                              {activeComment !== comment.id &&
+                                comment.replies?.length > 0 && (
+                                  <p className="text-xs text-gray-hint_text mt-1">
+                                    {comment.replies.length === 1
+                                      ? "1 reply"
+                                      : `${comment.replies.length} replies`}
+                                  </p>
+                                )}
+                            </div>
+                            {activeComment === comment.id && (
+                              <div className="flex">
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleToggleResolution(
+                                            comment.id,
+                                            currentSectionIndex,
+                                            setSharedState
+                                          );
+                                        }}
+                                        className="group p-0 hover:bg-transparent border-none"
+                                      >
+                                        <Check
+                                          size={16}
+                                          className="group-hover:text-orange"
+                                        />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      Resolve and hide
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Show replies when comment is active */}
+                          {activeComment === comment.id &&
+                            comment.replies.length > 0 && (
+                              <div className="mt-2 border-t border-gray-200 pt-2">
+                                <p className="text-xs font-medium text-gray-hint_text mb-2">
+                                  Replies
+                                </p>
+                                <div className="space-y-3">
+                                  {comment.replies.map((reply) => (
+                                    <div
+                                      key={reply.id}
+                                      className="pl-3 border-l-2 border-gray-200"
+                                    >
+                                      <div className="flex flex-col gap-2">
+                                        <ProfilePhoto
+                                          size="sm"
+                                          showName={true}
+                                        />
+                                        <div>
+                                          <p className="text-xs">
+                                            {reply.text}
+                                          </p>
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                          {activeComment === comment.id ? (
+                            <div className="mt-2 w-full">
+                              <textarea
+                                className="w-full border border-gray-300 rounded p-2 mb-2 text-sm"
+                                rows={2}
+                                placeholder="Add your reply..."
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                              />
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleCancelReply(
+                                      setReplyText,
+                                      setActiveComment
+                                    )
+                                  }
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleSubmitReply(
+                                      comment.id,
+                                      replyText,
+                                      currentSectionIndex,
+                                      auth,
+                                      setSharedState,
+
+                                      setReplyText
+                                    )
+                                  }
+                                >
+                                  Reply
+                                </Button>
                               </div>
                             </div>
-                          )}
-
-                        {activeComment === comment.id ? (
-                          <div className="mt-2 w-full">
-                            <Textarea
-                              className="w-full mb-2 text-sm"
-                              rows={2}
-                              placeholder="Add your reply..."
-                              value={replyText}
-                              onChange={(e) => setReplyText(e.target.value)}
-                            />
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleCancelReply}
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                variant="default"
-                                size="sm"
-                                onClick={() => handleSubmitReply(comment.id)}
-                              >
-                                Reply
-                              </Button>
-                            </div>
-                          </div>
-                        ) : null}
-                      </div>
-                    ))}
+                          ) : null}
+                        </div>
+                      ))}
                   </div>
                 ) : null}
               </div>
