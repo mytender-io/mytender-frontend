@@ -24,6 +24,9 @@ import {
   ReactNode,
   useEffect
 } from "react";
+import ElipsisMenuIcon from "@/components/icons/ElipsisMenuIcon";
+import PlusIcon from "@/components/icons/PlusIcon";
+import RecyclebinIcon from "@/components/icons/RecyclebinIcon";
 
 type BidStatus =
   | "Planning"
@@ -206,13 +209,13 @@ const BidStatusMenu = ({
         <Button
           variant="ghost"
           className={cn(
-            "font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px]",
+            "font-semibold whitespace-nowrap justify-between focus-visible:ring-0",
             getStatusStyles(currentStatusKey),
             disabled && "opacity-50 cursor-not-allowed pointer-events-none"
           )}
         >
           {currentItem.label}
-          <StatusIcon className="ml-2 h-4 w-4" />
+          <StatusIcon />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -244,14 +247,59 @@ const BidStatusMenu = ({
                     <Input
                       value={item.label}
                       onChange={(e) => handleLabelChange(index, e.target.value)}
-                      className="h-8 text-sm pl-9"
+                      className="h-9 text-sm pl-9"
                       onClick={(e) => e.stopPropagation()}
                       onKeyDown={(e) => e.stopPropagation()}
                     />
                   </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 p-0 text-gray-hint_text [&_svg]:size-3"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ElipsisMenuIcon />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (editedItems.length > 1) {
+                            const newItems = [...editedItems];
+                            newItems.splice(index, 1);
+                            setEditedItems(newItems);
+                          }
+                        }}
+                        disabled={editedItems.length <= 1}
+                        className="text-destructive"
+                      >
+                        <RecyclebinIcon />
+                        Remove
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               );
             })}
+            <Button
+              variant="ghost"
+              className="w-full [&_svg]:size-3 font-semibold text-gray-hint_text"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const newKey = `Status${editedItems.length + 1}` as BidStatus;
+                setEditedItems([
+                  ...editedItems,
+                  { key: newKey, label: `New Status` }
+                ]);
+              }}
+            >
+              <PlusIcon />
+              New Label
+            </Button>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleSaveLabels}
@@ -260,11 +308,11 @@ const BidStatusMenu = ({
             >
               <Button
                 variant="ghost"
-                className="font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px] w-full text-green-600 hover:text-green-800 hover:bg-green-50"
+                className="font-semibold w-full text-green-600 hover:text-green-800 hover:bg-green-50"
                 onClick={handleSaveLabels}
               >
+                <Save />
                 Save Changes
-                <Save className="h-4 w-4" />
               </Button>
             </DropdownMenuItem>
           </>
@@ -282,7 +330,7 @@ const BidStatusMenu = ({
                   <Button
                     variant="ghost"
                     className={cn(
-                      "font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px] w-full",
+                      "font-semibold whitespace-nowrap w-full justify-between focus-visible:ring-0",
                       getStatusStyles(item.key),
                       disabled && "opacity-50 cursor-not-allowed"
                     )}
@@ -302,11 +350,11 @@ const BidStatusMenu = ({
             >
               <Button
                 variant="ghost"
-                className="font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px] w-full text-gray-600 hover:text-gray-800"
+                className="whitespace-nowrap w-full font-semibold text-gray-hint_text"
                 onClick={handleEditLabels}
               >
+                <Edit />
                 Edit Labels
-                <Edit className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuItem>
           </>

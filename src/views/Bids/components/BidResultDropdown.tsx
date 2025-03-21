@@ -29,9 +29,9 @@ const BidResultDropdown = ({
       case "won":
         return "bg-status-success_light text-status-success hover:text-status-success hover:bg-status-success_light/90 border-status-success";
       case "lost":
-        return "bg-status-draft_light text-status-draft hover:text-status-draft hover:bg-status-draft_light/90 border-status-draft";
-      default:
         return "bg-status-planning_light text-status-planning hover:text-status-planning hover:bg-status-planning_light/90 border-status-planning";
+      default:
+        return "bg-status-beige_light text-status-beige hover:text-status-beige hover:bg-status-beige_light/90 border-status-beige";
     }
   };
 
@@ -52,7 +52,8 @@ const BidResultDropdown = ({
     { key: "lost", label: "Lost" }
   ];
 
-  const currentItem = statusItems.find(item => item.key === normalizedValue) || statusItems[0];
+  const currentItem =
+    statusItems.find((item) => item.key === normalizedValue) || statusItems[0];
   const StatusIcon = getStatusIcon(normalizedValue);
 
   return (
@@ -61,7 +62,7 @@ const BidResultDropdown = ({
         <Button
           variant="ghost"
           className={cn(
-            "font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px]",
+            "font-semibold whitespace-nowrap rounded-md focus-visible:ring-0",
             getStatusStyles(normalizedValue),
             disabled && "opacity-50 cursor-not-allowed pointer-events-none"
           )}
@@ -83,7 +84,7 @@ const BidResultDropdown = ({
               <Button
                 variant="ghost"
                 className={cn(
-                  "font-semibold text-sm whitespace-nowrap rounded-md py-1 px-3 border-[0.5px] w-full",
+                  "font-semibold whitespace-nowrap rounded-md focus-visible:ring-0 w-full",
                   getStatusStyles(item.key),
                   disabled && "opacity-50 cursor-not-allowed"
                 )}

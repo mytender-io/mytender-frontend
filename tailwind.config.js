@@ -29,7 +29,9 @@ export default {
           research_light: "#E1F3FB",
           research: "#5CA4C3",
           review_light: "#F8E6F8",
-          review: "#9D629D"
+          review: "#9D629D",
+          beige_light: "#FFF8D6",
+          beige: "#E6C000"
         },
         gray: {
           DEFAULT: "#8B888D",
