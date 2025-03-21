@@ -1838,7 +1838,7 @@ const ProposalPreview = () => {
                           className={cn(
                             "transition-all duration-300 w-fit absolute left-0",
                             activeComment === comment.id &&
-                              "p-2 rounded-md border bg-white border-gray-lineshadow-md z-[52]"
+                              "p-2 rounded-md border bg-white border-gray-line shadow-md z-[52]"
                           )}
                           data-comment-id={comment.id}
                           style={{
