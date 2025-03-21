@@ -70,6 +70,7 @@ import {
   handleSubmitReply,
   handleToggleResolution
 } from "./commentFunctions";
+import { Textarea } from "@/components/ui/textarea";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -1837,7 +1838,7 @@ const ProposalPreview = () => {
                           className={cn(
                             "transition-all duration-300 w-fit absolute left-0",
                             activeComment === comment.id &&
-                              "p-2 rounded-md border bg-white border-gray-line shadow-md"
+                              "p-2 rounded-md border bg-white border-gray-lineshadow-md z-[52]"
                           )}
                           data-comment-id={comment.id}
                           style={{
@@ -1931,7 +1932,7 @@ const ProposalPreview = () => {
 
                           {activeComment === comment.id ? (
                             <div className="mt-2 w-full">
-                              <textarea
+                              <Textarea
                                 className="w-full border border-gray-300 rounded p-2 mb-2 text-sm"
                                 rows={2}
                                 placeholder="Add your reply..."

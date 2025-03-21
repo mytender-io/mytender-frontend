@@ -178,17 +178,25 @@ export const handleToggleResolution = (
           );
 
           if (commentedSpan) {
+            // First, remove background color from all child elements
+            const childElements = commentedSpan.querySelectorAll("*");
+            childElements.forEach((element) => {
+              (element as HTMLElement).style.backgroundColor = "";
+            });
+
             // Create a document fragment to hold all the span's contents
             const fragment = document.createDocumentFragment();
 
             // Move all child nodes from the span to the fragment
             while (commentedSpan.firstChild) {
+              // Remove background color from the node if it's an element
+              if (commentedSpan.firstChild.nodeType === Node.ELEMENT_NODE) {
+                (
+                  commentedSpan.firstChild as HTMLElement
+                ).style.backgroundColor = "";
+              }
               fragment.appendChild(commentedSpan.firstChild);
             }
-
-            // Replace the span with its contents
-            commentedSpan.parentNode?.insertBefore(fragment, commentedSpan);
-            commentedSpan.parentNode?.removeChild(commentedSpan);
           }
         }
 
