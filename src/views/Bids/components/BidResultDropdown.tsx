@@ -31,7 +31,7 @@ const BidResultDropdown = ({
       case "lost":
         return "bg-status-planning_light text-status-planning hover:text-status-planning hover:bg-status-planning_light/90 border-status-planning";
       default:
-        return "bg-status-beige_light text-status-beige hover:text-status-beige hover:bg-status-beige_light/90 border-status-beige";
+        return "bg-status-pending_light text-status-pending hover:text-status-pending hover:bg-status-beige_light/90 border-status-pending";
     }
   };
 
