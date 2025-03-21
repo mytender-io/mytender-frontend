@@ -88,7 +88,7 @@ const SelectTenderLibraryFile: React.FC<{
 
   return (
     <Card className="h-[22.5rem] bg-white rounded-md shadow-sm p-4">
-      <CardContent className="h-full p-0">
+      <CardContent className="h-full p-0 overflow-y-auto">
         <>
           {isLoading ? (
             <div className="flex justify-center items-center h-full">
