@@ -30,8 +30,8 @@ export default {
           research: "#5CA4C3",
           review_light: "#F8E6F8",
           review: "#9D629D",
-          pending_light: "#FFF8D6",
-          pending: "#E6C000"
+          pending_light: "#F5F5F5",
+          pending: "#6C757D"
         },
         gray: {
           DEFAULT: "#8B888D",

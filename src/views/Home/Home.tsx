@@ -320,7 +320,7 @@ const Home = () => {
                   return (
                     <div
                       key={bid._id}
-                      className="flex items-center justify-between gap-2 py-2"
+                      className="flex items-center justify-between gap-4 py-2"
                     >
                       <div className="truncate flex-1">
                         <Button
