@@ -320,9 +320,9 @@ const Home = () => {
                   return (
                     <div
                       key={bid._id}
-                      className="grid grid-cols-4 text-sm py-2"
+                      className="flex items-center justify-between gap-2 py-2"
                     >
-                      <div className="truncate col-span-3">
+                      <div className="truncate flex-1">
                         <Button
                           variant="link"
                           className="p-0 h-auto text-left font-normal"
@@ -331,13 +331,11 @@ const Home = () => {
                           {bid.bid_title || bid.client_name || "Unnamed Bid"}
                         </Button>
                       </div>
-                      <div className="text-right">
-                        <BidStatusMenu
-                          value={bid.status}
-                          onChange={(value) => updateBidStatus(bid._id, value)}
-                          disabled={false}
-                        />
-                      </div>
+                      <BidStatusMenu
+                        value={bid.status}
+                        onChange={(value) => updateBidStatus(bid._id, value)}
+                        disabled={false}
+                      />
                     </div>
                   );
                 })}
