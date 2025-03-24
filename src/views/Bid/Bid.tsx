@@ -133,7 +133,8 @@ const Bid = () => {
             features: "",
             approach: ""
           },
-          tone_of_voice: bidData?.tone_of_voice || ""
+          tone_of_voice: bidData?.tone_of_voice || "",
+          new_bid_completed: bidData?.new_bid_completed || true
         };
       });
       console.log("bid planner");

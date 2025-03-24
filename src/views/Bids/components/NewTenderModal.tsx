@@ -251,23 +251,8 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       console.log(response.data.differentiation_opportunities);
       console.log(response.data?.newbid_completed);
 
-      // Update shared state with outline data
-      setSharedState((prevState) => ({
-        ...prevState,
-        outline: response.data?.outline || [],
-        tender_summary: response.data?.tender_summary || "",
-        evaluation_criteria: response.data?.evaluation_criteria || "",
-        derive_insights: response.data?.derive_insights || "",
-        differentiation_opportunities:
-          response.data?.differentiation_opportunities || "",
-        customer_pain_points: response.data?.customer_pain_points || [],
-        win_themes: response.data?.win_themes || [],
-        differentiating_factors: response.data?.differentiating_factors || [],
-        new_bid_completed: response.data?.new_bid_completed || true
-      }));
-
       // Navigate after updating shared state
-      navigate("/bid");
+      navigate("/bids");
       resetForm();
       onHide();
     } catch (err) {

@@ -31,7 +31,6 @@ import { customLocale, cn } from "@/utils";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "react-toastify";
 import { useLoading } from "@/context/LoadingContext";
-
 interface Bid {
   _id: string;
   bid_title: string;
@@ -48,8 +47,8 @@ interface Bid {
   opportunity_owner?: string;
   bid_qualification_result?: string;
   win_themes?: string[];
-  [key: string]: string | string[] | undefined; // Index signature for dynamic access
-  new_bid_completed?: boolean;
+  new_bid_completed?: boolean; 
+  [key: string]: string | string[] | boolean | undefined;
 }
 
 interface SortConfig {
