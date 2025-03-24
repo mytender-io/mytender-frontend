@@ -20,7 +20,7 @@ const ReviewerDropdown: React.FC<ReviewerDropdownProps> = ({
 }) => {
   return (
     <Select value={value || ""} onValueChange={onChange}>
-      <SelectTrigger className="w-40 bg-white text-sm">
+      <SelectTrigger className="w-40 text-sm">
         <SelectValue placeholder="Select Reviewer" />
       </SelectTrigger>
       <SelectContent>
