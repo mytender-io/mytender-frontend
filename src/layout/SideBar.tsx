@@ -79,19 +79,6 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
     onCollapseChange?.(newState);
   };
 
-  // const handleDashboardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-  //   e.preventDefault();
-  //   if (lastActiveBid) {
-  //     const lastActiveTab =
-  //       localStorage.getItem("lastActiveTab") || "/bid-extractor";
-  //     navigate(lastActiveTab, {
-  //       state: { bid: lastActiveBid, fromBidsTable: true }
-  //     });
-  //   } else {
-  //     navigate("/bids");
-  //   }
-  // };
-
   return (
     <div
       className={`fixed top-0 left-0 h-screen bg-transparent transition-all duration-300 z-[1] ${

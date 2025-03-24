@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/table";
 import SortUpIcon from "@/components/icons/SortUpIcon.tsx";
 import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
-import { Badge } from "@/components/ui/badge";
 import { customLocale, cn } from "@/utils";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "react-toastify";
@@ -200,37 +199,8 @@ const Bids = () => {
     { key: "submission_deadline", label: "Deadline" },
     { key: "status", label: "Status" },
     { key: "bid_qualification_result", label: "Won/Lost" }
-    // { key: "client_name", label: "Client" },
-    // { key: "bid_manager", label: "Bid Manager", width: "15%" },
-    // { key: "opportunity_owner", label: "Opportunity Owner", width: "15%" },
+  
   ];
-
-  // Helper function to render Won/Lost status with appropriate styling
-  const renderWonLostStatus = (result: string | undefined) => {
-    if (!result) return <span className="text-gray-400">--</span>;
-
-    if (result.toLowerCase() === "won") {
-      return (
-        <Badge
-          variant="outline"
-          className="bg-green-100 text-green-800 border-green-200"
-        >
-          Won
-        </Badge>
-      );
-    } else if (result.toLowerCase() === "lost") {
-      return (
-        <Badge
-          variant="outline"
-          className="bg-red-100 text-red-800 border-red-200"
-        >
-          Lost
-        </Badge>
-      );
-    } else {
-      return <span>{result}</span>;
-    }
-  };
 
   useEffect(() => {
     setFilteredBids(filterBids(bids, searchTerm));

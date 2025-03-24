@@ -182,41 +182,6 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     "Generating outline... Please wait a little bit longer..."
   ];
 
-  // function LinearProgressWithLabel(props) {
-  //   return (
-  //     <Box
-  //       sx={{ display: "flex", alignItems: "center", flexDirection: "column" }}
-  //     >
-  //       <Box sx={{ width: "100%", mr: 1 }}>
-  //         <LinearProgress
-  //           variant="determinate"
-  //           {...props}
-  //           sx={{
-  //             height: 10,
-  //             borderRadius: 5,
-  //             backgroundColor: "#ffd699",
-  //             "& .MuiLinearProgress-bar": {
-  //               backgroundColor: "#ff9900"
-  //             }
-  //           }}
-  //         />
-  //       </Box>
-  //       <Box sx={{ minWidth: 35, mt: 1, textAlign: "center" }}>
-  //         <Typography variant="body2" color="text.secondary">
-  //           {`${Math.round(props.value)}%`}
-  //         </Typography>
-  //         <Typography
-  //           variant="body2"
-  //           color="text.secondary"
-  //           sx={{ fontStyle: "italic" }}
-  //         >
-  //           {props.message}
-  //         </Typography>
-  //       </Box>
-  //     </Box>
-  //   );
-  // }
-
   const startProgressBar = () => {
     const duration = 68000; // 1 minute in ms
     const interval = 100;
@@ -367,14 +332,13 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         outline: response.data?.outline || [],
         tender_summary: response.data?.tender_summary || "",
         evaluation_criteria: response.data?.evaluation_criteria || "",
-        derive_insights: response.data?.pain_points || "",
+        derive_insights: response.data?.derive_insights || "",
         differentiation_opportunities:
           response.data?.differentiation_opportunities || "",
-        customer_pain_points: response.data?.relevant_pain_points || [],
-        win_themes: response.data?.relevant_win_themes || [],
-        differentiating_factors:
-          response.data?.relevant_differentiation_opportunities || [],
-        new_bid_completed: response.data?.newbid_completed || true
+        customer_pain_points: response.data?.customer_pain_points || [],
+        win_themes: response.data?.win_themes || [],
+        differentiating_factors: response.data?.differentiating_factors || [],
+        new_bid_completed: response.data?.new_bid_completed || true
       }));
 
       // Navigate after updating shared state
