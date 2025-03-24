@@ -40,8 +40,6 @@ import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 import RedoSparkIcon from "@/components/icons/RedoSparkIcon";
 import PencilEditCheckIcon from "@/components/icons/PencilEditCheckIcon";
-import CommentIcon from "@/components/icons/CommentIcon";
-import UpscaleSparkIcon from "@/components/icons/UpscaleSparkIcon";
 import RedoIcon from "@/components/icons/RedoIcon";
 import UndoIcon from "@/components/icons/UndoIcon";
 import QuoteIcon from "@/components/icons/QuoteIcon";
@@ -55,9 +53,6 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import PlusCircleIcon from "@/components/icons/PlusCircleIcon";
 import ArrowDownIcon from "@/components/icons/ArrowDownIcon";
-import ShortenHorizontalIcon from "@/components/icons/ShortenHorizontalIcon";
-import ExpandVerticalIcon from "@/components/icons/ExpandVerticalIcon";
-// import PencilIcon from "@/components/icons/PencilIcon";
 import { cn, getSectionHeading } from "@/utils";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
@@ -71,6 +66,7 @@ import {
   handleToggleResolution
 } from "./commentFunctions";
 import { Textarea } from "@/components/ui/textarea";
+import TextSelectionMenu from "./components/TextSelectionMenu";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -158,8 +154,6 @@ const ProposalPreview = () => {
   const toggleSidepane = () => {
     setSidepaneOpen((prevState) => !prevState);
   };
-
-  // 3. Add this function to handle rewrite submission
 
   // 2. Update the handleRewriteSubmit function to use section-specific loading
   const handleRewriteSubmit = async () => {
@@ -479,47 +473,6 @@ const ProposalPreview = () => {
     }
   };
 
-  // Add comment handler
-  const handleAddComment = () => {
-    setShowCommentInput(true);
-
-    // Highlight the selected text in grey instead of orange
-    if (selectedRange) {
-      // Create a span to wrap the selected content
-      const span = document.createElement("span");
-      span.className = "commented-text";
-      span.dataset.commentId = `pending-${Date.now()}`;
-
-      // Make sure the style applies to all child elements
-      span.style.backgroundColor = "#FFE5CC";
-
-      // Preserve the original HTML structure by cloning the range contents
-      // instead of just wrapping everything in a span
-      try {
-        selectedRange.surroundContents(span);
-      } catch (e) {
-        // If surroundContents fails (which can happen with complex selections),
-        // use a more robust approach that preserves the structure
-        console.log("Using alternative comment highlighting method");
-
-        // Extract the content
-        const fragment = selectedRange.extractContents();
-
-        // Add the content to our span
-        span.appendChild(fragment);
-
-        // Insert the span
-        selectedRange.insertNode(span);
-      }
-
-      // Apply the style to all child elements
-      const childElements = span.querySelectorAll("*");
-      childElements.forEach((element) => {
-        (element as HTMLElement).style.backgroundColor = "#FFE5CC";
-      });
-    }
-  };
-
   // Add this new function to highlight comment and text
   const highlightCommentAndText = (commentId: string) => {
     setActiveComment(commentId);
@@ -572,276 +525,6 @@ const ProposalPreview = () => {
         outline: newOutline
       };
     });
-  };
-
-  // Modify the handleEvidencePrompt function to store the range more reliably
-  const handleEvidencePrompt = async () => {
-    if (!selectedRange) {
-      toast.error("Please select text to find evidence for");
-      return;
-    }
-
-    // Get the selected text
-    const selectedText = selectedRange.toString();
-    if (!selectedText || selectedText.trim() === "") {
-      toast.error("Please select text to find evidence for");
-      return;
-    }
-
-    setPromptTarget(selectedText);
-    setActionType("evidence");
-    // Store a deep clone of the range for later use
-    const storedRange = selectedRange.cloneRange();
-    setSelectedRange(storedRange);
-
-    // Highlight the selected text with a different color
-    const span = document.createElement("span");
-    span.className = "evidence-text";
-    span.dataset.evidenceId = `evidence-${Date.now()}`;
-    span.style.backgroundColor = "#FFE5CC"; // Light blue background
-
-    try {
-      selectedRange.surroundContents(span);
-    } catch (e) {
-      // If surroundContents fails (which can happen with complex selections),
-      // use a more robust approach that preserves the structure
-      console.log("Using alternative evidence highlighting method");
-
-      // Extract the content
-      const fragment = selectedRange.extractContents();
-
-      // Add the content to our span
-      span.appendChild(fragment);
-
-      // Insert the span
-      selectedRange.insertNode(span);
-    }
-
-    // Apply the style to all child elements
-    const childElements = span.querySelectorAll("*");
-    childElements.forEach((element) => {
-      (element as HTMLElement).style.backgroundColor = "#FFE5CC";
-    });
-
-    setSidepaneOpen(true); // Open the sidepane instead of evidence panel
-    setIsLoadingEvidence(true);
-
-    try {
-      // Create FormData instead of using JSON
-      const formData = new FormData();
-      formData.append("selected_text", selectedText);
-
-      // Make API call to get evidence using FormData
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_evidence_from_company_lib`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`
-          }
-        }
-      );
-
-      if (
-        response.data.success &&
-        response.data.evidence &&
-        response.data.evidence.length > 0
-      ) {
-        // Check if enhanced_text is available
-        if (response.data.enhanced_text) {
-          setPromptResult(response.data.enhanced_text);
-        } else {
-          // Format the evidence results manually if enhanced_text is not available
-          const formattedEvidence = response.data.evidence
-            .map((item, index) => {
-              return `Evidence ${index + 1} [Source: ${item.source}]:\n${item.content}`;
-            })
-            .join("\n\n");
-
-          setPromptResult(formattedEvidence);
-        }
-      } else {
-        // Show the error message from the API if available
-        setPromptResult(
-          response.data.message ||
-            "No relevant evidence found in your company library."
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching evidence:", error);
-      setPromptResult("Error retrieving evidence. Please try again.");
-      toast.error("Failed to retrieve evidence from company library");
-    } finally {
-      setIsLoadingEvidence(false);
-    }
-  };
-
-  const handleExpand = async () => {
-    if (!selectedRange) {
-      toast.error("Please select text to expand");
-      return;
-    }
-
-    // Get the selected text
-    const selectedText = selectedRange.toString();
-    if (!selectedText || selectedText.trim() === "") {
-      toast.error("Please select text to expand");
-      return;
-    }
-
-    setPromptTarget(selectedText);
-    setActionType("expand");
-    // Store a deep clone of the range for later use
-    const storedRange = selectedRange.cloneRange();
-    setSelectedRange(storedRange);
-
-    // Highlight the selected text with a different color
-    const span = document.createElement("span");
-    span.className = "expand-text";
-    span.dataset.expandId = `expand-${Date.now()}`;
-    span.style.backgroundColor = "#FFE5CC";
-
-    try {
-      selectedRange.surroundContents(span);
-    } catch (e) {
-      // If surroundContents fails (which can happen with complex selections),
-      // use a more robust approach that preserves the structure
-      console.log("Using alternative expand highlighting method");
-
-      // Extract the content
-      const fragment = selectedRange.extractContents();
-
-      // Add the content to our span
-      span.appendChild(fragment);
-
-      // Insert the span
-      selectedRange.insertNode(span);
-    }
-
-    // Apply the style to all child elements
-    const childElements = span.querySelectorAll("*");
-    childElements.forEach((element) => {
-      (element as HTMLElement).style.backgroundColor = "#FFE5CC";
-    });
-
-    setSidepaneOpen(true);
-    setIsLoadingEvidence(true);
-
-    try {
-      // Make API call to expand text using copilot endpoint
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/copilot`,
-        {
-          input_text: selectedText,
-          extra_instructions: "",
-          copilot_mode: "1expand",
-          datasets: [],
-          bid_id: sharedState.object_id
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`
-          }
-        }
-      );
-
-      if (response.data) {
-        setPromptResult(response.data);
-      } else {
-        setPromptResult("Could not expand text. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error expanding text:", error);
-      setPromptResult("Error expanding text. Please try again.");
-      toast.error("Failed to expand text");
-    } finally {
-      setIsLoadingEvidence(false);
-    }
-  };
-
-  const handleSummarise = async () => {
-    if (!selectedRange) {
-      toast.error("Please select text to summarise");
-      return;
-    }
-
-    // Get the selected text
-    const selectedText = selectedRange.toString();
-    if (!selectedText || selectedText.trim() === "") {
-      toast.error("Please select text to summarise");
-      return;
-    }
-
-    setPromptTarget(selectedText);
-    setActionType("summarise");
-    // Store a deep clone of the range for later use
-    const storedRange = selectedRange.cloneRange();
-    setSelectedRange(storedRange);
-
-    // Highlight the selected text with a different color
-    const span = document.createElement("span");
-    span.className = "summarise-text";
-    span.dataset.summariseId = `summarise-${Date.now()}`;
-    span.style.backgroundColor = "#FFE5CC";
-
-    try {
-      selectedRange.surroundContents(span);
-    } catch (e) {
-      // If surroundContents fails (which can happen with complex selections),
-      // use a more robust approach that preserves the structure
-      console.log("Using alternative summarise highlighting method");
-
-      // Extract the content
-      const fragment = selectedRange.extractContents();
-
-      // Add the content to our span
-      span.appendChild(fragment);
-
-      // Insert the span
-      selectedRange.insertNode(span);
-    }
-
-    // Apply the style to all child elements
-    const childElements = span.querySelectorAll("*");
-    childElements.forEach((element) => {
-      (element as HTMLElement).style.backgroundColor = "#FFE5CC";
-    });
-
-    setSidepaneOpen(true);
-    setIsLoadingEvidence(true);
-
-    try {
-      // Make API call to get summary using copilot endpoint
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/copilot`,
-        {
-          input_text: selectedText,
-          extra_instructions: "",
-          copilot_mode: "1summarise",
-          datasets: [],
-          bid_id: sharedState.object_id
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`
-          }
-        }
-      );
-
-      console.log(response.data);
-
-      if (response.data) {
-        setPromptResult(response.data); // Copilot returns an array of options, take the first one
-      } else {
-        setPromptResult("Could not generate summary. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error fetching summary:", error);
-      setPromptResult("Error generating summary. Please try again.");
-      toast.error("Failed to generate summary");
-    } finally {
-      setIsLoadingEvidence(false);
-    }
   };
 
   const handleReplaceWithPrompt = (text: string) => {
@@ -1664,103 +1347,21 @@ const ProposalPreview = () => {
                         </p>
                       </div>
                     )}
-
                     {/* Selection Menu */}
                     {showSelectionMenu && (
-                      <div
-                        className="absolute right-1"
-                        style={{
-                          top: `${selectionMenuPosition.top}px`
-                        }}
-                      >
-                        <div className="flex flex-col bg-white shadow-lg rounded-2xl border border-gray-200 z-50 overflow-hidden gap-1 py-2">
-                          <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={handleAddComment}
-                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
-                                >
-                                  <CommentIcon />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent side="left">
-                                Add Comment
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={handleEvidencePrompt}
-                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
-                                >
-                                  <UpscaleSparkIcon />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent side="left">
-                                Evidence
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          {/* <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={handleEvidencePrompt}
-                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
-                                >
-                                  <PencilIcon />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent side="left">
-                                Custom
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider> */}
-                          <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={handleExpand}
-                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
-                                >
-                                  <ExpandVerticalIcon />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent side="left">
-                                Expand
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={handleSummarise}
-                                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
-                                >
-                                  <ShortenHorizontalIcon />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent side="left">
-                                Summarise
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      </div>
+                      <TextSelectionMenu
+                        selectionMenuPosition={selectionMenuPosition}
+                        selectedRange={selectedRange}
+                        setSelectedRange={setSelectedRange}
+                        setShowCommentInput={setShowCommentInput}
+                        setPromptTarget={setPromptTarget}
+                        setPromptResult={setPromptResult}
+                        setSidepaneOpen={setSidepaneOpen}
+                        setIsLoadingEvidence={setIsLoadingEvidence}
+                        setActionType={setActionType}
+                        tokenRef={tokenRef}
+                        objectId={sharedState.object_id}
+                      />
                     )}
                   </div>
                 </div>
@@ -2033,50 +1634,6 @@ const ProposalPreview = () => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {/* <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="[&_svg]:size-6">
-                  <ConsultIcon />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent
-                side="left"
-                className="border-[0.5px] border-gray-line rounded-md p-2 px-1.5 py-1 shadow-tooltip bg-white"
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="text-gray-hint_text font-medium text-sm">
-                    Consult
-                  </span>
-                  <span className="text-gray-border text-xs">
-                    Polish your writing
-                  </span>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="[&_svg]:size-6">
-                  <CheckDocumentIcon />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent
-                side="left"
-                className="border-[0.5px] border-gray-line rounded-md p-2 px-1.5 py-1 shadow-tooltip bg-white"
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="text-gray-hint_text font-medium text-sm">
-                    Checks
-                  </span>
-                  <span className="text-gray-border text-xs">
-                    Use ready made prompts
-                  </span>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
         </div>
       </div>
     </div>
