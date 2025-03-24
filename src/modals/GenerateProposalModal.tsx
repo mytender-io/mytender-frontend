@@ -21,24 +21,19 @@ import { Button } from "@/components/ui/button";
 import wordpaneImage from "../resources/images/wordpanescreenshot.png";
 import Confetti from "react-confetti";
 import FastIcon from "@/components/icons/FastIcon";
-import { fetchOutline } from "../services/outline";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 interface GenerateProposalModalProps {
   bid_id: string;
-  outline: Array<{
-    status: string;
-    [key: string]: any;
-  }>;
+  handleTabClick: (path: string) => void;
 }
 
 const GenerateProposalModal = ({
   bid_id,
-  outline
+  handleTabClick
 }: GenerateProposalModalProps) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
-  const navigate = useNavigate();
   const { sharedState, setSharedState } = useContext(BidContext);
   const [currentStep, setCurrentStep] = useState(1);
   const tokenRef = useRef(auth?.token || "default");
@@ -69,12 +64,6 @@ const GenerateProposalModal = ({
     "Almost there! Just applying the finishing touches...",
     "Finalizing the proposal..."
   ];
-
-  const incompleteSections =
-    outline?.filter(
-      (section: { status: string }) => section.status !== "Completed"
-    ) || [];
-  const hasIncompleteSections = incompleteSections.length > 0;
 
   const [progress, setProgress] = useState(0);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
@@ -179,22 +168,9 @@ const GenerateProposalModal = ({
     }
   };
 
-  const handleClose = () => {
-    setShow(false);
-    setCurrentStep(1);
-  };
-
   const handleNext = async () => {
     if (currentStep === 1) {
       generateProposal();
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep === 2) {
-      setCurrentStep(1);
-    } else {
-      handleClose();
     }
   };
 
@@ -263,7 +239,7 @@ const GenerateProposalModal = ({
             className="animate-[slideUp_0.5s_ease-out]"
             onClick={() => {
               setShow(false);
-              // navigate(`/proposal-preview`);
+              handleTabClick("/proposal-preview");
             }}
           >
             Preview Your Masterpiece

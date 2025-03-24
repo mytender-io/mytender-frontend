@@ -29,40 +29,6 @@ const BidNavbar: React.FC<{
 }) => {
   const { sharedState } = useContext(BidContext);
 
-  // const getPermissionDetails = (permission) => {
-  //   switch (permission) {
-  //     case "admin":
-  //       return {
-  //         icon: faUsers,
-  //         text: "Admin",
-  //         description: "You have full access to edit and manage this proposal."
-  //       };
-  //     case "editor":
-  //       return {
-  //         icon: faEdit,
-  //         text: "Editor",
-  //         description:
-  //           "You can edit this proposal but cannot change permissions."
-  //       };
-  //     default:
-  //       return {
-  //         icon: faEye,
-  //         text: "Viewer",
-  //         description: "You can view this proposal but cannot make changes."
-  //       };
-  //   }
-  // };
-
-  // const permissionDetails = getPermissionDetails(currentUserPermission);
-
-  // const handleBackClick = () => {
-  //   if (location.pathname == "/question-crafter") {
-  //     navigate("/proposal-planner");
-  //   } else {
-  //     navigate("/bids");
-  //   }
-  // };
-
   const baseNavLinkStyles =
     "mr-6 text-base font-semibold text-gray-hint_text hover:text-orange px-3 py-2.5 cursor-pointer transition-all duration-300 ease-in-out relative";
   const activeNavLinkStyles = "text-orange";
@@ -167,7 +133,10 @@ const BidNavbar: React.FC<{
                 <PlusIcon />
                 New Outline
               </Button>
-              <GenerateProposalModal bid_id={object_id} outline={outline} />
+              <GenerateProposalModal
+                bid_id={object_id}
+                handleTabClick={handleTabClick}
+              />
             </div>
           ) : null}
         </div>
