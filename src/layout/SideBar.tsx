@@ -302,7 +302,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               )}
             </Link>
             <Link
-              to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
+              to="https://app.storylane.io/share/emiqkpwn2e5r?embed=inline"
               className="flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3 bg-transparent"
               target="_blank"
               rel="noopener noreferrer"

@@ -157,13 +157,12 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
         outline: response.data?.outline || [],
         tender_summary: response.data?.tender_summary || "",
         evaluation_criteria: response.data?.evaluation_criteria || "",
-        derive_insights: response.data?.pain_points || "",
+        derive_insights: response.data?.derive_insights || "",
         differentiation_opportunities:
           response.data?.differentiation_opportunities || "",
-        customer_pain_points: response.data?.relevant_pain_points || [],
-        win_themes: response.data?.relevant_win_themes || [],
-        differentiating_factors:
-          response.data?.relevant_differentiation_opportunities || []
+        customer_pain_points: response.data?.customer_pain_points || [],
+        win_themes: response.data?.win_themes || [],
+        differentiating_factors: response.data?.differentiating_factors || []
       }));
     } catch (err) {
       console.error("Full error:", err.response?.data);
