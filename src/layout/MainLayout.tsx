@@ -4,6 +4,7 @@ import { useAuthUser } from "react-auth-kit";
 import AutoLogout from "@/components/auth/AutoLogout";
 import posthog from "posthog-js";
 import { cn } from "@/utils";
+import { LoadingProvider } from "@/context/LoadingContext";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -17,7 +18,7 @@ posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
 
 const CHECK_INTERVAL = 60 * 60 * 1000; // 1 hour in milliseconds
 
-const MainLayout = ({ children }: MainLayoutProps) => {
+const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(
     JSON.parse(localStorage.getItem("sidebarCollapsed") || "false")
   );
@@ -99,7 +100,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       >
         <SideBar onCollapseChange={setSidebarCollapsed} />
         <main className="flex-1 transition-all duration-300 ease-in-out bg-white border border-typo-200 rounded-2xl overflow-x-auto">
-          {children}
+          <LoadingProvider>{children}</LoadingProvider>
         </main>
       </div>
     </>

@@ -13,7 +13,6 @@ import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -22,105 +21,35 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/utils";
 import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal";
-import { Maximize2, Minimize2 } from "lucide-react";
-import Sloth1 from "@/resources/images/sloth1.gif";
-import Sloth2 from "@/resources/images/sloth2.gif";
-import Sloth3 from "@/resources/images/sloth3.gif";
-import Sloth4 from "@/resources/images/sloth4.gif";
-import Sloth5 from "@/resources/images/sloth5.gif";
 
 interface NewTenderModalProps {
   show: boolean;
   onHide: () => void;
   existingBids: Array<{ bid_title: string }>;
   fetchBids: () => void;
+  isGeneratingOutline: boolean;
+  setIsGeneratingOutline: (isGenerating: boolean) => void;
+  setProgress: (progress: number) => void;
+  setLoadingMessage: (message: string) => void;
 }
 
 type Step = "details" | "documents" | "content" | "questions";
-
-const LoadingOverlay = ({
-  isOpen,
-  progress,
-  loadingMessage
-}: {
-  isOpen: boolean;
-  progress: number;
-  loadingMessage: string;
-}) => {
-  const [expanded, setExpanded] = useState(false);
-
-  // Add array of sloth images
-  const slothImages = [Sloth1, Sloth2, Sloth3, Sloth4, Sloth5];
-
-  // Get random sloth image on component mount
-  const [randomSloth] = useState(
-    () => slothImages[Math.floor(Math.random() * slothImages.length)]
-  );
-
-  if (!isOpen) return null;
-
-  return (
-    <div
-      className={cn(
-        "fixed p-0 bg-white rounded-lg shadow-2xl overflow-hidden transition-all duration-300",
-        expanded
-          ? "max-w-[50rem] w-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-          : "w-80 right-4 bottom-4"
-      )}
-    >
-      <div className="bg-gray-bg border-[0.5px] border-gray-line p-3 flex justify-between items-center">
-        <h2 className="text-base font-semibold">Thank you for completing</h2>
-        <Button
-          onClick={() => setExpanded(!expanded)}
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 text-gray-600 hover:text-gray-900 p-0"
-        >
-          {expanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-        </Button>
-      </div>
-      <div
-        className={cn(
-          "flex flex-col justify-between w-full gap-3 p-3",
-          expanded ? "h-fit" : "h-40",
-          "w-full transition-all duration-300"
-        )}
-      >
-        <div className="space-y-3">
-          <span className="font-semibold">Setting up your bid:</span>
-          {expanded ? (
-            <img
-              src={randomSloth}
-              alt="Loading Sloth"
-              className="w-80 h-80 mx-auto rounded-lg shadow-md"
-            />
-          ) : null}
-          <span className={cn("block", expanded ? "text-center" : "mb-7")}>
-            {loadingMessage}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 max-w-96 w-full mx-auto">
-          <Progress value={progress} />
-          <p className="text-sm">{`${Math.round(progress)}%`}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const NewTenderModal: React.FC<NewTenderModalProps> = ({
   show,
   onHide,
   existingBids,
-  fetchBids
+  fetchBids,
+  isGeneratingOutline,
+  setIsGeneratingOutline,
+  setProgress,
+  setLoadingMessage
 }) => {
   const getAuth = useAuthUser();
   const auth = useMemo(() => getAuth(), [getAuth]);
   const tokenRef = useRef(auth?.token || "default");
 
   const { sharedState, setSharedState } = useContext(BidContext);
-  const [isGeneratingOutline, setIsGeneratingOutline] =
-    useState<boolean>(false);
   const [deadline, setDeadline] = useState<string>("");
   const [contractValue, setContractValue] = useState<string>("");
   const [clientName, setClientName] = useState<string>("");
@@ -132,10 +61,6 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
 
   const navigate = useNavigate();
 
-  const [progress, setProgress] = useState(0);
-  const [loadingMessage, setLoadingMessage] = useState(
-    "Analysing tender documents..."
-  );
   const progressInterval = useRef(null);
 
   // Add new state for confirmation dialog
@@ -465,116 +390,6 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     }
   };
 
-  // const renderStepContent = () => {
-  //   switch (currentStep) {
-  //     case "details":
-  //       return (
-  //         <div className="selectfolder-container mt-0 p-0">
-  //           <div className="white-card p-4 ">
-  //             <Form.Group className="mb-4">
-  //               <Form.Label className="card-label">Tender Name:</Form.Label>
-  //               <Form.Control
-  //                 type="text"
-  //                 value={clientName}
-  //                 onChange={(e) => setClientName(e.target.value)}
-  //                 placeholder="Enter tender name"
-  //               />
-  //             </Form.Group>
-
-  //             <Form.Group className="mb-4">
-  //               <Form.Label className="card-label">Deadline:</Form.Label>
-  //               <CustomDateInput
-  //                 value={deadline}
-  //                 onChange={(value) => setDeadline(value)} // Direct value handling
-  //                 defaultValue={new Date().toISOString().split("T")[0]}
-  //               />
-  //             </Form.Group>
-
-  //             <Form.Group className="mb-4">
-  //               <Form.Label className="card-label">Contract Value:</Form.Label>
-  //               <Form.Control
-  //                 type="text"
-  //                 value={contractValue}
-  //                 onChange={handleValueChange}
-  //                 placeholder="Enter contract value"
-  //               />
-  //             </Form.Group>
-  //           </div>
-  //         </div>
-  //       );
-
-  //     case "documents":
-  //       return (
-  //         <div className="white-card p-4">
-  //           <UploadPDF
-  //             bid_id={sharedState.object_id}
-  //             apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
-  //             descriptionText="Documents uploaded to the Tender Library will be used as context by
-  //                 our AI to generate compliance requirements and opportunity
-  //                 information for the Tender."
-  //             onUploadComplete={(uploadedFiles) => {
-  //               // Instead of an immediate handleNextStep call, update documents
-  //               // and use a useEffect to handle the transition
-  //               setDocuments(uploadedFiles);
-  //             }}
-  //           />
-  //         </div>
-  //       );
-
-  //     case "content":
-  //       return (
-  //         <div className="white-card p-4 ">
-  //           <p className="description-text">
-  //             Select the documents which contain the questions you need to
-  //             answer in your bid. These will be used to generate the outline for
-  //             your proposal.
-  //           </p>
-  //           <div className="selectfolder-container mt-0 p-0">
-  //             <SelectTenderLibraryFile
-  //               bid_id={sharedState.object_id}
-  //               onFileSelect={handleFileSelection}
-  //               initialSelectedFiles={selectedFiles}
-  //               folderView={true}
-  //             />
-  //           </div>
-  //         </div>
-  //       );
-
-  //     case "questions":
-  //       return (
-  //         <div>
-  //           <div className="">
-  //             <p>
-  //               Select the folders below from your content library to use as
-  //               context in your final proposal. The AI will be able to use
-  //               information from these when generating an answer.
-  //             </p>
-  //           </div>
-
-  //           <div className="selectfolder-container mt-3">
-  //             <SelectFolder
-  //               onFolderSelect={handleFolderSelection}
-  //               initialSelectedFolders={selectedFolders}
-  //             />
-  //           </div>
-
-  //           {isGeneratingOutline && (
-  //             <div className="mt-4">
-  //               <Progress
-  //                 value={progress}
-  //                 className="h-2.5 rounded-full bg-[#ffd699]"
-  //               />
-  //               <div className="mt-1 text-center">
-  //                 <p className="text-gray-600">{`${Math.round(progress)}%`}</p>
-  //                 <p className="text-gray-600 italic">{loadingMessage}</p>
-  //               </div>
-  //             </div>
-  //           )}
-  //         </div>
-  //       );
-  //   }
-  // };
-
   return (
     <>
       <Dialog open={show && !isGeneratingOutline} onOpenChange={handleClose}>
@@ -819,12 +634,6 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         title="Are you sure you want to exit?"
         message="All progress will be lost. This action cannot be undone."
         confirmTitle="Exit"
-      />
-
-      <LoadingOverlay
-        isOpen={isGeneratingOutline}
-        progress={progress}
-        loadingMessage={loadingMessage}
       />
     </>
   );

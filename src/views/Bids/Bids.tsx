@@ -30,6 +30,8 @@ import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
 import { customLocale, cn } from "@/utils";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "react-toastify";
+import { useLoading } from "@/context/LoadingContext";
+
 interface Bid {
   _id: string;
   bid_title: string;
@@ -74,6 +76,13 @@ const Bids = () => {
   const navigate = useNavigate();
 
   const [viewType, setViewType] = useState("table"); // or 'kanban'
+
+  const {
+    isGeneratingOutline,
+    setIsGeneratingOutline,
+    setProgress,
+    setLoadingMessage
+  } = useLoading();
 
   // Function to check if a bid was edited less than 20 minutes ago and has empty win themes
   // Function to check if a bid was recently created and new_bid_completed is false
@@ -199,7 +208,6 @@ const Bids = () => {
     { key: "submission_deadline", label: "Deadline" },
     { key: "status", label: "Status" },
     { key: "bid_qualification_result", label: "Won/Lost" }
-  
   ];
 
   useEffect(() => {
@@ -424,8 +432,7 @@ const Bids = () => {
 
   const handleModalClose = () => {
     setShowModal(false);
-    setBidName("");
-    fetchBids();
+    setIsGeneratingOutline(false);
   };
 
   const SkeletonRow = () => (
@@ -622,6 +629,10 @@ const Bids = () => {
           onHide={handleModalClose}
           existingBids={bids}
           fetchBids={fetchBids}
+          isGeneratingOutline={isGeneratingOutline}
+          setIsGeneratingOutline={setIsGeneratingOutline}
+          setProgress={setProgress}
+          setLoadingMessage={setLoadingMessage}
         />
 
         <DeleteConfirmationDialog
