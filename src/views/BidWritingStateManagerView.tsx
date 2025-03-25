@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  useRef,
-  useCallback
-} from "react";
+import React, { createContext, useState, useEffect, useRef } from "react";
 import { EditorState } from "draft-js";
 import { Outlet } from "react-router-dom";
 import axios from "axios";
@@ -166,41 +160,10 @@ const BidManagement: React.FC = () => {
   // Create a separate ref to track if we're currently saving
   const isSavingRef = useRef(false);
 
-  // Initialize shared state from localStorage or use default state
-  const [sharedState, setSharedState] = useState<SharedState>(() => {
-    try {
-      const savedState = localStorage.getItem("bidState");
-      if (savedState) {
-        const parsedState = JSON.parse(savedState);
-        // Ensure outline is properly structured when loading from localStorage
-        const validatedOutline = Array.isArray(parsedState.outline)
-          ? parsedState.outline
-          : [];
-
-        // Combine default state with saved state, ensuring all required fields exist
-        console.log(parsedState.object_id);
-        return {
-          ...defaultState.sharedState, // Start with default state
-          ...parsedState, // Override with saved state
-          outline: validatedOutline, // Use validated outline
-          contributors: parsedState.contributors || {},
-          original_creator: parsedState.original_creator || "",
-          isSaved: false,
-          isLoading: false,
-          saveSuccess: null,
-          object_id: parsedState.object_id || null,
-          selectedFolders: parsedState.selectedFolders || ["default"],
-          selectedCaseStudies: parsedState.selectedCaseStudies || [], // Ensure selectedCaseStudies exists
-          tone_of_voice: parsedState.tone_of_voice || "",
-          new_bid_completed: parsedState.new_bid_completed || true
-        };
-      }
-      return defaultState.sharedState;
-    } catch (error) {
-      console.error("Error loading state from localStorage:", error);
-      return defaultState.sharedState;
-    }
-  });
+  // Initialize shared state using default state
+  const [sharedState, setSharedState] = useState<SharedState>(
+    defaultState.sharedState
+  );
 
   // Debounce timer for auto-save functionality
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
@@ -211,19 +174,11 @@ const BidManagement: React.FC = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
-  const currentUserEmail = auth?.email; // Safely access email
 
   // Utility function to combine background information
   const getBackgroundInfo = () => {
     return `${sharedState.opportunity_information}\n${sharedState.compliance_requirements}`;
   };
-
-  // Check if current user has permission to save changes
-  const canUserSave = useCallback((): boolean => {
-    if (!currentUserEmail) return false; // If no user email, they can't save
-    const userPermission = sharedState.contributors[currentUserEmail];
-    return userPermission === "admin" || userPermission === "editor";
-  }, [sharedState.contributors, currentUserEmail]);
 
   // Main save function that sends data to the server
   const saveProposal = async () => {
@@ -232,14 +187,6 @@ const BidManagement: React.FC = () => {
       console.log("Save already in progress, skipping");
       return;
     }
-
-    // Check user permissions before proceeding
-    // if (!canUserSave()) {
-    //   console.log(
-    //     "User does not have permission to save. Skipping save operation."
-    //   );
-    //   return;
-    // }
 
     try {
       isSavingRef.current = true;
@@ -283,7 +230,7 @@ const BidManagement: React.FC = () => {
       } = stateCopy;
 
       if (!bidInfo || bidInfo.trim() === "") {
-        // toast.error("Please type in a bid name...");
+        //toast.error("Please type in a bid name...");
         return;
       }
 
@@ -375,18 +322,6 @@ const BidManagement: React.FC = () => {
         object_id: bid_id
       }));
 
-      // Update localStorage with the latest state
-      localStorage.setItem(
-        "bidState",
-        JSON.stringify({
-          ...stateCopy,
-          object_id: bid_id,
-          isSaved: true,
-          isLoading: false,
-          saveSuccess: true
-        })
-      );
-
       // Reset isSaved after 3 seconds
       setTimeout(
         () => setSharedState((prev) => ({ ...prev, isSaved: false })),
@@ -422,18 +357,9 @@ const BidManagement: React.FC = () => {
       constributors: sharedState.contributors,
       selectedFolders: sharedState.selectedFolders,
       selectedCaseStudies: sharedState.selectedCaseStudies,
-      tone_of_voice: sharedState.tone_of_voice, // Log tone_of_voice changes
-      new_bid_completed: sharedState.new_bid_completed,
-      canSave: canUserSave()
+      tone_of_voice: sharedState.tone_of_voice,
+      new_bid_completed: sharedState.new_bid_completed
     });
-
-    // Immediately save current state to localStorage
-    const stateToSave = {
-      ...sharedState
-    };
-
-    localStorage.setItem("bidState", JSON.stringify(stateToSave));
-    console.log("State saved to localStorage");
 
     // Clear any existing save timer
     if (typingTimeout) {
@@ -483,8 +409,7 @@ const BidManagement: React.FC = () => {
       }))
     ),
     // Triggers on deep changes to outline
-    JSON.stringify(sharedState.outline),
-    canUserSave
+    JSON.stringify(sharedState.outline)
   ]);
 
   useEffect(() => {

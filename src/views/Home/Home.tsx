@@ -62,7 +62,7 @@ const Home = () => {
         }
       );
       if (response.data && response.data.bids) {
-        const bidsList = response.data.bids;
+        const bidsList = response.data.bids.filter(bid => bid.new_bid_completed !== false);
         setBids(bidsList);
 
         // Create a map of bid_id to bid for easier lookup

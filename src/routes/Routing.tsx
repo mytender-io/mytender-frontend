@@ -8,11 +8,8 @@ import UploadTemplateText from "../components/UploadTemplateText.tsx";
 import Pannels from "../views/Pannels";
 import Bids from "@/views/Bids/Bids";
 import Library from "@/views/Library/Library";
-import Proposal from "../views/Proposal";
 import Dashboard from "../views/Dashboard";
 import ChatbotResponse from "../views/Chat/ChatbotResponse";
-// import BidExtractor from "../views/BidExtractor.tsx";
-import QuestionCrafter from "../views/QuestionCrafter";
 import Calculator from "../views/Calculator.tsx";
 import BidManagement from "../views/BidWritingStateManagerView.tsx";
 import HowTo from "../views/HowTo.tsx";
@@ -20,7 +17,6 @@ import ProfilePage from "../views/Profile/Profile";
 import Signup from "../components/auth/Signup";
 import ForgotPassword from "../components/auth/ForgotPassword";
 import QAGenerator from "../views/QAGenerator/Q&AGenerator";
-import ComplianceMatrix from "../views/ComplianceMatrix.tsx";
 import MainLayout from "@/layout/MainLayout";
 import posthog from "posthog-js";
 import Bid from "@/views/Bid/Bid";
@@ -65,11 +61,10 @@ function Routing() {
           <Route path="/howto" element={<HowTo />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/question-answer" element={<QAGenerator />} />
+
           <Route element={<BidManagement />}>
+            {/* context manager which give the component access to the shared state (the bid they are working on) */}
             <Route path="/bid" element={<Bid />} />
-            <Route path="/question-crafter" element={<QuestionCrafter />} />
-            <Route path="/compliance-matrix" element={<ComplianceMatrix />} />
-            <Route path="/proposal" element={<Proposal />} />
             <Route path="/bids" element={<Bids />} />
           </Route>
         </Route>
