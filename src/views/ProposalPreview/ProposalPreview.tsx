@@ -19,9 +19,8 @@ import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
 import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 import RedoSparkIcon from "@/components/icons/RedoSparkIcon";
-import PencilEditCheckIcon from "@/components/icons/PencilEditCheckIcon";
 import { Input } from "@/components/ui/input";
-import { cn, getSectionHeading } from "@/utils";
+import { cn } from "@/utils";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
 import DebouncedContentEditable from "./components/DebouncedContentEditable";
@@ -36,6 +35,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import TextSelectionMenu from "./components/TextSelectionMenu";
 import ProposalToolbar from "./components/ProposalToolbar";
+import MarkReviewReadyButton from "./components/MarkReviewReadyButton";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -183,78 +183,6 @@ const ProposalPreview = () => {
     }
   };
 
-  const handleMarkAsReviewReady = async (index: number) => {
-    try {
-      const section = outline[index];
-
-      // If no reviewer has been assigned, show a toast and return
-      if (!section.reviewer) {
-        toast.warning(
-          "Please assign a reviewer before marking as review ready"
-        );
-        return;
-      }
-
-      // Find the reviewer in the organization users to get their email
-      const reviewerUser = organizationUsers.find(
-        (user) => user.username === section.reviewer
-      );
-
-      if (!reviewerUser || !reviewerUser.email) {
-        toast.error(
-          "Could not find reviewer's email. Please reassign the reviewer."
-        );
-        return;
-      }
-
-      // After successfully updating the status, create a task for the reviewer
-      try {
-        const taskData = {
-          name: `Review section: ${section.heading} (Ready for Review)`,
-          bid_id: sharedState.object_id,
-          index: index,
-          priority: "high", // Optionally set higher priority for review tasks
-          target_user: reviewerUser.username // Use login if available, fall back to email or username
-        };
-
-        console.log(reviewerUser.username);
-
-        // Create the task
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
-          taskData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`
-            }
-          }
-        );
-
-        if (response.data.success) {
-          // Track review ready action with posthog
-          posthog.capture("section_marked_review_ready", {
-            bidId: sharedState.object_id,
-            sectionId: section.section_id,
-            sectionHeading: section.heading,
-            reviewer: section.reviewer,
-            emailSent: true
-          });
-          toast.success(
-            `Section "${section.heading}" marked as Review Ready and notification sent to ${reviewerUser.username}`
-          );
-        } else {
-          console.error("Error creating review task:", response.data.error);
-          toast.error("Failed to assign review task");
-        }
-      } catch (error) {
-        console.error("Error creating task for review:", error);
-        toast.error("Failed to create review task");
-      }
-    } catch (error) {
-      console.error("Error marking section as review ready:", error);
-      toast.error("Failed to mark section as review ready");
-    }
-  };
   const execCommand = (command: string, value: string = "") => {
     document.execCommand(command, false, value);
     if (activeEditorRef.current) {
@@ -894,15 +822,7 @@ const ProposalPreview = () => {
                               >
                                 <RedoSparkIcon /> Rewrite
                               </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-xs text-gray-hint_text"
-                                onClick={() => handleMarkAsReviewReady(index)}
-                              >
-                                <PencilEditCheckIcon />
-                                Mark as Review Ready
-                              </Button>
+                             <MarkReviewReadyButton section={section} index={index} objectId={sharedState.object_id} organizationUsers={organizationUsers} tokenRef={tokenRef} />
                             </div>
                           </div>
 
