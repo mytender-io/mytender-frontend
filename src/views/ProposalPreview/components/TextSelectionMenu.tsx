@@ -13,6 +13,7 @@ import CommentIcon from "@/components/icons/CommentIcon";
 import UpscaleSparkIcon from "@/components/icons/UpscaleSparkIcon";
 import ExpandVerticalIcon from "@/components/icons/ExpandVerticalIcon";
 import ShortenHorizontalIcon from "@/components/icons/ShortenHorizontalIcon";
+import CustomPromptButton from "./CustomPromptButton";
 
 interface TextSelectionMenuProps {
   /** Position of the selection menu relative to the editor */
@@ -374,75 +375,91 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
   };
 
   return (
-    <div
-      className="absolute right-1"
-      style={{
-        top: `${selectionMenuPosition.top}px`
-      }}
-    >
-      <div className="flex flex-col bg-white shadow-lg rounded-2xl border border-gray-200 z-50 overflow-hidden gap-1 py-2">
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleAddComment}
-                className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
-              >
-                <CommentIcon />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left">Add Comment</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleEvidencePrompt}
-                className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
-              >
-                <UpscaleSparkIcon />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left">Evidence</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleExpand}
-                className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
-              >
-                <ExpandVerticalIcon />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left">Expand</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSummarise}
-                className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
-              >
-                <ShortenHorizontalIcon />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left">Summarise</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+    <>
+      <div
+        className="absolute right-1"
+        style={{
+          top: `${selectionMenuPosition.top}px`
+        }}
+      >
+        <div className="flex flex-col bg-white shadow-lg rounded-2xl border border-gray-200 z-50 overflow-hidden gap-1 py-2">
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleAddComment}
+                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
+                >
+                  <CommentIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">Add Comment</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleEvidencePrompt}
+                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
+                >
+                  <UpscaleSparkIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">Evidence</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleExpand}
+                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
+                >
+                  <ExpandVerticalIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">Expand</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSummarise}
+                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
+                >
+                  <ShortenHorizontalIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">Summarise</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+         {/* Custom Prompt Button Component */}
+         <CustomPromptButton
+          selectedRange={selectedRange}
+          setSelectedRange={setSelectedRange}
+          setPromptTarget={setPromptTarget}
+          setPromptResult={setPromptResult}
+          setSidepaneOpen={setSidepaneOpen}
+          setIsLoadingEvidence={setIsLoadingEvidence}
+          setActionType={setActionType}
+          tokenRef={tokenRef}
+          objectId={objectId}
+        />
+        </div>
       </div>
-    </div>
+
+
+    </>
   );
 };
 

@@ -17,7 +17,6 @@ import {
   TooltipProvider
 } from "@/components/ui/tooltip";
 import DataTransferHorizontalIcon from "@/components/icons/DataTransferHorizontalIcon";
-import RefreshArrowIcon from "@/components/icons/RefreshArrowIcon";
 
 const ProposalPreviewSidepane = ({
   bid_id,
@@ -585,10 +584,12 @@ const ProposalPreviewSidepane = ({
                               ? "Summarise"
                               : actionType === "expand"
                                 ? "Expand"
+                                 : actionType === "custom"
+                                ? "Custom"
                                 : "Evidence"}
                           </span>
                         )}
-                        {/* Add insert button for evidence messages */}
+                
                         {message.type === "evidence" ? (
                           <div className="flex gap-1 mt-3">
                             <Button

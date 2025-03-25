@@ -281,7 +281,8 @@ const ProposalPreview = () => {
       const span =
         document.querySelector("span.evidence-text") ||
         document.querySelector("span.summarise-text") ||
-        document.querySelector("span.expand-text");
+        document.querySelector("span.expand-text") ||
+        document.querySelector("span.custom-text");
 
       if (span) {
         // Create a new range targeting the span
@@ -412,7 +413,8 @@ const ProposalPreview = () => {
     const span =
       document.querySelector("span.evidence-text") ||
       document.querySelector("span.summarise-text") ||
-      document.querySelector("span.expand-text");
+      document.querySelector("span.expand-text") ||
+      document.querySelector("span.custom-text");
 
     if (span) {
       // Get the text content
@@ -510,7 +512,7 @@ const ProposalPreview = () => {
       const evidenceSpans = document.querySelectorAll("span.evidence-text");
       const expandSpans = document.querySelectorAll("span.expand-text");
       const summariseSpans = document.querySelectorAll("span.summarise-text");
-
+      const customSpans = document.querySelectorAll("span.custom-text");
       // Only proceed if we have at least one highlighted span
       if (
         evidenceSpans.length === 0 &&
@@ -539,6 +541,13 @@ const ProposalPreview = () => {
 
       // Check summarise spans
       summariseSpans.forEach((span) => {
+        if (span.contains(event.target as Node)) {
+          isClickInsideHighlight = true;
+        }
+      });
+
+      // Check evidence spans
+      customSpans.forEach((span) => {
         if (span.contains(event.target as Node)) {
           isClickInsideHighlight = true;
         }
@@ -682,12 +691,10 @@ const ProposalPreview = () => {
               >
                 <div className="rounded-md bg-white w-full max-w-4xl flex-1">
                   <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-10">
-                   
-                      <ProposalToolbar
-                        activeEditorRef={activeEditorRef}
-                        execCommand={execCommand}
-                      />
-                    
+                    <ProposalToolbar
+                      activeEditorRef={activeEditorRef}
+                      execCommand={execCommand}
+                    />
                   </div>
                   <div
                     className="h-auto relative border-x border-gray-line"
@@ -822,7 +829,13 @@ const ProposalPreview = () => {
                               >
                                 <RedoSparkIcon /> Rewrite
                               </Button>
-                             <MarkReviewReadyButton section={section} index={index} objectId={sharedState.object_id} organizationUsers={organizationUsers} tokenRef={tokenRef} />
+                              <MarkReviewReadyButton
+                                section={section}
+                                index={index}
+                                objectId={sharedState.object_id}
+                                organizationUsers={organizationUsers}
+                                tokenRef={tokenRef}
+                              />
                             </div>
                           </div>
 
