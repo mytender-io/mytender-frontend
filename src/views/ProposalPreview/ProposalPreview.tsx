@@ -204,7 +204,11 @@ const ProposalPreview = () => {
       setSelectedRange(range.cloneRange());
 
       // Position the menu above the selection, relative to the editor
-      const topPosition = rect.top - (editorContainerRect?.top || 0);
+      const menuHeight = 215;
+      const topPosition =
+        rect.top -
+        (editorContainerRect?.top || 0) -
+        (menuHeight - rect.height) / 2;
       setSelectionMenuPosition({
         top: topPosition // Position above the selection, relative to editor
       });

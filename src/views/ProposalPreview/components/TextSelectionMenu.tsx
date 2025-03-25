@@ -413,6 +413,17 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
               <TooltipContent side="left">Evidence</TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          <CustomPromptButton
+            selectedRange={selectedRange}
+            setSelectedRange={setSelectedRange}
+            setPromptTarget={setPromptTarget}
+            setPromptResult={setPromptResult}
+            setSidepaneOpen={setSidepaneOpen}
+            setIsLoadingEvidence={setIsLoadingEvidence}
+            setActionType={setActionType}
+            tokenRef={tokenRef}
+            objectId={objectId}
+          />
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -443,22 +454,9 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
               <TooltipContent side="left">Summarise</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-         {/* Custom Prompt Button Component */}
-         <CustomPromptButton
-          selectedRange={selectedRange}
-          setSelectedRange={setSelectedRange}
-          setPromptTarget={setPromptTarget}
-          setPromptResult={setPromptResult}
-          setSidepaneOpen={setSidepaneOpen}
-          setIsLoadingEvidence={setIsLoadingEvidence}
-          setActionType={setActionType}
-          tokenRef={tokenRef}
-          objectId={objectId}
-        />
+          {/* Custom Prompt Button Component */}
         </div>
       </div>
-
-
     </>
   );
 };
