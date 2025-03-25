@@ -412,29 +412,6 @@ const BidManagement: React.FC = () => {
     JSON.stringify(sharedState.outline)
   ]);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        console.log("fetch user data");
-
-        const response = await axios.get(
-          `http${HTTP_PREFIX}://${API_URL}/profile`,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`
-            }
-          }
-        );
-
-        console.log(response);
-      } catch (err) {
-        console.log("Failed to load profile data");
-      }
-    };
-
-    fetchUserData();
-  }, [tokenRef]);
-
   return (
     <BidContext.Provider
       value={{
