@@ -6,28 +6,8 @@ import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  Heading1,
-  Heading2,
-  Heading3,
-  Heading4,
-  List,
-  ListOrdered,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Type,
-  Check,
-  Download,
-  X,
-  Send
-} from "lucide-react";
+import { Check, Download, X, Send } from "lucide-react";
 import "./ProposalPreview.css";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover";
 import {
   TooltipContent,
   Tooltip,
@@ -40,19 +20,7 @@ import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 import RedoSparkIcon from "@/components/icons/RedoSparkIcon";
 import PencilEditCheckIcon from "@/components/icons/PencilEditCheckIcon";
-import RedoIcon from "@/components/icons/RedoIcon";
-import UndoIcon from "@/components/icons/UndoIcon";
-import QuoteIcon from "@/components/icons/QuoteIcon";
-import StrikeThroughIcon from "@/components/icons/StrikeThroughIcon";
-import HyperlinkIcon from "@/components/icons/HyperlinkIcon";
-import UnderlineIcon from "@/components/icons/UnderlineIcon";
-import ItalicIcon from "@/components/icons/ItalicIcon";
-import BoldIcon from "@/components/icons/BoldIcon";
-import ParagraphIcon from "@/components/icons/ParagraphIcon";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import PlusCircleIcon from "@/components/icons/PlusCircleIcon";
-import ArrowDownIcon from "@/components/icons/ArrowDownIcon";
 import { cn, getSectionHeading } from "@/utils";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
@@ -67,6 +35,7 @@ import {
 } from "./commentFunctions";
 import { Textarea } from "@/components/ui/textarea";
 import TextSelectionMenu from "./components/TextSelectionMenu";
+import ProposalToolbar from "./components/ProposalToolbar";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -102,16 +71,9 @@ const ProposalPreview = () => {
   const [localLoading, setLocalLoading] = useState(false);
 
   const [organizationUsers, setOrganizationUsers] = useState([]);
-  const [selectedVersion, setSelectedVersion] = useState<string>("version2");
-  const [versionPopoverOpen, setVersionPopoverOpen] = useState(false);
   const [isLoadingEvidence, setIsLoadingEvidence] = useState(false);
 
   const [actionType, setActionType] = useState("evidence");
-
-  const handleSelectVersion = (version: string) => {
-    setSelectedVersion(version);
-    setVersionPopoverOpen(false); // Close the popover when a version is selected
-  };
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
@@ -293,157 +255,10 @@ const ProposalPreview = () => {
       toast.error("Failed to mark section as review ready");
     }
   };
-  // Rich text editor functions
   const execCommand = (command: string, value: string = "") => {
     document.execCommand(command, false, value);
     if (activeEditorRef.current) {
       activeEditorRef.current.focus();
-    }
-  };
-
-  // Add this function to handle hyperlinks
-  const handleLink = () => {
-    const url = prompt("Enter URL:", "https://");
-    if (url) {
-      execCommand("createLink", url);
-    }
-  };
-
-  // Fix the list functions to ensure they work properly
-  const handleBulletedList = () => {
-    try {
-      // Check if the selection is empty or just whitespace
-      const selection = window.getSelection();
-      if (selection && selection.toString().trim() === "") {
-        // If empty, insert a list with a default item
-        const listItem = document.createElement("ul");
-        const li = document.createElement("li");
-        li.innerHTML = "&nbsp;"; // Add a non-breaking space
-        listItem.appendChild(li);
-
-        // Insert at current position
-        const range = selection.getRangeAt(0);
-        range.deleteContents();
-        range.insertNode(listItem);
-
-        // Place cursor inside the list item
-        const newRange = document.createRange();
-        newRange.setStart(li, 0);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-      } else {
-        // If there's content, use the standard command
-        document.execCommand("insertUnorderedList", false, null);
-      }
-    } catch (e) {
-      // Fallback implementation if the command fails
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const selectedText = range.toString();
-
-        // Create a list element
-        const ul = document.createElement("ul");
-        const li = document.createElement("li");
-        li.textContent = selectedText || "List item";
-        ul.appendChild(li);
-
-        // Replace the selection with the list
-        range.deleteContents();
-        range.insertNode(ul);
-
-        // Set cursor at the end of the list item
-        const newRange = document.createRange();
-        newRange.setStartAfter(li);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-      }
-    }
-
-    if (activeEditorRef.current) {
-      activeEditorRef.current.focus();
-    }
-  };
-
-  const handleNumberedList = () => {
-    try {
-      // Check if the selection is empty or just whitespace
-      const selection = window.getSelection();
-      if (selection && selection.toString().trim() === "") {
-        // If empty, insert a list with a default item
-        const listItem = document.createElement("ol");
-        const li = document.createElement("li");
-        li.innerHTML = "&nbsp;"; // Add a non-breaking space
-        listItem.appendChild(li);
-
-        // Insert at current position
-        const range = selection.getRangeAt(0);
-        range.deleteContents();
-        range.insertNode(listItem);
-
-        // Place cursor inside the list item
-        const newRange = document.createRange();
-        newRange.setStart(li, 0);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-      } else {
-        // If there's content, use the standard command
-        document.execCommand("insertOrderedList", false, null);
-      }
-    } catch (e) {
-      // Fallback implementation if the command fails
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const selectedText = range.toString();
-
-        // Create a list element
-        const ol = document.createElement("ol");
-        const li = document.createElement("li");
-        li.textContent = selectedText || "List item";
-        ol.appendChild(li);
-
-        // Replace the selection with the list
-        range.deleteContents();
-        range.insertNode(ol);
-
-        // Set cursor at the end of the list item
-        const newRange = document.createRange();
-        newRange.setStartAfter(li);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-      }
-    }
-
-    if (activeEditorRef.current) {
-      activeEditorRef.current.focus();
-    }
-  };
-
-  // Fix the blockquote command
-  const handleBlockquote = () => {
-    // First try the standard approach
-    try {
-      document.execCommand("formatBlock", false, "<blockquote>");
-    } catch (e) {
-      // If that fails, try a more manual approach
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const selectedContent = range.extractContents();
-        const blockquote = document.createElement("blockquote");
-        blockquote.appendChild(selectedContent);
-        range.insertNode(blockquote);
-
-        // Ensure the editor maintains focus
-        if (activeEditorRef.current) {
-          activeEditorRef.current.focus();
-        }
-      }
     }
   };
 
@@ -938,236 +753,13 @@ const ProposalPreview = () => {
                 )}
               >
                 <div className="rounded-md bg-white w-full max-w-4xl flex-1">
-                  <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-between gap-2 sticky -top-4 z-10">
-                    <span>
-                      {currentSectionIndex !== null
-                        ? `Question ${getSectionHeading(outline[currentSectionIndex].heading)}`
-                        : "Proposal Preview"}
-                    </span>
-                    <div className="flex gap-2">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="p-1 h-8 flex items-center gap-1"
-                          >
-                            <ParagraphIcon />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-56 p-2">
-                          <div className="grid gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => execCommand("formatBlock", "<h1>")}
-                              className="justify-start"
-                            >
-                              <Heading1 size={16} className="mr-2" /> Heading 1
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => execCommand("formatBlock", "<h2>")}
-                              className="justify-start"
-                            >
-                              <Heading2 size={16} className="mr-2" /> Heading 2
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => execCommand("formatBlock", "<h3>")}
-                              className="justify-start"
-                            >
-                              <Heading3 size={16} className="mr-2" /> Heading 3
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => execCommand("formatBlock", "<h4>")}
-                              className="justify-start"
-                            >
-                              <Heading4 size={16} className="mr-2" /> Heading 4
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => execCommand("formatBlock", "<p>")}
-                              className="justify-start"
-                            >
-                              <Type size={16} className="mr-2" /> Paragraph
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={handleBulletedList}
-                              className="justify-start"
-                            >
-                              <List size={16} className="mr-2" /> Bulleted List
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={handleNumberedList}
-                              className="justify-start"
-                            >
-                              <ListOrdered size={16} className="mr-2" />{" "}
-                              Numbered List
-                            </Button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("bold")}
-                        className="p-1 h-8"
-                      >
-                        <BoldIcon />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("italic")}
-                        className="p-1 h-8"
-                      >
-                        <ItalicIcon />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("underline")}
-                        className="p-1 h-8"
-                      >
-                        <UnderlineIcon />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleLink}
-                        className="p-1 h-8"
-                      >
-                        <HyperlinkIcon />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("strikeThrough")}
-                        className="p-1 h-8"
-                      >
-                        <StrikeThroughIcon />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleBlockquote}
-                        className="p-1 h-8"
-                      >
-                        <QuoteIcon />
-                      </Button>
-                      <div className="h-6 w-px bg-gray-300 mx-1"></div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("justifyLeft")}
-                        className="p-1 h-8"
-                      >
-                        <AlignLeft size={16} className="text-gray-hint_text" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("justifyCenter")}
-                        className="p-1 h-8"
-                      >
-                        <AlignCenter
-                          size={16}
-                          className="text-gray-hint_text"
-                        />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("justifyRight")}
-                        className="p-1 h-8"
-                      >
-                        <AlignRight size={16} className="text-gray-hint_text" />
-                      </Button>
-                      <div className="h-6 w-px bg-gray-300 mx-1"></div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("undo")}
-                        className="p-1 h-8"
-                      >
-                        <UndoIcon />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => execCommand("redo")}
-                        className="p-1 h-8"
-                      >
-                        <RedoIcon />
-                      </Button>
-                    </div>
-
-                    <Popover
-                      open={versionPopoverOpen}
-                      onOpenChange={setVersionPopoverOpen}
-                    >
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="text-gray-hint_text [&_svg]:w-3 opacity-0"
-                        >
-                          <span>
-                            {selectedVersion === "version2"
-                              ? "Version 2"
-                              : "Version 1"}
-                          </span>
-                          <ArrowDownIcon />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-48">
-                        <div className="px-3 py-2 border-b border-gray-line">
-                          <Button
-                            className="w-full rounded-2xl"
-                            size="sm"
-                            onClick={() => {
-                              toast.success("New version saved");
-                            }}
-                          >
-                            <PlusCircleIcon /> Save Version
-                          </Button>
-                        </div>
-                        <RadioGroup
-                          defaultValue="version2"
-                          value={selectedVersion}
-                          onValueChange={handleSelectVersion}
-                        >
-                          {["version2", "version1"].map((version) => (
-                            <div
-                              key={version}
-                              className="flex items-center space-x-2 px-3 py-2 cursor-pointer border-b last:border-none border-gray-line"
-                              onClick={() => handleSelectVersion(version)}
-                            >
-                              <RadioGroupItem value={version} id={version} />
-                              <div className="flex flex-col gap-1">
-                                <span className="font-medium text-gray-hint_text">
-                                  {version === "version2"
-                                    ? "Version 2"
-                                    : "Version 1"}
-                                </span>
-                                <span className="text-xs text-gray">
-                                  Created 15 Mar
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </RadioGroup>
-                      </PopoverContent>
-                    </Popover>
+                  <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-10">
+                   
+                      <ProposalToolbar
+                        activeEditorRef={activeEditorRef}
+                        execCommand={execCommand}
+                      />
+                    
                   </div>
                   <div
                     className="h-auto relative border-x border-gray-line"
