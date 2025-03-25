@@ -47,12 +47,27 @@ const CustomDateInput = ({
       <Input
         type="text"
         value={displayValue}
-        readOnly
+        onChange={(e) => {
+          setDisplayValue(e.target.value);
+          // Only update if the input matches the expected format (DD/MM/YYYY)
+          const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+          if (dateRegex.test(e.target.value)) {
+            const [day, month, year] = e.target.value.split("/");
+            const date = new Date(
+              parseInt(year),
+              parseInt(month) - 1,
+              parseInt(day) + 1
+            );
+            if (!isNaN(date.getTime())) {
+              onChange(date.toISOString().split("T")[0]);
+            }
+          }
+        }}
         disabled={disabled}
         className="pr-9"
-        onClick={handleIconClick}
+        placeholder="DD/MM/YYYY"
       />
-      <input
+      <Input
         ref={dateInputRef}
         type="date"
         value={value || defaultValue || ""}

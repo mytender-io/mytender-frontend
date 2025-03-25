@@ -47,7 +47,7 @@ interface Bid {
   opportunity_owner?: string;
   bid_qualification_result?: string;
   win_themes?: string[];
-  new_bid_completed?: boolean; 
+  new_bid_completed?: boolean;
   [key: string]: string | string[] | boolean | undefined;
 }
 
@@ -563,7 +563,7 @@ const Bids = () => {
                                   })
                                 : ""}
                             </TableCell>
-                            <TableCell className="px-4">{bid.value}</TableCell>
+                            <TableCell className="px-4">£{bid.value}</TableCell>
                             <TableCell className="px-4">
                               {bid.submission_deadline &&
                               !isNaN(Date.parse(bid.submission_deadline))

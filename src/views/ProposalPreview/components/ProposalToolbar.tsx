@@ -182,14 +182,10 @@ const ProposalToolbar = ({
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-1">
       <Popover>
         <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="p-1 h-8 flex items-center gap-1"
-          >
+          <Button variant="ghost" size="sm">
             <ParagraphIcon />
           </Button>
         </PopoverTrigger>
@@ -201,7 +197,7 @@ const ProposalToolbar = ({
               onClick={() => execCommand("formatBlock", "<h1>")}
               className="justify-start"
             >
-              <Heading1 size={16} className="mr-2" /> Heading 1
+              <Heading1 size={16} /> Heading 1
             </Button>
             <Button
               variant="ghost"
@@ -209,7 +205,7 @@ const ProposalToolbar = ({
               onClick={() => execCommand("formatBlock", "<h2>")}
               className="justify-start"
             >
-              <Heading2 size={16} className="mr-2" /> Heading 2
+              <Heading2 size={16} /> Heading 2
             </Button>
             <Button
               variant="ghost"
@@ -217,7 +213,7 @@ const ProposalToolbar = ({
               onClick={() => execCommand("formatBlock", "<h3>")}
               className="justify-start"
             >
-              <Heading3 size={16} className="mr-2" /> Heading 3
+              <Heading3 size={16} /> Heading 3
             </Button>
             <Button
               variant="ghost"
@@ -225,7 +221,7 @@ const ProposalToolbar = ({
               onClick={() => execCommand("formatBlock", "<h4>")}
               className="justify-start"
             >
-              <Heading4 size={16} className="mr-2" /> Heading 4
+              <Heading4 size={16} /> Heading 4
             </Button>
             <Button
               variant="ghost"
@@ -233,7 +229,7 @@ const ProposalToolbar = ({
               onClick={() => execCommand("formatBlock", "<p>")}
               className="justify-start"
             >
-              <Type size={16} className="mr-2" /> Paragraph
+              <Type size={16} /> Paragraph
             </Button>
             <Button
               variant="ghost"
@@ -241,7 +237,7 @@ const ProposalToolbar = ({
               onClick={handleBulletedList}
               className="justify-start"
             >
-              <List size={16} className="mr-2" /> Bulleted List
+              <List size={16} /> Bulleted List
             </Button>
             <Button
               variant="ghost"
@@ -249,65 +245,42 @@ const ProposalToolbar = ({
               onClick={handleNumberedList}
               className="justify-start"
             >
-              <ListOrdered size={16} className="mr-2" /> Numbered List
+              <ListOrdered size={16} /> Numbered List
             </Button>
           </div>
         </PopoverContent>
       </Popover>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => execCommand("bold")}
-        className="p-1 h-8"
-      >
+      <Button variant="ghost" size="sm" onClick={() => execCommand("bold")}>
         <BoldIcon />
       </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => execCommand("italic")}
-        className="p-1 h-8"
-      >
+      <Button variant="ghost" size="sm" onClick={() => execCommand("italic")}>
         <ItalicIcon />
       </Button>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => execCommand("underline")}
-        className="p-1 h-8"
       >
         <UnderlineIcon />
       </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleLink}
-        className="p-1 h-8"
-      >
+      <Button variant="ghost" size="sm" onClick={handleLink}>
         <HyperlinkIcon />
       </Button>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => execCommand("strikeThrough")}
-        className="p-1 h-8"
       >
         <StrikeThroughIcon />
       </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleBlockquote}
-        className="p-1 h-8"
-      >
+      <Button variant="ghost" size="sm" onClick={handleBlockquote}>
         <QuoteIcon />
       </Button>
-      <div className="h-6 w-px bg-gray-300 mx-1"></div>
+      <div className="h-8 w-px bg-gray-300 mx-1"></div>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => execCommand("justifyLeft")}
-        className="p-1 h-8"
       >
         <AlignLeft size={16} className="text-gray-hint_text" />
       </Button>
@@ -315,7 +288,6 @@ const ProposalToolbar = ({
         variant="ghost"
         size="sm"
         onClick={() => execCommand("justifyCenter")}
-        className="p-1 h-8"
       >
         <AlignCenter size={16} className="text-gray-hint_text" />
       </Button>
@@ -323,25 +295,14 @@ const ProposalToolbar = ({
         variant="ghost"
         size="sm"
         onClick={() => execCommand("justifyRight")}
-        className="p-1 h-8"
       >
         <AlignRight size={16} className="text-gray-hint_text" />
       </Button>
-      <div className="h-6 w-px bg-gray-300 mx-1"></div>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => execCommand("undo")}
-        className="p-1 h-8"
-      >
+      <div className="h-8 w-px bg-gray-300 mx-1"></div>
+      <Button variant="ghost" size="sm" onClick={() => execCommand("undo")}>
         <UndoIcon />
       </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => execCommand("redo")}
-        className="p-1 h-8"
-      >
+      <Button variant="ghost" size="sm" onClick={() => execCommand("redo")}>
         <RedoIcon />
       </Button>
     </div>

@@ -542,12 +542,18 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                       <Label className="font-bold text-nowrap min-w-40">
                         Contract Value:
                       </Label>
-                      <Input
-                        type="text"
-                        value={contractValue}
-                        onChange={handleValueChange}
-                        placeholder="Enter contract value"
-                      />
+                      <div className="relative w-full">
+                        <Input
+                          type="text"
+                          value={contractValue}
+                          onChange={handleValueChange}
+                          placeholder="Enter contract value"
+                          className="pl-6"
+                        />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-hint_text">
+                          £
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
