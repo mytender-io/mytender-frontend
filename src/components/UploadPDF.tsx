@@ -325,7 +325,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       if (get_collections) {
         get_collections();
       }
-      if (onClose && successCount === filesToUpload.length) {
+      if (onClose) {
         onClose();
       }
     }
