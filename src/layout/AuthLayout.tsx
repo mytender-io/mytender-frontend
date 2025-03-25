@@ -9,7 +9,7 @@ interface AuthLayoutProps {
 
 const AuthLayout = ({ children, showDisclaimer = true }: AuthLayoutProps) => {
   return (
-    <div className="w-screen h-screen flex justify-center items-center m-0">
+    <div className="w-screen h-screen flex justify-center items-center m-0 overflow-y-auto">
       <MeshGradient>
         <div className="flex items-center gap-2 max-w-[1080px] px-5 py-4 w-full">
           <img src={Logo} className="h-14" alt="logo" />

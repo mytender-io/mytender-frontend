@@ -9,8 +9,9 @@ import { toast } from "react-toastify";
 import AuthLayout from "@/layout/AuthLayout";
 
 const Signup = () => {
-  const [tokenValid, setTokenValid] = useState(null);
+  const [tokenValid, setTokenValid] = useState(true);
   const [formData, setFormData] = useState({
+    firstname: "",
     username: "",
     password: "",
     company: "",
@@ -107,6 +108,18 @@ const Signup = () => {
         </div>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
+            <div className="grid w-full items-center gap-3">
+              <Label htmlFor="username">First Name</Label>
+              <Input
+                type="text"
+                id="firstname"
+                name="firstname"
+                placeholder="Enter your first name"
+                value={formData.firstname}
+                onChange={handleChange}
+                required
+              />
+            </div>
             <div className="grid w-full items-center gap-3">
               <Label htmlFor="username">Username</Label>
               <Input
