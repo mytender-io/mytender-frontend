@@ -89,7 +89,7 @@ const GenerateProposalModal = ({
 
   const startProgressBar = () => {
     const duration = 180000; // 3:00 minutes in ms
-    const interval = 100; // Update every 100ms
+    const interval = 1000; // Update every 100ms
     const steps = duration / interval;
     const increment = 98 / steps;
 
