@@ -8,11 +8,8 @@ import UploadTemplateText from "../components/UploadTemplateText.tsx";
 import Pannels from "../views/Pannels";
 import Bids from "@/views/Bids/Bids";
 import Library from "@/views/Library/Library";
-import Dashboard from "../views/Dashboard";
 import ChatbotResponse from "../views/Chat/ChatbotResponse";
-import Calculator from "../views/Calculator.tsx";
 import BidManagement from "../views/BidWritingStateManagerView.tsx";
-import HowTo from "../views/HowTo.tsx";
 import ProfilePage from "../views/Profile/Profile";
 import Signup from "../components/auth/Signup";
 import ForgotPassword from "../components/auth/ForgotPassword";
@@ -49,16 +46,13 @@ function Routing() {
           }
         >
           <Route path="/home" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/" element={<Bids />} />
-          <Route path="/calculator" element={<Calculator />} />
           <Route path="/chat" element={<ChatbotResponse />} />
           <Route path="/admin-pannel" element={<Pannels />} />
           <Route path="/upload-templatetext" element={<UploadTemplateText />} />
           <Route path="/qlog" element={<Log />} />
           <Route path="/flog" element={<FLog />} />
           <Route path="/library" element={<Library />} />
-          <Route path="/howto" element={<HowTo />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/question-answer" element={<QAGenerator />} />
 
