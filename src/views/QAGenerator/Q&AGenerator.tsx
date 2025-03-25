@@ -1440,7 +1440,7 @@ const QAGenerator = () => {
           </div>
         </div>
 
-        <div className="flex flex-row gap-4 flex-1">
+        <div className="flex flex-row gap-4 flex-1 min-h-[500px]">
           <div className="flex flex-col h-full w-full space-y-3">
             <div className="flex justify-between items-center h-9">
               <h1 id="answer-section" className="text-lg font-semibold">

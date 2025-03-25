@@ -58,7 +58,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
-  const [startTime, setStartTime] = useState(null);
+  const [startTime, setStartTime] = useState<number>(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [apiChoices, setApiChoices] = useState([]);
   const [selectedChoices, setSelectedChoices] = useState([]);
@@ -181,7 +181,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
   };
 
   // Bulk Update functions
-  const handleSelectSection = (index) => {
+  const handleSelectSection = (index: number) => {
     setSelectedSections((prev) => {
       const newSelection = new Set(prev);
       if (newSelection.has(index)) {
@@ -193,7 +193,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
     });
   };
 
-  const handleSelectAll = (checked) => {
+  const handleSelectAll = (checked: boolean) => {
     if (checked) {
       // Select all sections
       setSelectedSections(new Set(outline.map((_, index) => index)));
@@ -510,6 +510,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
     field: keyof Section,
     value: any
   ) => {
+    console.log("handleSectionChange", index, field, value);
     try {
       // Create new outline by properly spreading nested objects
       const newOutline = [...sharedState.outline];
@@ -682,7 +683,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
     } finally {
       setIsLoading(false);
       setIsPreviewLoading(false);
-      setStartTime(null);
+      setStartTime(0);
     }
   };
 
@@ -814,7 +815,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       toast.error("Error generating responses");
     } finally {
       setIsLoading(false);
-      setStartTime(null);
+      setStartTime(0);
     }
   };
 
@@ -871,7 +872,13 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
   );
 
   // Create a sortable table row component
-  const SortableTableRow = ({ section, index }) => {
+  const SortableTableRow = ({
+    section,
+    index
+  }: {
+    section: Section;
+    index: number;
+  }) => {
     const {
       attributes,
       listeners,
@@ -881,6 +888,10 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       isDragging,
       over
     } = useSortable({ id: section.section_id });
+
+    const [wordCount, setWordCount] = useState(section.word_count || 0);
+    // Add a ref to store the timeout ID
+    const wordCountTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // 1. Modified handleAnswererSelect function to include the correct user assignment and priority
     const handleAnswererSelect = async (user) => {
@@ -1025,6 +1036,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
         }
       }
     };
+
     const style = {
       transform: CSS.Transform.toString(transform),
       transition,
@@ -1096,14 +1108,36 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
           <div className="flex items-center justify-center">
             <Input
               type="number"
-              value={section.word_count || 0}
+              value={wordCount}
               min={0}
               step={50}
               className="w-20 text-center"
+              disabled={isLoading}
               onChange={(e) => {
                 const value = parseInt(e.target.value);
                 if (!isNaN(value) && value >= 0) {
-                  handleSectionChange(index, "word_count", value);
+                  setWordCount(value);
+
+                  // Clear any existing timeout
+                  if (wordCountTimeoutRef.current) {
+                    clearTimeout(wordCountTimeoutRef.current);
+                  }
+
+                  // Set a new timeout to update the shared state after 3 seconds of inactivity
+                  const timeoutId = setTimeout(() => {
+                    handleSectionChange(index, "word_count", value);
+                  }, 3000);
+
+                  // Store the timeout ID in the ref
+                  wordCountTimeoutRef.current = timeoutId;
+                }
+              }}
+              onBlur={() => {
+                // Also update when the input loses focus
+                if (wordCountTimeoutRef.current) {
+                  clearTimeout(wordCountTimeoutRef.current);
+                  wordCountTimeoutRef.current = null;
+                  handleSectionChange(index, "word_count", wordCount);
                 }
               }}
             />
