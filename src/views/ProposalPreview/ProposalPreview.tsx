@@ -6,7 +6,7 @@ import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { Check, Download, X, Send } from "lucide-react";
+import { Check, Download } from "lucide-react";
 import "./ProposalPreview.css";
 import {
   TooltipContent,
@@ -19,7 +19,6 @@ import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
 import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 import RedoSparkIcon from "@/components/icons/RedoSparkIcon";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/utils";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
@@ -36,6 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 import TextSelectionMenu from "./components/TextSelectionMenu";
 import ProposalToolbar from "./components/ProposalToolbar";
 import MarkReviewReadyButton from "./components/MarkReviewReadyButton";
+import RewriteInputBar from "./components/RewriteInputBar";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -60,7 +60,6 @@ const ProposalPreview = () => {
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number | null>(
     null
   );
-  const [rewriteFeedback, setRewriteFeedback] = useState("");
   const [rewritingSectionIndex, setRewritingSectionIndex] = useState<
     number | null
   >(null);
@@ -117,69 +116,32 @@ const ProposalPreview = () => {
     setSidepaneOpen((prevState) => !prevState);
   };
 
-  // 2. Update the handleRewriteSubmit function to use section-specific loading
-  const handleRewriteSubmit = async () => {
-    if (rewritingSectionIndex !== null && rewriteFeedback.trim()) {
-      try {
-        // Instead of setting the global isLoading, set the specific section as rewriting
-        setRewritingSection(outline[rewritingSectionIndex].section_id);
+  // Handle rewrite success from child component
+  const handleRewriteSuccess = (sectionIndex: number, updatedSection: any) => {
+    setSharedState((prevState) => {
+      const newOutline = [...prevState.outline];
+      newOutline[sectionIndex] = updatedSection;
+      return {
+        ...prevState,
+        outline: newOutline
+      };
+    });
 
-        const formData = new FormData();
-        formData.append(
-          "section",
-          JSON.stringify(outline[rewritingSectionIndex])
-        );
-        formData.append("user_feedback", rewriteFeedback);
-        formData.append("bid_id", sharedState.object_id);
+    // Clear rewriting state
+    setRewritingSection(null);
+    setRewritingSectionIndex(null);
+  };
 
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/rewrite_section`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`
-            }
-          }
-        );
-
-        if (response.data) {
-          // Update only the specific section in the shared state
-          setSharedState((prevState) => {
-            // Create a shallow copy of the previous outline
-            const newOutline = [...prevState.outline];
-
-            // Update only the specific section at the rewritingSectionIndex
-            newOutline[rewritingSectionIndex] = response.data;
-
-            // Return the new state with only the needed section updated
-            return {
-              ...prevState,
-              outline: newOutline
-            };
-          });
-
-          toast.success("Section rewritten successfully");
-        }
-      } catch (error) {
-        console.error("Error rewriting section:", error);
-        toast.error("Failed to rewrite section");
-      } finally {
-        // Clear the rewriting state
-        setRewritingSection(null);
-        setRewriteFeedback("");
-        setRewritingSectionIndex(null);
-      }
-    }
+  const handleRewriteCancel = () => {
+    setRewritingSectionIndex(null);
   };
 
   const handleRewriteClick = (index: number) => {
     // Toggle the rewrite section if clicking on the same section
     if (rewritingSectionIndex === index) {
       setRewritingSectionIndex(null);
-      setRewriteFeedback("");
     } else {
       setRewritingSectionIndex(index);
-      setRewriteFeedback("");
     }
   };
 
@@ -765,51 +727,15 @@ const ProposalPreview = () => {
 
                             {/* Inline rewrite feedback section */}
                             {rewritingSectionIndex === index && (
-                              <div className="flex items-center gap-2 relative border border-gray-200 rounded-md p-2 bg-white shadow-tooltip my-2">
-                                <Input
-                                  placeholder="Please type your instructions in here..."
-                                  value={rewriteFeedback}
-                                  onChange={(e) =>
-                                    setRewriteFeedback(e.target.value)
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter" && !e.shiftKey) {
-                                      e.preventDefault();
-                                      if (rewriteFeedback.trim()) {
-                                        handleRewriteSubmit();
-                                      }
-                                    }
-                                  }}
-                                  className="flex-1 border-none outline-none bg-transparent focus-visible:ring-0 shadow-none text-sm h-8 px-2"
-                                />
-                                <div className="flex items-center gap-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => {
-                                      setRewritingSectionIndex(null);
-                                      setRewriteFeedback("");
-                                    }}
-                                  >
-                                    <X size={16} />
-                                  </Button>
-                                  <Button
-                                    onClick={handleRewriteSubmit}
-                                    disabled={
-                                      !rewriteFeedback.trim() ||
-                                      rewritingSection === section.section_id
-                                    }
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full"
-                                  >
-                                    {rewritingSection === section.section_id ? (
-                                      <Spinner className="text-white" />
-                                    ) : (
-                                      <Send className="text-white" />
-                                    )}
-                                  </Button>
-                                </div>
-                              </div>
+                             <RewriteInputBar
+                             section={section}
+                             sectionIndex={index}
+                             isActive={rewritingSectionIndex === index}
+                             objectId={sharedState.object_id}
+                             tokenRef={tokenRef}
+                             onCancel={handleRewriteCancel}
+                             onRewriteSuccess={handleRewriteSuccess}
+                           />
                             )}
 
                             {/* Section action buttons */}
