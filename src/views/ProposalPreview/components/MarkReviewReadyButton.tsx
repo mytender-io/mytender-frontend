@@ -5,7 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
 import PencilEditCheckIcon from "@/components/icons/PencilEditCheckIcon";
-import { Section } from "@/views/BidWritingStateManagerView";
+import { Section, SharedState } from "@/views/BidWritingStateManagerView";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 
 interface MarkReviewReadyButtonProps {
@@ -14,6 +14,7 @@ interface MarkReviewReadyButtonProps {
   objectId: string | null;
   organizationUsers: any;
   tokenRef: MutableRefObject<string>;
+  setSharedState: (setState: any) => void;
 }
 
 const MarkReviewReadyButton = ({
@@ -21,7 +22,8 @@ const MarkReviewReadyButton = ({
   index,
   objectId,
   organizationUsers,
-  tokenRef
+  tokenRef,
+  setSharedState
 }: MarkReviewReadyButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,7 +43,7 @@ const MarkReviewReadyButton = ({
 
       // Find the reviewer in the organization users to get their email
       const reviewerUser = organizationUsers.find(
-        (user) => user.username === section.reviewer
+        (user: any) => user.username === section.reviewer
       );
 
       if (!reviewerUser || !reviewerUser.email) {
@@ -72,6 +74,19 @@ const MarkReviewReadyButton = ({
       );
 
       if (response.data.success) {
+
+        setSharedState((prevState: SharedState) => {
+          const newOutline = [...prevState.outline];
+          newOutline[index] = {
+            ...newOutline[index],
+            review_ready: true
+          };
+          return {
+            ...prevState,
+            outline: newOutline
+          };
+        });
+
         // Track review ready action with posthog
         posthog.capture("section_marked_review_ready", {
           bidId: objectId,

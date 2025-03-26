@@ -727,15 +727,15 @@ const ProposalPreview = () => {
 
                             {/* Inline rewrite feedback section */}
                             {rewritingSectionIndex === index && (
-                             <RewriteInputBar
-                             section={section}
-                             sectionIndex={index}
-                             isActive={rewritingSectionIndex === index}
-                             objectId={sharedState.object_id}
-                             tokenRef={tokenRef}
-                             onCancel={handleRewriteCancel}
-                             onRewriteSuccess={handleRewriteSuccess}
-                           />
+                              <RewriteInputBar
+                                section={section}
+                                sectionIndex={index}
+                                isActive={rewritingSectionIndex === index}
+                                objectId={sharedState.object_id}
+                                tokenRef={tokenRef}
+                                onCancel={handleRewriteCancel}
+                                onRewriteSuccess={handleRewriteSuccess}
+                              />
                             )}
 
                             {/* Section action buttons */}
@@ -765,6 +765,7 @@ const ProposalPreview = () => {
                                 objectId={sharedState.object_id}
                                 organizationUsers={organizationUsers}
                                 tokenRef={tokenRef}
+                                setSharedState={setSharedState}
                               />
                             </div>
                           </div>

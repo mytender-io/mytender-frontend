@@ -14,14 +14,15 @@ interface SelectOrganisationUserButton {
   onSelectUser?: (user: any) => void;
   selectedUser?: string;
   organizationUsers?: any[];
+  isReviewReady?: boolean;
 }
 
 const SelectOrganisationUserButton: React.FC<SelectOrganisationUserButton> = ({
   size = "md",
-  className = "",
   onSelectUser,
   selectedUser: initialSelectedUser,
-  organizationUsers = []
+  organizationUsers = [],
+  isReviewReady = false
 }) => {
   const [profilePicture, setProfilePicture] = useState<string>("");
   const [username, setUsername] = useState<string>("");
@@ -86,21 +87,40 @@ const SelectOrganisationUserButton: React.FC<SelectOrganisationUserButton> = ({
           className="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 focus:outline-none"
           onClick={(e) => e.stopPropagation()} // Explicitly stop propagation on trigger click
         >
-          <Avatar className={`${sizeClasses[size]} me-2`}>
-            {profilePicture ? (
-              <AvatarImage
-                src={`data:image/jpeg;base64,${profilePicture}`}
-                alt="Company Logo"
-                className="object-cover"
-              />
-            ) : null}
-            <AvatarFallback className="bg-orange-lighter text-primary font-semibold">
-              {username ? username.slice(0, 1).toUpperCase() : "U"}
-            </AvatarFallback>
-          </Avatar>
-          {/* <span className="font-medium w-24 truncate">
-            {username || "Select User"}
-          </span> */}
+          <div className="relative">
+            <Avatar className={`${sizeClasses[size]} me-2`}>
+              {profilePicture ? (
+                <AvatarImage
+                  src={`data:image/jpeg;base64,${profilePicture}`}
+                  alt="Company Logo"
+                  className="object-cover"
+                />
+              ) : null}
+              <AvatarFallback className="bg-orange-lighter text-primary font-semibold">
+                {username ? username.slice(0, 1).toUpperCase() : "U"}
+              </AvatarFallback>
+            </Avatar>
+
+            {/* Review Ready Indicator */}
+
+            {isReviewReady && (
+              <div className="absolute bottom-0 right-0 bg-green-600 rounded-full p-0.5 border border-white shadow-sm z-10">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+              </div>
+            )}
+          </div>
           <ChevronDown className="h-4 w-4 text-gray-500" />
         </DropdownMenuTrigger>
 

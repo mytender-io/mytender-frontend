@@ -45,6 +45,7 @@ export interface Section {
   relevant_derived_insights: string;
   relevant_differentiation_factors: string;
   highlightedDocuments: HighlightedDocument[];
+  review_ready: boolean;
 }
 
 export interface UserComment {

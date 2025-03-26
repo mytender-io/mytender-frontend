@@ -1149,6 +1149,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
               selectedUser={section.answerer}
               onSelectUser={handleAnswererSelect}
               organizationUsers={organizationUsers}
+              isReviewReady={section.review_ready} // Pass the review_ready status
             />
           </div>
         </TableCell>
@@ -1294,9 +1295,6 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
                 handleDeleteSubheading={handleDeleteSubheading}
                 totalSections={outline.length}
                 onNavigate={handleSectionNavigation}
-                // organizationUsers={
-                //   organizationUsers
-                // }
               />
             )}
 
@@ -1309,9 +1307,6 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
                 contributors={contributors}
                 onRevert={handleRevert}
                 canRevert={canRevert}
-                // organizationUsers={
-                //   organizationUsers
-                // }
               />
             )}
 
@@ -1334,4 +1329,4 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
     </>
   );
 };
-export default withAuth(ProposalPlan);
+export default ProposalPlan;
