@@ -476,10 +476,10 @@ const ProfilePage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-4 w-full px-4 bg-white pt-12">
+                <div className="flex gap-4 w-full px-4 bg-white pt-12 items-stretch">
                   <Card
                     className={cn(
-                      "w-[30%] h-fit",
+                      "w-[30%]",
                       formData.userType === "owner" ? "mt-11" : ""
                     )}
                   >
@@ -794,9 +794,18 @@ const ProfilePage = () => {
                           placeholder="Enter your company objectives here..."
                         />
                       ) : (
-                        <div className="flex items-center justify-center min-h-[150px] p-8 bg-gray-50 text-gray-500 border border-gray-200 rounded-md">
-                          {companyObjectives ||
-                            "No company objectives available."}
+                        <div
+                          className={cn(
+                            "min-h-[150px] h-[150px] p-8 bg-gray-50 text-gray-500 border border-gray-200 rounded-md",
+                            companyObjectives
+                              ? "overflow-y-auto"
+                              : "flex items-center justify-center"
+                          )}
+                          style={{ wordBreak: "break-word" }}
+                        >
+                          {companyObjectives
+                            ? companyObjectives
+                            : "No company objectives available."}
                         </div>
                       )}
                     </form>
