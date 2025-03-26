@@ -483,7 +483,8 @@ const ProposalPreview = () => {
       if (
         evidenceSpans.length === 0 &&
         expandSpans.length === 0 &&
-        summariseSpans.length === 0
+        summariseSpans.length === 0 &&
+        customSpans.length === 0
       ) {
         return;
       }
@@ -1019,7 +1020,6 @@ const ProposalPreview = () => {
                                       currentSectionIndex,
                                       auth,
                                       setSharedState,
-
                                       setReplyText
                                     )
                                   }
@@ -1034,12 +1034,12 @@ const ProposalPreview = () => {
                   </div>
                 ) : null}
               </div>
-              <div
-                className={cn(
-                  "max-h-[calc(100vh-66px)] overflow-auto z-50 sticky -top-4 right-0"
-                )}
-              >
-                {sidepaneOpen && (
+              {sidepaneOpen && (
+                <div
+                  className={cn(
+                    "w-[450px] max-h-[calc(100vh-66px)] overflow-y-auto z-50 sticky -top-4 right-0"
+                  )}
+                >
                   <ProposalPreviewSidepane
                     bid_id={sharedState.object_id}
                     open={sidepaneOpen}
@@ -1051,8 +1051,8 @@ const ProposalPreview = () => {
                     onCancelPrompt={handleCancelPrompt}
                     actionType={actionType} // Add this line
                   />
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         )}

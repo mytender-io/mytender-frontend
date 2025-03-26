@@ -1,4 +1,4 @@
-import { Dispatch, RefObject, SetStateAction, useState } from "react";
+import { Dispatch, RefObject, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -13,7 +13,7 @@ import CommentIcon from "@/components/icons/CommentIcon";
 import UpscaleSparkIcon from "@/components/icons/UpscaleSparkIcon";
 import ExpandVerticalIcon from "@/components/icons/ExpandVerticalIcon";
 import ShortenHorizontalIcon from "@/components/icons/ShortenHorizontalIcon";
-import CustomPromptButton from "./CustomPromptButton";
+import PencilIcon from "@/components/icons/PencilIcon";
 
 interface TextSelectionMenuProps {
   /** Position of the selection menu relative to the editor */
@@ -374,6 +374,61 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
     }
   };
 
+  /**
+   * Handles custom prompt the selected text using AI.
+   * Processes the selection and displays custom prompt content in the sidepane.
+   */
+  const handleCustomPrompt = async () => {
+    if (!selectedRange) {
+      toast.error("Please select text to custom prompt");
+      return;
+    }
+
+    // Get the selected text
+    const selectedText = selectedRange.toString();
+    if (!selectedText || selectedText.trim() === "") {
+      toast.error("Please select text to custom prompt");
+      return;
+    }
+
+    setPromptTarget(selectedText);
+    setActionType("custom");
+    // Store a deep clone of the range for later use
+    const storedRange = selectedRange.cloneRange();
+    setSelectedRange(storedRange);
+
+    // Highlight the selected text with a different color
+    const span = document.createElement("span");
+    span.className = "custom-text";
+    span.dataset.customPromptId = `custom-${Date.now()}`;
+    span.style.backgroundColor = "#FFE5CC";
+
+    try {
+      selectedRange.surroundContents(span);
+    } catch (e) {
+      // If surroundContents fails (which can happen with complex selections),
+      // use a more robust approach that preserves the structure
+      console.log("Using alternative custom prompt highlighting method");
+
+      // Extract the content
+      const fragment = selectedRange.extractContents();
+
+      // Add the content to our span
+      span.appendChild(fragment);
+
+      // Insert the span
+      selectedRange.insertNode(span);
+    }
+
+    // Apply the style to all child elements
+    const childElements = span.querySelectorAll("*");
+    childElements.forEach((element) => {
+      (element as HTMLElement).style.backgroundColor = "#FFE5CC";
+    });
+
+    setSidepaneOpen(true);
+  };
+
   return (
     <>
       <div
@@ -413,17 +468,21 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
               <TooltipContent side="left">Evidence</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <CustomPromptButton
-            selectedRange={selectedRange}
-            setSelectedRange={setSelectedRange}
-            setPromptTarget={setPromptTarget}
-            setPromptResult={setPromptResult}
-            setSidepaneOpen={setSidepaneOpen}
-            setIsLoadingEvidence={setIsLoadingEvidence}
-            setActionType={setActionType}
-            tokenRef={tokenRef}
-            objectId={objectId}
-          />
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCustomPrompt}
+                  className="p-2 flex flex-col items-center text-xs [&_svg]:size-6 h-auto"
+                >
+                  <PencilIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">Custom</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -454,7 +513,6 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
               <TooltipContent side="left">Summarise</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {/* Custom Prompt Button Component */}
         </div>
       </div>
     </>

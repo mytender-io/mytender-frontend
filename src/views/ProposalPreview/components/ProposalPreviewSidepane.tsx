@@ -48,6 +48,12 @@ const ProposalPreviewSidepane = ({
   });
 
   useEffect(() => {
+    if (actionType === "custom") {
+      setActiveChatPrompt("custom");
+    }
+  }, [actionType]);
+
+  useEffect(() => {
     // Save messages to localStorage whenever they change
     localStorage.setItem("previewSidepaneMessages", JSON.stringify(messages));
   }, [messages]);
@@ -87,6 +93,8 @@ const ProposalPreviewSidepane = ({
         sendTenderDocsQuestion(inputValue);
       } else if (activeChatPrompt === "internet") {
         sendInternetQuestion(inputValue);
+      } else if (activeChatPrompt === "custom") {
+        sendCustomQuestion(inputValue);
       }
 
       setInputValue("");
@@ -371,6 +379,66 @@ const ProposalPreviewSidepane = ({
     setIsLoading(false);
   };
 
+  // New function to send questions to the internet search endpoint
+  const sendCustomQuestion = async (question) => {
+    console.log("custom prompt");
+    setQuestionAsked(true);
+    setIsLoading(true);
+    setStartTime(Date.now());
+
+    // Add a temporary bot message with loading dots
+    setMessages((prevMessages) => {
+      const newMessages = [...prevMessages, { type: "bot", text: "loading" }];
+      // Use setTimeout to ensure the DOM updates before scrolling
+      setTimeout(scrollToBottom, 10);
+      return newMessages;
+    });
+
+    try {
+      const copilot_mode = "4" + question.toLowerCase().replace(/\s+/g, "_");
+
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/copilot`,
+        {
+          input_text: promptTarget,
+          extra_instructions: "",
+          copilot_mode: copilot_mode,
+          datasets: [],
+          bid_id: bid_id
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+
+      // Replace the temporary loading message with the actual response
+      const formattedResponse = formatResponse(result.data);
+
+      setMessages((prevMessages) => [
+        ...prevMessages.slice(0, -1),
+        { type: "bot", text: formattedResponse }
+      ]);
+      typeMessage(formattedResponse);
+    } catch (error) {
+      console.error("Error sending custom prompt:", error);
+
+      // Replace the temporary loading message with the error message
+      setMessages((prevMessages) => [
+        ...prevMessages.slice(0, -1),
+        {
+          type: "bot",
+          text:
+            error.response?.status === 400
+              ? "Message failed, please contact support..."
+              : error.message
+        }
+      ]);
+    }
+    setIsLoading(false);
+  };
+
   const handleCopyText = (text: string) => {
     navigator.clipboard.writeText(text);
 
@@ -439,7 +507,7 @@ const ProposalPreviewSidepane = ({
 
   // Render as a rounded card sidebar
   return (
-    <div className="shadow-lg w-[450px] flex flex-col h-full bg-white overflow-hidden border border-gray-line">
+    <div className="shadow-lg flex flex-col w-full h-full bg-white overflow-hidden border border-gray-line">
       <div className="p-3 border-b border-gray-100 flex justify-between items-center">
         <TooltipProvider delayDuration={0}>
           <Tooltip>
@@ -584,12 +652,12 @@ const ProposalPreviewSidepane = ({
                               ? "Summarise"
                               : actionType === "expand"
                                 ? "Expand"
-                                 : actionType === "custom"
-                                ? "Custom"
-                                : "Evidence"}
+                                : actionType === "custom"
+                                  ? "Custom"
+                                  : "Evidence"}
                           </span>
                         )}
-                
+
                         {message.type === "evidence" ? (
                           <div className="flex gap-1 mt-3">
                             <Button
@@ -641,7 +709,11 @@ const ProposalPreviewSidepane = ({
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1 border-none outline-none bg-transparent focus-visible:ring-0 shadow-none text-sm h-8 px-2"
+              className={cn(
+                "flex-1 border-none outline-none bg-transparent focus-visible:ring-0 shadow-none text-sm h-8 px-2",
+                actionType === "custom" &&
+                  "border border-orange-500 ring-1 ring-orange-500 focus-visible:ring-1 focus-visible:ring-orange-500"
+              )}
             />
             <Button
               variant="ghost"
@@ -723,6 +795,25 @@ const ProposalPreviewSidepane = ({
                 <TooltipContent side="top">Search the internet</TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            {actionType === "custom" ? (
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "text-gray-hint_text rounded-2xl",
+                        activeChatPrompt === "custom" && "bg-gray text-white"
+                      )}
+                    >
+                      Custom
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Custom Prompt</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ) : null}
           </div>
         </div>
       </div>
