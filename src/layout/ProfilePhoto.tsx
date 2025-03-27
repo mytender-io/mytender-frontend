@@ -17,6 +17,7 @@ interface ProfilePhotoProps {
   refreshImage?: boolean;
   showTeamMembers?: boolean;
   showName?: boolean;
+  answererId?: string;
 }
 
 const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
@@ -24,7 +25,8 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
   className = "",
   showTeamMembers = false,
   refreshImage = false,
-  showName = false
+  showName = false,
+  answererId = ""
 }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -33,6 +35,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
   const [profile, setProfile] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [organizationUsers, setOrganizationUsers] = useState([]);
+  const [answererProfile, setAnswererProfile] = useState({});
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -104,7 +107,6 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
             }
           }
         );
-        console.log(response);
         setOrganizationUsers(response.data);
         // Save to localStorage along with current token (if not already saved)
         localStorage.setItem(
@@ -123,6 +125,34 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
       fetchOrganizationUsers();
     }
   }, [tokenRef, profile, showTeamMembers]);
+
+  useEffect(() => {
+    if (answererId) {
+      // First, try to find a match in organization users
+      if (organizationUsers.length > 0) {
+        const matchedUser = organizationUsers.find(
+          (user) => user.username === answererId
+        );
+        if (matchedUser) {
+          console.log(matchedUser);
+          setAnswererProfile(matchedUser);
+          return;
+        }
+      }
+
+      // If no match found in org users, check if it's the current user
+      if (profile && profile.login === answererId) {
+        console.log(profile);
+        setAnswererProfile(profile);
+        return;
+      }
+      // If neither matches, set to empty object
+      setAnswererProfile({});
+    } else {
+      // No answererId provided
+      setAnswererProfile({});
+    }
+  }, [organizationUsers, answererId, profile]);
 
   // Size classes
   const sizeClasses = {
@@ -147,43 +177,51 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 
   // Only show up to 3 organization users
   const displayedUsers = organizationUsers.slice(0, 3);
+  console.log(displayedUsers);
+  const activeProfile = answererId ? answererProfile : profile;
 
   return (
     <div className="flex items-center gap-2">
       <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Avatar
-              className={cn(
-                "border border-gray-300",
-                sizeClasses[size],
-                className,
-                "cursor-pointer z-50"
-              )}
-            >
-              {profile.company_logo ? (
-                <AvatarImage
-                  src={`data:image/jpeg;base64,${profile.company_logo}`}
-                  alt="Profile"
-                  className="object-cover"
-                />
-              ) : null}
-              <AvatarFallback className="bg-orange-lighter text-primary font-semibold">
-                {profile.login?.slice(0, 1).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          </TooltipTrigger>
-          <TooltipContent>
-            <div>
-              <div className="flex items-center">
-                <div>
-                  <p className="font-semibold">{profile.login}</p>
-                  <p className="text-xs">{profile.email}</p>
+        <div className="flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Avatar
+                className={cn(
+                  "border border-gray-300",
+                  sizeClasses[size],
+                  className,
+                  "cursor-pointer z-50"
+                )}
+              >
+                {activeProfile.company_logo ? (
+                  <AvatarImage
+                    src={`data:image/jpeg;base64,${activeProfile.company_logo}`}
+                    alt="Profile"
+                    className="object-cover"
+                  />
+                ) : (
+                  <AvatarFallback className="bg-orange-lighter text-primary font-semibold">
+                    {activeProfile.login?.slice(0, 1).toUpperCase()}
+                  </AvatarFallback>
+                )}
+              </Avatar>
+            </TooltipTrigger>
+            <TooltipContent>
+              <div>
+                <div className="flex items-center">
+                  <div>
+                    <p className="font-semibold">{activeProfile.login}</p>
+                    <p className="text-xs">{activeProfile.email}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </TooltipContent>
-        </Tooltip>
+            </TooltipContent>
+          </Tooltip>
+          {showName && (
+            <span className="font-medium text-gray-600">{profile.login}</span>
+          )}
+        </div>
         {showTeamMembers &&
           profile.userType === "owner" &&
           displayedUsers.length > 0 && (
@@ -210,16 +248,17 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
                           "cursor-pointer"
                         )}
                       >
-                        {member.image ? (
+                        {member.company_logo ? (
                           <AvatarImage
-                            src={`data:image/jpeg;base64,${member.image}`}
+                            src={`data:image/jpeg;base64,${member.company_logo}`}
                             alt={member.username}
                             className="object-cover"
                           />
-                        ) : null}
-                        <AvatarFallback className="bg-orange-lighter text-primary font-semibold text-xs">
-                          {member.username?.slice(0, 1).toUpperCase()}
-                        </AvatarFallback>
+                        ) : (
+                          <AvatarFallback className="bg-orange-lighter text-primary font-semibold text-xs">
+                            {member.username?.slice(0, 1).toUpperCase()}
+                          </AvatarFallback>
+                        )}
                       </Avatar>
                     </div>
                   </TooltipTrigger>
@@ -256,9 +295,6 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
             </div>
           )}
       </TooltipProvider>
-      {showName && (
-        <span className="font-medium text-gray-600">{profile.login}</span>
-      )}
     </div>
   );
 };

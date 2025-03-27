@@ -104,15 +104,15 @@ const ProposalPreview = () => {
   useEffect(() => {
     // Set local loading when component mounts
     setLocalLoading(true);
-  
+
     // When outline data is available, turn off loading
     if (sharedState.outline) {
       setLocalLoading(false);
-      
+
       // Force a refresh of editor content when outline changes
       if (sharedState.outline.length > 0 && editorRefs.current.length > 0) {
         console.log("Outline updated, refreshing editors");
-        
+
         // Update editor refs with latest content
         sharedState.outline.forEach((section, index) => {
           if (editorRefs.current[index]) {
@@ -693,6 +693,15 @@ const ProposalPreview = () => {
                             "border-b border-gray-line relative last:rounded-b-md"
                           )}
                         >
+                          {section.answerer && (
+                            <div className="absolute right-1 top-2">
+                              <ProfilePhoto
+                                answererId={section.answerer}
+                                size="sm"
+                              />
+                            </div>
+                          )}
+
                           <div className="bg-white p-8 relative">
                             <h2 className="text-xl font-semibold mb-4">
                               {section.heading}
