@@ -1,7 +1,4 @@
-import { useContext, useMemo, useState } from "react";
-import { useAuthUser } from "react-auth-kit";
-// import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
-// import axios from "axios";
+import { useContext, useState } from "react";
 import withAuth from "../../routes/withAuth";
 import { BidContext } from "../BidWritingStateManagerView";
 import TenderLibrary from "../../components/TenderLibrary";
@@ -11,89 +8,10 @@ import { Button } from "@/components/ui/button";
 import ExpandIcon from "@/components/icons/ExpandIcon";
 
 const BidPlanner = () => {
-  const getAuth = useAuthUser();
-  const auth = useMemo(() => getAuth(), [getAuth]);
-  // const tokenRef = useRef(auth?.token || "default");
-
   const { sharedState } = useContext(BidContext);
-  const { contributors, object_id } = sharedState;
-
-  // const [loading, setLoading] = useState(false);
-  // const [existingBidNames, setExistingBidNames] = useState([]);
-  // const [organizationUsers, setOrganizationUsers] = useState([]);
-  // const [currentUserEmail, setCurrentUserEmail] = useState("");
-
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
-
+  const { object_id} = sharedState;
   const handleOpenLibrary = () => setIsLibraryOpen(true);
-
-  const currentUserPermission = contributors[auth?.email] || "viewer";
-
-  const canUserEdit =
-    currentUserPermission === "admin" || currentUserPermission === "editor";
-
-  // const fetchOrganizationUsers = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       `http${HTTP_PREFIX}://${API_URL}/organization_users`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${tokenRef.current}`
-  //         }
-  //       }
-  //     );
-  //     setOrganizationUsers(response.data);
-  //   } catch (err) {
-  //     console.log("Error fetching organization users:");
-  //   }
-  // };
-
-  // const fetchUserData = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       `http${HTTP_PREFIX}://${API_URL}/profile`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${tokenRef.current}`
-  //         }
-  //       }
-  //     );
-  //     setCurrentUserEmail(response.data.email);
-  //   } catch (err) {
-  //     console.log("Failed to load profile data");
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const fetchExistingBidNames = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       `http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
-  //       {},
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${tokenRef.current}`
-  //         }
-  //       }
-  //     );
-  //     if (response.data && response.data.bids) {
-  //       setExistingBidNames(response.data.bids.map((bid) => bid.bid_title));
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching bid names:", error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const fetchInitialData = async () => {
-  //     await Promise.all([
-  //       fetchUserData(),
-  //       fetchOrganizationUsers(),
-  //       fetchExistingBidNames()
-  //     ]);
-  //   };
-  //   fetchInitialData();
-  // }, []);
 
   return (
     <>
@@ -119,7 +37,7 @@ const BidPlanner = () => {
       </Dialog>
 
       <div className="max-w-6xl mx-auto w-full flex-1">
-        <TenderAnalysis canUserEdit={canUserEdit} />
+        <TenderAnalysis />
       </div>
     </>
   );

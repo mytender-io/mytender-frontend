@@ -239,8 +239,6 @@ const Bids = () => {
       toast.info("This tender is still being created. Please try again later.");
       return;
     }
-
-    localStorage.setItem("navigatedFromBidsTable", "true");
     localStorage.removeItem("bidState");
     localStorage.removeItem("tenderLibChatMessages");
     localStorage.removeItem("previewSidepaneMessages");

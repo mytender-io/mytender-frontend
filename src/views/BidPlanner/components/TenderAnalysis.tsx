@@ -142,7 +142,7 @@ const CustomTable = ({ content }: { content: string }) => {
   );
 };
 
-const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
+const TenderAnalysis = () => {
   const [currentTabIndex, setCurrentTabIndex] = useState<number>(0);
   const [loadingTab, setLoadingTab] = useState(null);
   const [chatDialogOpen, setChatDialogOpen] = useState(false);
@@ -236,10 +236,7 @@ const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
       toast.warning("Please wait until the current generation completes.");
       return;
     }
-    if (!canUserEdit) {
-      toast.error("You only have permission to view this bid.");
-      return;
-    }
+  
     setCurrentTabIndex(newValue); // Only handle the tab switch
   };
 
@@ -352,7 +349,6 @@ const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
   };
 
   const handleCompliance = async (index) => {
-    if (!canUserEdit || !mounted.current) return;
     if (!object_id) {
       toast.warning("Please save the bid first.");
       return;
@@ -405,7 +401,6 @@ const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
 
   const handleRegenerateClick = async (index, event) => {
     event.stopPropagation();
-    if (!canUserEdit || !mounted.current) return;
     if (!object_id) {
       toast.warning("Please save the bid first.");
       return;
@@ -484,7 +479,6 @@ const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
   };
 
   const handleSaveEdit = async (index: number) => {
-    if (!canUserEdit) return;
 
     try {
       const tab = tabs[index];
@@ -715,7 +709,7 @@ const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
                 className="h-full pt-0 mt-0"
               >
                 <div className={cn("relative px-8 py-4 h-full")}>
-                  {canUserEdit && editMode !== index && (
+                  { editMode !== index && (
                     <div className="text-right">
                       <Button
                         variant="outline"

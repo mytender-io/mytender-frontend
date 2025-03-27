@@ -86,7 +86,7 @@ const Bid = () => {
 
   useEffect(() => {
     if (bidData) {
-      console.log(bidData);
+      //console.log(bidData);
       setSharedState((prevState) => {
         // Filter out single-character entries from selectedFolders
         let selectedFolders = Array.isArray(bidData?.selectedFolders)
@@ -122,7 +122,7 @@ const Bid = () => {
           original_creator: bidData?.original_creator || "",
           object_id: bidData?._id || "",
           selectedFolders: selectedFolders,
-          lastUpdated: bidData?.lastUpdated || 0,
+          timestamp: bidData?.timestamp || "",
           outline: bidData?.outline || [],
           win_themes: bidData?.win_themes || [],
           customer_pain_points: bidData?.customer_pain_points || [],
@@ -137,10 +137,6 @@ const Bid = () => {
           new_bid_completed: bidData?.new_bid_completed || true
         };
       });
-      console.log("bid planner");
-      console.log(bidData?.selectedFolders);
-      console.log(bidData?.solution);
-      localStorage.setItem("navigatedFromBidsTable", "false");
     }
   }, [bidData, setSharedState]);
 

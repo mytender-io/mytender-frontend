@@ -96,7 +96,7 @@ export interface SharedState {
   saveSuccess: boolean | null;
   object_id: string | null;
   selectedFolders: string[];
-  lastUpdated?: number;
+  timestamp?: string;
   outline: Section[];
   win_themes: string[];
   customer_pain_points: string[];
@@ -148,7 +148,8 @@ const defaultState: BidContextType = {
     },
     selectedCaseStudies: [], // Initialize with an empty array
     tone_of_voice: "", // Initialize tone_of_voice with empty string
-    new_bid_completed: true
+    new_bid_completed: true,
+  
   },
   setSharedState: () => {},
   saveProposal: () => {},
@@ -341,18 +342,12 @@ const BidManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    // Skip if already saving
-    if (isSavingRef.current) {
-      console.log("Skipping autosave - already saving");
-      return;
-    }
-
     console.log("State change detected:", {
       bidid: sharedState.object_id,
       bidInfo: sharedState.bidInfo,
       value: sharedState.value,
       submission_deadline: sharedState.submission_deadline,
-      lastUpdated: sharedState.lastUpdated,
+      timestamp: sharedState.timestamp,
       isSavingRef: isSavingRef.current,
       originalCreator: sharedState.original_creator,
       constributors: sharedState.contributors,
@@ -372,9 +367,10 @@ const BidManagement: React.FC = () => {
     setTypingTimeout(
       setTimeout(() => {
         if (!isSavingRef.current) {
+          console.log("autosave triggered");
           saveProposal();
         }
-      }, 2000)
+      }, 4000)
     );
   }, [
     // Dependencies that trigger auto-save when changed
@@ -394,7 +390,6 @@ const BidManagement: React.FC = () => {
     sharedState.contributors,
     sharedState.original_creator,
     sharedState.selectedFolders,
-    sharedState.lastUpdated,
     sharedState.win_themes,
     sharedState.differentiating_factors,
     sharedState.customer_pain_points,
@@ -412,6 +407,101 @@ const BidManagement: React.FC = () => {
     // Triggers on deep changes to outline
     JSON.stringify(sharedState.outline)
   ]);
+
+  // Compare the local timestamp in the sharedstate against the server timestamp
+  useEffect(() => {
+    console.log("checking timestamp...");
+    // Only check if we have a bid ID
+    if (!sharedState.object_id) return;
+
+    // Create interval to check timestamp every 5 seconds
+    const interval = setInterval(async () => {
+      try {
+        // Skip if currently saving
+        if (isSavingRef.current) return;
+
+        const response = await axios.get(
+          `http${HTTP_PREFIX}://${API_URL}/get_timestamp/${sharedState.object_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`
+            }
+          }
+        );
+
+        console.log(response.data.timestamp);
+        const serverTimestamp = response.data.timestamp;
+        const localTimestamp = sharedState.timestamp;
+
+        // If no local timestamp, update it
+        if (!localTimestamp) {
+          setSharedState((prev) => ({
+            ...prev,
+            timestamp: serverTimestamp
+          }));
+          return;
+        }
+
+        // Compare timestamps
+        if (serverTimestamp && localTimestamp) {
+          const serverTime = new Date(serverTimestamp).getTime();
+          const localTime = new Date(localTimestamp).getTime();
+
+          // Add more detailed logging
+          console.log("Server timestamp:", serverTimestamp);
+          console.log("Local timestamp:", localTimestamp);
+
+          // If server version is newer
+          if (serverTime > localTime) {
+            console.log("Newer version detected on server, reloading bid");
+
+            // Fetch the updated bid
+            try {
+              const bidResponse = await axios.get(
+                `http${HTTP_PREFIX}://${API_URL}/get_bid/${sharedState.object_id}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${tokenRef.current}`
+                  }
+                }
+              );
+
+              const updatedBid = bidResponse.data.bid;
+              console.log("updated bid time (ms):", updatedBid.timestamp);
+
+              // Create a promise to track state update completion
+              const stateUpdateComplete = new Promise((resolve) => {
+                setSharedState((prev) => {
+                  const newState = {
+                    ...prev,
+                    timestamp: serverTimestamp
+                  };
+
+                  // Resolve with the new state
+                  setTimeout(() => resolve(newState), 0);
+
+                  return newState;
+                });
+              });
+
+              // Wait for state update to complete and use the resolved value
+              const updatedState = await stateUpdateComplete;
+              console.log("Bid data updated successfully");
+              console.log("updated bid time (ms):", updatedBid.timestamp);
+              console.log("timestamp after update:", updatedState.timestamp);
+
+            } catch (bidError) {
+              console.error("Failed to fetch updated bid:", bidError);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error checking timestamp:", error);
+      }
+    }, 5000);
+    // Cleanup
+    return () => clearInterval(interval);
+  }, [sharedState.object_id, sharedState.timestamp]); // ensure the effect reruns when the timestamp changes
 
   return (
     <BidContext.Provider

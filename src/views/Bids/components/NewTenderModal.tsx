@@ -184,8 +184,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         submission_deadline: deadline,
         original_creator: auth.email,
         contributors: auth.email ? { [auth.email]: "admin" } : {},
-        new_bid_completed: false,
-        lastUpdated: Date.now()
+        new_bid_completed: false
       }));
       setCurrentStep("documents");
     } else if (currentStep === "documents") {
@@ -282,8 +281,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       setSharedState({
         ...initialModalState,
         original_creator: auth?.email || "",
-        contributors: auth?.email ? { [auth?.email]: "admin" } : {},
-        lastUpdated: Date.now()
+        contributors: auth?.email ? { [auth?.email]: "admin" } : {}
       });
     }
   }, [show, auth?.email, setSharedState]);
