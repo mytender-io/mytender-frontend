@@ -105,6 +105,7 @@ export interface SharedState {
   selectedCaseStudies: HighlightedDocument[]; // Array of highlighted document objects
   tone_of_voice: string;
   new_bid_completed: boolean;
+  isExternalUpdate?: boolean; // Flag to prevent autosave after server update
 }
 export interface BidContextType {
   sharedState: SharedState;
@@ -149,7 +150,7 @@ const defaultState: BidContextType = {
     selectedCaseStudies: [], // Initialize with an empty array
     tone_of_voice: "", // Initialize tone_of_voice with empty string
     new_bid_completed: true,
-  
+    isExternalUpdate: false
   },
   setSharedState: () => {},
   saveProposal: () => {},
@@ -342,20 +343,17 @@ const BidManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log("State change detected:", {
-      bidid: sharedState.object_id,
-      bidInfo: sharedState.bidInfo,
-      value: sharedState.value,
-      submission_deadline: sharedState.submission_deadline,
-      timestamp: sharedState.timestamp,
-      isSavingRef: isSavingRef.current,
-      originalCreator: sharedState.original_creator,
-      constributors: sharedState.contributors,
-      selectedFolders: sharedState.selectedFolders,
-      selectedCaseStudies: sharedState.selectedCaseStudies,
-      tone_of_voice: sharedState.tone_of_voice,
-      new_bid_completed: sharedState.new_bid_completed
-    });
+    if (sharedState.isExternalUpdate) {
+      console.log("Skipping autosave - update came from server");
+
+      // Reset the flag after skipping (important!)
+      setSharedState((prev) => ({
+        ...prev,
+        isExternalUpdate: false
+      }));
+
+      return;
+    }
 
     // Clear any existing save timer
     if (typingTimeout) {
@@ -474,7 +472,58 @@ const BidManagement: React.FC = () => {
                 setSharedState((prev) => {
                   const newState = {
                     ...prev,
-                    timestamp: serverTimestamp
+                    timestamp: serverTimestamp,
+                    isExternalUpdate: true,
+                    bidInfo: updatedBid.bid_title || prev.bidInfo,
+                    opportunity_information:
+                      updatedBid.opportunity_information ||
+                      prev.opportunity_information,
+                    compliance_requirements:
+                      updatedBid.compliance_requirements ||
+                      prev.compliance_requirements,
+                    tender_summary:
+                      updatedBid.tender_summary || prev.tender_summary,
+                    evaluation_criteria:
+                      updatedBid.evaluation_criteria ||
+                      prev.evaluation_criteria,
+                    derive_insights:
+                      updatedBid.derive_insights || prev.derive_insights,
+                    differentiation_opportunities:
+                      updatedBid.differentiation_opportunities ||
+                      prev.differentiation_opportunities,
+                    questions: updatedBid.questions || prev.questions,
+                    value: updatedBid.value || prev.value,
+                    client_name: updatedBid.client_name || prev.client_name,
+                    bid_qualification_result:
+                      updatedBid.bid_qualification_result ||
+                      prev.bid_qualification_result,
+                    opportunity_owner:
+                      updatedBid.opportunity_owner || prev.opportunity_owner,
+                    submission_deadline:
+                      updatedBid.submission_deadline ||
+                      prev.submission_deadline,
+                    bid_manager: updatedBid.bid_manager || prev.bid_manager,
+                    contributors: updatedBid.contributors || prev.contributors,
+                    original_creator:
+                      updatedBid.original_creator || prev.original_creator,
+                    selectedFolders:
+                      updatedBid.selectedFolders || prev.selectedFolders,
+                    outline: updatedBid.outline || prev.outline,
+                    win_themes: updatedBid.win_themes || prev.win_themes,
+                    customer_pain_points:
+                      updatedBid.customer_pain_points ||
+                      prev.customer_pain_points,
+                    differentiating_factors:
+                      updatedBid.differentiating_factors ||
+                      prev.differentiating_factors,
+                    solution: updatedBid.solution || prev.solution,
+                    selectedCaseStudies:
+                      updatedBid.selectedCaseStudies ||
+                      prev.selectedCaseStudies,
+                    tone_of_voice:
+                      updatedBid.tone_of_voice || prev.tone_of_voice,
+                    new_bid_completed:
+                      updatedBid.new_bid_completed ?? prev.new_bid_completed
                   };
 
                   // Resolve with the new state
@@ -489,7 +538,6 @@ const BidManagement: React.FC = () => {
               console.log("Bid data updated successfully");
               console.log("updated bid time (ms):", updatedBid.timestamp);
               console.log("timestamp after update:", updatedState.timestamp);
-
             } catch (bidError) {
               console.error("Failed to fetch updated bid:", bidError);
             }
