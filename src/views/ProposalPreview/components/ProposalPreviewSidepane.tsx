@@ -27,7 +27,8 @@ const ProposalPreviewSidepane = ({
   isLoadingEvidence,
   onReplace,
   onCancelPrompt,
-  actionType
+  actionType,
+  setActionType
 }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -449,6 +450,9 @@ const ProposalPreviewSidepane = ({
       ]);
     }
     setIsLoading(false);
+
+    setActionType("default");
+    setActiveChatPrompt("library");
   };
 
   const handleCopyText = (text: string) => {
@@ -666,7 +670,9 @@ const ProposalPreviewSidepane = ({
                                 ? "Expand"
                                 : message.actionType === "custom"
                                   ? "Custom"
-                                  : "Evidence"}
+                                  : message.actionType === "evidence"
+                                    ? "Evidence"
+                                    : ""}
                           </span>
                         )}
 

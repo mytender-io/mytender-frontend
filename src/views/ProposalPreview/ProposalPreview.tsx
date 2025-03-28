@@ -1080,7 +1080,8 @@ const ProposalPreview = () => {
                     isLoadingEvidence={isLoadingEvidence}
                     onReplace={handleReplaceWithPrompt}
                     onCancelPrompt={handleCancelPrompt}
-                    actionType={actionType} // Add this line
+                    actionType={actionType}
+                    setActionType={setActionType}
                   />
                 </div>
               )}
