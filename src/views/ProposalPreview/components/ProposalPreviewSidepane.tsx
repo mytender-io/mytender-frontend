@@ -211,7 +211,10 @@ const ProposalPreviewSidepane = ({
 
     // Add a temporary bot message with loading dots
     setMessages((prevMessages) => {
-      const newMessages = [...prevMessages, { type: "bot", text: "loading" }];
+      const newMessages = [
+        ...prevMessages,
+        { type: "loading", text: "loading" }
+      ];
       // Use setTimeout to ensure the DOM updates before scrolling
       setTimeout(scrollToBottom, 10);
       return newMessages;
@@ -273,7 +276,10 @@ const ProposalPreviewSidepane = ({
 
     // Add a temporary bot message with loading dots
     setMessages((prevMessages) => {
-      const newMessages = [...prevMessages, { type: "bot", text: "loading" }];
+      const newMessages = [
+        ...prevMessages,
+        { type: "loading", text: "loading" }
+      ];
       // Use setTimeout to ensure the DOM updates before scrolling
       setTimeout(scrollToBottom, 10);
       return newMessages;
@@ -333,7 +339,10 @@ const ProposalPreviewSidepane = ({
 
     // Add a temporary bot message with loading dots
     setMessages((prevMessages) => {
-      const newMessages = [...prevMessages, { type: "bot", text: "loading" }];
+      const newMessages = [
+        ...prevMessages,
+        { type: "loading", text: "loading" }
+      ];
       // Use setTimeout to ensure the DOM updates before scrolling
       setTimeout(scrollToBottom, 10);
       return newMessages;
@@ -388,7 +397,10 @@ const ProposalPreviewSidepane = ({
 
     // Add a temporary bot message with loading dots
     setMessages((prevMessages) => {
-      const newMessages = [...prevMessages, { type: "bot", text: "loading" }];
+      const newMessages = [
+        ...prevMessages,
+        { type: "loading", text: "loading" }
+      ];
       // Use setTimeout to ensure the DOM updates before scrolling
       setTimeout(scrollToBottom, 10);
       return newMessages;
@@ -459,7 +471,7 @@ const ProposalPreviewSidepane = ({
     if (promptTarget) {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { type: "evidence-target", text: promptTarget }
+        { type: "evidence-target", text: promptTarget, actionType: actionType }
       ]);
     }
   }, [promptTarget]);
@@ -475,7 +487,7 @@ const ProposalPreviewSidepane = ({
     else if (promptResult) {
       // First remove any loading messages
       const messagesWithoutLoading = messages.filter(
-        (msg) => msg.text !== "loading"
+        (msg) => msg.type !== "loading"
       );
       // Then add the evidence message
       setMessages([
@@ -562,7 +574,7 @@ const ProposalPreviewSidepane = ({
                   )}
                 >
                   <div className="flex-1 flex flex-col">
-                    {message.text === "loading" ? (
+                    {message.type === "loading" ? (
                       <div className="flex justify-start items-center h-full text-2xl tracking-wider leading-none font-semibold">
                         <span className="animate-[blink_1.4s_infinite] text-orange">
                           .
@@ -648,11 +660,11 @@ const ProposalPreviewSidepane = ({
                         )}
                         {message.type === "evidence-target" && (
                           <span className="text-gray-hint_text mt-2">
-                            {actionType === "summarise"
+                            {message.actionType === "summarise"
                               ? "Summarise"
-                              : actionType === "expand"
+                              : message.actionType === "expand"
                                 ? "Expand"
-                                : actionType === "custom"
+                                : message.actionType === "custom"
                                   ? "Custom"
                                   : "Evidence"}
                           </span>

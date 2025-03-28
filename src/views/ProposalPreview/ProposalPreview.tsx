@@ -72,7 +72,7 @@ const ProposalPreview = () => {
   const [organizationUsers, setOrganizationUsers] = useState([]);
   const [isLoadingEvidence, setIsLoadingEvidence] = useState(false);
 
-  const [actionType, setActionType] = useState("evidence");
+  const [actionType, setActionType] = useState("default");
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
@@ -281,6 +281,7 @@ const ProposalPreview = () => {
 
         // Clear the prompt result
         setPromptResult("");
+        setActionType("default");
 
         // Update the shared state with the new content if we have a current section
         if (currentSectionIndex !== null && activeEditorRef.current) {
@@ -304,7 +305,9 @@ const ProposalPreview = () => {
         selectedRange.deleteContents();
         const textNode = document.createTextNode(text);
         selectedRange.insertNode(textNode);
+
         setPromptResult("");
+        setActionType("default");
 
         // Update the shared state with the new content if we have a current section
         if (currentSectionIndex !== null && activeEditorRef.current) {
@@ -365,6 +368,7 @@ const ProposalPreview = () => {
 
           // Clear the prompt result
           setPromptResult("");
+          setActionType("default");
 
           // Update the shared state with the new content
           const newContent = activeEditorRef.current.innerHTML;
@@ -412,6 +416,7 @@ const ProposalPreview = () => {
 
     setPromptResult("");
     setPromptTarget("");
+    setActionType("default");
   };
 
   // Copy section handler
