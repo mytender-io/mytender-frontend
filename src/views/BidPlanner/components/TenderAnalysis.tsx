@@ -648,10 +648,10 @@ const TenderAnalysis = ({ canUserEdit }: { canUserEdit: boolean }) => {
           onValueChange={(value) => handleTabChange(null, parseInt(value))}
           className={cn("flex flex-col w-full h-full")}
         >
-          <div className="w-full overflow-auto scrollbar-thin">
+          <div className="w-full overflow-auto scrollbar-none">
             <TabsList
               className={cn(
-                "w-fit min-w-[1120px]:w-full justify-start border-b border-gray-line h-auto py-0 px-0 rounded-none flex"
+                "w-fit xl:w-full justify-start border-b border-gray-line h-auto py-0 px-0 rounded-none flex"
               )}
             >
               {tabs.map((tab, index) => {
