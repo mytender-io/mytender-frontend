@@ -179,7 +179,7 @@ const BidIntel = ({
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {/* Customer Pain Points Card */}
         <div className="bg-white rounded-lg shadow w-full">
           <span className="font-medium px-4 py-3 bg-gray-100 rounded-t-lg border-b w-full block text-gray-hint_text">

@@ -76,7 +76,7 @@ const BidNavbar: React.FC<{
       </div>
 
       <div>
-        <div className="flex justify-between items-center border-b border-gray-line">
+        <div className="flex justify-between items-center border-b border-gray-line w-full overflow-auto scrollbar-thin">
           <div className="flex items-center mt-3 mb-1 relative">
             {/* Sliding indicator */}
             <div
@@ -134,7 +134,7 @@ const BidNavbar: React.FC<{
                 New Outline
               </Button>
               <GenerateProposalModal
-                bid_id={object_id}
+                bid_id={object_id as string}
                 handleTabClick={handleTabClick}
               />
             </div>

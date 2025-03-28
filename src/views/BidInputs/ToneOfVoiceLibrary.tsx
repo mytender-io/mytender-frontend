@@ -134,12 +134,12 @@ const ToneOfVoiceLibrary = ({ selectable = true }: ToneOfVoiceLibraryProps) => {
 
   return (
     <div className="space-y-2">
-      <div className="flex justify-between items-center w-full">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full">
         <h2 className="text-lg font-semibold">Tone of Voice Library</h2>
         <Button
           variant="outline"
           onClick={() => setIsDialogOpen(true)}
-          className="ml-auto"
+          className="sm:ml-auto"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Tone Of Voice
