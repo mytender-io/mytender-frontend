@@ -121,15 +121,18 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
       }
     };
 
-    if (profile.userType === "owner" && showTeamMembers) {
+    if (profile.userType === "owner") {
       fetchOrganizationUsers();
     }
-  }, [tokenRef, profile, showTeamMembers]);
+  }, [tokenRef, profile]);
 
   useEffect(() => {
     if (answererId) {
+      console.log(answererId);
+      console.log(organizationUsers);
       // First, try to find a match in organization users
       if (organizationUsers.length > 0) {
+        console.log(organizationUsers);
         const matchedUser = organizationUsers.find(
           (user) => user.username === answererId
         );
@@ -177,7 +180,6 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 
   // Only show up to 3 organization users
   const displayedUsers = organizationUsers.slice(0, 3);
-  console.log(displayedUsers);
   const activeProfile = answererId ? answererProfile : profile;
 
   return (
