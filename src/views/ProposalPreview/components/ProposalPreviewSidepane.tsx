@@ -80,12 +80,30 @@ const ProposalPreviewSidepane = ({
 
   const handleSendMessage = () => {
     if (inputValue.trim() !== "") {
-      setMessages((prev) => {
-        const newMessages = [...prev, { type: "user", text: inputValue }];
-        // Use setTimeout to ensure the DOM updates before scrolling
-        setTimeout(scrollToBottom, 10);
-        return newMessages;
-      });
+      // Check if actionType is custom - don't add a user message in this case
+      if (activeChatPrompt !== "custom") {
+        setMessages((prev) => {
+          const newMessages = [...prev, { type: "user", text: inputValue }];
+          setTimeout(scrollToBottom, 10);
+          return newMessages;
+        });
+      } else {
+        // For custom actionType, find the last evidence-target message with custom actionType
+        const lastCustomTargetIndex = messages.findIndex(
+          (msg) => msg.type === "evidence-target" && msg.actionType === "custom"
+        );
+
+        if (lastCustomTargetIndex !== -1) {
+          // Update the message with the prompt
+          const updatedMessages = [...messages];
+          updatedMessages[lastCustomTargetIndex] = {
+            ...updatedMessages[lastCustomTargetIndex],
+            prompt: inputValue
+          };
+          setMessages(updatedMessages);
+          setTimeout(scrollToBottom, 10);
+        }
+      }
 
       // Call the appropriate endpoint based on the active chat mode
       if (activeChatPrompt === "library") {
@@ -663,19 +681,25 @@ const ProposalPreviewSidepane = ({
                           </div>
                         )}
                         {message.type === "evidence-target" && (
-                          <span className="text-gray-hint_text mt-2">
+                          <span
+                            className={cn(
+                              "text-gray-hint_text",
+                              message.actionType === "custom" && !message.prompt
+                                ? ""
+                                : "mt-2"
+                            )}
+                          >
                             {message.actionType === "summarise"
                               ? "Summarise"
                               : message.actionType === "expand"
                                 ? "Expand"
                                 : message.actionType === "custom"
-                                  ? "Custom"
+                                  ? message.prompt
                                   : message.actionType === "evidence"
                                     ? "Evidence"
                                     : ""}
                           </span>
                         )}
-
                         {message.type === "evidence" ? (
                           <div className="flex gap-1 mt-3">
                             <Button
