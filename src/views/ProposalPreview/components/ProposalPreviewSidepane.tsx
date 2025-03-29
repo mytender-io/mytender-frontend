@@ -89,7 +89,7 @@ const ProposalPreviewSidepane = ({
         });
       } else {
         // For custom actionType, find the last evidence-target message with custom actionType
-        const lastCustomTargetIndex = messages.findIndex(
+        const lastCustomTargetIndex = messages.findLastIndex(
           (msg) => msg.type === "evidence-target" && msg.actionType === "custom"
         );
 
