@@ -549,7 +549,7 @@ const BidManagement: React.FC = () => {
       } catch (error) {
         console.error("Error checking timestamp:", error);
       }
-    }, 3000);
+    }, 9999999);
     // Cleanup
     return () => clearInterval(interval);
   }, [sharedState.object_id, sharedState.timestamp]); // ensure the effect reruns when the timestamp changes
