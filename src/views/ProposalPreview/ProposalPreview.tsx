@@ -36,6 +36,7 @@ import TextSelectionMenu from "./components/TextSelectionMenu";
 import ProposalToolbar from "./components/ProposalToolbar";
 import MarkReviewReadyButton from "./components/MarkReviewReadyButton";
 import RewriteInputBar from "./components/RewriteInputBar";
+import { formatSectionText } from "@/utils/formatSectionText";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -124,13 +125,7 @@ const ProposalPreview = () => {
             const editorElement = editorRefs.current[index];
             if (editorElement && section.answer !== editorElement.innerHTML) {
               // Only update if content has actually changed
-              editorElement.innerHTML = section.answer
-                ? section.answer
-                    .split("\n")
-                    .filter((line) => line.trim() !== "")
-                    .map((line) => `<p class="mb-4">${line}</p>`)
-                    .join("")
-                : "";
+              editorElement.innerHTML = formatSectionText(section.answer || "");
             }
           }
         });
