@@ -280,9 +280,15 @@ const ProposalPreview = () => {
         // Delete the span and its contents
         range.deleteContents();
 
-        // Insert the text parameter instead of promptResult
-        const textNode = document.createTextNode(text);
-        range.insertNode(textNode);
+        // Create a temporary container element
+        const tempDiv = document.createElement("div");
+        // Set the HTML content
+        tempDiv.innerHTML = text;
+
+        // Insert the HTML content
+        while (tempDiv.firstChild) {
+          range.insertNode(tempDiv.firstChild);
+        }
 
         // Clear the prompt result
         setPromptResult("");
@@ -308,8 +314,16 @@ const ProposalPreview = () => {
         console.log("selected range");
         // Fall back to using the stored selectedRange if span not found
         selectedRange.deleteContents();
-        const textNode = document.createTextNode(text);
-        selectedRange.insertNode(textNode);
+
+        // Create a temporary container element
+        const tempDiv = document.createElement("div");
+        // Set the HTML content
+        tempDiv.innerHTML = text;
+
+        // Insert the HTML content
+        while (tempDiv.firstChild) {
+          selectedRange.insertNode(tempDiv.firstChild);
+        }
 
         setPromptResult("");
         setActionType("default");
@@ -342,8 +356,8 @@ const ProposalPreview = () => {
             if (
               activeEditorRef.current.contains(range.commonAncestorContainer)
             ) {
-              // Insert text at current cursor position
-              document.execCommand("insertText", false, text);
+              // Insert HTML at current cursor position
+              document.execCommand("insertHTML", false, text);
             } else {
               // If cursor is not in the editor, place it at the end of editor content
               const endRange = document.createRange();
@@ -354,7 +368,7 @@ const ProposalPreview = () => {
               selection.addRange(endRange);
 
               // Now insert at the end
-              document.execCommand("insertText", false, text);
+              document.execCommand("insertHTML", false, text);
             }
           } else {
             // If no selection exists, append to the end of the editor
@@ -367,7 +381,7 @@ const ProposalPreview = () => {
             if (sel) {
               sel.removeAllRanges();
               sel.addRange(endRange);
-              document.execCommand("insertText", false, text);
+              document.execCommand("insertHTML", false, text);
             }
           }
 
@@ -388,8 +402,6 @@ const ProposalPreview = () => {
               outline: newOutline
             };
           });
-
-          // toast.success("Text inserted at cursor position");
         } else {
           toast.error("Please select a section to edit first");
         }
@@ -1134,4 +1146,3 @@ const ProposalPreview = () => {
 };
 
 export default withAuth(ProposalPreview);
-
