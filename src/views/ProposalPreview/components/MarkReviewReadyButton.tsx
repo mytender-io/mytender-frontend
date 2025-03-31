@@ -46,12 +46,12 @@ const MarkReviewReadyButton = ({
         (user: any) => user.username === section.reviewer
       );
 
-      if (!reviewerUser || !reviewerUser.email) {
-        toast.error(
-          "Could not find reviewer's email. Please reassign the reviewer."
-        );
-        return;
-      }
+      // if (!reviewerUser || !reviewerUser.email) {
+      //   toast.error(
+      //     "Could not find reviewer's email. Please reassign the reviewer."
+      //   );
+      //   return;
+      // }
 
       // Create a task for the reviewer
       const taskData = {
@@ -74,7 +74,6 @@ const MarkReviewReadyButton = ({
       );
 
       if (response.data.success) {
-
         setSharedState((prevState: SharedState) => {
           const newOutline = [...prevState.outline];
           newOutline[index] = {
@@ -115,16 +114,16 @@ const MarkReviewReadyButton = ({
     <Button
       variant="outline"
       size="sm"
-      className="text-xs text-gray-hint_text"
+      className={`text-xs ${
+        section.review_ready
+          ? "bg-green-500 hover:bg-green-600 text-white border-green-500 disabled:opacity-100"
+          : "text-gray-hint_text"
+      }`}
       onClick={handleMarkAsReviewReady}
-      disabled={isLoading}
+      disabled={isLoading || section.review_ready}
     >
-      {isLoading ? (
-        <Spinner className="mr-2 h-4 w-4" />
-      ) : (
-        <PencilEditCheckIcon />
-      )}
-      Mark as Review Ready
+      {isLoading ? <Spinner /> : <PencilEditCheckIcon />}
+      {section.review_ready ? "Ready for Review" : "Mark as Review Ready"}
     </Button>
   );
 };
