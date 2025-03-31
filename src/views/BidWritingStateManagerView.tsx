@@ -508,10 +508,7 @@ const BidManagement: React.FC = () => {
                       updatedBid.original_creator || prev.original_creator,
                     selectedFolders:
                       updatedBid.selectedFolders || prev.selectedFolders,
-                    outline: updatedBid.outline ? 
-                      // Do a deep copy of the outline array from the server
-                      JSON.parse(JSON.stringify(updatedBid.outline)) 
-                      : prev.outline,
+                    outline: updatedBid.outline || prev.outline,
                     win_themes: updatedBid.win_themes || prev.win_themes,
                     customer_pain_points:
                       updatedBid.customer_pain_points ||
@@ -549,7 +546,7 @@ const BidManagement: React.FC = () => {
       } catch (error) {
         console.error("Error checking timestamp:", error);
       }
-    }, 3000);
+    }, 5000);
     // Cleanup
     return () => clearInterval(interval);
   }, [sharedState.object_id, sharedState.timestamp]); // ensure the effect reruns when the timestamp changes
