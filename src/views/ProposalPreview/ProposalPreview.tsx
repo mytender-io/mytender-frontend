@@ -115,21 +115,22 @@ const ProposalPreview = () => {
       setLocalLoading(false);
 
       // Force a refresh of editor content when outline changes
-      if (sharedState.outline.length > 0 && editorRefs.current.length > 0) {
-        console.log("Outline updated, refreshing editors");
+      // if (sharedState.outline.length > 0 && editorRefs.current.length > 0) {
+      //   console.log("Outline updated, refreshing editors");
 
-        // Update editor refs with latest content
-        sharedState.outline.forEach((section, index) => {
-          if (editorRefs.current[index]) {
-            // This will force the editor to refresh with new content
-            const editorElement = editorRefs.current[index];
-            if (editorElement && section.answer !== editorElement.innerHTML) {
-              // Only update if content has actually changed
-              editorElement.innerHTML = formatSectionText(section.answer || "");
-            }
-          }
-        });
-      }
+      //   // Update editor refs with latest content
+      //   sharedState.outline.forEach((section, index) => {
+      //     if (editorRefs.current[index]) {
+      //       // This will force the editor to refresh with new content
+      //       const editorElement = editorRefs.current[index];
+      //       if (editorElement && section.answer !== editorElement.innerHTML) {
+      //         // Only update if content has actually changed
+      //         // editorElement.innerHTML = formatSectionText(section.answer || "");
+      //         editorElement.innerHTML = section.answer;
+      //       }
+      //     }
+      //   });
+      // }
     }
   }, [sharedState.outline]);
 
