@@ -19,7 +19,7 @@ import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
 import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 import RedoSparkIcon from "@/components/icons/RedoSparkIcon";
-import { cn } from "@/utils";
+import { calculateWordCount, cn } from "@/utils";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
 import DebouncedContentEditable from "./components/DebouncedContentEditable";
@@ -843,12 +843,8 @@ const ProposalPreview = () => {
                           {/* Show a meta info box with section details */}
                           <div className="bg-gray-50 px-4 py-2 text-xs text-gray-600 flex justify-between border-t border-gray-200">
                             <div>
-                              <span className="font-medium">Status:</span>{" "}
-                              {section.status}
-                            </div>
-                            <div>
                               <span className="font-medium">Words:</span>{" "}
-                              {section.word_count || 0}
+                              {calculateWordCount(section.answer || "")}
                             </div>
                             {section.reviewer && (
                               <div>
@@ -862,6 +858,10 @@ const ProposalPreview = () => {
                                 {section.answerer}
                               </div>
                             )}
+                            <div>
+                              <span className="font-medium">Status:</span>{" "}
+                              {section.status}
+                            </div>
                           </div>
                         </div>
                       ))

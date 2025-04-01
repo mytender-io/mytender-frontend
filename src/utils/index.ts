@@ -20,3 +20,17 @@ export const getSectionHeading = (heading: string) => {
   const sectionNumber = match ? match[0] : "";
   return sectionNumber;
 };
+
+export const calculateWordCount = (htmlContent: string): number => {
+  if (!htmlContent) return 0;
+
+  // Create a temporary div to extract text from HTML
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = htmlContent;
+
+  // Get text content without HTML tags
+  const textContent = tempDiv.textContent || tempDiv.innerText || "";
+
+  // Split by whitespace and filter out empty strings
+  return textContent.trim().split(/\s+/).filter(Boolean).length;
+};
