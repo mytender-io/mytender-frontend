@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Maximize2, Minimize2 } from "lucide-react";
@@ -31,6 +31,13 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   const [randomSloth] = useState(
     () => slothImages[Math.floor(Math.random() * slothImages.length)]
   );
+
+  // Reset expanded state when the overlay is closed
+  useEffect(() => {
+    if (!isOpen) {
+      setExpanded(false);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
