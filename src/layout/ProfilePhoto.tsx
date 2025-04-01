@@ -128,16 +128,12 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 
   useEffect(() => {
     if (answererId) {
-      console.log(answererId);
-      console.log(organizationUsers);
       // First, try to find a match in organization users
       if (organizationUsers.length > 0) {
-        console.log(organizationUsers);
         const matchedUser = organizationUsers.find(
           (user) => user.username === answererId
         );
         if (matchedUser) {
-          console.log(matchedUser);
           setAnswererProfile(matchedUser);
           return;
         }
@@ -145,7 +141,6 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 
       // If no match found in org users, check if it's the current user
       if (profile && profile.login === answererId) {
-        console.log(profile);
         setAnswererProfile(profile);
         return;
       }

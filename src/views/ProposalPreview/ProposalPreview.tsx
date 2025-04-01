@@ -36,7 +36,7 @@ import TextSelectionMenu from "./components/TextSelectionMenu";
 import ProposalToolbar from "./components/ProposalToolbar";
 import MarkReviewReadyButton from "./components/MarkReviewReadyButton";
 import RewriteInputBar from "./components/RewriteInputBar";
-import { formatSectionText } from "@/utils/formatSectionText";
+// import { formatSectionText } from "@/utils/formatSectionText";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -74,6 +74,10 @@ const ProposalPreview = () => {
   const [isLoadingEvidence, setIsLoadingEvidence] = useState(false);
 
   const [actionType, setActionType] = useState("default");
+
+  // Add a ref for the toolbar div
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  const [toolbarYPosition, setToolbarYPosition] = useState(0);
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
@@ -136,6 +140,7 @@ const ProposalPreview = () => {
 
   // Function to toggle the sidepane
   const toggleSidepane = () => {
+    setToolbarYPosition(getToolbarYPosition());
     setSidepaneOpen((prevState) => !prevState);
   };
 
@@ -675,6 +680,18 @@ const ProposalPreview = () => {
     setCurrentSectionIndex(index);
   };
 
+  // Then somewhere in your component, you can get the Y position:
+  const getToolbarYPosition = () => {
+    if (toolbarRef.current) {
+      const rect = toolbarRef.current.getBoundingClientRect();
+      // rect.top gives you the distance from the top of the viewport
+      // Add window.scrollY to get the distance from the top of the document
+      const yPosition = rect.top + window.scrollY;
+      return yPosition;
+    }
+    return 0;
+  };
+
   return (
     <div className="proposal-preview-container pb-8">
       <div>
@@ -697,7 +714,10 @@ const ProposalPreview = () => {
                 )}
               >
                 <div className="rounded-md bg-white w-full max-w-4xl flex-1">
-                  <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-10">
+                  <div
+                    ref={toolbarRef}
+                    className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-[51]"
+                  >
                     <ProposalToolbar
                       activeEditorRef={activeEditorRef}
                       execCommand={execCommand}
@@ -1086,8 +1106,11 @@ const ProposalPreview = () => {
               {sidepaneOpen && (
                 <div
                   className={cn(
-                    "w-[450px] max-h-[calc(100vh-66px)] overflow-y-auto z-50 sticky -top-4 right-0"
+                    "w-[450px] overflow-y-auto z-50 sticky -top-4 right-0"
                   )}
+                  style={{
+                    maxHeight: `calc(100vh - ${241 - (234 - toolbarYPosition)}px)`
+                  }}
                 >
                   <ProposalPreviewSidepane
                     bid_id={sharedState.object_id}
