@@ -321,26 +321,33 @@ const SelectFolder: React.FC<SelectFolderProps> = ({
             </div>
           ) : (
             <div className="h-full flex flex-col justify-between space-y-4">
-              <div className="space-y-4">
-                {getCurrentPageFolders().map((folder: string) => (
-                  <div key={folder} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={folder}
-                      checked={selectedFolders.includes(folder)}
-                      onCheckedChange={() => handleFolderSelect(folder)}
-                    >
-                      <label
-                        htmlFor={folder}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      >
-                        {folder === "default"
-                          ? "Whole Content Library"
-                          : folder}
-                      </label>
-                    </Checkbox>
-                  </div>
-                ))}
-              </div>
+              <Table>
+                <TableBody>
+                  {activeFolder === null
+                    ? getCurrentPageFolders().map((folder: string) => (
+                        <TableRow key={folder}>
+                          <TableCell className="flex items-center gap-4">
+                            <Checkbox
+                              checked={selectedFolders.includes(folder)}
+                              onCheckedChange={() => handleFolderSelect(folder)}
+                            />
+                            <div
+                              className="flex items-center gap-2 cursor-pointer"
+                              onClick={() => handleFolderClick(folder)}
+                            >
+                              <FolderIcon className="h-4 w-4" />
+                              <span className="text-sm">
+                                {folder === "default"
+                                  ? "Whole Content Library"
+                                  : formatDisplayName(folder)}
+                              </span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    : renderFolderContents(activeFolder)}
+                </TableBody>
+              </Table>
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
