@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import { Section, UserComment } from "../BidWritingStateManagerView";
+import posthog from "posthog-js";
 
 /**
  * Creates and saves a new comment for a section
@@ -104,6 +105,13 @@ export const handleSaveComment = (
       ...prevState,
       outline: newOutline
     };
+  });
+
+  posthog.capture("comment_added", {
+    comment_id: newComment.id,
+    section_id: newComment.sectionId,
+    createdAt: newComment.createdAt,
+    author: newComment.author
   });
 
   // Reset input state
@@ -273,6 +281,12 @@ export const handleSubmitReply = (
     };
   });
 
+  posthog.capture("reply_submitted", {
+    reply_id: newReply.id,
+    author: newReply.author,
+    createdAt: newReply.createdAt
+  });
+
   setReplyText("");
   toast.success("Reply added");
 };
@@ -318,3 +332,4 @@ export const getCommentsForCurrentSection = (
   // Filter out resolved comments
   return currentSection.comments.filter((comment) => !comment.resolved);
 };
+

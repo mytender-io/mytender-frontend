@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuthUser } from "react-auth-kit";
 import posthog from "posthog-js";
 import { toast } from "react-toastify";
+import { USERS_TO_EXCLUDE_IN_POSTHOG } from "@/constants/posthogUsers";
 
 // Check interval for updates (5 minutes)
 const CHECK_INTERVAL = 5 * 60 * 1000;
@@ -154,9 +155,13 @@ export const UpdateChecker = () => {
     // Identify user in PostHog if authenticated
     if (auth?.token) {
       console.log("UpdateChecker: User authenticated, identifying in PostHog");
-      posthog.identify(auth.email, {
-        email: auth.email
-      });
+      if (!USERS_TO_EXCLUDE_IN_POSTHOG.includes(auth.email)) {
+        posthog.identify(auth.email, {
+          email: auth.email
+        });
+      } else {
+        posthog.opt_out_capturing();
+      }
     }
 
     return () => {
@@ -167,3 +172,4 @@ export const UpdateChecker = () => {
 
   return null;
 };
+

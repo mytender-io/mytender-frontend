@@ -1,7 +1,12 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import axios from "axios";
-import withAuth from "../../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import { BidContext, Section, Subheading } from "../BidWritingStateManagerView";
 import StatusMenu from "../../buttons/StatusMenu";
@@ -48,8 +53,18 @@ import SelectOrganisationUserButton from "@/buttons/SelectOrganisationUserButton
 import { Spinner } from "@/components/ui/spinner";
 import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 
-const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
-  const outlineSectionsRef = useRef({});
+interface ProposalPlanProps {
+  openTask: (taskId: string | null, sectionIndex: string) => void;
+  taskToOpen: string | null;
+  sectionIndex: string | null;
+}
+
+const ProposalPlan = ({
+  openTask,
+  taskToOpen,
+  sectionIndex
+}: ProposalPlanProps) => {
+  const outlineSectionsRef = useRef<Record<string, any>>({});
 
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -57,9 +72,6 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
   const { sharedState, setSharedState } = useContext(BidContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
-  const [questionAsked, setQuestionAsked] = useState(false);
-  const [startTime, setStartTime] = useState<number>(0);
-  const [elapsedTime, setElapsedTime] = useState(0);
   const [apiChoices, setApiChoices] = useState([]);
   const [selectedChoices, setSelectedChoices] = useState([]);
   const [wordAmounts, setWordAmounts] = useState({});
@@ -68,7 +80,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
     null
   );
 
-  const [lastOutlineState, setLastOutlineState] = useState(null);
+  const [lastOutlineState, setLastOutlineState] = useState<any>(null);
   const [canRevert, setCanRevert] = useState(false);
 
   const { object_id, contributors, outline } = sharedState;
@@ -79,9 +91,11 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
 
   // const currentUserPermission = contributors[auth.email] || "viewer";
 
-  const [contextMenu, setContextMenu] = useState(null);
-  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
-  const [selectedSection, setSelectedSection] = useState(null);
+  const [contextMenu, setContextMenu] = useState<Record<string, number> | null>(
+    null
+  );
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+  const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [selectedSections, setSelectedSections] = useState(new Set());
 
   const [isSidepaneOpen, setIsSidepaneOpen] = useState(false);
@@ -157,7 +171,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
   }, [taskToOpen, sectionIndex, openTask, outline.length]);
 
   // Function to scroll to a specific section
-  const scrollToSection = (index) => {
+  const scrollToSection = (index: string) => {
     // Get the section element (this will depend on your implementation)
     const sectionElement = outlineSectionsRef.current[index];
 
@@ -176,7 +190,10 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
   };
 
   // Register section refs
-  const registerSectionRef = (index, element) => {
+  const registerSectionRef = (
+    index: string,
+    element: HTMLTableRowElement | null
+  ) => {
     outlineSectionsRef.current[index] = element;
   };
 
@@ -203,16 +220,22 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
     }
   };
 
-  const handleBulkUpdate = (updates) => {
+  const handleBulkUpdate = (updates: Record<string, any>) => {
     // Store current state before making changes
+    posthog.capture("bulk_update_sections", {
+      updatedFields: Object.keys(updates),
+      numberOfSections: selectedSections.size,
+      bidId: object_id
+    });
+
     setLastOutlineState([...sharedState.outline]);
     setCanRevert(true);
 
     setSharedState((prevState) => {
       const newOutline = [...prevState.outline];
       selectedSections.forEach((index) => {
-        newOutline[index] = {
-          ...newOutline[index],
+        newOutline[index as number] = {
+          ...newOutline[index as number],
           ...updates
         };
       });
@@ -238,7 +261,7 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       });
 
       const sectionsToDelete = Array.from(selectedSections).sort(
-        (a, b) => b - a
+        (a, b) => Number(b) - Number(a)
       );
       const updatedOutline = [...sharedState.outline];
       sectionsToDelete.forEach((index) => {
@@ -311,23 +334,34 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
     });
   };
 
-  const handleContextMenu = (e, index) => {
+  const handleContextMenu = (
+    e: React.MouseEvent<HTMLTableRowElement, MouseEvent>,
+    index: number
+  ) => {
     e.preventDefault();
     setContextMenu({ x: e.clientX, y: e.clientY });
     setSelectedRowIndex(index);
+
+    posthog.capture("context_menu_opened", {
+      sectionId: outline[index].section_id,
+      bidId: object_id
+    });
   };
 
-  const handleClickOutside = (e) => {
-    if (contextMenu && !e.target.closest(".context-menu")) {
-      setContextMenu(null);
-      setSelectedRowIndex(null);
-    }
-  };
+  const handleClickOutside = useCallback(
+    (e) => {
+      if (contextMenu && !e.target.closest(".context-menu")) {
+        setContextMenu(null);
+        setSelectedRowIndex(null);
+      }
+    },
+    [contextMenu]
+  );
 
   useEffect(() => {
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
-  }, [contextMenu]);
+  }, [contextMenu, handleClickOutside]);
 
   const handleAddSection = async () => {
     if (!object_id || selectedRowIndex === null) return;
@@ -479,6 +513,10 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       deleteSection(sectionToDelete.section.section_id, sectionToDelete.index);
       setShowDeleteDialog(false);
       setSectionToDelete(null);
+
+      posthog.capture("bid_outline_deleted", {
+        deleted_section_id: sectionToDelete.section.section_id
+      });
     }
   };
 
@@ -597,11 +635,18 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
     compliance_requirements?: string[]
   ) => {
     setCurrentSectionIndex(sectionIndex);
-    setQuestionAsked(true);
     localStorage.setItem("questionAsked", "true");
-    setStartTime(Date.now());
-    setElapsedTime(0);
     setApiChoices([]);
+
+    posthog.capture("question_sent", {
+      sectionIndex,
+      choice,
+      broadness,
+      inputText,
+      backgroundInfo,
+      datasets: sharedState.selectedFolders,
+      bidId: sharedState.object_id
+    });
 
     console.log("question");
     console.log(choice);
@@ -651,6 +696,12 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       );
 
       console.log("Received response:", result.data);
+      posthog.capture("chatbot_response_received", {
+        sectionIndex,
+        bidId: sharedState.object_id,
+        responseLength: result?.data?.length || 0,
+        choice
+      });
 
       if (choice === "3a") {
         let choicesArray = [];
@@ -679,11 +730,16 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       }
     } catch (error) {
       console.error("Error sending question:", error);
+      posthog.capture("chatbot_response_failed", {
+        sectionIndex,
+        bidId: sharedState.object_id,
+        choice,
+        errorMessage: error.message
+      });
       throw error;
     } finally {
       setIsLoading(false);
       setIsPreviewLoading(false);
-      setStartTime(0);
     }
   };
 
@@ -762,8 +818,6 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
 
   const submitSelections = async () => {
     setIsLoading(true);
-    setStartTime(Date.now());
-    setElapsedTime(0);
     try {
       console.log("Starting submitSelections with choices:", selectedChoices);
 
@@ -815,7 +869,6 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       toast.error("Error generating responses");
     } finally {
       setIsLoading(false);
-      setStartTime(0);
     }
   };
 
@@ -836,6 +889,12 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
         const newOutline = [...prevState.outline];
         const [movedItem] = newOutline.splice(oldIndex, 1);
         newOutline.splice(newIndex, 0, movedItem);
+
+        posthog.capture("section_reordered", {
+          movedSectionId: active.id,
+          newPosition: over.id,
+          bidId: object_id
+        });
 
         return {
           ...prevState,
@@ -902,6 +961,13 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       // Skip if no email is provided
       if (!email) {
         handleSectionChange(index, "answerer", username);
+
+        posthog.capture("answerer_selection_failed", {
+          reason: "No email provided",
+          answerer: username,
+          sectionId: section.section_id
+        });
+
         return;
       }
 
@@ -909,6 +975,12 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       const success = await handleSectionChange(index, "answerer", username);
 
       if (success) {
+        posthog.capture("answerer_assigned", {
+          answerer: username,
+          sectionId: section.section_id,
+          bidId: object_id
+        });
+
         // After successfully setting the answerer, create a task for them
         try {
           const taskData = {
@@ -974,6 +1046,13 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       // Skip if no email is provided
       if (!email) {
         handleSectionChange(index, "reviewer", username);
+
+        posthog.capture("reviewer_selection_failed", {
+          reviewer: username,
+          sectionId: section.section_id,
+          bidId: object_id
+        });
+
         return;
       }
 
@@ -981,6 +1060,12 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
       const success = await handleSectionChange(index, "reviewer", username);
 
       if (success) {
+        posthog.capture("reviewer_assigned", {
+          reviewer: username,
+          sectionId: section.section_id,
+          bidId: object_id
+        });
+
         // After successfully setting the reviewer, create a task for them
         try {
           const taskData = {
@@ -1126,6 +1211,12 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
                   // Set a new timeout to update the shared state after 3 seconds of inactivity
                   const timeoutId = setTimeout(() => {
                     handleSectionChange(index, "word_count", value);
+
+                    posthog.capture("word_count_updated", {
+                      sectionId: section.section_id,
+                      newWordCount: value,
+                      bidId: object_id
+                    });
                   }, 3000);
 
                   // Store the timeout ID in the ref
@@ -1138,6 +1229,11 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
                   clearTimeout(wordCountTimeoutRef.current);
                   wordCountTimeoutRef.current = null;
                   handleSectionChange(index, "word_count", wordCount);
+                  posthog.capture("word_count_updated", {
+                    sectionId: section.section_id,
+                    newWordCount: wordCount,
+                    bidId: object_id
+                  });
                 }
               }}
             />
@@ -1330,3 +1426,4 @@ const ProposalPlan = ({ openTask, taskToOpen, sectionIndex }) => {
   );
 };
 export default ProposalPlan;
+

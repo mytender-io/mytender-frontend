@@ -22,6 +22,7 @@ import wordpaneImage from "../resources/images/wordpanescreenshot.png";
 import Confetti from "react-confetti";
 import FastIcon from "@/components/icons/FastIcon";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import posthog from "posthog-js";
 
 interface GenerateProposalModalProps {
   bid_id: string;
@@ -127,6 +128,11 @@ const GenerateProposalModal = ({
   };
 
   const generateProposal = async () => {
+    posthog.capture("generating_proposal_started", {
+      bid_id,
+      selected_folders: sharedState.selectedFolders
+    });
+
     try {
       setIsGeneratingProposal(true);
       startProgressBar();
@@ -135,8 +141,6 @@ const GenerateProposalModal = ({
       const datasets = Array.isArray(sharedState.selectedFolders)
         ? sharedState.selectedFolders
         : ["default"];
-
-      console.log("Using datasets:", datasets);
 
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_proposal`,
@@ -158,8 +162,19 @@ const GenerateProposalModal = ({
 
       setProgress(100);
       setCurrentStep(2); // Move to success step
+
+      posthog.capture("generating_proposal_succeeded", {
+        bid_id,
+        selected_folders: sharedState.selectedFolders,
+        section_id: response.data.section_id
+      });
     } catch (err) {
       console.error("Error generating proposal:", err);
+      posthog.capture("generating_proposal_failed", {
+        bid_id,
+        selected_folders: sharedState.selectedFolders,
+        error: err.message || "Failed to generate proposal"
+      });
     } finally {
       if (progressInterval.current) {
         clearInterval(progressInterval.current);

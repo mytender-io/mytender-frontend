@@ -5,6 +5,7 @@ import { useSignIn } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import posthog from "posthog-js";
+import { USERS_TO_EXCLUDE_IN_POSTHOG } from "@/constants/posthogUsers";
 
 const useAuthSignIn = () => {
   const signIn = useSignIn();
@@ -50,11 +51,17 @@ const useAuthSignIn = () => {
 
         //localStorage.clear();
 
-        posthog.identify(res.data.email);
-        posthog.capture("user_active", {
-          distinct_id: res.data.email,
-          timestamp: new Date().toISOString()
-        });
+        if (!USERS_TO_EXCLUDE_IN_POSTHOG.includes(res.data.email)) {
+          posthog.identify(res.data.email, {
+            email: res.data.email
+          });
+          posthog.capture("user_active", {
+            distinct_id: res.data.email,
+            timestamp: new Date().toISOString()
+          });
+        } else {
+          posthog.opt_out_capturing();
+        }
 
         return { success: true, message: "Log in successful!" };
       } else {

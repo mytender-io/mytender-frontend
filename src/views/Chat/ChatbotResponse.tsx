@@ -19,6 +19,7 @@ import { TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import ProfilePhoto from "@/layout/ProfilePhoto";
+import posthog from "posthog-js";
 
 // Create a global state for chat processing
 const globalChatState = {
@@ -98,8 +99,6 @@ const ChatbotResponse = () => {
   const [inputValue, setInputValue] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
-  const [questionAsked, setQuestionAsked] = useState(false);
-  const [startTime, setStartTime] = useState(null);
 
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -148,6 +147,10 @@ const ChatbotResponse = () => {
       sendQuestion(inputValue);
       setInputValue("");
     }
+
+    posthog.capture("message_sent_to_chat", {
+      message: inputValue
+    });
   };
 
   const handleClearMessages = () => {
@@ -238,21 +241,15 @@ const ChatbotResponse = () => {
     }
   }, [messages]);
 
-  const sendQuestion = async (question) => {
+  const sendQuestion = async (question: string) => {
     handleGAEvent("Chatbot", "Submit Question", "Submit Button");
-    setQuestionAsked(true);
     setIsLoading(true);
-    setStartTime(Date.now());
 
     // Add a temporary bot message with loading dots
     setMessages((prevMessages) => [
       ...prevMessages,
       { type: "bot", text: "loading" }
     ]);
-
-    const backgroundInfo = messages
-      .map((msg) => `${msg.type}: ${msg.text}`)
-      .join("\n");
 
     // Add to background processing queue
     globalChatState.addToQueue(question, tokenRef.current, (response) => {
@@ -303,6 +300,10 @@ const ChatbotResponse = () => {
       } else if (feedbackType === "negative") {
         toast.error("Received bad response");
       }
+
+      posthog.capture("user_feedback_handled", {
+        feedback_type: feedbackType
+      });
 
       // If clicking different button, switch to it
       return {
@@ -542,3 +543,4 @@ const ChatbotResponse = () => {
 // Export the globalChatState to be used elsewhere in the app
 export { globalChatState };
 export default withAuth(ChatbotResponse);
+
