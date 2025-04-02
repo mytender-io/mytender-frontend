@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Logo from "../resources/images/mytender.io_badge.png";
-import { ChevronLeft, ChevronRight, HomeIcon, UserRound } from "lucide-react";
+import { ChevronLeft, ChevronRight, HomeIcon, UserRound, MessageCircle } from "lucide-react";
 // import HomeIcon from "@/components/icons/HomeIcon";
 import DashboardIcon from "@/components/icons/DashboardIcon";
 import ContentLibraryIcon from "@/components/icons/ContentLibraryIcon";
@@ -315,6 +315,23 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               {!isCollapsed && (
                 <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
                   How To
+                </span>
+              )}
+            </Link>
+            <Link
+              to="https://discord.gg/rzBmsWjR"
+              className="flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3 bg-transparent"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MessageCircle
+                className="text-gray-hint_text min-w-5 min-h-5"
+                width={20}
+                height={20}
+              />
+              {!isCollapsed && (
+                <span className="text-sm text-gray-hint_text font-medium whitespace-nowrap">
+                  Community Chat
                 </span>
               )}
             </Link>
