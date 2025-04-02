@@ -17,6 +17,7 @@ import {
   TooltipProvider
 } from "@/components/ui/tooltip";
 import DataTransferHorizontalIcon from "@/components/icons/DataTransferHorizontalIcon";
+import { formatResponse } from "@/utils/formatResponse";
 
 const ProposalPreviewSidepane = ({
   bid_id,
@@ -68,6 +69,7 @@ const ProposalPreviewSidepane = ({
 
   const messagesContainerRef = useRef(null);
   const inputRef = useRef(null);
+  const typingWorkerRef = useRef(null);
 
   // Focus the input field when the sidepane opens
   useEffect(() => {
@@ -136,34 +138,6 @@ const ProposalPreviewSidepane = ({
     localStorage.removeItem("previewSidepaneMessages");
   };
 
-  const formatResponse = (response) => {
-    // Handle numbered lists
-    response = response.replace(/^\d+\.\s(.+)$/gm, "<li>$1</li>");
-    if (response.includes("<li>")) {
-      response = `<ol>${response}</ol>`;
-    }
-
-    // Handle bullet points
-    response = response.replace(/^[-•]\s(.+)$/gm, "<li>$1</li>");
-    if (response.includes("<li>") && !response.includes("<ol>")) {
-      response = `<ul>${response}</ul>`;
-    }
-
-    // Handle bold text
-    response = response.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-
-    // Handle italic text
-    response = response.replace(/\*(.*?)\*/g, "<em>$1</em>");
-
-    // Replace any newlines with a single <br>
-    response = response.replace(/\n/g, "<br>");
-
-    response = response.replace(/(<br>)\s*(<br>)/g, "<br><br>");
-    response = response.replace(/(<\/li>)(<br>)+/g, "</li><br>");
-
-    return response;
-  };
-
   // Handle scrolling
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -176,31 +150,87 @@ const ProposalPreviewSidepane = ({
   const typeMessage = (message) => {
     setIsTyping(true);
     setTypingText("");
-    let index = 0;
 
-    const typeChar = () => {
-      if (index < message.length) {
-        setTypingText((prev) => {
-          const newText = prev + message[index];
-          // Scroll down every time a new line character is added
+    // Store animation state in localStorage for cross-tab persistence
+    const animationId = `preview_typing_${Date.now()}`;
+    localStorage.setItem(
+      animationId,
+      JSON.stringify({
+        message,
+        progress: 0,
+        isActive: true,
+        timestamp: Date.now()
+      })
+    );
+
+    // Batch size - characters to add per animation frame
+    const batchSize = 5;
+
+    const typeChars = () => {
+      // Get current state from localStorage
+      const animState = JSON.parse(localStorage.getItem(animationId) || "{}");
+      if (!animState.isActive) {
+        return; // Animation was stopped
+      }
+
+      const { message, progress } = animState;
+
+      if (progress < message.length) {
+        // Calculate how many characters to add in this frame (batch)
+        const charsToAdd = Math.min(batchSize, message.length - progress);
+        const newText = message.substring(0, progress + charsToAdd);
+
+        // Update UI
+        setTypingText(newText);
+
+        // Check if we need to scroll (for line breaks)
+        for (let i = progress; i < progress + charsToAdd; i++) {
           if (
-            message[index] === "\n" ||
-            (message[index] === "<" &&
-              message.substring(index, index + 4) === "<br>")
+            message[i] === "\n" ||
+            (message[i] === "<" && message.substring(i, i + 4) === "<br>")
           ) {
             setTimeout(scrollToBottom, 10);
+            break;
           }
-          return newText;
-        });
-        index++;
-        setTimeout(typeChar, 1);
+        }
+
+        // Update localStorage state
+        localStorage.setItem(
+          animationId,
+          JSON.stringify({
+            message,
+            progress: progress + charsToAdd,
+            isActive: true,
+            timestamp: Date.now()
+          })
+        );
+
+        // Continue animation with requestAnimationFrame
+        // This will continue even when tab is not active
+        typingWorkerRef.current = requestAnimationFrame(typeChars);
       } else {
+        // Animation complete
         setIsTyping(false);
         scrollToBottom(); // Final scroll at the end of typing
+        localStorage.removeItem(animationId);
       }
     };
 
-    typeChar();
+    // Start the animation
+    typingWorkerRef.current = requestAnimationFrame(typeChars);
+
+    // Return cleanup function (not used here but good practice)
+    return () => {
+      if (typingWorkerRef.current) {
+        cancelAnimationFrame(typingWorkerRef.current);
+        localStorage.setItem(
+          animationId,
+          JSON.stringify({
+            isActive: false
+          })
+        );
+      }
+    };
   };
 
   // Scroll on new messages

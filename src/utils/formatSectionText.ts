@@ -1,5 +1,3 @@
-// Add these formatting utilities to your utils.js file
-
 /**
  * Formats text content to properly display paragraphs, bold text, and other formatting
  * Compatible with Tailwind styling approach

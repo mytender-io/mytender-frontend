@@ -15,12 +15,6 @@ export const customLocale: Locale = {
   }
 };
 
-export const getSectionHeading = (heading: string) => {
-  const match = heading.match(/^[\d.]+/);
-  const sectionNumber = match ? match[0] : "";
-  return sectionNumber;
-};
-
 export const calculateWordCount = (htmlContent: string): number => {
   if (!htmlContent) return 0;
 

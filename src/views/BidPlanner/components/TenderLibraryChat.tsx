@@ -3,7 +3,7 @@ import { useAuthUser } from "react-auth-kit";
 import handleGAEvent from "../../../utils/handleGAEvent";
 import { HTTP_PREFIX, API_URL } from "../../../helper/Constants";
 import axios from "axios";
-import { Send, Trash2, MessageSquare } from "lucide-react";
+import { Send, Trash2, MessageSquare, Square } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
@@ -22,16 +22,32 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import ProfilePhoto from "@/layout/ProfilePhoto";
+import { formatResponse } from "@/utils/formatResponse";
+
+interface TenderLibraryChatDialogProps {
+  bid_id: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+interface Message {
+  type: "user" | "bot";
+  text: string;
+}
+
+interface FeedbackState {
+  [key: number]: string;
+}
 
 const TenderLibraryChatDialog = ({
   bid_id,
   open: externalOpen,
   onOpenChange: externalOnOpenChange
-}) => {
+}: TenderLibraryChatDialogProps) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
-  const tokenRef = useRef(auth?.token || "default");
-  const [messageFeedback, setMessageFeedback] = useState({});
+  const tokenRef = useRef<string>(auth?.token || "default");
+  const [messageFeedback, setMessageFeedback] = useState<FeedbackState>({});
 
   // Use internal state if external control props aren't provided
   const [internalOpen, setInternalOpen] = useState(false);
@@ -42,7 +58,7 @@ const TenderLibraryChatDialog = ({
   const open = isControlled ? externalOpen : internalOpen;
   const setOpen = isControlled ? externalOnOpenChange : setInternalOpen;
 
-  const [messages, setMessages] = useState(() => {
+  const [messages, setMessages] = useState<Message[]>(() => {
     const savedMessages = localStorage.getItem("tenderLibChatMessages");
 
     if (savedMessages) {
@@ -69,14 +85,17 @@ const TenderLibraryChatDialog = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
-  const [startTime, setStartTime] = useState(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
 
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
   // Add this ref for the messages container
-  const messagesContainerRef = useRef(null);
-  const inputRef = useRef(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  // Add this ref for the typing worker
+  const typingWorkerRef = useRef<number | null>(null);
+  const fullResponseRef = useRef<string>(""); // Store the complete response for instant display when stopped
 
   // Focus the input field when the dialog opens
   useEffect(() => {
@@ -88,6 +107,12 @@ const TenderLibraryChatDialog = ({
   }, [open]);
 
   const handleSendMessage = () => {
+    if (isTyping) {
+      // If typing is in progress, stop it
+      stopTyping();
+      return;
+    }
+
     if (inputValue.trim() !== "") {
       setMessages([...messages, { type: "user", text: inputValue }]);
       sendQuestion(inputValue);
@@ -95,9 +120,13 @@ const TenderLibraryChatDialog = ({
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !isLoading) {
-      handleSendMessage();
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      if (isTyping) {
+        stopTyping();
+      } else if (!isLoading) {
+        handleSendMessage();
+      }
     }
   };
 
@@ -111,35 +140,18 @@ const TenderLibraryChatDialog = ({
     localStorage.removeItem("tenderLibChatMessages");
   };
 
-  const formatResponse = (response) => {
-    // Handle numbered lists
-    response = response.replace(/^\d+\.\s(.+)$/gm, "<li>$1</li>");
-    if (response.includes("<li>")) {
-      response = `<ol>${response}</ol>`;
+  // Modify useEffect to scroll on new messages and when typing updates
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, typingText]);
+
+  // Consistently scroll when dialog opens
+  useEffect(() => {
+    if (open) {
+      setTimeout(scrollToBottom, 100); // Small delay to ensure dialog is fully rendered
     }
+  }, [open]);
 
-    // Handle bullet points
-    response = response.replace(/^[-•]\s(.+)$/gm, "<li>$1</li>");
-    if (response.includes("<li>") && !response.includes("<ol>")) {
-      response = `<ul>${response}</ul>`;
-    }
-
-    // Handle bold text
-    response = response.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-
-    // Handle italic text
-    response = response.replace(/\*(.*?)\*/g, "<em>$1</em>");
-
-    // Replace any newlines with a single <br>
-    response = response.replace(/\n/g, "<br>");
-
-    response = response.replace(/(<br>)\s*(<br>)/g, "<br><br>");
-    response = response.replace(/(<\/li>)(<br>)+/g, "</li><br>");
-
-    return response;
-  };
-
-  // Add this function to handle scrolling
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
@@ -147,60 +159,74 @@ const TenderLibraryChatDialog = ({
     }
   };
 
-  // Modify the typeMessage function to not force scroll while typing
-  const typeMessage = (message) => {
+  // Add a function to stop the typing animation and show the full response immediately
+  const stopTyping = () => {
+    if (typingWorkerRef.current) {
+      cancelAnimationFrame(typingWorkerRef.current);
+      typingWorkerRef.current = null;
+    }
+
+    // Only keep what has been typed so far
+    setMessages((prevMessages) => {
+      const lastMessage = prevMessages[prevMessages.length - 1];
+      if (lastMessage.type === "bot") {
+        return [
+          ...prevMessages.slice(0, -1),
+          { ...lastMessage, text: typingText }
+        ];
+      }
+      return prevMessages;
+    });
+
+    setIsTyping(false);
+    fullResponseRef.current = ""; // Clear the stored response
+    scrollToBottom();
+  };
+
+  // Modify the typeMessage function to use batch processing for faster typing
+  const typeMessage = (message: string) => {
     setIsTyping(true);
     setTypingText("");
-    let index = 0;
+    fullResponseRef.current = message; // Store the full response
 
-    const typeChar = () => {
-      if (index < message.length) {
-        setTypingText((prev) => prev + message[index]);
-        index++;
-        setTimeout(typeChar, 1);
+    // Batch size - characters to add per animation frame
+    const batchSize = 5;
+    let progress = 0;
+
+    const typeChars = () => {
+      if (progress < message.length) {
+        // Calculate how many characters to add in this frame (batch)
+        const charsToAdd = Math.min(batchSize, message.length - progress);
+        const newText = message.substring(0, progress + charsToAdd);
+
+        // Update UI
+        setTypingText(newText);
+
+        // Update progress
+        progress += charsToAdd;
+
+        // Continue animation with requestAnimationFrame for better performance
+        typingWorkerRef.current = requestAnimationFrame(typeChars);
       } else {
+        // Animation complete
         setIsTyping(false);
+        fullResponseRef.current = ""; // Clear the stored response
         scrollToBottom(); // Only scroll at the end of typing
       }
     };
 
-    typeChar();
+    // Start the animation
+    typingWorkerRef.current = requestAnimationFrame(typeChars);
+
+    // Return cleanup function
+    return () => {
+      if (typingWorkerRef.current) {
+        cancelAnimationFrame(typingWorkerRef.current);
+      }
+    };
   };
 
-  // Modify useEffect to only scroll on new messages when appropriate
-  useEffect(() => {
-    // Only auto-scroll if user is already at the bottom
-    if (messagesContainerRef.current) {
-      const container = messagesContainerRef.current;
-      const isAtBottom =
-        container.scrollHeight - container.scrollTop <=
-        container.clientHeight + 100;
-
-      if (isAtBottom) {
-        scrollToBottom();
-      }
-    }
-  }, [messages]);
-
-  // Scroll when dialog opens, but only if at bottom
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        if (messagesContainerRef.current) {
-          const container = messagesContainerRef.current;
-          const isAtBottom =
-            container.scrollHeight - container.scrollTop <=
-            container.clientHeight + 100;
-
-          if (isAtBottom) {
-            scrollToBottom();
-          }
-        }
-      }, 100); // Small delay to ensure dialog is fully rendered
-    }
-  }, [open]);
-
-  const sendQuestion = async (question) => {
+  const sendQuestion = async (question: string) => {
     handleGAEvent("Chatbot", "Submit Question", "Submit Button");
     setQuestionAsked(true);
     setIsLoading(true);
@@ -259,11 +285,11 @@ const TenderLibraryChatDialog = ({
     setIsLoading(false);
   };
 
-  const handleCopyText = (text) => {
+  const handleCopyText = (text: string) => {
     navigator.clipboard.writeText(text);
   };
 
-  const handleFeedback = (messageIndex, feedbackType) => {
+  const handleFeedback = (messageIndex: number, feedbackType: string) => {
     setMessageFeedback((prev) => {
       const currentFeedback = prev[messageIndex];
 
@@ -447,11 +473,11 @@ const TenderLibraryChatDialog = ({
             </TooltipProvider>
             <Button
               onClick={handleSendMessage}
-              disabled={isLoading}
+              disabled={isLoading && !isTyping}
               size="icon"
-              className="h-6 w-6 rounded-full pr-[1px] pt-[1px]"
+              className="h-6 w-6 rounded-full"
             >
-              <Send className="h-6 w-6" />
+              {isTyping ? <Square className="fill-current" /> : <Send />}
             </Button>
           </div>
         </div>
