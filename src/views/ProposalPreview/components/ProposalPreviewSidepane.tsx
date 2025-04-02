@@ -147,7 +147,7 @@ const ProposalPreviewSidepane = ({
   };
 
   // Type message animation
-  const typeMessage = (message) => {
+  const typeMessage = (message: string) => {
     setIsTyping(true);
     setTypingText("");
 
@@ -498,7 +498,6 @@ const ProposalPreviewSidepane = ({
       ]);
     }
     setIsLoading(false);
-
     setActionType("default");
     setActiveChatPrompt("library");
   };
@@ -546,6 +545,7 @@ const ProposalPreviewSidepane = ({
         ...messagesWithoutLoading,
         { type: "evidence", text: promptResult }
       ]);
+      typeMessage(promptResult);
     }
   }, [isLoadingEvidence, promptResult]);
 

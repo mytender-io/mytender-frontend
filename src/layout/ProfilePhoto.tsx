@@ -121,7 +121,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
       }
     };
 
-    if (profile.userType === "owner") {
+    if (profile.userType === "owner" && (showTeamMembers || answererId)) {
       fetchOrganizationUsers();
     }
   }, [tokenRef, profile]);

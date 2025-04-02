@@ -427,7 +427,7 @@ const BidManagement: React.FC = () => {
           }
         );
 
-        console.log(response.data.timestamp);
+        // console.log(response.data.timestamp);
         const serverTimestamp = response.data.timestamp;
         const localTimestamp = sharedState.timestamp;
 
@@ -446,8 +446,8 @@ const BidManagement: React.FC = () => {
           const localTime = new Date(localTimestamp).getTime();
 
           // Add more detailed logging
-          console.log("Server timestamp:", serverTimestamp);
-          console.log("Local timestamp:", localTimestamp);
+          // console.log("Server timestamp:", serverTimestamp);
+          // console.log("Local timestamp:", localTimestamp);
 
           // If server version is newer
           if (serverTime > localTime) {
@@ -465,7 +465,7 @@ const BidManagement: React.FC = () => {
               );
 
               const updatedBid = bidResponse.data.bid;
-              console.log("updated bid time (ms):", updatedBid.timestamp);
+              // console.log("updated bid time (ms):", updatedBid.timestamp);
 
               // Create a promise to track state update completion
               const stateUpdateComplete = new Promise((resolve) => {
