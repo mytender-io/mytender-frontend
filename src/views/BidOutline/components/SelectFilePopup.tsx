@@ -7,6 +7,7 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import SelectFile from "@/components/SelectFile";
+import { toast } from "react-toastify";
 
 const SelectFilePopup = ({
   onSaveSelectedFiles,
@@ -25,6 +26,9 @@ const SelectFilePopup = ({
   // Track both the file IDs and full metadata
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectedFilesMetadata, setSelectedFilesMetadata] = useState([]);
+
+  // Define maximum number of allowed files
+  const MAX_FILES = 3;
 
   // This flag helps prevent circular updates
   const processingUpdateRef = useRef(false);
@@ -46,14 +50,34 @@ const SelectFilePopup = ({
       files
     );
 
-    // Store the full metadata objects
-    setSelectedFilesMetadata(files);
+    // Check if the user is trying to select more than MAX_FILES
+    if (files.length > MAX_FILES) {
+      // Show toast notification about the file limit
+      toast.warning(
+        `You can select a maximum of ${MAX_FILES} documents. Only the first ${MAX_FILES} will be used.`
+      );
 
-    // Extract just the IDs to match SelectFile's expectations
-    const fileIds = files.map((file) => file.unique_id);
-    console.log("SelectFilePopup - Extracted file IDs:", fileIds);
+      // Limit to first MAX_FILES
+      const limitedFiles = files.slice(0, MAX_FILES);
 
-    setSelectedFiles(fileIds);
+      // Store the limited metadata objects
+      setSelectedFilesMetadata(limitedFiles);
+
+      // Extract just the IDs to match SelectFile's expectations
+      const fileIds = limitedFiles.map((file) => file.unique_id);
+      console.log("SelectFilePopup - Limited to first 3 files:", fileIds);
+
+      setSelectedFiles(fileIds);
+    } else {
+      // Store the full metadata objects
+      setSelectedFilesMetadata(files);
+
+      // Extract just the IDs to match SelectFile's expectations
+      const fileIds = files.map((file) => file.unique_id);
+      console.log("SelectFilePopup - Extracted file IDs:", fileIds);
+
+      setSelectedFiles(fileIds);
+    }
   };
 
   const handleSave = () => {
@@ -115,6 +139,9 @@ const SelectFilePopup = ({
           <DialogHeader>
             <DialogTitle className="texta-lg font-semibold">
               Highlight specific documents you want the answer to focus on
+              <span className="text-sm text-gray-500 font-normal ml-2">
+                (Max: {MAX_FILES})
+              </span>
             </DialogTitle>
           </DialogHeader>
           <div className="p-4">

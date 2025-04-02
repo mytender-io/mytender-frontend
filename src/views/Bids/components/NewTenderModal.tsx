@@ -25,6 +25,7 @@ import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal";
 interface NewTenderModalProps {
   show: boolean;
   onHide: () => void;
+  onSuccess: () => void;
   existingBids: Array<{ bid_title: string }>;
   fetchBids: () => void;
   isGeneratingOutline: boolean;
@@ -38,6 +39,7 @@ type Step = "details" | "documents" | "content" | "questions";
 const NewTenderModal: React.FC<NewTenderModalProps> = ({
   show,
   onHide,
+  onSuccess,
   existingBids,
   fetchBids,
   isGeneratingOutline,
@@ -253,7 +255,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       // Navigate after updating shared state
       navigate("/bids");
       resetForm();
-      onHide();
+      onSuccess();
     } catch (err) {
       console.error("Full error:", err.response?.data);
       handleError(err);

@@ -214,6 +214,15 @@ const Bids = () => {
   ];
 
   useEffect(() => {
+    // First apply the search term filter
+    const searchFiltered = filterBids(bids, searchTerm);
+
+    // Then filter out any incomplete bids
+    const completeBids = searchFiltered.filter(
+      (bid) => !isRecentlyCreatedWithEmptyThemes(bid)
+    );
+
+    setFilteredBids(completeBids);
     setFilteredBids(filterBids(bids, searchTerm));
     posthog.capture("search_bids", { search_term: searchTerm });
   }, [bids, searchTerm]);
@@ -450,6 +459,11 @@ const Bids = () => {
     setIsGeneratingOutline(false);
   };
 
+  const handleSuccess = () => {
+    handleModalClose();
+    fetchBids();
+  };
+
   const SkeletonRow = () => (
     <TableRow>
       <TableCell className="px-4">
@@ -548,28 +562,17 @@ const Bids = () => {
                         .map((_, index) => <SkeletonRow key={index} />)
                     ) : currentBids.length > 0 ? (
                       currentBids.map((bid) => {
-                        const isDisabled =
-                          isRecentlyCreatedWithEmptyThemes(bid);
                         return (
-                          <TableRow
-                            key={bid._id}
-                            className={isDisabled ? "opacity-50" : ""}
-                          >
+                          <TableRow key={bid._id}>
                             <TableCell className="px-4 group">
-                              {isDisabled ? (
-                                <span className="block truncate w-full text-gray-400 cursor-not-allowed">
-                                  {bid.bid_title} (Creating...)
-                                </span>
-                              ) : (
-                                <Link
-                                  to={`/bid?id=${bid._id}`}
-                                  state={{ bid: bid, fromBidsTable: true }}
-                                  onClick={() => navigateToChatbot(bid)}
-                                  className="block truncate w-full text-gray-hint_text no-underline group-hover:text-orange group-hover:font-bold transition-colors duration-200"
-                                >
-                                  {bid.bid_title}
-                                </Link>
-                              )}
+                              <Link
+                                to={`/bid?id=${bid._id}`}
+                                state={{ bid: bid, fromBidsTable: true }}
+                                onClick={() => navigateToChatbot(bid)}
+                                className="block truncate w-full text-gray-hint_text no-underline group-hover:text-orange group-hover:font-bold transition-colors duration-200"
+                              >
+                                {bid.bid_title}
+                              </Link>
                             </TableCell>
                             <TableCell className="px-4">
                               {bid.timestamp
@@ -594,7 +597,6 @@ const Bids = () => {
                                 onChange={(value) => {
                                   updateBidStatus(bid._id, value);
                                 }}
-                                disabled={isDisabled}
                               />
                             </TableCell>
                             <TableCell className="px-4">
@@ -603,7 +605,6 @@ const Bids = () => {
                                 onChange={(value) => {
                                   updateBidQualificationResult(bid._id, value);
                                 }}
-                                disabled={isDisabled}
                               />
                             </TableCell>
                             <TableCell className="w-[100px] text-right px-4">
@@ -642,6 +643,7 @@ const Bids = () => {
         <NewTenderModal
           show={showModal}
           onHide={handleModalClose}
+          onSuccess={handleSuccess}
           existingBids={bids}
           fetchBids={fetchBids}
           isGeneratingOutline={isGeneratingOutline}

@@ -36,7 +36,6 @@ import TextSelectionMenu from "./components/TextSelectionMenu";
 import ProposalToolbar from "./components/ProposalToolbar";
 import MarkReviewReadyButton from "./components/MarkReviewReadyButton";
 import RewriteInputBar from "./components/RewriteInputBar";
-// import { formatSectionText } from "@/utils/formatSectionText";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -77,7 +76,7 @@ const ProposalPreview = () => {
 
   // Add a ref for the toolbar div
   const toolbarRef = useRef<HTMLDivElement>(null);
-  const [toolbarYPosition, setToolbarYPosition] = useState(0);
+  const [toolbarYPosition, setToolbarYPosition] = useState(58);
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
@@ -589,9 +588,7 @@ const ProposalPreview = () => {
         sidePane && sidePane.contains(event.target as Node);
 
       // Also check if we're clicking inside the right sidebar where the sidepane lives
-      const rightSidebar = document.querySelector(
-        ".max-h-\\[calc\\(100vh-66px\\)\\]"
-      );
+      const rightSidebar = document.querySelector(".proposal-preview-sidepane");
       const isInsideRightSidebar =
         rightSidebar && rightSidebar.contains(event.target as Node);
 
@@ -1114,7 +1111,7 @@ const ProposalPreview = () => {
               {sidepaneOpen && (
                 <div
                   className={cn(
-                    "w-[450px] overflow-y-auto z-50 sticky -top-4 right-0"
+                    "proposal-preview-sidepane w-[450px] overflow-y-auto z-50 sticky -top-4 right-0"
                   )}
                   style={{
                     maxHeight: `calc(100vh - ${241 - (234 - toolbarYPosition)}px)`
