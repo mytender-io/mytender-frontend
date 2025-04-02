@@ -22,6 +22,7 @@ import ThumbupIcon from "@/components/icons/ThumbupIcon";
 import ThumbdownIcon from "@/components/icons/ThumbdownIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 import ProfilePhoto from "@/layout/ProfilePhoto";
+import posthog from "posthog-js";
 import { formatResponse } from "@/utils/formatResponse";
 
 // Create a global state for chat processing
@@ -102,8 +103,6 @@ const ChatbotResponse = () => {
   const [inputValue, setInputValue] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
-  const [questionAsked, setQuestionAsked] = useState(false);
-  const [startTime, setStartTime] = useState(null);
 
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -155,6 +154,10 @@ const ChatbotResponse = () => {
       sendQuestion(inputValue);
       setInputValue("");
     }
+
+    posthog.capture("message_sent_to_chat", {
+      message: inputValue
+    });
   };
 
   const handleClearMessages = () => {
@@ -272,11 +275,9 @@ const ChatbotResponse = () => {
     }
   }, [messages]);
 
-  const sendQuestion = async (question) => {
+  const sendQuestion = async (question: string) => {
     handleGAEvent("Chatbot", "Submit Question", "Submit Button");
-    setQuestionAsked(true);
     setIsLoading(true);
-    setStartTime(Date.now());
 
     // Add a temporary bot message with loading dots
     setMessages((prevMessages) => [
@@ -333,6 +334,10 @@ const ChatbotResponse = () => {
       } else if (feedbackType === "negative") {
         toast.error("Received bad response");
       }
+
+      posthog.capture("user_feedback_handled", {
+        feedback_type: feedbackType
+      });
 
       // If clicking different button, switch to it
       return {
@@ -562,3 +567,4 @@ const ChatbotResponse = () => {
 // Export the globalChatState to be used elsewhere in the app
 export { globalChatState };
 export default withAuth(ChatbotResponse);
+

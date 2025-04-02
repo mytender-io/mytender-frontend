@@ -36,7 +36,6 @@ import TextSelectionMenu from "./components/TextSelectionMenu";
 import ProposalToolbar from "./components/ProposalToolbar";
 import MarkReviewReadyButton from "./components/MarkReviewReadyButton";
 import RewriteInputBar from "./components/RewriteInputBar";
-// import { formatSectionText } from "@/utils/formatSectionText";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -165,7 +164,8 @@ const ProposalPreview = () => {
   };
 
   const handleRewriteClick = (index: number) => {
-    // Toggle the rewrite section if clicking on the same section
+    posthog.capture("section_rewrite_triggered", { sectionIndex: index });
+
     if (rewritingSectionIndex === index) {
       setRewritingSectionIndex(null);
     } else {
@@ -204,6 +204,10 @@ const ProposalPreview = () => {
       });
 
       setShowSelectionMenu(true);
+
+      posthog.capture("text_selected", {
+        selected_range: range.cloneRange()
+      });
     } else {
       setShowSelectionMenu(false);
       setSelectedRange(null);
@@ -247,16 +251,18 @@ const ProposalPreview = () => {
 
   const handleContentChange = (index: number, newContent: string) => {
     setSharedState((prevState) => {
-      // Create a shallow copy of the outline
+      posthog.capture("section_content_edited", {
+        sectionIndex: index,
+        contentLength: newContent.length
+      });
+
       const newOutline = [...prevState.outline];
 
-      // Update only the specific section
       newOutline[index] = {
-        ...newOutline[index], // Keep all other properties
-        answer: newContent // Update only the answer field
+        ...newOutline[index],
+        answer: newContent
       };
 
-      // Return the new state with only the outline updated
       return {
         ...prevState,
         outline: newOutline
@@ -452,6 +458,7 @@ const ProposalPreview = () => {
           toast.error("Failed to copy section");
         });
         toast.success("Copied to clipboard");
+        posthog.capture("section_copied", { sectionIndex: index });
       }
     }
   };
@@ -1168,3 +1175,4 @@ const ProposalPreview = () => {
 };
 
 export default withAuth(ProposalPreview);
+

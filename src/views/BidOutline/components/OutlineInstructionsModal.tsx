@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "react-toastify";
+import posthog from "posthog-js";
 
 const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
   const getAuth = useAuthUser();
@@ -95,8 +96,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
     setSelectedFiles(files);
   };
 
-  const handleFolderSelection = (folders) => {
-    console.log("Folders selected in SelectFolder component:", folders);
+  const handleFolderSelection = (folders: string[]) => {
     setSelectedFolders(folders);
     setSharedState((prevState) => ({
       ...prevState,
@@ -120,9 +120,12 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
 
     setIsGeneratingOutline(true);
     startProgressBar();
-    console.log(bid_id);
-    console.log(sharedState.selectedFolders);
-    console.log(selectedFiles);
+
+    posthog.capture("generating_outline_started", {
+      bid_id,
+      selected_folders: sharedState.selectedFolders,
+      selected_files: selectedFiles
+    });
 
     const datasets = Array.isArray(sharedState.selectedFolders)
       ? sharedState.selectedFolders
@@ -145,12 +148,12 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
       );
       setCurrentStep(4);
 
-      console.log("outline final submit");
-      console.log(response.data.outline);
-      console.log(response.data.tender_summary);
-      console.log(response.data.evaluation_criteria);
-      console.log(response.data.pain_points);
-      console.log(response.data.differentiation_opportunities);
+      posthog.capture("generating_outline_succeeded", {
+        bid_id,
+        section_id: response.data.section_id,
+        selected_folders: sharedState.selectedFolders,
+        selected_files: selectedFiles
+      });
 
       setSharedState((prevState) => ({
         ...prevState,
@@ -165,7 +168,13 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
         differentiating_factors: response.data?.differentiating_factors || []
       }));
     } catch (err) {
-      console.error("Full error:", err.response?.data);
+      posthog.capture("generating_outline_failed", {
+        bid_id,
+        selected_folders: sharedState.selectedFolders,
+        selected_files: selectedFiles,
+        error: err.message || "Failed to generate outline"
+      });
+
       if (err.response?.status === 404) {
         toast.warning("No documents found in the tender library.");
       } else {
@@ -430,3 +439,4 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
 };
 
 export default OutlineInstructionsModal;
+

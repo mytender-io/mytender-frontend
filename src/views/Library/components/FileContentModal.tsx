@@ -7,8 +7,8 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { Spinner } from "@/components/ui/spinner";
+import posthog from "posthog-js";
 
 const FileContentModal = ({
   showModal,
@@ -29,10 +29,6 @@ const FileContentModal = ({
     setEditableContent(modalContent);
   }, [modalContent]);
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
   const handleSaveClick = () => {
     onSave(editableContent);
     setIsEditing(false);
@@ -45,7 +41,13 @@ const FileContentModal = ({
 
   const handleViewPdfClick = () => {
     onViewPdf(fileName, folderName);
-    setShowModal(false); // Close the FileContentModal
+
+    posthog.capture("view_pdf_file", {
+      file_name: fileName,
+      profile_name: folderName
+    });
+
+    setShowModal(false);
   };
 
   return (
@@ -90,3 +92,4 @@ const FileContentModal = ({
 };
 
 export default FileContentModal;
+

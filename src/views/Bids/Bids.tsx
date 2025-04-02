@@ -31,6 +31,7 @@ import { customLocale, cn } from "@/utils";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "react-toastify";
 import { useLoading } from "@/context/LoadingContext";
+import posthog from "posthog-js";
 interface Bid {
   _id: string;
   bid_title: string;
@@ -62,7 +63,6 @@ const Bids = () => {
   const [sortedBids, setSortedBids] = useState<Bid[]>([]);
   const [currentBids, setCurrentBids] = useState<Bid[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [bidName, setBidName] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [bidToDelete, setBidToDelete] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -97,6 +97,7 @@ const Bids = () => {
   // Modify the ViewToggle button click handler
   const handleViewChange = (view: "table" | "kanban") => {
     setViewType(view);
+    posthog.capture("view_change", { view_type: view });
   };
 
   const handlePageChange = (page: number) => {
@@ -129,14 +130,14 @@ const Bids = () => {
       if (isEmpty(aValue) && isEmpty(bValue)) return 0;
 
       let comparison = 0;
+      const dateA = new Date(aValue as string);
+      const dateB = new Date(bValue as string);
+      const isValidDateA = !isNaN(dateA.getTime());
+      const isValidDateB = !isNaN(dateB.getTime());
+
       switch (sortConfig.key) {
         case "timestamp":
         case "submission_deadline":
-          const dateA = new Date(aValue as string);
-          const dateB = new Date(bValue as string);
-          const isValidDateA = !isNaN(dateA.getTime());
-          const isValidDateB = !isNaN(dateB.getTime());
-
           if (!isValidDateA && isValidDateB) return 1;
           if (isValidDateA && !isValidDateB) return -1;
           if (!isValidDateA && !isValidDateB) return 0;
@@ -171,7 +172,8 @@ const Bids = () => {
       return (
         bid.bid_title?.toLowerCase().includes(lowercaseSearch) ||
         bid.client_name?.toLowerCase().includes(lowercaseSearch) ||
-        bid.value?.toLowerCase().includes(lowercaseSearch) ||
+        (typeof bid.value === "string" &&
+          bid.value?.toLowerCase().includes(lowercaseSearch)) ||
         bid.status?.toLowerCase().includes(lowercaseSearch) ||
         bid.bid_qualification_result?.toLowerCase().includes(lowercaseSearch)
       );
@@ -184,6 +186,8 @@ const Bids = () => {
       direction = "desc";
     }
     setSortConfig({ key, direction });
+
+    posthog.capture("sort_bids", { sort_key: key, sort_direction: direction });
   };
 
   const getSortIcon = (columnKey: keyof Bid): React.ReactElement => {
@@ -219,6 +223,8 @@ const Bids = () => {
     );
 
     setFilteredBids(completeBids);
+    setFilteredBids(filterBids(bids, searchTerm));
+    posthog.capture("search_bids", { search_term: searchTerm });
   }, [bids, searchTerm]);
 
   useEffect(() => {
@@ -242,6 +248,17 @@ const Bids = () => {
   }, [sortedBids, currentPage, pageSize]);
 
   const navigateToChatbot = (bid: Bid) => {
+    // Check if bid is disabled
+    if (isRecentlyCreatedWithEmptyThemes(bid)) {
+      toast.info("This tender is still being created. Please try again later.");
+      return;
+    }
+
+    posthog.capture("view_bid_details", {
+      bid_id: bid._id,
+      bid_title: bid.bid_title
+    });
+
     localStorage.removeItem("bidState");
     localStorage.removeItem("tenderLibChatMessages");
     localStorage.removeItem("previewSidepaneMessages");
@@ -279,6 +296,8 @@ const Bids = () => {
 
   const confirmDeleteBid = async () => {
     if (bidToDelete) {
+      posthog.capture("delete_bid", { bid_id: bidToDelete });
+
       const formData = new FormData();
       formData.append("bid_id", bidToDelete);
       try {
@@ -384,6 +403,11 @@ const Bids = () => {
     newStatus: any
   ): Promise<void> => {
     try {
+      posthog.capture("update_bid_status", {
+        bid_id: bidId,
+        new_status: newStatus
+      });
+
       const formData = new FormData();
       formData.append("bid_id", bidId);
       formData.append("status", newStatus);
@@ -641,3 +665,4 @@ const Bids = () => {
 };
 
 export default withAuth(Bids);
+

@@ -14,6 +14,7 @@ import UpscaleSparkIcon from "@/components/icons/UpscaleSparkIcon";
 import ExpandVerticalIcon from "@/components/icons/ExpandVerticalIcon";
 import ShortenHorizontalIcon from "@/components/icons/ShortenHorizontalIcon";
 import PencilIcon from "@/components/icons/PencilIcon";
+import posthog from "posthog-js";
 
 interface TextSelectionMenuProps {
   /** Position of the selection menu relative to the editor */
@@ -92,6 +93,10 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
         (element as HTMLElement).style.backgroundColor = "#FFE5CC";
       });
     }
+
+    posthog.capture("Add Comment Clicked", {
+      selection: selectedRange?.toString()
+    });
   };
 
   /**
@@ -110,6 +115,8 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
       toast.error("Please select text to find evidence for");
       return;
     }
+
+    posthog.capture("Evidence Clicked", { selection: selectedText });
 
     setPromptTarget(selectedText);
     setActionType("evidence");
@@ -214,6 +221,8 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
       return;
     }
 
+    posthog.capture("Expand Clicked", { selection: selectedText });
+
     setPromptTarget(selectedText);
     setActionType("expand");
 
@@ -301,6 +310,8 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
       toast.error("Please select text to summarise");
       return;
     }
+
+    posthog.capture("Summirise Clicked", { selection: selectedText });
 
     setPromptTarget(selectedText);
     setActionType("summarise");
@@ -427,6 +438,8 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
     });
 
     setSidepaneOpen(true);
+
+    posthog.capture("Custom Prompt Clicked", { selection: selectedText });
   };
 
   return (
@@ -520,3 +533,4 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
 };
 
 export default TextSelectionMenu;
+

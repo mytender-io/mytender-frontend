@@ -43,82 +43,8 @@ import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
 import { toast } from "react-toastify";
 import PDFViewer from "@/modals/PDFViewer.tsx";
 import UploadZip from "@/components/UploadZip.tsx";
-
-const NewFolderModal = React.memo(
-  ({ show, onHide, onCreateFolder, title, parentFolder }) => {
-    const [localNewFolderName, setLocalNewFolderName] = useState("");
-    const [error, setError] = useState("");
-
-    const validateFolderName = (name) => {
-      if (name.trim().length < 3 || name.trim().length > 63) {
-        return "Folder name must be between 3 and 63 characters long.";
-      }
-      if (!/^[a-zA-Z0-9].*[a-zA-Z0-9\s]$/.test(name)) {
-        return "Folder name must start and end with an alphanumeric character.";
-      }
-      if (!/^[a-zA-Z0-9_\s-]+$/.test(name)) {
-        return "Folder name can only contain alphanumeric characters, spaces, underscores, or hyphens.";
-      }
-      if (name.includes("..")) {
-        return "Folder name cannot contain two consecutive periods.";
-      }
-      if (/^(\d{1,3}\.){3}\d{1,3}$/.test(name)) {
-        return "Folder name cannot be a valid IPv4 address.";
-      }
-      return "";
-    };
-
-    const handleInputChange = (e) => {
-      const newName = e.target.value;
-      setLocalNewFolderName(newName);
-      setError(validateFolderName(newName));
-    };
-
-    const handleCreate = () => {
-      const validationError = validateFolderName(localNewFolderName);
-      if (validationError) {
-        setError(validationError);
-      } else {
-        onCreateFolder(localNewFolderName, parentFolder);
-        setLocalNewFolderName("");
-        setError("");
-      }
-    };
-
-    return (
-      <Dialog open={show} onOpenChange={onHide}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{title || "Create New Folder"}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="folderName">
-                {parentFolder ? "Subfolder Name" : "Folder Name"}
-              </Label>
-              <Input
-                id="folderName"
-                placeholder={`Enter ${parentFolder ? "subfolder" : "folder"} name`}
-                value={localNewFolderName}
-                onChange={handleInputChange}
-                className={error ? "border-destructive" : ""}
-              />
-              {error && <p className="text-sm text-destructive">{error}</p>}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              onClick={handleCreate}
-              disabled={!!error || localNewFolderName.length === 0}
-            >
-              Create
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-);
+import posthog from "posthog-js";
+import NewFolderModal from "./components/NewFolderModal.tsx";
 
 const CaseStudies = () => {
   const getAuth = useAuthUser();
@@ -141,7 +67,10 @@ const CaseStudies = () => {
   const [showDeleteFolderModal, setShowDeleteFolderModal] = useState(false);
   const [folderToDelete, setFolderToDelete] = useState("");
   const [showDeleteFileModal, setShowDeleteFileModal] = useState(false);
-  const [fileToDelete, setFileToDelete] = useState(null);
+  const [fileToDelete, setFileToDelete] = useState<{
+    unique_id: string;
+    filename: string;
+  } | null>(null);
   const [uploadFolder, setUploadFolder] = useState(null);
   const [currentFile, setCurrentFile] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -187,15 +116,21 @@ const CaseStudies = () => {
     return caseStudyFolders.sort((a, b) => a.name.localeCompare(b.name));
   };
   const handleMenuItemClick = (action) => {
+    posthog.capture("upload_document_to_case_study", { action });
     if (action === "pdf") handleOpenPDFModal();
     else if (action === "text") handleOpenTextModal();
     else if (action === "zip") handleOpenZipModal();
   };
 
-  const handleDelete = async (folderTitle) => {
+  const handleDelete = async (folderTitle: string) => {
     console.log("Deleting folder:", folderTitle);
     setFolderToDelete("");
     deleteFolder(folderTitle, newFolderParent);
+
+    posthog.capture("delete_folder_from_case_study", {
+      deleted_folder: folderTitle,
+      parent_folder: newFolderParent
+    });
 
     setShowDeleteFolderModal(false);
   };
@@ -237,7 +172,7 @@ const CaseStudies = () => {
     setShowTextModal(true);
   };
 
-  const fetchFolderStructure = async () => {
+  const fetchFolderStructure = useCallback(async () => {
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/get_case_studies`,
@@ -264,48 +199,52 @@ const CaseStudies = () => {
     } catch (error) {
       console.error("Error fetching folder structure:", error);
     }
-  };
-  const fetchFolderContents = async (folderPath) => {
-    try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
-        { collection_name: folderPath },
-        { headers: { Authorization: `Bearer ${tokenRef.current}` } }
-      );
+  }, []);
 
-      const filesWithIds = response.data.map((item) => ({
-        filename: item.filename,
-        unique_id: item.unique_id,
-        isFolder: false
-      }));
+  const fetchFolderContents = useCallback(
+    async (folderPath: string) => {
+      try {
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
+          { collection_name: folderPath },
+          { headers: { Authorization: `Bearer ${tokenRef.current}` } }
+        );
 
-      // Get subfolders
-      const subfolders = availableCollections
-        .filter((collection) =>
-          collection.startsWith(folderPath + "FORWARDSLASH")
-        )
-        .map((collection) => {
-          const parts = collection.split("FORWARDSLASH");
-          return {
-            filename: parts[parts.length - 1],
-            unique_id: collection,
-            isFolder: true
-          };
-        });
+        const filesWithIds = response.data.map((item) => ({
+          filename: item.filename,
+          unique_id: item.unique_id,
+          isFolder: false
+        }));
 
-      const allContents = [...subfolders, ...filesWithIds];
+        // Get subfolders
+        const subfolders = availableCollections
+          .filter((collection) =>
+            collection.startsWith(folderPath + "FORWARDSLASH")
+          )
+          .map((collection) => {
+            const parts = collection.split("FORWARDSLASH");
+            return {
+              filename: parts[parts.length - 1],
+              unique_id: collection,
+              isFolder: true
+            };
+          });
 
-      setFolderContents((prevContents) => ({
-        ...prevContents,
-        [folderPath]: allContents
-      }));
-    } catch (error) {
-      console.error("Error fetching folder contents:", error);
-    }
-  };
+        const allContents = [...subfolders, ...filesWithIds];
+
+        setFolderContents((prevContents) => ({
+          ...prevContents,
+          [folderPath]: allContents
+        }));
+      } catch (error) {
+        console.error("Error fetching folder contents:", error);
+      }
+    },
+    [availableCollections]
+  );
 
   const handleCreateFolder = useCallback(
-    async (folderName, parentFolder = null) => {
+    async (folderName: string, parentFolder = null) => {
       try {
         const formattedFolderName = folderName.trim().replace(/\s+/g, "_");
         const formData = new FormData();
@@ -327,6 +266,12 @@ const CaseStudies = () => {
           toast.success(
             `${parentFolder ? "Subfolder" : "Folder"} created successfully`
           );
+
+          posthog.capture("folder_create_success", {
+            folder_name: formattedFolderName,
+            parent_folder: parentFolder
+          });
+
           // Refresh the folder structure
           await fetchFolderStructure();
           // If we're creating a subfolder, refresh the contents of the parent folder
@@ -343,6 +288,11 @@ const CaseStudies = () => {
           toast.error(
             `Failed to create ${parentFolder ? "subfolder" : "folder"}`
           );
+
+          posthog.capture("folder_create_failed", {
+            folder_name: formattedFolderName,
+            parent_folder: parentFolder
+          });
         }
       } catch (error) {
         console.error(
@@ -484,7 +434,11 @@ const CaseStudies = () => {
     />
   );
 
-  const saveFileContent = async (id, newContent, folderName) => {
+  const saveFileContent = async (
+    id: string,
+    newContent: string,
+    folderName: string
+  ) => {
     try {
       const formData = new FormData();
       formData.append("id", id); // Make sure this matches your FastAPI endpoint's expected field
@@ -500,16 +454,32 @@ const CaseStudies = () => {
 
       setModalContent(newContent); // Update the modal content with the new content
 
+      posthog.capture("save_file_content_success", {
+        file_id: id,
+        file_text: newContent,
+        profile_name: folderName
+      });
+
       //console.log("Content updated successfully");
     } catch (error) {
       console.error("Error saving file content:", error);
+
+      posthog.capture("save_file_content_failed", {
+        file_id: id,
+        file_text: newContent,
+        profile_name: folderName
+      });
     }
   };
 
-  const viewFile = async (fileName, folderName, unique_id) => {
+  const viewFile = async (
+    fileName: string,
+    folderName: string,
+    unique_id: string
+  ) => {
     setIsLoading(true);
     setShowModal(true);
-    setModalContent(null);
+    setModalContent("");
     const formData = new FormData();
     formData.append("file_name", fileName);
     formData.append("profile_name", folderName);
@@ -528,17 +498,27 @@ const CaseStudies = () => {
       setModalContent(response.data);
       setCurrentFileId(unique_id);
       setCurrentFileName(fileName);
+
+      posthog.capture("view_file_success", {
+        file_name: fileName,
+        profile_name: folderName
+      });
     } catch (error) {
       console.error("Error viewing file:", error);
       toast.error(`Error loading document`);
+
+      posthog.capture("view_file_failed", {
+        file_name: fileName,
+        profile_name: folderName
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const viewPdfFile = async (fileName, folderName) => {
+  const viewPdfFile = async (fileName: string, folderName: string) => {
     setIsLoading(true);
-    setPdfUrl(null);
+    setPdfUrl("");
     setShowPdfViewerModal(true);
     const formData = new FormData();
     formData.append("file_name", fileName);
@@ -560,15 +540,27 @@ const CaseStudies = () => {
         new Blob([response.data], { type: "application/pdf" })
       );
       setPdfUrl(fileURL);
+
+      posthog.capture("view_pdf_file_success", {
+        file_name: fileName,
+        profile_name: folderName
+      });
     } catch (error) {
       console.error("Error viewing PDF file:", error);
+
       if (error.response && error.response.status === 404) {
         toast.error(`PDF file not found, try reuploading the pdf file`);
       }
+
+      posthog.capture("view_pdf_file_failed", {
+        file_name: fileName,
+        profile_name: folderName
+      });
     } finally {
       setIsLoading(false);
     }
   };
+
   const deleteDocument = async (uniqueId) => {
     const formData = new FormData();
     formData.append("unique_id", uniqueId);
@@ -715,6 +707,54 @@ const CaseStudies = () => {
     });
   };
 
+  const onFileMove = async (newFolder: string, unique_id: string) => {
+    try {
+      setMovingFiles((prev) => ({ ...prev, [unique_id]: true }));
+
+      const formData = new FormData();
+      formData.append("unique_id", unique_id);
+      formData.append("new_folder", newFolder);
+      await axios.post(`http${HTTP_PREFIX}://${API_URL}/move_file`, formData, {
+        headers: {
+          Authorization: `Bearer ${tokenRef.current}`,
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      await fetchFolderContents(activeFolder);
+
+      posthog.capture("file_moved", {
+        unique_id,
+        destination_folder: newFolder,
+        timestamp: new Date().toISOString()
+      });
+
+      toast.success("File moved successfully");
+    } catch (error) {
+      console.error("Error moving file:", error);
+      const errorMessage = error.response?.data?.detail || "Error moving file";
+
+      posthog.capture("file_move_failed", {
+        unique_id,
+        destination_folder: newFolder,
+        error: errorMessage,
+        timestamp: new Date().toISOString()
+      });
+
+      toast.error(errorMessage);
+    } finally {
+      setMovingFiles((prev) => ({ ...prev, [unique_id]: false }));
+    }
+  };
+
+  const onFileDelete = () => {
+    posthog.capture("delete_file_from_content_library", {
+      unique_id: fileToDelete?.unique_id,
+      filename: fileToDelete?.filename
+    });
+    deleteDocument(fileToDelete?.unique_id);
+    setShowDeleteFileModal(false);
+  };
+
   const renderFolderContents = (folderPath) => {
     //console.log("Rendering contents for folder:", folderPath);
     const contents = folderContents[folderPath] || [];
@@ -799,34 +839,7 @@ const CaseStudies = () => {
                 availableFolders={availableCollections}
                 currentFolder={activeFolder}
                 isMoving={movingFiles[unique_id]}
-                onMove={async (newFolder) => {
-                  try {
-                    setMovingFiles((prev) => ({ ...prev, [unique_id]: true }));
-                    const formData = new FormData();
-                    formData.append("unique_id", unique_id);
-                    formData.append("new_folder", newFolder);
-                    await axios.post(
-                      `http${HTTP_PREFIX}://${API_URL}/move_file`,
-                      formData,
-                      {
-                        headers: {
-                          Authorization: `Bearer ${tokenRef.current}`,
-                          "Content-Type": "multipart/form-data"
-                        }
-                      }
-                    );
-                    await fetchFolderContents(activeFolder);
-                    toast.success("File moved successfully");
-                  } catch (error) {
-                    console.error("Error moving file:", error);
-                    // Extract the detail error message from the response
-                    const errorMessage =
-                      error.response?.data?.detail || "Error moving file";
-                    toast.error(errorMessage);
-                  } finally {
-                    setMovingFiles((prev) => ({ ...prev, [unique_id]: false }));
-                  }
-                }}
+                onMove={(newFolder: string) => onFileMove(newFolder, unique_id)}
               />
             )}
           </TableCell>
@@ -1120,10 +1133,7 @@ const CaseStudies = () => {
             <DeleteFileModal
               show={showDeleteFileModal}
               onHide={() => setShowDeleteFileModal(false)}
-              onDelete={() => {
-                deleteDocument(fileToDelete.unique_id);
-                setShowDeleteFileModal(false);
-              }}
+              onDelete={onFileDelete}
               fileName={fileToDelete ? fileToDelete.filename : ""}
             />
 
@@ -1176,3 +1186,4 @@ const CaseStudies = () => {
 };
 
 export default withAuth(CaseStudies);
+

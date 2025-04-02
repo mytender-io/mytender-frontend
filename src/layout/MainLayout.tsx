@@ -5,6 +5,7 @@ import AutoLogout from "@/components/auth/AutoLogout";
 import posthog from "posthog-js";
 import { cn } from "@/utils";
 import { LoadingProvider } from "@/context/LoadingContext";
+import { USERS_TO_EXCLUDE_IN_POSTHOG } from "@/constants/posthogUsers";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -81,9 +82,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
     if (auth?.token) {
       console.log("User authenticated");
-      posthog.identify(auth.email, {
-        email: auth.email
-      });
+
+      if (!USERS_TO_EXCLUDE_IN_POSTHOG.includes(auth.email)) {
+        posthog.identify(auth.email, {
+          email: auth.email
+        });
+      } else {
+        posthog.opt_out_capturing();
+      }
     }
 
     return () => clearInterval(intervalId);
@@ -108,3 +114,4 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 };
 
 export default MainLayout;
+

@@ -17,6 +17,7 @@ import {
   TooltipProvider
 } from "@/components/ui/tooltip";
 import DataTransferHorizontalIcon from "@/components/icons/DataTransferHorizontalIcon";
+import posthog from "posthog-js";
 import { formatResponse } from "@/utils/formatResponse";
 
 const ProposalPreviewSidepane = ({
@@ -117,6 +118,10 @@ const ProposalPreviewSidepane = ({
       } else if (activeChatPrompt === "custom") {
         sendCustomQuestion(inputValue);
       }
+
+      posthog.capture(`${activeChatPrompt}_question_send`, {
+        question: inputValue
+      });
 
       setInputValue("");
     }
@@ -298,8 +303,19 @@ const ProposalPreviewSidepane = ({
         { type: "bot", text: formattedResponse }
       ]);
       typeMessage(formattedResponse); // Start typing animation
+
+      posthog.capture("answer_received", {
+        active_chat_prompt: activeChatPrompt,
+        answer: formattedResponse,
+        question
+      });
     } catch (error) {
       console.error("Error sending library question:", error);
+      posthog.capture("question_sending_failed", {
+        question,
+        active_chat_prompt: activeChatPrompt,
+        error
+      });
 
       // Replace the temporary loading message with the error message
       setMessages((prevMessages) => [
@@ -361,8 +377,19 @@ const ProposalPreviewSidepane = ({
         { type: "bot", text: formattedResponse }
       ]);
       typeMessage(formattedResponse);
+
+      posthog.capture("answer_received", {
+        active_chat_prompt: activeChatPrompt,
+        answer: formattedResponse,
+        question
+      });
     } catch (error) {
       console.error("Error sending tender docs question:", error);
+      posthog.capture("question_sending_failed", {
+        question,
+        active_chat_prompt: activeChatPrompt,
+        error
+      });
 
       // Replace the temporary loading message with the error message
       setMessages((prevMessages) => [
@@ -419,8 +446,19 @@ const ProposalPreviewSidepane = ({
         { type: "bot", text: formattedResponse }
       ]);
       typeMessage(formattedResponse);
+
+      posthog.capture("answer_received", {
+        active_chat_prompt: activeChatPrompt,
+        answer: formattedResponse,
+        question
+      });
     } catch (error) {
       console.error("Error sending internet question:", error);
+      posthog.capture("question_sending_failed", {
+        question,
+        active_chat_prompt: activeChatPrompt,
+        error
+      });
 
       // Replace the temporary loading message with the error message
       setMessages((prevMessages) => [
@@ -482,8 +520,18 @@ const ProposalPreviewSidepane = ({
         { type: "bot", text: formattedResponse }
       ]);
       typeMessage(formattedResponse);
+      posthog.capture("answer_received", {
+        active_chat_prompt: activeChatPrompt,
+        answer: formattedResponse,
+        question
+      });
     } catch (error) {
       console.error("Error sending custom prompt:", error);
+      posthog.capture("question_sending_failed", {
+        question,
+        active_chat_prompt: activeChatPrompt,
+        error
+      });
 
       // Replace the temporary loading message with the error message
       setMessages((prevMessages) => [
@@ -504,6 +552,10 @@ const ProposalPreviewSidepane = ({
 
   const handleCopyText = (text: string) => {
     navigator.clipboard.writeText(text);
+
+    posthog.capture("answer_is_copied", {
+      text
+    });
 
     // Get the target button element and store original text
     const copyButton = document.activeElement;
@@ -556,6 +608,11 @@ const ProposalPreviewSidepane = ({
     if (insertButton instanceof HTMLButtonElement) {
       const originalText = insertButton.innerHTML;
       insertButton.innerHTML = "<span>Inserted</span>";
+
+      posthog.capture("evidence_is_replaced", {
+        original_text: originalText,
+        inserted_text: text
+      });
 
       // Revert back after 1.5 seconds
       setTimeout(() => {
@@ -894,3 +951,4 @@ const ProposalPreviewSidepane = ({
 };
 
 export default ProposalPreviewSidepane;
+
