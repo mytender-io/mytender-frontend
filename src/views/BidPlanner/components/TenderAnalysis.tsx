@@ -38,6 +38,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
 import TenderLibraryChatDialog from "@/views/BidPlanner/components/TenderLibraryChat";
 import InterrogateTenderDialog from "./InterrogateTender";
+import AddCompetitors from "./AddCompetitors";
 
 const LoadingState = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -236,7 +237,7 @@ const TenderAnalysis = () => {
       toast.warning("Please wait until the current generation completes.");
       return;
     }
-  
+
     setCurrentTabIndex(newValue); // Only handle the tab switch
   };
 
@@ -479,7 +480,6 @@ const TenderAnalysis = () => {
   };
 
   const handleSaveEdit = async (index: number) => {
-
     try {
       const tab = tabs[index];
       setTabContent((prev) => ({ ...prev, [index]: editContent }));
@@ -709,7 +709,10 @@ const TenderAnalysis = () => {
                 className="h-full pt-0 mt-0"
               >
                 <div className={cn("relative px-8 py-4 h-full")}>
-                  { editMode !== index && (
+                  {tab.stateKey === "differentiation_opportunities" && (
+                    <AddCompetitors />
+                  )}
+                  {editMode !== index && (
                     <div className="text-right">
                       <Button
                         variant="outline"
@@ -740,3 +743,4 @@ const TenderAnalysis = () => {
 };
 
 export default TenderAnalysis;
+
