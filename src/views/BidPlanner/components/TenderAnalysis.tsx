@@ -710,7 +710,10 @@ const TenderAnalysis = () => {
               >
                 <div className={cn("relative px-8 py-4 h-full")}>
                   {tab.stateKey === "differentiation_opportunities" && (
-                    <AddCompetitors />
+                    <AddCompetitors
+                      setTabContent={setTabContent}
+                      setSharedState={setSharedState}
+                    />
                   )}
                   {editMode !== index && (
                     <div className="text-right">
