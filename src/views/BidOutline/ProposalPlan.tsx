@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { DeleteConfirmationDialog } from "../../modals/DeleteConfirmationModal";
 import {
   DndContext,
@@ -47,11 +49,10 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { GripVertical } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/utils";
+import { cn, calculateCharacterLength } from "@/utils";
 import SelectOrganisationUserButton from "@/buttons/SelectOrganisationUserButton";
-import { Spinner } from "@/components/ui/spinner";
 import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
+import LengthUnitDropdown from "./components/LengthUnitDropdown";
 
 interface ProposalPlanProps {
   openTask: (taskId: string | null, sectionIndex: string) => void;
@@ -107,6 +108,9 @@ const ProposalPlan = ({
   } | null>(null);
 
   const [activeId, setActiveId] = useState(null);
+
+  // Add state for the dropdown selection
+  const [lengthUnit, setLengthUnit] = useState("words");
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
@@ -1191,52 +1195,60 @@ const ProposalPlan = ({
         </TableCell>
         <TableCell className="px-4">
           <div className="flex items-center justify-center">
-            <Input
-              type="number"
-              value={wordCount}
-              min={0}
-              step={50}
-              className="w-20 text-center"
-              disabled={isLoading}
-              onChange={(e) => {
-                const value = parseInt(e.target.value);
-                if (!isNaN(value) && value >= 0) {
-                  setWordCount(value);
+            {lengthUnit === "words" ? (
+              <>
+                <Input
+                  type="number"
+                  value={wordCount}
+                  min={0}
+                  step={50}
+                  className="w-20 text-center"
+                  disabled={isLoading}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    if (!isNaN(value) && value >= 0) {
+                      setWordCount(value);
 
-                  // Clear any existing timeout
-                  if (wordCountTimeoutRef.current) {
-                    clearTimeout(wordCountTimeoutRef.current);
-                  }
+                      // Clear any existing timeout
+                      if (wordCountTimeoutRef.current) {
+                        clearTimeout(wordCountTimeoutRef.current);
+                      }
 
-                  // Set a new timeout to update the shared state after 3 seconds of inactivity
-                  const timeoutId = setTimeout(() => {
-                    handleSectionChange(index, "word_count", value);
+                      // Set a new timeout to update the shared state after 3 seconds of inactivity
+                      const timeoutId = setTimeout(() => {
+                        handleSectionChange(index, "word_count", value);
 
-                    posthog.capture("word_count_updated", {
-                      sectionId: section.section_id,
-                      newWordCount: value,
-                      bidId: object_id
-                    });
-                  }, 3000);
+                        posthog.capture("word_count_updated", {
+                          sectionId: section.section_id,
+                          newWordCount: value,
+                          bidId: object_id
+                        });
+                      }, 3000);
 
-                  // Store the timeout ID in the ref
-                  wordCountTimeoutRef.current = timeoutId;
-                }
-              }}
-              onBlur={() => {
-                // Also update when the input loses focus
-                if (wordCountTimeoutRef.current) {
-                  clearTimeout(wordCountTimeoutRef.current);
-                  wordCountTimeoutRef.current = null;
-                  handleSectionChange(index, "word_count", wordCount);
-                  posthog.capture("word_count_updated", {
-                    sectionId: section.section_id,
-                    newWordCount: wordCount,
-                    bidId: object_id
-                  });
-                }
-              }}
-            />
+                      // Store the timeout ID in the ref
+                      wordCountTimeoutRef.current = timeoutId;
+                    }
+                  }}
+                  onBlur={() => {
+                    // Also update when the input loses focus
+                    if (wordCountTimeoutRef.current) {
+                      clearTimeout(wordCountTimeoutRef.current);
+                      wordCountTimeoutRef.current = null;
+                      handleSectionChange(index, "word_count", wordCount);
+                      posthog.capture("word_count_updated", {
+                        sectionId: section.section_id,
+                        newWordCount: wordCount,
+                        bidId: object_id
+                      });
+                    }
+                  }}
+                />
+              </>
+            ) : lengthUnit === "pages" ? (
+              Math.max(1, Math.round(wordCount / 400))
+            ) : (
+              calculateCharacterLength(section.answer)
+            )}
           </div>
         </TableCell>
         <TableCell className="px-4">
@@ -1290,27 +1302,31 @@ const ProposalPlan = ({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[60px] flex items-center justify-end gap-2 h-full text-sm text-typo-900 font-semibold py-3.5 px-4">
-                        <Checkbox
-                          checked={selectedSections.size === outline.length}
-                          onCheckedChange={(checked) =>
-                            handleSelectAll(checked)
-                          }
-                          onClick={(e) => e.stopPropagation()}
-                        />
+                      <TableHead className="w-[60px] flex items-center justify-end gap-2 h-full py-3.5 px-4">
+                        <div className="flex items-center h-10">
+                          <Checkbox
+                            checked={selectedSections.size === outline.length}
+                            onCheckedChange={(checked: boolean) =>
+                              handleSelectAll(checked)
+                            }
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
                       </TableHead>
                       <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
                         Section
                       </TableHead>
-
                       <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                         Question Type
                       </TableHead>
                       <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                         Status
                       </TableHead>
-                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                        Words
+                      <TableHead className="flex items-center h-full justify-center text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                        <LengthUnitDropdown
+                          value={lengthUnit}
+                          onChange={(value) => setLengthUnit(value)}
+                        />
                       </TableHead>
                       <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                         Answerer
@@ -1426,4 +1442,3 @@ const ProposalPlan = ({
   );
 };
 export default ProposalPlan;
-

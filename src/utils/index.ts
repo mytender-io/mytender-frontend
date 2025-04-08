@@ -28,3 +28,17 @@ export const calculateWordCount = (htmlContent: string): number => {
   // Split by whitespace and filter out empty strings
   return textContent.trim().split(/\s+/).filter(Boolean).length;
 };
+
+export const calculateCharacterLength = (htmlContent: string): number => {
+  if (!htmlContent) return 0;
+
+  // Create a temporary div to extract text from HTML
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = htmlContent;
+
+  // Get text content without HTML tags
+  const textContent = tempDiv.textContent || tempDiv.innerText || "";
+
+  // Return the length of the text content
+  return textContent.length;
+};
