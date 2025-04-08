@@ -36,6 +36,8 @@ import TextSelectionMenu from "./components/TextSelectionMenu";
 import ProposalToolbar from "./components/ProposalToolbar";
 import MarkReviewReadyButton from "./components/MarkReviewReadyButton";
 import RewriteInputBar from "./components/RewriteInputBar";
+import { RobotIdeaIcon } from "@/components/icons/RobotIdeaIcon";
+import { AiBidConsultant } from "./components/AiBidConsultant";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -56,6 +58,7 @@ const ProposalPreview = () => {
   const [selectedRange, setSelectedRange] = useState<Range | null>(null);
   const [activeComment, setActiveComment] = useState<string | null>(null);
   const [sidepaneOpen, setSidepaneOpen] = useState(false);
+  const [sidePanContent, setSidePanContent] = useState("");
   const [replyText, setReplyText] = useState("");
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number | null>(
     null
@@ -138,9 +141,13 @@ const ProposalPreview = () => {
   }, [sharedState.outline]);
 
   // Function to toggle the sidepane
-  const toggleSidepane = () => {
+  const toggleSidepane = (content: string) => {
+    setSidePanContent(content);
     setToolbarYPosition(getToolbarYPosition());
-    setSidepaneOpen((prevState) => !prevState);
+
+    if (content === sidePanContent || !sidePanContent) {
+      setSidepaneOpen((prevState) => !prevState);
+    }
   };
 
   // Handle rewrite success from child component
@@ -1111,15 +1118,22 @@ const ProposalPreview = () => {
               {sidepaneOpen && (
                 <div
                   className={cn(
-                    "proposal-preview-sidepane w-[450px] overflow-y-auto z-50 sticky -top-4 right-0"
+                    "proposal-preview-sidepane w-[450px] overflow-y-auto z-50 sticky -top-4 right-0",
+                    {
+                      "h-full overflow-scroll":
+                        sidePanContent === "bid_consultant"
+                    }
                   )}
                   style={{
-                    maxHeight: `calc(100vh - ${241 - (234 - toolbarYPosition)}px)`
+                    maxHeight:
+                      sidePanContent === "chat"
+                        ? `calc(100vh - ${241 - (234 - toolbarYPosition)}px)`
+                        : "100vh"
                   }}
                 >
                   <ProposalPreviewSidepane
                     bid_id={sharedState.object_id}
-                    open={sidepaneOpen}
+                    open={sidePanContent === "chat"}
                     onOpenChange={setSidepaneOpen}
                     promptTarget={promptTarget}
                     promptResult={promptResult}
@@ -1128,6 +1142,11 @@ const ProposalPreview = () => {
                     onCancelPrompt={handleCancelPrompt}
                     actionType={actionType}
                     setActionType={setActionType}
+                  />
+
+                  <AiBidConsultant
+                    open={sidePanContent === "bid_consultant"}
+                    onOpenChange={setSidepaneOpen}
                   />
                 </div>
               )}
@@ -1145,11 +1164,13 @@ const ProposalPreview = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={toggleSidepane}
+                  onClick={() => toggleSidepane("chat")}
                   className="[&_svg]:size-6 text-gray-hint_text"
                 >
                   <ToolSparkIcon
-                    className={cn(sidepaneOpen ? "text-orange" : "")}
+                    className={cn(
+                      sidePanContent === "chat" ? "text-orange" : ""
+                    )}
                   />
                 </Button>
               </TooltipTrigger>
@@ -1163,6 +1184,38 @@ const ProposalPreview = () => {
                   </span>
                   <span className="text-gray-border text-xs">
                     Chat, brainstorm, research
+                  </span>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleSidepane("bid_consultant")}
+                  className="[&_svg]:size-6 text-gray-hint_text"
+                >
+                  <RobotIdeaIcon
+                    className={cn(
+                      sidePanContent === "bid_consultant" ? "text-orange" : ""
+                    )}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="left"
+                className="border-[0.5px] border-gray-line rounded-md p-2 px-1.5 py-1 shadow-tooltip bg-white"
+              >
+                <div className="flex flex-col gap-1">
+                  <span className="text-gray-hint_text font-medium text-sm">
+                    Ai Bid Consultant
+                  </span>
+                  <span className="text-gray-border text-xs">
+                    Feedback based on specific criteria
                   </span>
                 </div>
               </TooltipContent>
