@@ -728,7 +728,7 @@ const ProposalPreview = () => {
                 <div className="rounded-md bg-white w-full max-w-4xl flex-1">
                   <div
                     ref={toolbarRef}
-                    className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-[51]"
+                    className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-[50]"
                   >
                     <ProposalToolbar
                       activeEditorRef={activeEditorRef}

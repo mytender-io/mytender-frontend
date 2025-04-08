@@ -1,36 +1,36 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import {
   Tooltip,
   TooltipProvider,
   TooltipTrigger,
   TooltipContent
 } from "@/components/ui/tooltip";
-import { X } from "lucide-react";
+import { Trash, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { AiBidConsultantModal } from "./AiBidConsultantModal";
 
 interface AiBidConsultantProps {
   onOpenChange: (arg: boolean) => void;
   open: boolean;
 }
 
-const check_options = [
+const initial_criterias = [
   {
-    check: "overall_feedback",
-    title: "Overall Feedback",
-    desc: "Assess where you could improve given the scoring criteria"
+    key: "overall_feedback",
+    question: "Overall Feedback",
+    requirements: "Assess where you could improve given the scoring criteria"
   },
   {
-    check: "evidencing",
-    title: "Evidencing",
-    desc: "Find areas where you need to support your claims more"
+    key: "evidencing",
+    question: "Evidencing",
+    requirements: "Find areas where you need to support your claims more"
   },
   {
-    check: "grammar",
-    title: "Grammar",
-    desc: "Fix spelling and grammar errors"
+    key: "grammar",
+    question: "Grammar",
+    requirements: "Fix spelling and grammar errors"
   }
 ];
 
@@ -38,40 +38,33 @@ export const AiBidConsultant = ({
   onOpenChange,
   open
 }: AiBidConsultantProps) => {
-  const [checks, setChecks] = useState<string[]>([]);
-  const [customCriteriaList, setCustomCriteriaList] = useState<string[]>([]);
+  const [checkedCriterias, setCheckedCriterias] = useState<string[]>([]);
+  const [criterias, setCriterias] =
+    useState<typeof initial_criterias>(initial_criterias);
   const [loading, setLoading] = useState(false);
 
   if (!open) return null;
 
-  const handleCriteriaSelect = (check: string) => {
-    if (checks.includes(check)) {
-      setChecks((prev) => prev.filter((i) => i !== check));
+  const handleCriteriaSelect = (criteriaKey: string) => {
+    if (checkedCriterias.find((c) => c === criteriaKey)) {
+      setCheckedCriterias((prev) => prev.filter((i) => i !== criteriaKey));
     } else {
-      setChecks((prev) => [...prev, check]);
+      setCheckedCriterias((prev) => [...prev, criteriaKey]);
     }
   };
 
-  const handleAddCustomCriteria = () => {
-    const newCheckKey = `custom_${customCriteriaList.length + 1}`;
-    setCustomCriteriaList((prev) => [...prev, newCheckKey]);
-    setChecks((prev) => [...prev, newCheckKey]);
-  };
-
-  const handleCustomInputChange = (index: number, value: string) => {
-    const newList = [...customCriteriaList];
-    newList[index] = value;
-    setCustomCriteriaList(newList);
-  };
-
   const handleStartEvaluation = () => {
-    if (!checks.length && !customCriteriaList.length) {
+    if (!checkedCriterias.length) {
       toast.error("Plesae select at least one criteria for evaluation");
       return;
     }
 
     setLoading(true);
     setTimeout(() => setLoading(false), 1000);
+  };
+
+  const handleDeleteCriteria = (key: string) => {
+    setCriterias((prev) => prev.filter((c) => c.key !== key));
   };
 
   return (
@@ -120,13 +113,7 @@ export const AiBidConsultant = ({
         <p className="text-sm text-gray-500">
           Get much more specific feedback based around the criteria
         </p>
-        <Button
-          variant="outline"
-          className="text-orange border-orange mt-4 hover:bg-orange-100 hover:text-orange-600"
-          onClick={handleAddCustomCriteria}
-        >
-          Add Criteria
-        </Button>
+        <AiBidConsultantModal setCriterias={setCriterias} />
 
         <div className="mt-8 pb-6">
           <p className="text-lg font-medium mb-2">
@@ -134,38 +121,28 @@ export const AiBidConsultant = ({
           </p>
 
           <div className="flex flex-col gap-6">
-            {check_options.map((option) => (
-              <div key={option.check} className="flex gap-3">
+            {criterias.map((criteria) => (
+              <div key={criteria.key} className="flex gap-3">
                 <Checkbox
-                  checked={checks.includes(option.check)}
-                  onCheckedChange={() => handleCriteriaSelect(option.check)}
+                  checked={checkedCriterias.includes(criteria.key)}
+                  onCheckedChange={() => handleCriteriaSelect(criteria.key)}
                   className="rounded"
                 />
                 <div className="flex flex-col w-full">
-                  <p className="text-lg font-medium">{option.title}</p>
-                  <p className="text-sm text-gray-400">{option.desc}</p>
+                  <p className="text-lg font-medium">{criteria.question}</p>
+                  <p className="text-sm text-gray-400">
+                    {criteria.requirements}
+                  </p>
                 </div>
-              </div>
-            ))}
 
-            {customCriteriaList.map((checkKey, idx) => (
-              <div key={checkKey} className="flex gap-3">
-                <Checkbox
-                  checked={checks.includes(checkKey)}
-                  onCheckedChange={() => handleCriteriaSelect(checkKey)}
-                  className="rounded"
-                />
-                <div className="flex flex-col w-full">
-                  <p className="text-lg font-medium">Custom Criteria</p>
-                  <Input
-                    className="placeholder:text-gray-400"
-                    placeholder="What would you like us to check or analyze?"
-                    value={customCriteriaList[idx]}
-                    onChange={(e) =>
-                      handleCustomInputChange(idx, e.target.value)
-                    }
-                  />
-                </div>
+                <Button
+                  disabled={loading}
+                  onClick={() => handleDeleteCriteria(criteria.key)}
+                  variant="ghost"
+                  className="hover:bg-transparent border-0 hover:text-orange"
+                >
+                  <Trash />
+                </Button>
               </div>
             ))}
           </div>
