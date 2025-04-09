@@ -39,6 +39,7 @@ interface TextSelectionMenuProps {
   tokenRef: RefObject<string>;
   /** Current bid's object ID used for API calls */
   objectId: string | null;
+  setSidePanContent: (arg: string) => void;
 }
 
 /**
@@ -55,6 +56,7 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
   setSidepaneOpen,
   setIsLoadingEvidence,
   setActionType,
+  setSidePanContent,
   tokenRef,
   objectId
 }) => {
@@ -154,6 +156,7 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
     });
 
     setSidepaneOpen(true); // Open the sidepane instead of evidence panel
+    setSidePanContent("chat");
     setIsLoadingEvidence(true);
 
     try {
@@ -260,6 +263,7 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
     });
 
     setSidepaneOpen(true);
+    setSidePanContent("chat");
     setIsLoadingEvidence(true);
 
     try {
@@ -349,6 +353,7 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
     });
 
     setSidepaneOpen(true);
+    setSidePanContent("chat");
     setIsLoadingEvidence(true);
 
     try {
@@ -438,6 +443,7 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
     });
 
     setSidepaneOpen(true);
+    setSidePanContent("chat");
 
     posthog.capture("Custom Prompt Clicked", { selection: selectedText });
   };

@@ -895,6 +895,7 @@ const ProposalPreview = () => {
                         setPromptTarget={setPromptTarget}
                         setPromptResult={setPromptResult}
                         setSidepaneOpen={setSidepaneOpen}
+                        setSidePanContent={setSidePanContent}
                         setIsLoadingEvidence={setIsLoadingEvidence}
                         setActionType={setActionType}
                         tokenRef={tokenRef}
