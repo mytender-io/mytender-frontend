@@ -23,8 +23,8 @@ const BidTitle: React.FC<{
 
     setSharedState((prevState) => ({
       ...prevState,
-      bidInfo: newBidName,
-      isSaved: false
+      bidInfo: newBidName
+      // isSaved: false
     }));
     setIsEditing(false);
   };

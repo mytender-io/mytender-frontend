@@ -91,7 +91,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     bid_manager: "",
     contributors: {},
     original_creator: "",
-    isSaved: false,
+    // isSaved: false,
     isLoading: false,
     saveSuccess: null,
     object_id: null,

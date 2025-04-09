@@ -1203,7 +1203,7 @@ const ProposalPlan = ({
                   min={0}
                   step={50}
                   className="w-20 text-center"
-                  disabled={isLoading}
+                  disabled={isLoading || sharedState.isLoading}
                   onChange={(e) => {
                     const value = parseInt(e.target.value);
                     if (!isNaN(value) && value >= 0) {
@@ -1223,7 +1223,7 @@ const ProposalPlan = ({
                           newWordCount: value,
                           bidId: object_id
                         });
-                      }, 3000);
+                      }, 2000);
 
                       // Store the timeout ID in the ref
                       wordCountTimeoutRef.current = timeoutId;
@@ -1302,8 +1302,8 @@ const ProposalPlan = ({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[60px] flex items-center justify-end gap-2 h-full py-3.5 px-4">
-                        <div className="flex items-center h-10">
+                      <TableHead className="w-[60px] py-3.5 px-4">
+                        <div className="flex justify-end">
                           <Checkbox
                             checked={selectedSections.size === outline.length}
                             onCheckedChange={(checked: boolean) =>
@@ -1322,7 +1322,7 @@ const ProposalPlan = ({
                       <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                         Status
                       </TableHead>
-                      <TableHead className="flex items-center h-full justify-center text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                         <LengthUnitDropdown
                           value={lengthUnit}
                           onChange={(value) => setLengthUnit(value)}
