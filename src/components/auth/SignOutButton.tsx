@@ -1,28 +1,45 @@
 import { useSignOut } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useAuthUser } from "react-auth-kit";
+import { useOktaAuth } from '@okta/okta-react';
 
 const SignOut = () => {
   const navigate = useNavigate();
+  const getAuth = useAuthUser();
+  const auth = getAuth();
+  const { oktaAuth } = useOktaAuth();
+  const authType = useRef(auth?.auth_type || "default");
   const signOut = useSignOut();
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     const performSignOut = async () => {
       try {
-        // Perform sign out
-        const success = signOut();
+        // Perform sign out Okta/default
 
-        if (!success) {
-          setError("Failed to sign out properly");
-          return;
+        if (authType.current === 'Okta') {
+          // Clear local tokens without Okta redirect
+          await oktaAuth.tokenManager.clear(); // Removes tokens from storage
+          oktaAuth.authStateManager.updateAuthState(); // Updates React state
+          // Clear application-specific storage
+          localStorage.clear();
+          sessionStorage.clear();
+          
+        }
+        else {
+          const success = signOut();
+          if (!success) {
+            setError("Failed to sign out properly");
+            return;
+          }
+          
         }
 
-        // Add a small delay to ensure signOut completes
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      // Add a small delay to ensure signOut completes
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
-        // Navigate to login page
-        navigate("/login");
+      // Navigate to login page
+      navigate("/login");
       } catch (err) {
         setError("An error occurred during sign out");
         console.error("SignOut error:", err);
