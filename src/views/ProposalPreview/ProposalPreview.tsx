@@ -64,6 +64,14 @@ const ProposalPreview = () => {
     number | null
   >(null);
   const [rewritingSection, setRewritingSection] = useState<string | null>(null);
+  const [previousSectionContent, setPreviousSectionContent] = useState<{
+    sectionIndex: number | null;
+    content: any | null;
+  }>({ sectionIndex: null, content: null });
+  const [redoSectionContent, setRedoSectionContent] = useState<{
+    sectionIndex: number | null;
+    content: any | null;
+  }>({ sectionIndex: null, content: null });
 
   // Get sections from shared state
   const { outline } = sharedState;
@@ -145,6 +153,12 @@ const ProposalPreview = () => {
 
   // Handle rewrite success from child component
   const handleRewriteSuccess = (sectionIndex: number, updatedSection: any) => {
+    // Store the previous section content before updating
+    setPreviousSectionContent({
+      sectionIndex,
+      content: sharedState.outline[sectionIndex]
+    });
+
     setSharedState((prevState) => {
       const newOutline = [...prevState.outline];
       newOutline[sectionIndex] = updatedSection;
@@ -157,6 +171,64 @@ const ProposalPreview = () => {
     // Clear rewriting state
     setRewritingSection(null);
     setRewritingSectionIndex(null);
+  };
+
+  // Update handleUndoRewrite function
+  const handleUndoRewrite = () => {
+    if (
+      previousSectionContent.sectionIndex !== null &&
+      previousSectionContent.content !== null
+    ) {
+      // Store the current content for redo
+      setRedoSectionContent({
+        sectionIndex: previousSectionContent.sectionIndex,
+        content: sharedState.outline[previousSectionContent.sectionIndex]
+      });
+
+      setSharedState((prevState) => {
+        const newOutline = [...prevState.outline];
+        newOutline[previousSectionContent.sectionIndex!] =
+          previousSectionContent.content;
+        return {
+          ...prevState,
+          outline: newOutline
+        };
+      });
+
+      // Show toast confirmation
+      toast.info("Previous content restored");
+
+      // Clear the previous content state
+      setPreviousSectionContent({ sectionIndex: null, content: null });
+    } else {
+      toast.info("Nothing to undo");
+    }
+  };
+
+  // Add a new function to handle redo
+  const handleRedoRewrite = () => {
+    if (
+      redoSectionContent.sectionIndex !== null &&
+      redoSectionContent.content !== null
+    ) {
+      setSharedState((prevState) => {
+        const newOutline = [...prevState.outline];
+        newOutline[redoSectionContent.sectionIndex!] =
+          redoSectionContent.content;
+        return {
+          ...prevState,
+          outline: newOutline
+        };
+      });
+
+      // Show toast confirmation
+      toast.info("Redo successful");
+
+      // Clear the redo content state
+      setRedoSectionContent({ sectionIndex: null, content: null });
+    } else {
+      toast.info("Nothing to redo");
+    }
   };
 
   const handleRewriteCancel = () => {
@@ -173,10 +245,17 @@ const ProposalPreview = () => {
     }
   };
 
+  // Update the execCommand function to handle our custom redo for rewrites
   const execCommand = (command: string, value: string = "") => {
-    document.execCommand(command, false, value);
-    if (activeEditorRef.current) {
-      activeEditorRef.current.focus();
+    if (command === "undo" && previousSectionContent.content !== null) {
+      handleUndoRewrite();
+    } else if (command === "redo" && redoSectionContent.content !== null) {
+      handleRedoRewrite();
+    } else {
+      document.execCommand(command, false, value);
+      if (activeEditorRef.current) {
+        activeEditorRef.current.focus();
+      }
     }
   };
 
@@ -1175,4 +1254,3 @@ const ProposalPreview = () => {
 };
 
 export default withAuth(ProposalPreview);
-
