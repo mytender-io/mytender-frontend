@@ -952,7 +952,33 @@ const ProposalPlan = ({
       over
     } = useSortable({ id: section.section_id });
 
-    const [wordCount, setWordCount] = useState(section.word_count || 0);
+    const [wordCount, setWordCount] = useState(0);
+
+    useEffect(() => {
+      if (!sharedState.isSaved) {
+        setWordCount(section.word_count || 0);
+
+        // Get existing word counts from localStorage
+        const existingWordCounts = JSON.parse(
+          localStorage.getItem("wordCounts") || "{}"
+        );
+
+        // Update the word count for this section
+        existingWordCounts[section.section_id] = section.word_count;
+
+        // Save the updated word counts back to localStorage
+        localStorage.setItem("wordCounts", JSON.stringify(existingWordCounts));
+      } else {
+        // Get stored word counts from localStorage
+        const storedWordCounts = JSON.parse(
+          localStorage.getItem("wordCounts") || "{}"
+        );
+
+        // Use the word count for this section or default to 0
+        setWordCount(storedWordCounts[section.section_id] || 0);
+      }
+    }, [sharedState.isSaved]);
+
     // Add a ref to store the timeout ID
     const wordCountTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -1203,18 +1229,32 @@ const ProposalPlan = ({
                   min={0}
                   step={50}
                   className="w-20 text-center"
-                  disabled={isLoading || sharedState.isLoading}
+                  disabled={isLoading}
                   onChange={(e) => {
                     const value = parseInt(e.target.value);
                     if (!isNaN(value) && value >= 0) {
                       setWordCount(value);
+
+                      // Get existing word counts
+                      const existingWordCounts = JSON.parse(
+                        localStorage.getItem("wordCounts") || "{}"
+                      );
+
+                      // Update this section's word count
+                      existingWordCounts[section.section_id] = value;
+
+                      // Save back to localStorage as a single object
+                      localStorage.setItem(
+                        "wordCounts",
+                        JSON.stringify(existingWordCounts)
+                      );
 
                       // Clear any existing timeout
                       if (wordCountTimeoutRef.current) {
                         clearTimeout(wordCountTimeoutRef.current);
                       }
 
-                      // Set a new timeout to update the shared state after 3 seconds of inactivity
+                      // Set a new timeout to update the shared state after 2 seconds of inactivity
                       const timeoutId = setTimeout(() => {
                         handleSectionChange(index, "word_count", value);
 

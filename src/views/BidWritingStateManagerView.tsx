@@ -91,7 +91,7 @@ export interface SharedState {
   bid_manager: string;
   contributors: Contributor;
   original_creator: string;
-  // isSaved: boolean;
+  isSaved: boolean;
   isLoading: boolean;
   saveSuccess: boolean | null;
   object_id: string | null;
@@ -132,7 +132,7 @@ const defaultState: BidContextType = {
     bid_manager: "",
     contributors: {},
     original_creator: "",
-    // isSaved: false,
+    isSaved: false,
     isLoading: false,
     saveSuccess: null,
     object_id: null,
@@ -319,7 +319,7 @@ const BidManagement: React.FC = () => {
 
       setSharedState((prev) => ({
         ...prev,
-        // isSaved: true,
+        isSaved: true,
         isLoading: false,
         saveSuccess: true,
         object_id: bid_id
