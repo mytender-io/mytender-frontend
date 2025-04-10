@@ -19,9 +19,9 @@ import {
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import { BidContext, SharedState } from "@/views/BidWritingStateManagerView";
 import axios from "axios";
-import { Check, Plus, Trash } from "lucide-react";
+import { Check, Plus, Trash, X } from "lucide-react";
 import posthog from "posthog-js";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { useAuthUser } from "react-auth-kit";
 import { toast } from "react-toastify";
 
@@ -39,44 +39,43 @@ interface Props {
 }
 
 const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
+  const [url, setUrl] = useState("");
   const [competitorsUrl, setCompetitorsUrl] = useState<string[]>([]);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [inputVisible, setInputVisible] = useState(true);
   const [dialogOpened, setDialogOpened] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const inputRef = useRef(null);
 
   const { sharedState } = useContext(BidContext);
+
+  // Retrieve recent searches (if any) or default to an empty array.
+  const recentSearches: string[] = JSON.parse(
+    localStorage.getItem("competitor_urls") || "[]"
+  );
 
   const { object_id } = sharedState;
 
   const getAuth = useAuthUser();
   const auth = getAuth();
 
-  const handleAddUrlBlur = (e: React.FocusEvent<HTMLInputElement, Element>) => {
-    e.preventDefault();
-    const url = e.target.value;
-
-    if (url) {
-      posthog.capture("added_competitor_url", {
-        url
-      });
-      setCompetitorsUrl((prev) => [url, ...prev]);
-      setInputVisible(false);
-      e.target.value = "";
-    }
+  const handleAddUrlToSetAndHistory = (url: string) => {
+    setCompetitorsUrl((prev) => [url, ...prev]);
+    localStorage.setItem(
+      "competitor_urls",
+      JSON.stringify([url, ...recentSearches])
+    );
+    setInputVisible(false);
   };
 
   const handleAddUrlKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      const url = e.currentTarget.value;
-
+      const url = e.currentTarget.value.trim();
       if (url) {
-        posthog.capture("added_competitor_url", {
-          url
-        });
-        setCompetitorsUrl((prev) => [url, ...prev]);
-        setInputVisible(false);
+        posthog.capture("added_competitor_url", { url });
+        handleAddUrlToSetAndHistory(url);
         e.currentTarget.value = "";
       }
     }
@@ -84,7 +83,6 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
 
   const handleSearch = async () => {
     if (!object_id) return;
-
     setLoading(true);
 
     const formData = new FormData();
@@ -130,7 +128,7 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
     e: React.FocusEvent<HTMLInputElement, Element>,
     i: number
   ) => {
-    const updatedUrl = e.target.value;
+    const updatedUrl = e.target.value.trim();
     setCompetitorsUrl((prev) => {
       const newList = [...prev];
       newList[i] = updatedUrl;
@@ -144,7 +142,7 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
     i: number
   ) => {
     if (e.key === "Enter") {
-      const updatedUrl = (e.target as HTMLInputElement).value;
+      const updatedUrl = (e.target as HTMLInputElement).value.trim();
       setCompetitorsUrl((prev) => {
         const newList = [...prev];
         newList[i] = updatedUrl;
@@ -168,7 +166,7 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button className="" onClick={() => setDialogOpened(true)}>
+            <Button onClick={() => setDialogOpened(true)}>
               <Plus className="h-5 w-5 text-white" />
               Competitors URLs
             </Button>
@@ -180,7 +178,7 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
             className="flex flex-col items-center max-w-[200px] text-center"
           >
             <TooltipArrow className="text-primary" />
-            <p>Add Specific competitors you know to improve accuracy</p>
+            <p>Add specific competitors you know to improve accuracy</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -192,58 +190,107 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
               Add Competitors
             </DialogTitle>
             <DialogDescription className="font-medium">
-              Paste in your competitors websites to the analyse
+              Paste in your competitors’ websites to analyse
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            {competitorsUrl.map((url, i) =>
-              editingIndex === i ? (
-                <Input
-                  key={i}
-                  defaultValue={url}
-                  onBlur={(e) => handleSaveEditBlur(e, i)}
-                  onKeyDown={(e) => handleSaveEditKeyDown(e, i)}
-                  autoFocus
-                  className="!border-0 !shadow-none focus-visible:!ring-0"
-                />
-              ) : (
-                <div className="flex w-full justify-between">
-                  <button
+            <div className="max-h-40 space-y-4 overflow-y-auto">
+              {competitorsUrl.map((url, i) =>
+                editingIndex === i ? (
+                  <Input
                     key={i}
-                    type="button"
-                    className="flex gap-2 items-center text-orange w-full text-left"
-                    onClick={() => handleEditUrl(i)}
-                  >
-                    <Check />
-                    {url}
-                  </button>
-
-                  <Button
-                    disabled={loading}
-                    onClick={() => handleDeleteUrl(i)}
-                    variant="ghost"
-                    className="hover:bg-transparent border-0"
-                  >
-                    <Trash />
-                  </Button>
-                </div>
-              )
-            )}
+                    defaultValue={url}
+                    onBlur={(e) => handleSaveEditBlur(e, i)}
+                    onKeyDown={(e) => handleSaveEditKeyDown(e, i)}
+                    autoFocus
+                    className="!border-0 !shadow-none focus-visible:!ring-0"
+                  />
+                ) : (
+                  <div key={i} className="flex w-full justify-between">
+                    <button
+                      type="button"
+                      className="flex gap-2 items-center text-orange w-full text-left"
+                      onClick={() => handleEditUrl(i)}
+                    >
+                      <Check />
+                      {url}
+                    </button>
+                    <Button
+                      disabled={loading}
+                      onClick={() => handleDeleteUrl(i)}
+                      variant="ghost"
+                      className="hover:bg-transparent border-0"
+                    >
+                      <Trash />
+                    </Button>
+                  </div>
+                )
+              )}
+            </div>
 
             {inputVisible && (
-              <Input
-                placeholder="Type Competitor URL..."
-                onBlur={handleAddUrlBlur}
-                onKeyDown={handleAddUrlKeyDown}
-                className="!border-0 !shadow-none focus-visible:!ring-0"
-              />
+              <div className="">
+                <div className="relative">
+                  <Input
+                    ref={inputRef}
+                    placeholder="Type Competitor URL..."
+                    onKeyDown={handleAddUrlKeyDown}
+                    className="!border-0 !shadow-none focus-visible:!ring-0"
+                    onClick={() => setOpen(true)}
+                    onChange={(e) => setUrl(e.target.value)}
+                  />
+
+                  <Button
+                    variant="ghost"
+                    className="absolute top-0 right-0 text-sm py-4 hover:bg-transparent hover:text-orange-600 border-0 justify-start text-orange font-semibold"
+                    onClick={() => handleAddUrlToSetAndHistory(url)}
+                  >
+                    Add
+                  </Button>
+                </div>
+
+                {open && (
+                  <div className="px-3 mt-2">
+                    <div className="flex justify-between items-center">
+                      <p className="text-gray-500 text-sm">Recent searches:</p>
+                      <Button
+                        variant="ghost"
+                        className="text-sm py-4 hover:bg-transparent border-0 justify-start text-[#575859] font-semibold p-0"
+                        onClick={() => {
+                          setOpen(false);
+                          inputRef?.current.focus();
+                        }}
+                      >
+                        <X />
+                      </Button>
+                    </div>
+                    <div className="flex flex-col max-h-36  overflow-y-auto border rounded-md mt-2">
+                      {recentSearches.map((s, i) => (
+                        <button
+                          className="text-left p-2 hover:bg-gray-50 rounded border-b last:border-b-0"
+                          onClick={() => {
+                            setCompetitorsUrl((prev) => [s, ...prev]);
+                            setInputVisible(false);
+                          }}
+                          key={i}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
 
             {competitorsUrl.length > 0 && (
               <Button
                 variant="ghost"
                 className="hover:bg-transparent border-0 justify-start text-[#575859] font-semibold"
-                onClick={() => setInputVisible(true)}
+                onClick={() => {
+                  setInputVisible(true);
+                  inputRef?.current.focus();
+                }}
               >
                 + Add Competitor
               </Button>
