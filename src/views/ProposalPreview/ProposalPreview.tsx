@@ -800,7 +800,7 @@ const ProposalPreview = () => {
                 <div className="rounded-md bg-white w-full max-w-4xl flex-1">
                   <div
                     ref={toolbarRef}
-                    className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-[51]"
+                    className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-[49]"
                   >
                     <ProposalToolbar
                       activeEditorRef={activeEditorRef}
@@ -986,7 +986,7 @@ const ProposalPreview = () => {
                     {/* Comment Input */}
                     {showCommentInput && (
                       <div
-                        className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-[51] p-3 w-72"
+                        className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-72"
                         style={{
                           top: `${selectionMenuPosition.top}px`
                         }}
