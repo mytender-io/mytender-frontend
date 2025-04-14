@@ -146,7 +146,8 @@ const GenerateProposalModal = ({
         `http${HTTP_PREFIX}://${API_URL}/generate_proposal`,
         {
           bid_id: bid_id,
-          datasets: datasets
+          datasets: datasets,
+          outline: sharedState.outline || []
         },
         {
           headers: {
