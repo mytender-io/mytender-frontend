@@ -85,7 +85,7 @@ const Bids = () => {
 
   // Function to check if a bid was edited less than 20 minutes ago and has empty win themes
   // Function to check if a bid was recently created and new_bid_completed is false
-  const isRecentlyCreatedWithEmptyThemes = (bid: Bid): boolean => {
+  const isIncompleteBid = (bid: Bid): boolean => {
     // Check if timestamp exists
 
     // Check if new_bid_completed is false or undefined (treating undefined as false)
@@ -218,9 +218,7 @@ const Bids = () => {
     const searchFiltered = filterBids(bids, searchTerm);
 
     // Then filter out any incomplete bids
-    const completeBids = searchFiltered.filter(
-      (bid) => !isRecentlyCreatedWithEmptyThemes(bid)
-    );
+    const completeBids = searchFiltered.filter((bid) => !isIncompleteBid(bid));
 
     setFilteredBids(completeBids);
     setFilteredBids(filterBids(bids, searchTerm));
@@ -248,17 +246,6 @@ const Bids = () => {
   }, [sortedBids, currentPage, pageSize]);
 
   const navigateToChatbot = (bid: Bid) => {
-    // Check if bid is disabled
-    if (isRecentlyCreatedWithEmptyThemes(bid)) {
-      toast.info("This tender is still being created. Please try again later.");
-      return;
-    }
-
-    posthog.capture("view_bid_details", {
-      bid_id: bid._id,
-      bid_title: bid.bid_title
-    });
-
     localStorage.removeItem("bidState");
     localStorage.removeItem("tenderLibChatMessages");
     localStorage.removeItem("previewSidepaneMessages");
@@ -565,14 +552,28 @@ const Bids = () => {
                         return (
                           <TableRow key={bid._id}>
                             <TableCell className="px-4 group">
-                              <Link
-                                to={`/bid?id=${bid._id}`}
-                                state={{ bid: bid, fromBidsTable: true }}
-                                onClick={() => navigateToChatbot(bid)}
-                                className="block truncate w-full text-gray-hint_text no-underline group-hover:text-orange group-hover:font-bold transition-colors duration-200"
+                              {/* For all bids, use a span that we can control the click behavior on */}
+                              <span
+                                className={`block truncate w-full ${
+                                  isIncompleteBid(bid)
+                                    ? "text-gray-300 cursor-not-allowed"
+                                    : "text-gray-hint_text cursor-pointer hover:text-orange hover:font-bold transition-colors duration-200"
+                                }`}
+                                onClick={(e) => {
+                                  // Only navigate for complete bids
+                                  if (!isIncompleteBid(bid)) {
+                                    navigateToChatbot(bid);
+                                  } else {
+                                    // For incomplete bids, just show the toast and don't navigate
+                                    e.preventDefault();
+                                    toast.info(
+                                      "This tender is still being created. Please try again later."
+                                    );
+                                  }
+                                }}
                               >
                                 {bid.bid_title}
-                              </Link>
+                              </span>
                             </TableCell>
                             <TableCell className="px-4">
                               {bid.timestamp
@@ -665,4 +666,3 @@ const Bids = () => {
 };
 
 export default withAuth(Bids);
-
