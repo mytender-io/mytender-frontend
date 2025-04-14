@@ -120,6 +120,7 @@ const Bid = () => {
           bid_manager: bidData?.bid_manager || "",
           contributors: bidData?.contributors || "",
           original_creator: bidData?.original_creator || "",
+          isSaved: false,
           object_id: bidData?._id || "",
           selectedFolders: selectedFolders,
           timestamp: bidData?.timestamp || "",

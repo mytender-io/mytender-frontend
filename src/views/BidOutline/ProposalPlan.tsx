@@ -968,6 +968,10 @@ const ProposalPlan = ({
 
         // Save the updated word counts back to localStorage
         localStorage.setItem("wordCounts", JSON.stringify(existingWordCounts));
+        setSharedState((prevState) => ({
+          ...prevState,
+          isSaved: true
+        }));
       } else {
         // Get stored word counts from localStorage
         const storedWordCounts = JSON.parse(
@@ -1363,10 +1367,12 @@ const ProposalPlan = ({
                         Status
                       </TableHead>
                       <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                        <LengthUnitDropdown
-                          value={lengthUnit}
-                          onChange={(value) => setLengthUnit(value)}
-                        />
+                        <div className="flex items-center justify-center">
+                          <LengthUnitDropdown
+                            value={lengthUnit}
+                            onChange={(value) => setLengthUnit(value)}
+                          />
+                        </div>
                       </TableHead>
                       <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                         Answerer

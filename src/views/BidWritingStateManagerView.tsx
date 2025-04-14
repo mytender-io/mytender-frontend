@@ -319,7 +319,7 @@ const BidManagement: React.FC = () => {
 
       setSharedState((prev) => ({
         ...prev,
-        isSaved: true,
+        // isSaved: true,
         isLoading: false,
         saveSuccess: true,
         object_id: bid_id
