@@ -201,7 +201,7 @@ const TenderAnalysis = () => {
     {
       name: "Pain Points",
       Icon: Lightbulb,
-      prompt: "generate_derive_insights",
+      prompt: "generate_customer_painpoints",
       stateKey: "derive_insights",
       summaryKey: "customer_pain_points",
       extract_insights_prompt: "extract_section_derive_insights"
