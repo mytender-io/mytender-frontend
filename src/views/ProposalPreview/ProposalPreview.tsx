@@ -777,7 +777,7 @@ const ProposalPreview = () => {
   };
 
   return (
-    <div className="proposal-preview-container pb-8">
+    <div className="proposal-preview-container">
       <div>
         {localLoading ? (
           <div className="flex justify-center items-center h-full">
@@ -794,7 +794,7 @@ const ProposalPreview = () => {
             <div className="flex gap-2 pr-4">
               <div
                 className={cn(
-                  "h-full relative flex justify-center gap-4 flex-1"
+                  "h-full relative flex justify-center gap-4 flex-1 pb-8"
                 )}
               >
                 <div className="rounded-md bg-white w-full max-w-4xl flex-1">
