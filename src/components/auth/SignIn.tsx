@@ -115,9 +115,9 @@ const Signin = () => {
 
         navigate("/home");
 
-        posthog.identify(userInfo.email);
+        posthog.identify(user.email);
         posthog.capture("user_active", {
-          distinct_id: userInfo.email,
+          distinct_id: user.email,
           timestamp: new Date().toISOString()
         });
       }
