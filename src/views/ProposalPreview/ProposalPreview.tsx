@@ -64,6 +64,14 @@ const ProposalPreview = () => {
     number | null
   >(null);
   const [rewritingSection, setRewritingSection] = useState<string | null>(null);
+  const [previousSectionContent, setPreviousSectionContent] = useState<{
+    sectionIndex: number | null;
+    content: any | null;
+  }>({ sectionIndex: null, content: null });
+  const [redoSectionContent, setRedoSectionContent] = useState<{
+    sectionIndex: number | null;
+    content: any | null;
+  }>({ sectionIndex: null, content: null });
 
   // Get sections from shared state
   const { outline } = sharedState;
@@ -145,6 +153,12 @@ const ProposalPreview = () => {
 
   // Handle rewrite success from child component
   const handleRewriteSuccess = (sectionIndex: number, updatedSection: any) => {
+    // Store the previous section content before updating
+    setPreviousSectionContent({
+      sectionIndex,
+      content: sharedState.outline[sectionIndex]
+    });
+
     setSharedState((prevState) => {
       const newOutline = [...prevState.outline];
       newOutline[sectionIndex] = updatedSection;
@@ -157,6 +171,64 @@ const ProposalPreview = () => {
     // Clear rewriting state
     setRewritingSection(null);
     setRewritingSectionIndex(null);
+  };
+
+  // Update handleUndoRewrite function
+  const handleUndoRewrite = () => {
+    if (
+      previousSectionContent.sectionIndex !== null &&
+      previousSectionContent.content !== null
+    ) {
+      // Store the current content for redo
+      setRedoSectionContent({
+        sectionIndex: previousSectionContent.sectionIndex,
+        content: sharedState.outline[previousSectionContent.sectionIndex]
+      });
+
+      setSharedState((prevState) => {
+        const newOutline = [...prevState.outline];
+        newOutline[previousSectionContent.sectionIndex!] =
+          previousSectionContent.content;
+        return {
+          ...prevState,
+          outline: newOutline
+        };
+      });
+
+      // Show toast confirmation
+      toast.info("Previous content restored");
+
+      // Clear the previous content state
+      setPreviousSectionContent({ sectionIndex: null, content: null });
+    } else {
+      toast.info("Nothing to undo");
+    }
+  };
+
+  // Add a new function to handle redo
+  const handleRedoRewrite = () => {
+    if (
+      redoSectionContent.sectionIndex !== null &&
+      redoSectionContent.content !== null
+    ) {
+      setSharedState((prevState) => {
+        const newOutline = [...prevState.outline];
+        newOutline[redoSectionContent.sectionIndex!] =
+          redoSectionContent.content;
+        return {
+          ...prevState,
+          outline: newOutline
+        };
+      });
+
+      // Show toast confirmation
+      toast.info("Redo successful");
+
+      // Clear the redo content state
+      setRedoSectionContent({ sectionIndex: null, content: null });
+    } else {
+      toast.info("Nothing to redo");
+    }
   };
 
   const handleRewriteCancel = () => {
@@ -173,10 +245,17 @@ const ProposalPreview = () => {
     }
   };
 
+  // Update the execCommand function to handle our custom redo for rewrites
   const execCommand = (command: string, value: string = "") => {
-    document.execCommand(command, false, value);
-    if (activeEditorRef.current) {
-      activeEditorRef.current.focus();
+    if (command === "undo" && previousSectionContent.content !== null) {
+      handleUndoRewrite();
+    } else if (command === "redo" && redoSectionContent.content !== null) {
+      handleRedoRewrite();
+    } else {
+      document.execCommand(command, false, value);
+      if (activeEditorRef.current) {
+        activeEditorRef.current.focus();
+      }
     }
   };
 
@@ -698,7 +777,7 @@ const ProposalPreview = () => {
   };
 
   return (
-    <div className="proposal-preview-container pb-8">
+    <div className="proposal-preview-container">
       <div>
         {localLoading ? (
           <div className="flex justify-center items-center h-full">
@@ -715,13 +794,13 @@ const ProposalPreview = () => {
             <div className="flex gap-2 pr-4">
               <div
                 className={cn(
-                  "h-full relative flex justify-center gap-4 flex-1"
+                  "h-full relative flex justify-center gap-4 flex-1 pb-8"
                 )}
               >
                 <div className="rounded-md bg-white w-full max-w-4xl flex-1">
                   <div
                     ref={toolbarRef}
-                    className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-[51]"
+                    className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-[49]"
                   >
                     <ProposalToolbar
                       activeEditorRef={activeEditorRef}
@@ -907,7 +986,7 @@ const ProposalPreview = () => {
                     {/* Comment Input */}
                     {showCommentInput && (
                       <div
-                        className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-[51] p-3 w-72"
+                        className="absolute left-0 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-3 w-72"
                         style={{
                           top: `${selectionMenuPosition.top}px`
                         }}
@@ -1175,4 +1254,3 @@ const ProposalPreview = () => {
 };
 
 export default withAuth(ProposalPreview);
-

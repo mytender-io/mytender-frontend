@@ -445,7 +445,7 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
   return (
     <>
       <div
-        className="absolute right-1"
+        className="absolute right-1 z-50"
         style={{
           top: `${selectionMenuPosition.top}px`
         }}
@@ -533,4 +533,3 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
 };
 
 export default TextSelectionMenu;
-

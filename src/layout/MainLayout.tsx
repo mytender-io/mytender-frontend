@@ -6,6 +6,7 @@ import posthog from "posthog-js";
 import { cn } from "@/utils";
 import { LoadingProvider } from "@/context/LoadingContext";
 import { USERS_TO_EXCLUDE_IN_POSTHOG } from "@/constants/posthogUsers";
+import { GeneratingTenderInsightProvider } from "@/context/GeneratingTenderInsightContext";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -106,7 +107,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       >
         <SideBar onCollapseChange={setSidebarCollapsed} />
         <main className="flex-1 transition-all duration-300 ease-in-out bg-white border border-typo-200 rounded-2xl overflow-x-auto">
-          <LoadingProvider>{children}</LoadingProvider>
+          <LoadingProvider>
+            <GeneratingTenderInsightProvider>
+              {children}
+            </GeneratingTenderInsightProvider>
+          </LoadingProvider>
         </main>
       </div>
     </>

@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../../../helper/Constants";
 import { BidContext } from "../../BidWritingStateManagerView";
@@ -39,6 +39,8 @@ import { cn } from "@/utils";
 import TenderLibraryChatDialog from "@/views/BidPlanner/components/TenderLibraryChat";
 import InterrogateTenderDialog from "./InterrogateTender";
 import AddCompetitors from "./AddCompetitors";
+import { useLoading } from "@/context/LoadingContext";
+import { useGeneratingTenderInsightContext } from "@/context/GeneratingTenderInsightContext";
 
 const LoadingState = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -145,12 +147,21 @@ const CustomTable = ({ content }: { content: string }) => {
 
 const TenderAnalysis = () => {
   const [currentTabIndex, setCurrentTabIndex] = useState<number>(0);
-  const [loadingTab, setLoadingTab] = useState(null);
+  // const [loadingBidTab, setLoadingBidTab] = useState(null);
+  const {
+    loadingBidTab,
+    setLoadingBidTab,
+    generate_tender_insights,
+    tenderInsight,
+    setTenderInsight,
+    generatingInsightError
+  } = useGeneratingTenderInsightContext();
   const [chatDialogOpen, setChatDialogOpen] = useState(false);
   const { sharedState, setSharedState } = useContext(BidContext);
   const getAuth = useAuthUser();
   const auth = getAuth();
   const mounted = useRef(false);
+  const regenerateBtnRef = useRef<HTMLButtonElement | null>(null);
 
   const [editMode, setEditMode] = useState<number | null>(null);
   const [editContent, setEditContent] = useState<string>("");
@@ -190,7 +201,7 @@ const TenderAnalysis = () => {
     {
       name: "Pain Points",
       Icon: Lightbulb,
-      prompt: "generate_derive_insights",
+      prompt: "generate_customer_painpoints",
       stateKey: "derive_insights",
       summaryKey: "customer_pain_points",
       extract_insights_prompt: "extract_section_derive_insights"
@@ -233,7 +244,7 @@ const TenderAnalysis = () => {
   ]);
 
   const handleTabChange = (_, newValue: number) => {
-    if (loadingTab !== null) {
+    if (loadingBidTab !== null) {
       toast.warning("Please wait until the current generation completes.");
       return;
     }
@@ -257,8 +268,6 @@ const TenderAnalysis = () => {
     formData.append("bid_intel_type", bid_intel_type);
     formData.append("extract_insights_prompt", tab.extract_insights_prompt);
 
-    console.log(formData);
-
     const result = await axios.post(
       `http${HTTP_PREFIX}://${API_URL}/assign_insights_to_outline_questions`,
       formData,
@@ -277,7 +286,7 @@ const TenderAnalysis = () => {
   };
 
   const handleTabClick = async (index) => {
-    if (loadingTab !== null) {
+    if (loadingBidTab !== null) {
       toast.warning("Please wait until the current generation completes.");
       return;
     }
@@ -298,7 +307,7 @@ const TenderAnalysis = () => {
       return;
     }
 
-    setLoadingTab(index);
+    setLoadingBidTab(index);
 
     try {
       const formData = new FormData();
@@ -345,7 +354,7 @@ const TenderAnalysis = () => {
       if (err.response?.status === 404) toast.warning(errorMsg);
       else toast.error(errorMsg);
     } finally {
-      setLoadingTab(null);
+      setLoadingBidTab(null);
     }
   };
 
@@ -356,7 +365,7 @@ const TenderAnalysis = () => {
     }
 
     const tab = tabs[index];
-    setLoadingTab(index);
+    setLoadingBidTab(index);
 
     try {
       const formData = new FormData();
@@ -395,7 +404,7 @@ const TenderAnalysis = () => {
       }
     } finally {
       if (mounted.current) {
-        setLoadingTab(null);
+        setLoadingBidTab(null);
       }
     }
   };
@@ -408,69 +417,28 @@ const TenderAnalysis = () => {
     }
 
     const tab = tabs[index];
-    setLoadingTab(index);
+    setLoadingBidTab(index);
     setCurrentTabIndex(index);
 
-    // Use special handler for compliance tab regeneration
     if (tab.prompt === "generate_compliance") {
       handleCompliance(index);
       return;
     }
 
-    try {
-      const formData = new FormData();
-      formData.append("bid_id", object_id);
-      formData.append("prompt", tab.prompt);
+    const formData = new FormData();
+    formData.append("bid_id", object_id);
+    formData.append("prompt", tab.prompt);
 
-      const endpoint =
-        tab.prompt === "generate_differentiation_opportunities"
-          ? `generate_differentiation_opportunities`
-          : `generate_tender_insights`;
+    const endpoint =
+      tab.prompt === "generate_differentiation_opportunities"
+        ? `generate_differentiation_opportunities`
+        : `generate_tender_insights`;
 
-      const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/${endpoint}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${auth?.token}`,
-            "Content-Type": "multipart/form-data"
-          }
-        }
-      );
+    await generate_tender_insights(endpoint, formData, mounted);
 
-      if (mounted.current) {
-        const generatedContent =
-          result.data.requirements || result.data.analysis;
-        setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
-        setSharedState((prev) => ({
-          ...prev,
-          [tab.stateKey]: generatedContent
-        }));
-
-        if (result.data.summary && tab.summaryKey) {
-          setSharedState((prev) => ({
-            ...prev,
-            [tab.summaryKey]: result.data.summary
-          }));
-        }
-
-        // Pass the tab object to assign_insights_to_questions
-        await assign_insights_to_questions(tab.summaryKey, tab);
-        toast.success("Regenerated successfully!");
-      }
-    } catch (err) {
-      if (mounted.current) {
-        const errorMsg =
-          err.response?.status === 404
-            ? "No documents found in the tender library. Please upload documents before generating"
-            : "An error occurred while regenerating. Please try again.";
-        if (err.response?.status === 404) toast.warning(errorMsg);
-        else toast.error(errorMsg);
-      }
-    } finally {
-      if (mounted.current) {
-        setLoadingTab(null);
-      }
+    if (generatingInsightError) {
+      setLoadingBidTab(null);
+      toast.error(generatingInsightError);
     }
   };
 
@@ -601,6 +569,57 @@ const TenderAnalysis = () => {
     });
   };
 
+  useEffect(() => {
+    const handleTenderInsight = async () => {
+      if (generatingInsightError) {
+        setLoadingBidTab(null);
+        toast.error(generatingInsightError);
+      }
+
+      if (
+        mounted.current &&
+        tenderInsight &&
+        loadingBidTab !== null &&
+        object_id
+      ) {
+        const tab = tabs[loadingBidTab];
+
+        const generatedContent =
+          tenderInsight.data.requirements || tenderInsight.data.analysis;
+
+        setTabContent((prev) => ({
+          ...prev,
+          [loadingBidTab]: generatedContent
+        }));
+        setSharedState((prev) => ({
+          ...prev,
+          [tab.stateKey]: generatedContent
+        }));
+
+        if (tenderInsight.data.summary && tab.summaryKey) {
+          setSharedState((prev) => ({
+            ...prev,
+            [tab.summaryKey]: tenderInsight.data.summary
+          }));
+        }
+
+        await assign_insights_to_questions(tab.summaryKey, tab);
+        toast.success("Regenerated successfully!");
+        setLoadingBidTab(null);
+        setTenderInsight(null);
+      }
+    };
+
+    handleTenderInsight();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tenderInsight, loadingBidTab, object_id, generatingInsightError]);
+
+  useEffect(() => {
+    if (loadingBidTab) {
+      setCurrentTabIndex(loadingBidTab);
+    }
+  }, [loadingBidTab, currentTabIndex]);
+
   return (
     <div>
       <div className="bg-gray-100 border border-gray-line rounded-md p-2 mb-4">
@@ -658,9 +677,9 @@ const TenderAnalysis = () => {
                     "relative flex items-center justify-center gap-2 px-6 py-3 data-[state=active]:text-orange bg-transparent w-full min-w-0",
                     "min-w-0"
                   )}
-                  disabled={loadingTab !== null && loadingTab !== index}
+                  disabled={loadingBidTab !== null && loadingBidTab !== index}
                 >
-                  {loadingTab === index && (
+                  {loadingBidTab === index && (
                     <div
                       className={cn(
                         "absolute top-14 left-0 z-10 bg-white rounded-lg shadow-2xl"
@@ -681,17 +700,18 @@ const TenderAnalysis = () => {
                   <span className={cn("font-medium")}>{tab.name}</span>
                   {tabContent[index as keyof typeof tabContent] && (
                     <Button
+                      ref={regenerateBtnRef}
                       onClick={(e) => handleRegenerateClick(index, e)}
                       variant="ghost"
                       size="icon"
-                      disabled={loadingTab !== null}
+                      disabled={loadingBidTab !== null}
                       className={cn(
                         "bg-gray-line hover:bg-orange-100 hover:text-orange h-6 w-6 min-w-6",
                         currentTabIndex === index &&
-                          (loadingTab !== index
+                          (loadingBidTab !== index
                             ? "bg-orange-100"
                             : "bg-transparent"),
-                        loadingTab === index && "animate-spin"
+                        loadingBidTab === index && "animate-spin"
                       )}
                     >
                       <RefreshCw size={14} />

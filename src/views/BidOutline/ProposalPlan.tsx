@@ -952,7 +952,37 @@ const ProposalPlan = ({
       over
     } = useSortable({ id: section.section_id });
 
-    const [wordCount, setWordCount] = useState(section.word_count || 0);
+    const [wordCount, setWordCount] = useState(0);
+
+    useEffect(() => {
+      if (!sharedState.isSaved) {
+        setWordCount(section.word_count || 0);
+
+        // Get existing word counts from localStorage
+        const existingWordCounts = JSON.parse(
+          localStorage.getItem("wordCounts") || "{}"
+        );
+
+        // Update the word count for this section
+        existingWordCounts[section.section_id] = section.word_count;
+
+        // Save the updated word counts back to localStorage
+        localStorage.setItem("wordCounts", JSON.stringify(existingWordCounts));
+        setSharedState((prevState) => ({
+          ...prevState,
+          isSaved: true
+        }));
+      } else {
+        // Get stored word counts from localStorage
+        const storedWordCounts = JSON.parse(
+          localStorage.getItem("wordCounts") || "{}"
+        );
+
+        // Use the word count for this section or default to 0
+        setWordCount(storedWordCounts[section.section_id] || 0);
+      }
+    }, [sharedState.isSaved]);
+
     // Add a ref to store the timeout ID
     const wordCountTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -1209,12 +1239,26 @@ const ProposalPlan = ({
                     if (!isNaN(value) && value >= 0) {
                       setWordCount(value);
 
+                      // Get existing word counts
+                      const existingWordCounts = JSON.parse(
+                        localStorage.getItem("wordCounts") || "{}"
+                      );
+
+                      // Update this section's word count
+                      existingWordCounts[section.section_id] = value;
+
+                      // Save back to localStorage as a single object
+                      localStorage.setItem(
+                        "wordCounts",
+                        JSON.stringify(existingWordCounts)
+                      );
+
                       // Clear any existing timeout
                       if (wordCountTimeoutRef.current) {
                         clearTimeout(wordCountTimeoutRef.current);
                       }
 
-                      // Set a new timeout to update the shared state after 3 seconds of inactivity
+                      // Set a new timeout to update the shared state after 2 seconds of inactivity
                       const timeoutId = setTimeout(() => {
                         handleSectionChange(index, "word_count", value);
 
@@ -1223,7 +1267,7 @@ const ProposalPlan = ({
                           newWordCount: value,
                           bidId: object_id
                         });
-                      }, 3000);
+                      }, 2000);
 
                       // Store the timeout ID in the ref
                       wordCountTimeoutRef.current = timeoutId;
@@ -1302,8 +1346,8 @@ const ProposalPlan = ({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[60px] flex items-center justify-end gap-2 h-full py-3.5 px-4">
-                        <div className="flex items-center h-10">
+                      <TableHead className="w-[60px] py-3.5 px-4">
+                        <div className="flex justify-end">
                           <Checkbox
                             checked={selectedSections.size === outline.length}
                             onCheckedChange={(checked: boolean) =>
@@ -1322,11 +1366,13 @@ const ProposalPlan = ({
                       <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                         Status
                       </TableHead>
-                      <TableHead className="flex items-center h-full justify-center text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                        <LengthUnitDropdown
-                          value={lengthUnit}
-                          onChange={(value) => setLengthUnit(value)}
-                        />
+                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                        <div className="flex items-center justify-center">
+                          <LengthUnitDropdown
+                            value={lengthUnit}
+                            onChange={(value) => setLengthUnit(value)}
+                          />
+                        </div>
                       </TableHead>
                       <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
                         Answerer

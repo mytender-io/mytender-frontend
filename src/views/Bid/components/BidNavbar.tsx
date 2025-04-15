@@ -1,9 +1,8 @@
 import React, { useContext } from "react";
-import { BidContext, Section } from "../../BidWritingStateManagerView";
-// import { faEdit, faEye, faUsers } from "@fortawesome/free-solid-svg-icons";
-import BidTitle from "../../../components/BidTitle";
-import GenerateProposalModal from "../../../modals/GenerateProposalModal";
-import SaveStatus from "@/components/SaveStatus";
+import { BidContext, Section } from "@/views/BidWritingStateManagerView";
+import BidTitle from "@/components/BidTitle";
+import GenerateProposalModal from "@/modals/GenerateProposalModal";
+import SaveStatus from "./SaveStatus";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import PlusIcon from "@/components/icons/PlusIcon";
