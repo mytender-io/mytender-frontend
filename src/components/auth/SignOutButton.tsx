@@ -1,21 +1,44 @@
 import { useSignOut } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useAuthUser } from "react-auth-kit";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const SignOut = () => {
   const navigate = useNavigate();
+  const getAuth = useAuthUser();
+  const auth = getAuth();
+  const {
+    logout
+  } = useAuth0();
+  const authType = useRef(auth?.authType || "default");
   const signOut = useSignOut();
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     const performSignOut = async () => {
       try {
-        // Perform sign out
-        const success = signOut();
+        // Perform sign out Okta/default
+        console.log('it is call signout for auth0',authType.current)
 
-        if (!success) {
-          setError("Failed to sign out properly");
-          return;
+        if (authType.current === 'Auth0') {
+          console.log('it is call signout for auth0')
+          await logout({
+            logoutParams: {
+              returnTo: window.location.origin+'/login', // Redirect URL after logout
+              // federated: true // Logout from identity provider too
+            }
+          });
+          localStorage.clear();
+          sessionStorage.clear();
+
+        }
+        else {
+          const success = signOut();
+          if (!success) {
+            setError("Failed to sign out properly");
+            return;
+          }
+
         }
 
         // Add a small delay to ensure signOut completes

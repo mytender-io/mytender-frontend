@@ -18,17 +18,127 @@ import AuthState from "./AuthState";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import AuthLayout from "@/layout/AuthLayout";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useSignIn } from "react-auth-kit";
+import { useNavigate } from "react-router-dom";
+import posthog from "posthog-js";
 
 const Signin = () => {
-  const { submitSignIn, isLoading } = useAuthSignIn();
+  const signIn = useSignIn();
+  const navigate = useNavigate();
 
+  const { submitSignIn, isLoading } = useAuthSignIn();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState<string>("");
   const [isMounted, setIsMounted] = useState<boolean>(true);
 
-  // Set up cleanup when component unmounts
+  const {
+    isLoading:auth0Loading,
+    isAuthenticated,
+    user,
+    loginWithRedirect,
+    getAccessTokenSilently,
+    getIdTokenClaims
+  } = useAuth0();
+
+  const sendAuth0DataToBackend = async (userData: any, tokens: any) => {
+    try {
+      const new_data = {
+        user: {
+          name: userData.name,
+          email: userData.email,
+          sub: userData.sub,
+          locale: userData.locale,
+          preferred_username: userData.preferred_username,
+          picture: userData.picture
+        },
+        tokens: {
+          id_token: tokens.__raw
+        }
+      }
+
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/auth0_login`,
+        new_data,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      return response.data;
+    } catch (err) {
+      console.error('Error sending Okta data to backend:', err);
+      throw new Error(err.response?.data?.detail || "Failed to send Okta data to backend");
+    }
+  };
+
+
+
+  const fetchToken = () => {
+    if (!isAuthenticated) {
+      console.log('User not authenticated');
+      return;
+    }
+    getIdTokenClaims().then(idTokenClaims => {
+
+      sendAuth0DataToBackend(user, idTokenClaims)
+      const currentTime = Math.floor(Date.now() / 1000); 
+      const MAX_ALLOWED_EXPIRATION = 30 * 24 * 60 * 60; // 30 days in seconds
+
+      const authSuccess = signIn({
+        token: idTokenClaims.__raw,
+        tokenType: "Bearer",
+        expiresIn: MAX_ALLOWED_EXPIRATION,
+        authState: {
+          email: user.email,
+          name:user.name,
+          auth0Id:user.sub,
+          token: idTokenClaims.__raw,
+          authType: 'Auth0',
+          expiresAt: currentTime + MAX_ALLOWED_EXPIRATION,
+          timeRemaining: MAX_ALLOWED_EXPIRATION,
+
+        }
+      });
+
+
+      if (authSuccess) {
+        // Clear local storage
+        ['bidInfo', 'backgroundInfo', 'response', 'inputText',
+          'editorState', 'messages', 'chatResponseMessages',
+          'tenderLibChatMessages', 'previewSidepaneMessages',
+          'bidState', 'lastActiveTab'].forEach(key => {
+            localStorage.removeItem(key);
+          });
+
+        navigate("/home");
+
+        posthog.identify(userInfo.email);
+        posthog.capture("user_active", {
+          distinct_id: userInfo.email,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+    }).catch(error => {
+      console.error('Error getting token:', error);
+    });
+
+  };
+
   useEffect(() => {
+    fetchToken();
+
+  }, [isAuthenticated, getAccessTokenSilently]);
+
+
+  useEffect(() => {
+
     return () => {
+
+
       setIsMounted(false);
     };
   }, []);
@@ -54,6 +164,7 @@ const Signin = () => {
       }
     }
   };
+
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -193,8 +304,24 @@ const Signin = () => {
             >
               {isLoading ? "Loading..." : "Sign in"}
             </Button>
+
+
           </div>
         </form>
+        <br />
+
+        <Button
+          disabled={auth0Loading}
+          className="w-full h-12 text-lg text-white"
+          onClick={() =>
+            loginWithRedirect({
+              responseType: 'code', // Explicitly set
+            }).catch(err => console.error('Login error:', err))
+          }
+        >
+         {auth0Loading ? "Loading..." : "Sign in with Okta"} 
+        </Button>
+
       </div>
       <AuthState />
     </AuthLayout>
@@ -202,3 +329,4 @@ const Signin = () => {
 };
 
 export default Signin;
+
