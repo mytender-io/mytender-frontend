@@ -33,6 +33,7 @@ const Signin = () => {
   const [isMounted, setIsMounted] = useState<boolean>(true);
 
   const {
+    isLoading:auth0Loading,
     isAuthenticated,
     user,
     loginWithRedirect,
@@ -310,6 +311,7 @@ const Signin = () => {
         <br />
 
         <Button
+          disabled={auth0Loading}
           className="w-full h-12 text-lg text-white"
           onClick={() =>
             loginWithRedirect({
@@ -317,7 +319,7 @@ const Signin = () => {
             }).catch(err => console.error('Login error:', err))
           }
         >
-          Log In with Okta
+         {auth0Loading ? "Loading..." : "Sign in with Okta"} 
         </Button>
 
       </div>
