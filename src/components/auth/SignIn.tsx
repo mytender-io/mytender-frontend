@@ -18,24 +18,29 @@ import AuthState from "./AuthState";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import AuthLayout from "@/layout/AuthLayout";
-import { useOktaAuth } from '@okta/okta-react';
-import posthog from "posthog-js";
+import { useAuth0 } from "@auth0/auth0-react";
 import { useSignIn } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
-
+import posthog from "posthog-js";
 
 const Signin = () => {
-  const navigate = useNavigate();
   const signIn = useSignIn();
+  const navigate = useNavigate();
 
   const { submitSignIn, isLoading } = useAuthSignIn();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState<string>("");
   const [isMounted, setIsMounted] = useState<boolean>(true);
-  const { authState, oktaAuth } = useOktaAuth();
 
-  //send OKta token to verfiy from the backend and save users data
-  const sendOktaDataToBackend = async (userData: any, tokens: any) => {
+  const {
+    isAuthenticated,
+    user,
+    loginWithRedirect,
+    getAccessTokenSilently,
+    getIdTokenClaims
+  } = useAuth0();
+
+  const sendAuth0DataToBackend = async (userData: any, tokens: any) => {
     try {
       const new_data = {
         user: {
@@ -43,19 +48,16 @@ const Signin = () => {
           email: userData.email,
           sub: userData.sub,
           locale: userData.locale,
-          preferred_username: userData.preferred_username
+          preferred_username: userData.preferred_username,
+          picture: userData.picture
         },
         tokens: {
-          access_token: tokens.accessToken.accessToken,
-          access_token_exp: tokens.accessToken.expiresAt,
-          refresh_token: tokens.refreshToken.refreshToken,
-          refresh_token_exp: tokens.refreshToken.expiresAt,
-          id_token: tokens.idToken.idToken
+          id_token: tokens.__raw
         }
       }
 
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/okta_login`,
+        `http${HTTP_PREFIX}://${API_URL}/auth0_login`,
         new_data,
         {
           headers: {
@@ -71,44 +73,32 @@ const Signin = () => {
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      if (window.location.search.includes('code=')) {
-        const { tokens } = await oktaAuth.token.parseFromUrl();
-        await oktaAuth.tokenManager.setTokens(tokens);
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-      await oktaAuth.authStateManager.updateAuthState();
-    })();
-  }, [oktaAuth]);
 
-  useEffect(async () => {
-    if (authState?.isAuthenticated) {
 
-      const tokens = await oktaAuth.tokenManager.getTokens();
-      const accessToken = tokens.accessToken;
-      const userInfo = await oktaAuth.getUser();
-      const refreshToken = tokens.refreshToken;
-      const idToken = tokens.idToken
-      if (!userInfo?.email) {
-        throw new Error("No email found in user info");
-      }
-      const backendResponse = await sendOktaDataToBackend(userInfo, {
-        accessToken,
-        refreshToken,
-        idToken
-      });
+  const fetchToken = () => {
+    if (!isAuthenticated) {
+      console.log('User not authenticated');
+      return;
+    }
+    getIdTokenClaims().then(idTokenClaims => {
+
+      sendAuth0DataToBackend(user, idTokenClaims)
+      const currentTime = Math.floor(Date.now() / 1000); 
+      const MAX_ALLOWED_EXPIRATION = 30 * 24 * 60 * 60; // 30 days in seconds
 
       const authSuccess = signIn({
-        token: tokens.accessToken.accessToken,
-        expiresIn: tokens.accessToken.expiresAt,
+        token: idTokenClaims.__raw,
         tokenType: "Bearer",
+        expiresIn: MAX_ALLOWED_EXPIRATION,
         authState: {
-          email: userInfo.email,
-          token: tokens.accessToken.accessToken,
-          refreshToken: tokens.refreshToken.refreshToken,
-          auth_type: 'Okta',
-          ...userInfo
+          email: user.email,
+          name:user.name,
+          auth0Id:user.sub,
+          token: idTokenClaims.__raw,
+          authType: 'Auth0',
+          expiresAt: currentTime + MAX_ALLOWED_EXPIRATION,
+          timeRemaining: MAX_ALLOWED_EXPIRATION,
+
         }
       });
 
@@ -129,20 +119,28 @@ const Signin = () => {
           distinct_id: userInfo.email,
           timestamp: new Date().toISOString()
         });
-
       }
-    }
 
-  }, [authState]);
+    }).catch(error => {
+      console.error('Error getting token:', error);
+    });
 
+  };
 
-  // Set up cleanup when component unmounts
   useEffect(() => {
+    fetchToken();
+
+  }, [isAuthenticated, getAccessTokenSilently]);
+
+
+  useEffect(() => {
+
     return () => {
+
+
       setIsMounted(false);
     };
   }, []);
-
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -310,14 +308,17 @@ const Signin = () => {
           </div>
         </form>
         <br />
-        <Button
-          onClick={() => oktaAuth.signInWithRedirect()}
-          className="w-full h-12 text-lg text-white"
-          size="lg"
-        >
-          Okta Login
-        </Button>
 
+        <Button
+          className="w-full h-12 text-lg text-white"
+          onClick={() =>
+            loginWithRedirect({
+              responseType: 'code', // Explicitly set
+            }).catch(err => console.error('Login error:', err))
+          }
+        >
+          Log In with Okta
+        </Button>
 
       </div>
       <AuthState />
@@ -326,3 +327,4 @@ const Signin = () => {
 };
 
 export default Signin;
+

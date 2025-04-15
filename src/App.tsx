@@ -10,8 +10,12 @@ import posthog from "posthog-js";
 import { UpdateChecker } from "./components/UpdateChecker";
 import "react-toastify/dist/ReactToastify.css";
 import { StatusLabelsProvider } from "./views/Bids/components/BidStatusMenu";
-import { VITE_APP_OKTA_DOMAIN, VITE_APP_OKTA_CLIENT_ID } from "../../helper/Constants";
-
+import { Auth0Provider } from '@auth0/auth0-react';
+const auth0Config = {
+  domain: import.meta.env.VITE_REACT_APP_AUTH0_DOMAIN,
+  clientId: import.meta.env.VITE_REACT_APP_AUTH0_CLIENT_ID,
+  redirectUri: import.meta.env.VITE_REACT_APP_AUTH0_REDIRECT_URI
+};
 ReactGA4.initialize("G-X8S1ZMRM3C");
 
 // Initialize PostHog
@@ -32,33 +36,25 @@ const AppContent = () => {
   );
 };
 
-import { Security } from '@okta/okta-react';
-import { OktaAuth } from '@okta/okta-auth-js';
-console.log("the main uri",window.location.origin)
 
-const oktaAuth = new OktaAuth({
-  issuer: 'https://dev-77225952.okta.com/oauth2/default',
-  clientId: '0oao48fi1kmE4qy2O5d7',
-  redirectUri: window.location.origin + '/login',
-  postLogoutRedirectUri: window.location.origin + '/login',
-  scopes: ['openid', 'profile', 'email', 'offline_access'],
-  pkce: true,
-  tokenManager: {
-    storage: 'sessionStorage',
-    autoRenew: true
-  },
-  devMode: true  // Allow HTTP in development
-});
 const App = () => {
-  const restoreOriginalUri = async (_oktaAuth: any, originalUri: string) => {
-    window.location.replace(originalUri);
-  };
+
   return (
-         
+
     <AuthProvider authType={"localstorage"} authName={"sparkaichatbot"}>
-      <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
-      <AppContent />
-      </Security>
+      {/* <Auth0ProviderWithConfig> */}
+      <Auth0Provider
+            domain={auth0Config.domain}
+            clientId={auth0Config.clientId}
+            responseType="code"  // Enforce Authorization Code flow
+            useRefreshTokens={true}  // Optional, for SPA security
+            scope="openid profile email offline_access"  // Ensure offline_access is included
+            redirectUri={auth0Config.redirectUri}
+      >
+
+        <AppContent />
+      </Auth0Provider>
+      {/* </Auth0ProviderWithConfig> */}
       <ToastContainer
         position="bottom-right"
         autoClose={4000}
@@ -74,3 +70,4 @@ const App = () => {
 };
 
 export default App;
+

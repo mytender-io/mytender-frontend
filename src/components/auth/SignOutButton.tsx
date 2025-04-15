@@ -2,29 +2,35 @@ import { useSignOut } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { useAuthUser } from "react-auth-kit";
-import { useOktaAuth } from '@okta/okta-react';
+import { useAuth0 } from "@auth0/auth0-react";
 
 const SignOut = () => {
   const navigate = useNavigate();
   const getAuth = useAuthUser();
   const auth = getAuth();
-  const { oktaAuth } = useOktaAuth();
-  const authType = useRef(auth?.auth_type || "default");
+  const {
+    logout
+  } = useAuth0();
+  const authType = useRef(auth?.authType || "default");
   const signOut = useSignOut();
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     const performSignOut = async () => {
       try {
         // Perform sign out Okta/default
+        console.log('it is call signout for auth0',authType.current)
 
-        if (authType.current === 'Okta') {
-          // Clear local tokens without Okta redirect
-          await oktaAuth.tokenManager.clear(); // Removes tokens from storage
-          oktaAuth.authStateManager.updateAuthState(); // Updates React state
-          // Clear application-specific storage
+        if (authType.current === 'Auth0') {
+          console.log('it is call signout for auth0')
+          await logout({
+            logoutParams: {
+              returnTo: window.location.origin+'/login', // Redirect URL after logout
+              // federated: true // Logout from identity provider too
+            }
+          });
           localStorage.clear();
           sessionStorage.clear();
-          
+
         }
         else {
           const success = signOut();
@@ -32,14 +38,14 @@ const SignOut = () => {
             setError("Failed to sign out properly");
             return;
           }
-          
+
         }
 
-      // Add a small delay to ensure signOut completes
-      await new Promise((resolve) => setTimeout(resolve, 100));
+        // Add a small delay to ensure signOut completes
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Navigate to login page
-      navigate("/login");
+        // Navigate to login page
+        navigate("/login");
       } catch (err) {
         setError("An error occurred during sign out");
         console.error("SignOut error:", err);
