@@ -1,10 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-  faXmark
-} from "@fortawesome/free-solid-svg-icons";
 import DebouncedTextArea from "./DebouncedTextArea";
 import SubheadingCards from "./SubheadingCards";
 import { Contributor, Section } from "../../BidWritingStateManagerView";
@@ -15,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/utils";
-import { ChevronRight, FileIcon } from "lucide-react";
+import { ChevronRight, FileIcon, ChevronLeft, X } from "lucide-react";
 import SelectFilePopup from "./SelectFilePopup";
 import { Badge } from "@/components/ui/badge";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
@@ -96,6 +90,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   // Whenever the section prop changes, update the local state
   useEffect(() => {
     setHighlightedDocuments(section?.highlightedDocuments || []);
+    console.log(section);
   }, [section]);
 
   // For tracking loading states of document content fetching
@@ -190,6 +185,29 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     return highlightedDocuments.map((doc) => doc.name);
   }, [highlightedDocuments]);
 
+  // Function to parse bullet points into an array
+  const parseBulletPoints = (text: string): string[] => {
+    if (!text) return [];
+    return text
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.startsWith("-") || line.startsWith("•"))
+      .map((line) => line.substring(1).trim())
+      .filter(Boolean);
+  };
+
+  // Get win theme bullet points
+  const winThemeBullets = useMemo(
+    () => parseBulletPoints(section?.relevant_evaluation_criteria || ""),
+    [section?.relevant_evaluation_criteria]
+  );
+
+  // Get customer pain points bullet points
+  const painPointBullets = useMemo(
+    () => parseBulletPoints(section?.relevant_derived_insights || ""),
+    [section?.relevant_derived_insights]
+  );
+
   if (!section) return null;
 
   return (
@@ -203,7 +221,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
       />
       <div
         className={cn(
-          "fixed top-0 right-0 w-full max-w-3xl h-full bg-white shadow-lg z-50",
+          "fixed top-0 right-0 w-full max-w-3xl h-full bg-white shadow-lg z-50 rounded-md",
           "transform transition-transform duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
@@ -216,7 +234,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 onChange={(e) =>
                   handleSectionChange(index, "heading", e.target.value)
                 }
-                className="flex-1 font-bold resize-none overflow-hidden whitespace-nowrap min-h-[1.75rem] bg-transparent border-none focus:ring-0 shadow-none"
+                className="flex-1 font-bold resize-none overflow-hidden whitespace-nowrap min-h-[1.75rem] bg-transparent border-none focus:ring-0 shadow-none md:text-lg"
               />
               <Button
                 variant="ghost"
@@ -235,34 +253,61 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     size="icon"
                     onClick={() => onNavigate("prev")}
                     disabled={index === 0}
-                    className="text-gray-600 hover:text-gray-800 disabled:text-gray-300 bg-transparent"
+                    className="w-fit px-2 gap-1"
                   >
-                    <FontAwesomeIcon icon={faChevronLeft} />
+                    <ChevronLeft />
+                    Prev
                   </Button>
-
-                  <span>
+                  {/* <span>
                     Question {index + 1} of {totalSections}
-                  </span>
+                  </span> */}
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => onNavigate("next")}
                     disabled={index === totalSections - 1}
-                    className="text-gray-600 hover:text-gray-800 disabled:text-gray-300 bg-transparent"
+                    className="w-fit px-2 gap-1"
                   >
-                    <FontAwesomeIcon icon={faChevronRight} />
+                    Next
+                    <ChevronRight />
                   </Button>
                 </div>
-                <div className="flex flex-row gap-2">
-                  <StatusMenu
-                    value={section.status}
+                <StatusMenu
+                  value={section.status}
+                  onChange={(value) =>
+                    handleSectionChange(index, "status", value)
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <QuestionTypeDropdown
+                    value={section.choice}
                     onChange={(value) =>
-                      handleSectionChange(index, "status", value)
+                      handleSectionChange(index, "choice", value)
                     }
+                    showIcon={true}
                   />
                   <SelectFilePopup
                     onSaveSelectedFiles={handleSaveSelectedFiles}
                     initialSelectedFiles={selectedFileNames}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Word count:</span>
+                  <Input
+                    type="number"
+                    value={section.word_count || 0}
+                    min={0}
+                    step={50}
+                    className="w-20 text-center h-9"
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (!isNaN(value) && value >= 0) {
+                        handleSectionChange(index, "word_count", value);
+                      }
+                    }}
                   />
                 </div>
               </div>
@@ -294,40 +339,13 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                           size="icon"
                           className="ml-1 h-4 w-4 p-0"
                         >
-                          <FontAwesomeIcon icon={faXmark} className="h-3 w-3" />
+                          <X className="h-3 w-3" />
                         </Button>
                       </Badge>
                     ))}
                   </div>
                 </div>
               )}
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <QuestionTypeDropdown
-                    value={section.choice}
-                    onChange={(value) =>
-                      handleSectionChange(index, "choice", value)
-                    }
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  Word count:
-                  <Input
-                    type="number"
-                    value={section.word_count || 0}
-                    min={0}
-                    step={50}
-                    className="w-20 text-center"
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      if (!isNaN(value) && value >= 0) {
-                        handleSectionChange(index, "word_count", value);
-                      }
-                    }}
-                  />
-                </div>
-              </div>
 
               <div className="space-y-2">
                 <span className="text-lg font-semibold">Question</span>
@@ -336,6 +354,8 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   onChange={(value) =>
                     handleSectionChange(index, "question", value)
                   }
+                  rows={3}
+                  className="border-gray-border min-h-16 font-medium"
                   placeholder="Add in the question here"
                 />
               </div>
@@ -387,17 +407,29 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     Relevant Win Themes
                   </span>
                   {openSections.winThemes && (
-                    <DebouncedTextArea
-                      value={section.relevant_evaluation_criteria}
-                      onChange={(value) =>
-                        handleSectionChange(
-                          index,
-                          "relevant_evaluation_criteria",
-                          value
-                        )
-                      }
-                      placeholder="These are the win themes relevant to the section..."
-                    />
+                    <>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {winThemeBullets.map((theme, idx) => (
+                          <Badge
+                            key={idx}
+                            className="bg-status-research_light text-status-research border border-status-research rounded-xl py-1"
+                          >
+                            {theme}
+                          </Badge>
+                        ))}
+                      </div>
+                      {/* <DebouncedTextArea
+                        value={section.relevant_evaluation_criteria}
+                        onChange={(value) =>
+                          handleSectionChange(
+                            index,
+                            "relevant_evaluation_criteria",
+                            value
+                          )
+                        }
+                        placeholder="These are the win themes relevant to the section..."
+                      /> */}
+                    </>
                   )}
                 </div>
                 <div className="space-y-2 min-h-10">
@@ -414,17 +446,29 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     Relevant Customer Pain Points
                   </span>
                   {openSections.painPoints && (
-                    <DebouncedTextArea
-                      value={section.relevant_derived_insights}
-                      onChange={(value) =>
-                        handleSectionChange(
-                          index,
-                          "relevant_derived_insights",
-                          value
-                        )
-                      }
-                      placeholder="These are the customer pain points relevant to the section..."
-                    />
+                    <>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {painPointBullets.map((point, idx) => (
+                          <Badge
+                            key={idx}
+                            className="bg-status-review_light text-status-review border border-status-review rounded-xl py-1"
+                          >
+                            {point}
+                          </Badge>
+                        ))}
+                      </div>
+                      {/* <DebouncedTextArea
+                        value={section.relevant_derived_insights}
+                        onChange={(value) =>
+                          handleSectionChange(
+                            index,
+                            "relevant_derived_insights",
+                            value
+                          )
+                        }
+                        placeholder="These are the customer pain points relevant to the section..."
+                      /> */}
+                    </>
                   )}
                 </div>
                 <div className="space-y-2 min-h-10">

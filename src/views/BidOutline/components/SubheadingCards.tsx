@@ -6,7 +6,7 @@ import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import DebouncedTextArea from "./DebouncedTextArea";
 import { PlusIcon, Trash } from "lucide-react";
 import RegeneratePopover from "./RegeneratePopover";
-import RegenerateButton from "./RegenerateButton";
+// import RegenerateButton from "./RegenerateButton";
 import { Button } from "@/components/ui/button";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 
@@ -169,16 +169,11 @@ const SubheadingCards = ({
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <div>Writing Plan</div>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="font-medium">Writing Plan</span>
         <div className="flex items-center">
-          <Button
-            variant="outline"
-            size="icon"
-            className="me-2"
-            onClick={handleAddSubheading}
-          >
+          <Button variant="outline" size="icon" onClick={handleAddSubheading}>
             <PlusIcon className="w-4 h-4" />
           </Button>
           {/* <RegenerateButton
@@ -190,21 +185,28 @@ const SubheadingCards = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="space-y-4">
         {section.subheadings.map((subheading, subIndex) => (
-          <div key={subIndex} className="bg-white rounded-lg shadow-md">
-            <div className="p-2 bg-gray-50 border-b">
+          <div key={subIndex}>
+            <div className="p-1 border border-gray-line rounded-lg">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex-1">
                   <DebouncedTextArea
                     value={subheading.title}
                     onChange={(value) => handleTitleChange(subIndex, value)}
-                    className="w-full bg-transparent resize-none focus:outline-none min-h-6 p-1"
+                    className="w-full bg-transparent resize-none focus:outline-none border-none focus:ring-0 focus-visible:ring-0 shadow-none min-h-6 p-1 font-bold"
                     placeholder="Write the name of the subtopic..."
-                    rows={2}
+                    rows={1}
                   />
                 </div>
                 <div className="flex items-center space-x-2">
+                  <RegeneratePopover
+                    subIndex={subIndex}
+                    isOpen={openPopoverIndex === subIndex}
+                    onOpenChange={handlePopoverChange}
+                    onRegenerateSubheading={handleRegenerateSubheading}
+                    isLoading={isLoading}
+                  />
                   <Button
                     variant="ghost"
                     size="icon"
@@ -214,14 +216,6 @@ const SubheadingCards = ({
                   >
                     <Trash className="h-4 w-4" />
                   </Button>
-
-                  <RegeneratePopover
-                    subIndex={subIndex}
-                    isOpen={openPopoverIndex === subIndex}
-                    onOpenChange={handlePopoverChange}
-                    onRegenerateSubheading={handleRegenerateSubheading}
-                    isLoading={isLoading}
-                  />
                 </div>
               </div>
             </div>
