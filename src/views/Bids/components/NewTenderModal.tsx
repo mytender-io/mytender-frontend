@@ -204,6 +204,24 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     }
   };
 
+  // Handle keyboard events
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      console.log("Enter key pressed");
+      e.preventDefault();
+      e.stopPropagation(); // Stop event propagation to prevent modal focus issues
+
+      if (currentStep === "questions") {
+        handleFinalSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+      } else {
+        handleNextStep();
+      }
+
+      // Return false to prevent default behavior
+      return false;
+    }
+  };
+
   const handleFinalSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (currentStep === "questions" && !selectedFolders.length) {
@@ -378,7 +396,10 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   return (
     <>
       <Dialog open={show && !isGeneratingOutline} onOpenChange={handleClose}>
-        <DialogContent className="w-full max-w-5xl overflow-hidden p-0 bg-gray-light">
+        <DialogContent
+          className="w-full max-w-5xl overflow-hidden p-0 bg-gray-light focus-visible:outline-0"
+          onKeyDown={handleKeyDown}
+        >
           <DialogTitle className="sr-only">Create New Tender</DialogTitle>
           <div className="bg-white border-b border-gray-200">
             <div className="flex items-stretch w-full h-12 overflow-x-auto">
