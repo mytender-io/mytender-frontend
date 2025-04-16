@@ -1,7 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import DebouncedTextArea from "./DebouncedTextArea";
 import SubheadingCards from "./SubheadingCards";
-import { Contributor, Section } from "../../BidWritingStateManagerView";
+import {
+  BidContext,
+  Contributor,
+  Section
+} from "../../BidWritingStateManagerView";
 import StatusMenu from "@/buttons/StatusMenu";
 // import ReviewerDropdown from "@/views/BidOutline/components/ReviewerDropdown";
 import QuestionTypeDropdown from "@/views/BidOutline/components/QuestionTypeDropdown";
@@ -9,13 +13,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/utils";
-import { ChevronRight, FileIcon, ChevronLeft, X } from "lucide-react";
+import { ChevronRight, FileIcon, ChevronLeft, X, Plus } from "lucide-react";
 import SelectFilePopup from "./SelectFilePopup";
 import { Badge } from "@/components/ui/badge";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 import { toast } from "react-toastify";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 
 interface HighlightedDocument {
   name: string;
@@ -65,6 +76,8 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   totalSections,
   onNavigate
 }) => {
+  const { sharedState } = useContext(BidContext);
+
   const [openSections, setOpenSections] = React.useState({
     compliance: false,
     winThemes: false,
@@ -180,6 +193,44 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     handleSectionChange(index, "highlightedDocuments", updatedDocs);
   };
 
+  // Function to remove a win theme
+  const handleRemoveWinTheme = (themeToRemove: string) => {
+    // Get current themes
+    const currentThemes = section?.relevant_evaluation_criteria || "";
+    // Filter out the theme to remove and reconstruct the string
+    const updatedThemes = currentThemes
+      .split("\n")
+      .filter((line) => {
+        const trimmed = line.trim();
+        return !(
+          trimmed === `- ${themeToRemove}` || trimmed === `• ${themeToRemove}`
+        );
+      })
+      .join("\n");
+
+    // Update section through parent's change handler
+    handleSectionChange(index, "relevant_evaluation_criteria", updatedThemes);
+  };
+
+  // Function to remove a pain point
+  const handleRemovePainPoint = (pointToRemove: string) => {
+    // Get current pain points
+    const currentPainPoints = section?.relevant_derived_insights || "";
+    // Filter out the point to remove and reconstruct the string
+    const updatedPainPoints = currentPainPoints
+      .split("\n")
+      .filter((line) => {
+        const trimmed = line.trim();
+        return !(
+          trimmed === `- ${pointToRemove}` || trimmed === `• ${pointToRemove}`
+        );
+      })
+      .join("\n");
+
+    // Update section through parent's change handler
+    handleSectionChange(index, "relevant_derived_insights", updatedPainPoints);
+  };
+
   // Get just the file names for the SelectFilePopup component
   const selectedFileNames = useMemo(() => {
     return highlightedDocuments.map((doc) => doc.name);
@@ -207,6 +258,93 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     () => parseBulletPoints(section?.relevant_derived_insights || ""),
     [section?.relevant_derived_insights]
   );
+
+  // New state for the dropdown selections
+  const [selectedPainPoint, setSelectedPainPoint] = useState<string>("");
+  const [selectedWinTheme, setSelectedWinTheme] = useState<string>("");
+
+  // New state for showing/hiding dropdowns
+  const [showWinThemeSelect, setShowWinThemeSelect] = useState<boolean>(false);
+  const [showPainPointSelect, setShowPainPointSelect] =
+    useState<boolean>(false);
+
+  // Function to add a win theme
+  const handleAddWinTheme = () => {
+    if (showWinThemeSelect) {
+      if (!selectedWinTheme) {
+        setShowWinThemeSelect(false);
+        return;
+      }
+
+      // Get current themes
+      const currentThemes = section?.relevant_evaluation_criteria || "";
+      // Check if theme already exists
+      const themeExists = currentThemes.split("\n").some((line) => {
+        const trimmed = line.trim();
+        return (
+          trimmed === `- ${selectedWinTheme}` ||
+          trimmed === `• ${selectedWinTheme}`
+        );
+      });
+
+      if (themeExists) {
+        toast.warning("This win theme is already added");
+        return;
+      }
+
+      // Add the new theme
+      const newLine = currentThemes ? "\n" : "";
+      const updatedThemes = `${currentThemes}${newLine}- ${selectedWinTheme}`;
+
+      // Update section through parent's change handler
+      handleSectionChange(index, "relevant_evaluation_criteria", updatedThemes);
+      setSelectedWinTheme("");
+      setShowWinThemeSelect(false);
+    } else {
+      setShowWinThemeSelect(true);
+    }
+  };
+
+  // Function to add a pain point
+  const handleAddPainPoint = () => {
+    if (showPainPointSelect) {
+      if (!selectedPainPoint) {
+        setShowPainPointSelect(false);
+        return;
+      }
+
+      // Get current pain points
+      const currentPainPoints = section?.relevant_derived_insights || "";
+      // Check if pain point already exists
+      const pointExists = currentPainPoints.split("\n").some((line) => {
+        const trimmed = line.trim();
+        return (
+          trimmed === `- ${selectedPainPoint}` ||
+          trimmed === `• ${selectedPainPoint}`
+        );
+      });
+
+      if (pointExists) {
+        toast.warning("This pain point is already added");
+        return;
+      }
+
+      // Add the new pain point
+      const newLine = currentPainPoints ? "\n" : "";
+      const updatedPainPoints = `${currentPainPoints}${newLine}- ${selectedPainPoint}`;
+
+      // Update section through parent's change handler
+      handleSectionChange(
+        index,
+        "relevant_derived_insights",
+        updatedPainPoints
+      );
+      setSelectedPainPoint("");
+      setShowPainPointSelect(false);
+    } else {
+      setShowPainPointSelect(true);
+    }
+  };
 
   if (!section) return null;
 
@@ -412,11 +550,57 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         {winThemeBullets.map((theme, idx) => (
                           <Badge
                             key={idx}
-                            className="bg-status-research_light text-status-research border border-status-research rounded-xl py-1"
+                            className="bg-status-research_light text-status-research border border-status-research rounded-xl flex items-center gap-1 h-8"
                           >
                             {theme}
+                            <Button
+                              onClick={() => handleRemoveWinTheme(theme)}
+                              variant="ghost"
+                              size="icon"
+                              className="ml-1 h-4 w-4 p-0"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
                           </Badge>
                         ))}
+                        <div className="flex items-center gap-2 mb-2">
+                          {showWinThemeSelect ? (
+                            <>
+                              <Select
+                                value={selectedWinTheme}
+                                onValueChange={setSelectedWinTheme}
+                              >
+                                <SelectTrigger className="w-64 h-8 bg-white text-sm">
+                                  <SelectValue placeholder="Select a win theme" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {sharedState.win_themes.map((theme, idx) => (
+                                    <SelectItem key={idx} value={theme}>
+                                      {theme}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleAddWinTheme}
+                                className="flex items-center rounded-lg p-2"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleAddWinTheme}
+                              className="flex items-center rounded-lg p-2"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                       {/* <DebouncedTextArea
                         value={section.relevant_evaluation_criteria}
@@ -451,11 +635,59 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         {painPointBullets.map((point, idx) => (
                           <Badge
                             key={idx}
-                            className="bg-status-review_light text-status-review border border-status-review rounded-xl py-1"
+                            className="bg-status-review_light text-status-review border border-status-review rounded-xl flex items-center gap-1 h-8"
                           >
                             {point}
+                            <Button
+                              onClick={() => handleRemovePainPoint(point)}
+                              variant="ghost"
+                              size="icon"
+                              className="ml-1 h-4 w-4 p-0"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
                           </Badge>
                         ))}
+                        <div className="flex items-center gap-2 mb-2">
+                          {showPainPointSelect ? (
+                            <>
+                              <Select
+                                value={selectedPainPoint}
+                                onValueChange={setSelectedPainPoint}
+                              >
+                                <SelectTrigger className="w-64 h-8 bg-white text-sm">
+                                  <SelectValue placeholder="Select a pain point" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {sharedState.customer_pain_points.map(
+                                    (point, idx) => (
+                                      <SelectItem key={idx} value={point}>
+                                        {point}
+                                      </SelectItem>
+                                    )
+                                  )}
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleAddPainPoint}
+                                className="flex items-center rounded-lg p-2"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleAddPainPoint}
+                              className="flex items-center rounded-lg p-2"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                       {/* <DebouncedTextArea
                         value={section.relevant_derived_insights}
