@@ -8,6 +8,14 @@ import {
 } from "@/components/ui/dialog";
 import SelectFile from "@/components/SelectFile";
 import { toast } from "react-toastify";
+import FileStarIcon from "@/components/icons/FileStarIcon";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 const SelectFilePopup = ({
   onSaveSelectedFiles,
@@ -121,19 +129,31 @@ const SelectFilePopup = ({
 
   return (
     <>
-      <Button
-        variant="outline"
-        id="select-file"
-        onClick={() => {
-          console.log(
-            "SelectFilePopup - Opening dialog with selected files:",
-            selectedFiles
-          );
-          setOpen(true);
-        }}
-      >
-        Highlight Documents
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              id="select-file"
+              onClick={() => {
+                console.log(
+                  "SelectFilePopup - Opening dialog with selected files:",
+                  selectedFiles
+                );
+                setOpen(true);
+              }}
+              className="font-medium"
+            >
+              <FileStarIcon className="text-black" />
+              Select Highlight Document
+              <Info className="size-4 stroke-[1.5]" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            Select the documents you want the answer to focus on
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <Dialog open={open} onOpenChange={handleDialogClose}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>

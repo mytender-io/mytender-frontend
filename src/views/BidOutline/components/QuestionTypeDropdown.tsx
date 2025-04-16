@@ -5,34 +5,40 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import { CircleHelp } from "lucide-react";
 
 const QuestionTypeDropdown = ({
   value,
-  onChange
+  onChange,
+  showIcon = false
 }: {
   value: string;
   onChange: (value: string) => void;
+  showIcon?: boolean;
 }) => {
   return (
     <Select value={value || "3b"} onValueChange={onChange}>
       <SelectTrigger className="w-32 bg-white text-sm">
-        <SelectValue />
+        <div className="flex items-center gap-1">
+          {showIcon && <CircleHelp className="size-4 stroke-[1.5]" />}
+          <SelectValue />
+        </div>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="3b">
-          <span className="italic">General</span>
+          <span className="font-medium">General</span>
         </SelectItem>
         <SelectItem value="3b_case_study">
-          <span className="italic">Case Study</span>
+          <span className="font-medium">Case Study</span>
         </SelectItem>
         <SelectItem value="3b_commercial">
-          <span className="italic">Compliance</span>
+          <span className="font-medium">Compliance</span>
         </SelectItem>
         <SelectItem value="3b_personnel">
-          <span className="italic">Team</span>
+          <span className="font-medium">Team</span>
         </SelectItem>
         <SelectItem value="3b_technical">
-          <span className="italic">Technical</span>
+          <span className="font-medium">Technical</span>
         </SelectItem>
       </SelectContent>
     </Select>
