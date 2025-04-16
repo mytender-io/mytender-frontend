@@ -33,7 +33,7 @@ const Signin = () => {
   const [isMounted, setIsMounted] = useState<boolean>(true);
 
   const {
-    isLoading:auth0Loading,
+    isLoading: auth0Loading,
     isAuthenticated,
     user,
     loginWithRedirect,
@@ -55,90 +55,91 @@ const Signin = () => {
         tokens: {
           id_token: tokens.__raw
         }
-      }
+      };
 
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/auth0_login`,
         new_data,
         {
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json"
           }
         }
       );
 
       return response.data;
     } catch (err) {
-      console.error('Error sending Okta data to backend:', err);
-      throw new Error(err.response?.data?.detail || "Failed to send Okta data to backend");
+      console.error("Error sending Okta data to backend:", err);
+      throw new Error(
+        err.response?.data?.detail || "Failed to send Okta data to backend"
+      );
     }
   };
 
-
-
   const fetchToken = () => {
     if (!isAuthenticated) {
-      console.log('User not authenticated');
+      console.log("User not authenticated");
       return;
     }
-    getIdTokenClaims().then(idTokenClaims => {
+    getIdTokenClaims()
+      .then((idTokenClaims) => {
+        sendAuth0DataToBackend(user, idTokenClaims);
+        const currentTime = Math.floor(Date.now() / 1000);
+        const MAX_ALLOWED_EXPIRATION = 30 * 24 * 60 * 60; // 30 days in seconds
 
-      sendAuth0DataToBackend(user, idTokenClaims)
-      const currentTime = Math.floor(Date.now() / 1000); 
-      const MAX_ALLOWED_EXPIRATION = 30 * 24 * 60 * 60; // 30 days in seconds
-
-      const authSuccess = signIn({
-        token: idTokenClaims.__raw,
-        tokenType: "Bearer",
-        expiresIn: MAX_ALLOWED_EXPIRATION,
-        authState: {
-          email: user.email,
-          name:user.name,
-          auth0Id:user.sub,
+        const authSuccess = signIn({
           token: idTokenClaims.__raw,
-          authType: 'Auth0',
-          expiresAt: currentTime + MAX_ALLOWED_EXPIRATION,
-          timeRemaining: MAX_ALLOWED_EXPIRATION,
+          tokenType: "Bearer",
+          expiresIn: MAX_ALLOWED_EXPIRATION,
+          authState: {
+            email: user.email,
+            name: user.name,
+            auth0Id: user.sub,
+            token: idTokenClaims.__raw,
+            authType: "Auth0",
+            expiresAt: currentTime + MAX_ALLOWED_EXPIRATION,
+            timeRemaining: MAX_ALLOWED_EXPIRATION
+          }
+        });
 
-        }
-      });
-
-
-      if (authSuccess) {
-        // Clear local storage
-        ['bidInfo', 'backgroundInfo', 'response', 'inputText',
-          'editorState', 'messages', 'chatResponseMessages',
-          'tenderLibChatMessages', 'previewSidepaneMessages',
-          'bidState', 'lastActiveTab'].forEach(key => {
+        if (authSuccess) {
+          // Clear local storage
+          [
+            "bidInfo",
+            "backgroundInfo",
+            "response",
+            "inputText",
+            "editorState",
+            "messages",
+            "chatResponseMessages",
+            "tenderLibChatMessages",
+            "previewSidepaneMessages",
+            "bidState",
+            "lastActiveTab"
+          ].forEach((key) => {
             localStorage.removeItem(key);
           });
 
-        navigate("/home");
+          navigate("/home");
 
-        posthog.identify(user.email);
-        posthog.capture("user_active", {
-          distinct_id: user.email,
-          timestamp: new Date().toISOString()
-        });
-      }
-
-    }).catch(error => {
-      console.error('Error getting token:', error);
-    });
-
+          posthog.identify(user.email);
+          posthog.capture("user_active", {
+            distinct_id: user.email,
+            timestamp: new Date().toISOString()
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error getting token:", error);
+      });
   };
 
   useEffect(() => {
     fetchToken();
-
   }, [isAuthenticated, getAccessTokenSilently]);
 
-
   useEffect(() => {
-
     return () => {
-
-
       setIsMounted(false);
     };
   }, []);
@@ -164,7 +165,6 @@ const Signin = () => {
       }
     }
   };
-
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -304,24 +304,22 @@ const Signin = () => {
             >
               {isLoading ? "Loading..." : "Sign in"}
             </Button>
-
-
           </div>
         </form>
         <br />
 
         <Button
           disabled={auth0Loading}
-          className="w-full h-12 text-lg text-white"
+          variant="outline"
+          className="w-full h-12 text-lg"
           onClick={() =>
             loginWithRedirect({
-              responseType: 'code', // Explicitly set
-            }).catch(err => console.error('Login error:', err))
+              responseType: "code" // Explicitly set
+            }).catch((err) => console.error("Login error:", err))
           }
         >
-         {auth0Loading ? "Loading..." : "Sign in with Okta"} 
+          {auth0Loading ? "Loading..." : "Sign in with Okta"}
         </Button>
-
       </div>
       <AuthState />
     </AuthLayout>
@@ -329,4 +327,3 @@ const Signin = () => {
 };
 
 export default Signin;
-
