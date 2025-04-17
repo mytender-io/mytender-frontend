@@ -312,4 +312,4 @@ const BidIntel = ({
   );
 };
 
-export default withAuth(BidIntel);
+export default BidIntel;

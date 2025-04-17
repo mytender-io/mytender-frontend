@@ -11,6 +11,7 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip";
 import { cn } from "@/utils";
+
 interface ProfilePhotoProps {
   size?: "sm" | "md" | "lg";
   className?: string;
@@ -32,21 +33,14 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const [profile, setProfile] = useState([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [userProfile, setUserProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [organizationUsers, setOrganizationUsers] = useState([]);
-  const [answererProfile, setAnswererProfile] = useState({});
 
+  // Fetch current user profile if needed
   useEffect(() => {
     const fetchProfileData = async () => {
-      // Only use localStorage if token hasn't changed and refreshImage is false
-      const cachedProfile = localStorage.getItem("userProfile");
-      const savedToken = localStorage.getItem("cachedToken");
-
-      if (cachedProfile && savedToken === tokenRef.current && !refreshImage) {
-        setProfile(JSON.parse(cachedProfile));
-        return;
-      }
+      if (answererId) return; // Skip if we're trying to show another user's profile
 
       setLoading(true);
       try {
@@ -58,13 +52,8 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
             }
           }
         );
-        setProfile(profileResponse.data);
-        // Save to localStorage along with the current token
-        localStorage.setItem(
-          "userProfile",
-          JSON.stringify(profileResponse.data)
-        );
-        localStorage.setItem("cachedToken", tokenRef.current);
+        
+        setUserProfile(profileResponse.data);
         setLoading(false);
       } catch (err) {
         console.error("Failed to load profile photo:", err);
@@ -73,24 +62,12 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
     };
 
     fetchProfileData();
-  }, [tokenRef, refreshImage]);
+  }, [answererId, refreshImage]);
 
+  // Fetch organization users when needed
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
-      // Only use localStorage if token hasn't changed
-      const cachedProfile = localStorage.getItem("userProfile");
-      const cachedOrgUsers = localStorage.getItem("organizationUsers");
-      const savedToken = localStorage.getItem("cachedToken");
-
-      if (
-        cachedProfile &&
-        cachedOrgUsers &&
-        savedToken === tokenRef.current &&
-        cachedProfile._id === profile._id
-      ) {
-        setOrganizationUsers(JSON.parse(cachedOrgUsers));
-        return;
-      }
+      if (!answererId && !showTeamMembers) return; // Skip if we don't need org users
 
       setLoading(true);
       try {
@@ -108,49 +85,45 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
           }
         );
         setOrganizationUsers(response.data);
-        // Save to localStorage along with current token (if not already saved)
-        localStorage.setItem(
-          "organizationUsers",
-          JSON.stringify(response.data)
-        );
-        localStorage.setItem("cachedToken", tokenRef.current);
+
+        // If we have an answererId, find and set the matching user profile
+        if (answererId && response.data.length > 0) {
+          const matchedUser = response.data.find(
+            (user) => user.username === answererId
+          );
+          
+          if (matchedUser) {
+            setUserProfile(matchedUser);
+            setUserProfile({
+              login: matchedUser.username,
+              company_logo: matchedUser.company_logo,
+              email: matchedUser.email
+            });
+          } else {
+            // Fallback to displaying initials if no matching user found
+            setUserProfile({
+              login: answererId,
+              company_logo: ""  // Empty string for consistent fallback handling
+            });
+          }
+        }
+
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching organisation users:", err);
+        console.error("Error fetching organization users:", err);
+        // Fallback for errors
+        if (answererId) {
+          setUserProfile({
+            login: answererId,
+            company_logo: ""
+          });
+        }
         setLoading(false);
       }
     };
 
-    if (profile.userType === "owner" && (showTeamMembers || answererId)) {
-      fetchOrganizationUsers();
-    }
-  }, [tokenRef, profile]);
-
-  useEffect(() => {
-    if (answererId) {
-      // First, try to find a match in organisation users
-      if (organizationUsers.length > 0) {
-        const matchedUser = organizationUsers.find(
-          (user) => user.username === answererId
-        );
-        if (matchedUser) {
-          setAnswererProfile(matchedUser);
-          return;
-        }
-      }
-
-      // If no match found in org users, check if it's the current user
-      if (profile && profile.login === answererId) {
-        setAnswererProfile(profile);
-        return;
-      }
-      // If neither matches, set to empty object
-      setAnswererProfile({});
-    } else {
-      // No answererId provided
-      setAnswererProfile({});
-    }
-  }, [organizationUsers, answererId, profile]);
+    fetchOrganizationUsers();
+  }, [answererId, showTeamMembers]);
 
   // Size classes
   const sizeClasses = {
@@ -175,7 +148,12 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 
   // Only show up to 3 organisation users
   const displayedUsers = organizationUsers.slice(0, 3);
-  const activeProfile = answererId ? answererProfile : profile;
+
+  // Make sure we have a profile to display with consistent fallback
+  const displayProfile = userProfile || {
+    login: answererId || "User",
+    company_logo: ""
+  };
 
   return (
     <div className="flex items-center gap-2">
@@ -191,15 +169,15 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
                   "cursor-pointer z-50"
                 )}
               >
-                {activeProfile.company_logo ? (
+                {displayProfile.company_logo ? (
                   <AvatarImage
-                    src={`data:image/jpeg;base64,${activeProfile.company_logo}`}
+                    src={`data:image/jpeg;base64,${displayProfile.company_logo}`}
                     alt="Profile"
                     className="object-cover"
                   />
                 ) : (
                   <AvatarFallback className="bg-orange-lighter text-primary font-semibold">
-                    {activeProfile.login?.slice(0, 1).toUpperCase()}
+                    {displayProfile.login?.slice(0, 1).toUpperCase() || "U"}
                   </AvatarFallback>
                 )}
               </Avatar>
@@ -208,23 +186,27 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
               <div>
                 <div className="flex items-center">
                   <div>
-                    <p className="font-semibold">{activeProfile.login}</p>
-                    <p className="text-xs">{activeProfile.email}</p>
+                    <p className="font-semibold">{displayProfile.login || "User"}</p>
+                    {displayProfile.email && (
+                      <p className="text-xs">{displayProfile.email}</p>
+                    )}
                   </div>
                 </div>
               </div>
             </TooltipContent>
           </Tooltip>
           {showName && (
-            <span className="font-medium text-gray-600">{profile.login}</span>
+            <span className="font-medium text-gray-600">
+              {displayProfile.login || "User"}
+            </span>
           )}
         </div>
         {showTeamMembers &&
-          profile.userType === "owner" &&
+          userProfile?.userType === "owner" &&
           displayedUsers.length > 0 && (
             <div className="flex -space-x-3 -ml-3 opacity-50">
-              {displayedUsers.map((member, index: number) => (
-                <Tooltip key={member?.email}>
+              {displayedUsers.map((member, index) => (
+                <Tooltip key={member?.email || index}>
                   <TooltipTrigger asChild>
                     <div
                       className={cn(
@@ -253,7 +235,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
                           />
                         ) : (
                           <AvatarFallback className="bg-orange-lighter text-primary font-semibold text-xs">
-                            {member.username?.slice(0, 1).toUpperCase()}
+                            {member.username?.slice(0, 1).toUpperCase() || "U"}
                           </AvatarFallback>
                         )}
                       </Avatar>
@@ -261,8 +243,8 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
                   </TooltipTrigger>
                   <TooltipContent>
                     <div>
-                      <p className="font-semibold">{member.username}</p>
-                      <p className="text-xs">{member.email}</p>
+                      <p className="font-semibold">{member.username || "User"}</p>
+                      <p className="text-xs">{member.email || ""}</p>
                     </div>
                   </TooltipContent>
                 </Tooltip>

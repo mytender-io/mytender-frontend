@@ -1063,7 +1063,11 @@ const ProposalPreview = () => {
                                 highlightCommentAndText(comment.id)
                               }
                             >
-                              <ProfilePhoto size="sm" showName={true} />
+                              <ProfilePhoto
+                                size="sm"
+                                showName={true}
+                                answererId={comment.author}
+                              />
                               <p className="text-sm cursor-pointer">
                                 {comment.text}
                               </p>
@@ -1128,6 +1132,7 @@ const ProposalPreview = () => {
                                         <ProfilePhoto
                                           size="sm"
                                           showName={true}
+                                          answererId={reply.author}
                                         />
                                         <div>
                                           <p className="text-xs">
