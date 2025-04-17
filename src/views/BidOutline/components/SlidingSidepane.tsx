@@ -247,6 +247,31 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
       .filter(Boolean);
   };
 
+  // Function to parse compliance requirements from markdown table
+  const parseComplianceTable = (text: string): string[] => {
+    if (!text) return [];
+
+    // Split the table into lines
+    const lines = text.split("\n");
+    // Filter out header, separator, and empty lines
+    const dataRows = lines.filter(
+      (line) =>
+        line.trim() &&
+        !line.includes("---") &&
+        !line.includes("| ID") &&
+        !line.includes("Category")
+    );
+
+    // Extract requirement descriptions from the 3rd column (index 2)
+    return dataRows
+      .map((row) => {
+        const columns = row.split("|").map((col) => col.trim());
+        // The requirement description is in the 3rd column (index 2 after splitting)
+        return columns.length >= 4 ? columns[3] : "";
+      })
+      .filter(Boolean);
+  };
+
   // Get win theme bullet points
   const winThemeBullets = useMemo(
     () => parseBulletPoints(section?.relevant_evaluation_criteria || ""),
@@ -259,13 +284,29 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     [section?.relevant_derived_insights]
   );
 
+  // Get compliance requirements - try to parse from table first, then fallback to bullet points
+  const complianceBullets = useMemo(() => {
+    const requirements = section?.compliance_requirements || "";
+
+    // Check if it's in table format (contains '|')
+    if (requirements.includes("|")) {
+      return parseComplianceTable(requirements);
+    }
+
+    // Fallback to bullet points
+    return parseBulletPoints(requirements);
+  }, [section?.compliance_requirements]);
+
   // New state for the dropdown selections
   const [selectedPainPoint, setSelectedPainPoint] = useState<string>("");
   const [selectedWinTheme, setSelectedWinTheme] = useState<string>("");
+  const [selectedCompliance, setSelectedCompliance] = useState<string>("");
 
   // New state for showing/hiding dropdowns
   const [showWinThemeSelect, setShowWinThemeSelect] = useState<boolean>(false);
   const [showPainPointSelect, setShowPainPointSelect] =
+    useState<boolean>(false);
+  const [showComplianceSelect, setShowComplianceSelect] =
     useState<boolean>(false);
 
   // Function to add a win theme
@@ -344,6 +385,205 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     } else {
       setShowPainPointSelect(true);
     }
+  };
+
+  // Function to remove a compliance requirement
+  const handleRemoveCompliance = (requirementToRemove: string) => {
+    // Get current requirements
+    const currentRequirements = section?.compliance_requirements || "";
+
+    // Check if it's in table format
+    if (currentRequirements.includes("|")) {
+      // For table format, filter out the row containing the requirement
+      const lines = currentRequirements.split("\n");
+      const updatedLines = lines.filter(
+        (line) => !line.includes(requirementToRemove)
+      );
+      const updatedRequirements = updatedLines.join("\n");
+      handleSectionChange(
+        index,
+        "compliance_requirements",
+        updatedRequirements
+      );
+    } else {
+      // Standard bullet point format
+      const updatedRequirements = currentRequirements
+        .split("\n")
+        .filter((line) => {
+          const trimmed = line.trim();
+          return !(
+            trimmed === `- ${requirementToRemove}` ||
+            trimmed === `• ${requirementToRemove}`
+          );
+        })
+        .join("\n");
+      handleSectionChange(
+        index,
+        "compliance_requirements",
+        updatedRequirements
+      );
+    }
+  };
+
+  // Function to add a compliance requirement
+  const handleAddCompliance = () => {
+    if (showComplianceSelect) {
+      if (!selectedCompliance) {
+        setShowComplianceSelect(false);
+        return;
+      }
+
+      // Get current requirements
+      const currentRequirements = section?.compliance_requirements || "";
+
+      // Check if it's in table format
+      if (currentRequirements.includes("|")) {
+        // Find the next available ID
+        const existingIds = parseComplianceTable(currentRequirements).map(
+          (_, idx) => idx + 1
+        );
+        const nextId = Math.max(...existingIds, 0) + 1;
+
+        // Add a new row to the table with the compliance requirement
+        const newRow = `| ${nextId}   | Service Delivery Requirements     | ${selectedCompliance} | Technical Response | Technical Response       |`;
+
+        // Add the new row to the table, preserving the header
+        if (currentRequirements.includes("| ID  |")) {
+          // Table already exists, add a new row
+          const lines = currentRequirements.split("\n");
+          const lastLineIndex = lines.length - 1;
+          lines.splice(lastLineIndex + 1, 0, newRow);
+          const updatedRequirements = lines.join("\n");
+          handleSectionChange(
+            index,
+            "compliance_requirements",
+            updatedRequirements
+          );
+        } else {
+          // Create a new table
+          const tableHeader =
+            "| ID  | Category | Requirement Description | Source | Response Section |\n|-----|----------|-------------------------|--------|-------------------|";
+          const updatedRequirements = `${tableHeader}\n${newRow}`;
+          handleSectionChange(
+            index,
+            "compliance_requirements",
+            updatedRequirements
+          );
+        }
+      } else {
+        // Standard bullet point format
+        // Check if requirement already exists
+        const requirementExists = currentRequirements
+          .split("\n")
+          .some((line) => {
+            const trimmed = line.trim();
+            return (
+              trimmed === `- ${selectedCompliance}` ||
+              trimmed === `• ${selectedCompliance}`
+            );
+          });
+
+        if (requirementExists) {
+          toast.warning("This compliance requirement is already added");
+          return;
+        }
+
+        // Add the new requirement as a bullet point
+        const newLine = currentRequirements ? "\n" : "";
+        const updatedRequirements = `${currentRequirements}${newLine}- ${selectedCompliance}`;
+        handleSectionChange(
+          index,
+          "compliance_requirements",
+          updatedRequirements
+        );
+      }
+
+      setSelectedCompliance("");
+      setShowComplianceSelect(false);
+    } else {
+      setShowComplianceSelect(true);
+    }
+  };
+
+  // Parse compliance requirements from shared state for dropdown options
+  const complianceOptions = useMemo(() => {
+    if (!sharedState.compliance_requirements) return [];
+
+    if (sharedState.compliance_requirements.includes("|")) {
+      return parseComplianceTable(sharedState.compliance_requirements);
+    }
+
+    return parseBulletPoints(sharedState.compliance_requirements);
+  }, [sharedState.compliance_requirements]);
+
+  // New state for the differentiation factor
+  const [selectedDifferentiation, setSelectedDifferentiation] =
+    useState<string>("");
+  const [showDifferentiationSelect, setShowDifferentiationSelect] =
+    useState<boolean>(false);
+
+  // Function to add a differentiation factor
+  const handleAddDifferentiation = () => {
+    if (showDifferentiationSelect) {
+      if (!selectedDifferentiation) {
+        setShowDifferentiationSelect(false);
+        return;
+      }
+
+      // Get current factors
+      const currentFactors = section?.relevant_differentiation_factors || "";
+      // Check if factor already exists
+      const factorExists = currentFactors.split("\n").some((line) => {
+        const trimmed = line.trim();
+        return (
+          trimmed === `- ${selectedDifferentiation}` ||
+          trimmed === `• ${selectedDifferentiation}`
+        );
+      });
+
+      if (factorExists) {
+        toast.warning("This differentiation factor is already added");
+        return;
+      }
+
+      // Add the new factor
+      const newLine = currentFactors ? "\n" : "";
+      const updatedFactors = `${currentFactors}${newLine}- ${selectedDifferentiation}`;
+
+      // Update section through parent's change handler
+      handleSectionChange(
+        index,
+        "relevant_differentiation_factors",
+        updatedFactors
+      );
+      setSelectedDifferentiation("");
+      setShowDifferentiationSelect(false);
+    } else {
+      setShowDifferentiationSelect(true);
+    }
+  };
+
+  // Function to remove a differentiation factor
+  const handleRemoveDifferentiation = (factorToRemove: string) => {
+    // Get current factors
+    const currentFactors = section?.relevant_differentiation_factors || "";
+    // Filter out the factor to remove and reconstruct the string
+    const updatedFactors = currentFactors
+      .split("\n")
+      .filter((line) => {
+        const trimmed = line.trim();
+        return !(
+          trimmed === `- ${factorToRemove}` || trimmed === `• ${factorToRemove}`
+        );
+      })
+      .join("\n");
+
+    // Update section through parent's change handler
+    handleSectionChange(
+      index,
+      "relevant_differentiation_factors",
+      updatedFactors
+    );
   };
 
   if (!section) return null;
@@ -518,17 +758,81 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     Compliance Requirements
                   </span>
                   {openSections.compliance && (
-                    <DebouncedTextArea
-                      value={section.compliance_requirements}
-                      onChange={(value) =>
-                        handleSectionChange(
-                          index,
-                          "compliance_requirements",
-                          value
-                        )
-                      }
-                      placeholder="These are the compliance requirements relevant to the section..."
-                    />
+                    <>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {complianceBullets.map((requirement, idx) => (
+                          <Badge
+                            key={idx}
+                            className="bg-status-success_light text-status-success border border-status-success rounded-xl flex items-center gap-1 min-h-8"
+                          >
+                            {requirement}
+                            <Button
+                              onClick={() =>
+                                handleRemoveCompliance(requirement)
+                              }
+                              variant="ghost"
+                              size="icon"
+                              className="ml-1 h-4 w-4 p-0"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </Badge>
+                        ))}
+                        <div className="flex items-center gap-2 mb-2">
+                          {showComplianceSelect ? (
+                            <>
+                              <Select
+                                value={selectedCompliance}
+                                onValueChange={setSelectedCompliance}
+                              >
+                                <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
+                                  <SelectValue placeholder="Enter compliance requirement" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {complianceOptions.map((requirement, idx) => (
+                                    <SelectItem
+                                      key={idx}
+                                      value={requirement}
+                                      className="max-w-xl"
+                                    >
+                                      {requirement}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleAddCompliance}
+                                className="flex items-center rounded-lg p-2"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleAddCompliance}
+                              className="flex items-center rounded-lg p-2"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      {/* <DebouncedTextArea
+                        value={section.compliance_requirements}
+                        onChange={(value) =>
+                          handleSectionChange(
+                            index,
+                            "compliance_requirements",
+                            value
+                          )
+                        }
+                        placeholder="These are the compliance requirements relevant to the section..."
+                      /> */}
+                    </>
                   )}
                 </div>
                 <div className="space-y-2 min-h-10">
@@ -550,7 +854,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         {winThemeBullets.map((theme, idx) => (
                           <Badge
                             key={idx}
-                            className="bg-status-research_light text-status-research border border-status-research rounded-xl flex items-center gap-1 h-8"
+                            className="bg-status-research_light text-status-research border border-status-research rounded-xl flex items-center gap-1 min-h-8"
                           >
                             {theme}
                             <Button
@@ -570,12 +874,16 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                                 value={selectedWinTheme}
                                 onValueChange={setSelectedWinTheme}
                               >
-                                <SelectTrigger className="w-64 h-8 bg-white text-sm">
+                                <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
                                   <SelectValue placeholder="Select a win theme" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {sharedState.win_themes.map((theme, idx) => (
-                                    <SelectItem key={idx} value={theme}>
+                                    <SelectItem
+                                      key={idx}
+                                      value={theme}
+                                      className="max-w-xl"
+                                    >
                                       {theme}
                                     </SelectItem>
                                   ))}
@@ -635,7 +943,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         {painPointBullets.map((point, idx) => (
                           <Badge
                             key={idx}
-                            className="bg-status-review_light text-status-review border border-status-review rounded-xl flex items-center gap-1 h-8"
+                            className="bg-status-review_light text-status-review border border-status-review rounded-xl flex items-center gap-1 min-h-8"
                           >
                             {point}
                             <Button
@@ -655,13 +963,17 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                                 value={selectedPainPoint}
                                 onValueChange={setSelectedPainPoint}
                               >
-                                <SelectTrigger className="w-64 h-8 bg-white text-sm">
+                                <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
                                   <SelectValue placeholder="Select a pain point" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {sharedState.customer_pain_points.map(
                                     (point, idx) => (
-                                      <SelectItem key={idx} value={point}>
+                                      <SelectItem
+                                        key={idx}
+                                        value={point}
+                                        className="max-w-xl"
+                                      >
                                         {point}
                                       </SelectItem>
                                     )
@@ -717,17 +1029,74 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     Competitor Differentiation Factors
                   </span>
                   {openSections.differentiation && (
-                    <DebouncedTextArea
-                      value={section.relevant_differentiation_factors}
-                      onChange={(value) =>
-                        handleSectionChange(
-                          index,
-                          "relevant_differentiation_factors",
-                          value
-                        )
-                      }
-                      placeholder="These are the competitor differentiation factors relevant to the section..."
-                    />
+                    <>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {parseBulletPoints(
+                          section?.relevant_differentiation_factors || ""
+                        ).map((factor, idx) => (
+                          <Badge
+                            key={idx}
+                            className="bg-status-planning_light text-status-planning border border-status-planning rounded-xl flex items-center gap-1 min-h-8"
+                          >
+                            {factor}
+                            <Button
+                              onClick={() =>
+                                handleRemoveDifferentiation(factor)
+                              }
+                              variant="ghost"
+                              size="icon"
+                              className="ml-1 h-4 w-4 p-0"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </Badge>
+                        ))}
+                        <div className="flex items-center gap-2 mb-2">
+                          {showDifferentiationSelect ? (
+                            <>
+                              <Select
+                                value={selectedDifferentiation}
+                                onValueChange={setSelectedDifferentiation}
+                              >
+                                <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
+                                  <SelectValue placeholder="Enter differentiation factor" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {sharedState.differentiating_factors?.map(
+                                    (factor, idx) => (
+                                      <SelectItem
+                                        key={idx}
+                                        value={factor}
+                                        className="max-w-xl"
+                                      >
+                                        {factor}
+                                      </SelectItem>
+                                    )
+                                  ) || []}
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleAddDifferentiation}
+                                className="flex items-center rounded-lg p-2"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleAddDifferentiation}
+                              className="flex items-center rounded-lg p-2"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
