@@ -118,7 +118,7 @@ const DebouncedContentEditable: React.FC<DebouncedContentEditableProps> = ({
     <div
       ref={setRefs}
       className={cn(
-        "font-sans text-base leading-relaxed w-full m-0 outline-none focus:outline-none",
+        "text-base leading-relaxed w-full m-0 outline-none focus:outline-none",
         className
       )}
       contentEditable={!disabled}
