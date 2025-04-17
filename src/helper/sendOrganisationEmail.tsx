@@ -29,7 +29,7 @@ interface EmailResponseError {
 type EmailResponse = EmailResponseSuccess | EmailResponseError;
 
 /**
- * Send an email to an organization member
+ * Send an email to an organisation member
  * @param params - The email parameters
  * @returns Promise that resolves with the response data
  */

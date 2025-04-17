@@ -41,7 +41,7 @@ const MarkReviewReadyButton = ({
         return;
       }
 
-      // Find the reviewer in the organization users to get their email
+      // Find the reviewer in the organisation users to get their email
       const reviewerUser = organizationUsers.find(
         (user: any) => user.username === section.reviewer
       );

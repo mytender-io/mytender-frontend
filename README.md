@@ -28,17 +28,21 @@ Our roadmap includes developing an agentic AI system that maximizes the scoring 
 ## Why Choose MyTender.io for Your RFP and Tender Responses?
 
 ### Write Bids & Proposals Faster
+
 Our technology puts time back with your bid writers and proposal teams by providing high-quality draft responses to new tenders based on your previous bids. You only have to focus on refining your client strategy and win themes while our AI handles the heavy lifting of RFP response development.
 
 ### Win More Bids & Increase Contract Success Rates
+
 In the competitive world of tendering and public procurement, standing out is crucial. We enhance your bid writing capabilities, enabling you to create client-focused responses that capture the attention of assessors and evaluation committees. Our platform helps you maximize your bid scores and improve win rates.
 
 ### Secure Data Infrastructure for Sensitive Procurement Documents
+
 Client data and procurement information is stored individually in their own secure environment, outside of open-source AI and the internet. We maintain the highest standards of data security with full compliance to GDPR, SOC 2, and ISO27001, ensuring your competitive tender responses remain confidential.
 
 ## Technical Documentation
 
 ### Installation
+
 ```bash
 # Clone the repo
 git clone https://github.com/mytender-io/mytender-frontend.git
@@ -49,6 +53,7 @@ npm run dev
 ```
 
 ### Project Structure
+
 - `src` - contains the source code
 - `src/components` - contains the React components
 - `src/components/auth` - contains the authentication components
@@ -59,6 +64,7 @@ npm run dev
 ### Frontend Architecture Overview
 
 #### Frontend Stack
+
 - **React**: UI component library
 - **TypeScript**: Static typing for improved developer experience
 - **React Router**: Client-side routing
@@ -68,6 +74,7 @@ npm run dev
 - **Vite**: Build tool and development server
 
 #### State Management
+
 The application uses multiple state management strategies:
 
 - **React Context API**: Used to share state across component trees without prop drilling
@@ -78,37 +85,45 @@ The application uses multiple state management strategies:
 - **LocalStorage**: Persists state between sessions for draft content, auth tokens, and user preferences
 
 #### Key Features
+
 - **Q&A Generator**: AI-powered question answering system that retrieves information from content libraries to quickly respond to RFP questions
 - **Bid Pilot**: Interactive AI assistant for refining answers with various enhancement options to meet evaluation criteria
 - **Document Editor**: Rich text editing with Draft.js for creating and editing tender responses and proposal documents
 - **Wizard System**: Interactive onboarding tours for new users to quickly master the proposal development process
-- **Content Library**: Document management with folder organization and search capabilities for storing and retrieving previous RFP responses
+- **Content Library**: Document management with folder organisation and search capabilities for storing and retrieving previous RFP responses
 
 #### Data Flow
+
 1. **User Authentication**: Managed through React Auth Kit with tokens stored in localStorage
 2. **API Communication**: Axios-based HTTP requests to backend services
 3. **Real-time Updates**: Components re-render based on context changes or API responses
 4. **State Persistence**: Important state is persisted to localStorage and/or the backend API
 
 #### Analytics & Monitoring
+
 - **PostHog**: User behavior tracking and analytics
 - **Google Analytics**: Web traffic analytics
 - **Custom Event Tracking**: Application-specific event tracking for feature usage
 
 #### Responsive Design
+
 The UI adapts to different screen sizes using:
+
 - Bootstrap's responsive grid system
 - Custom responsive components
 - Media queries for specific breakpoints
 
 #### Accessibility
+
 The application implements accessibility features including:
+
 - Semantic HTML
 - ARIA attributes
 - Keyboard navigation
 - Focus management in modal dialogs and wizards
 
 ### How to Contribute
+
 1. Fork the repo
 2. Create a new branch
 3. Make your changes
@@ -116,6 +131,7 @@ The application implements accessibility features including:
 5. Your pull request will be reviewed and merged
 
 Keep your branch up to date with the dev branch of the original repo:
+
 ```bash
 # Add the original repo as a second remote
 git remote add upstream https://github.com/mytender-io/mytender-frontend.git
@@ -134,6 +150,7 @@ Our AI-powered solution is designed by bid writers for bid writers, providing an
 With Fuel Ventures' backing, we're positioned to deliver even greater value to both current and future clients. We're committed to continuous innovation and customer-centric development, ensuring our platform evolves to meet the changing needs of the procurement landscape.
 
 ### Industries We Serve
+
 - **IT & Technology Services**: Respond to complex technical RFPs with precision
 - **Construction & Facilities Management**: Win more public and private sector contracts
 - **Healthcare & Pharmaceutical**: Navigate complex procurement processes efficiently
@@ -141,8 +158,10 @@ With Fuel Ventures' backing, we're positioned to deliver even greater value to b
 - **Government & Public Sector Suppliers**: Meet strict compliance requirements while crafting winning responses
 
 ### Contact Us
+
 - Email: [info@mytender.io](mailto:info@mytender.io)
 - Website: [www.mytender.io](https://www.mytender.io)
 
 ---
-© Copyright mytender.io All Rights Reserved 
+
+© Copyright mytender.io All Rights Reserved

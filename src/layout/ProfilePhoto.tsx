@@ -128,7 +128,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 
   useEffect(() => {
     if (answererId) {
-      // First, try to find a match in organization users
+      // First, try to find a match in organisation users
       if (organizationUsers.length > 0) {
         const matchedUser = organizationUsers.find(
           (user) => user.username === answererId
@@ -173,7 +173,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
     );
   }
 
-  // Only show up to 3 organization users
+  // Only show up to 3 organisation users
   const displayedUsers = organizationUsers.slice(0, 3);
   const activeProfile = answererId ? answererProfile : profile;
 
