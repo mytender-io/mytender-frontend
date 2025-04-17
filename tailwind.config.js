@@ -56,6 +56,7 @@ export default {
           }
         },
         button: "#D4D4D4",
+        link: "#2D2BA4",
         breadcrumb: {
           DEFAULT: "#9ca3af",
           current: "#111827"

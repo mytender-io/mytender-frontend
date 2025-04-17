@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useCallback } from "react";
+import { useContext, useState, useEffect, useCallback, useRef } from "react";
 import withAuth from "../../routes/withAuth";
 import BidNavbar from "@/views/Bid/components/BidNavbar";
 import { BidContext } from "../BidWritingStateManagerView";
@@ -11,6 +11,8 @@ import ProposalPreview from "../ProposalPreview/ProposalPreview";
 import OutlineInstructionsModal from "../BidOutline/components/OutlineInstructionsModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/utils";
+import { ArrowUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Bid = () => {
   const { sharedState, setSharedState } = useContext(BidContext);
@@ -22,6 +24,8 @@ const Bid = () => {
 
   const location = useLocation();
   const bidData = location.state?.bid || null;
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
 
   // Parse query parameters
   const queryParams = new URLSearchParams(location.search);
@@ -42,7 +46,7 @@ const Bid = () => {
 
   // Function to handle opening a task
   const openTask = useCallback(
-    (taskId, sectionIndex) => {
+    (taskId: string | null, sectionIndex: string | null) => {
       console.log(`Opening task ${taskId} at section index ${sectionIndex}`);
 
       // Remove query parameters from URL to avoid reopening on refresh
@@ -58,6 +62,32 @@ const Bid = () => {
       setActiveTab("/proposal-planner");
     }
   }, [shouldOpenTask, taskId, sectionIndex]);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    contentRef.current?.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
+  // Handle scroll event to show/hide scroll button
+  const handleScroll = () => {
+    if (contentRef.current) {
+      setShowScrollButton(contentRef.current.scrollTop > 200);
+    }
+  };
+
+  // Add scroll event listener
+  useEffect(() => {
+    const currentRef = contentRef.current;
+    if (currentRef) {
+      currentRef.addEventListener("scroll", handleScroll);
+      return () => {
+        currentRef.removeEventListener("scroll", handleScroll);
+      };
+    }
+  }, []);
 
   const showViewOnlyMessage = () => {
     toast.error("You only have permission to view this bid.");
@@ -93,7 +123,7 @@ const Bid = () => {
           ? bidData.selectedFolders
           : ["default"];
         selectedFolders = selectedFolders.filter(
-          (folder) => folder?.length > 1
+          (folder: string) => folder?.length > 1
         );
         if (selectedFolders.length === 0) {
           selectedFolders = ["default"];
@@ -154,7 +184,10 @@ const Bid = () => {
           parentPages={parentPages}
         />
       </div>
-      <div className="px-6 pt-4 flex-1 overflow-y-auto">
+      <div
+        ref={contentRef}
+        className="px-6 pt-4 flex-1 overflow-y-auto relative"
+      >
         <div className="flex flex-col space-y-4 h-full">
           <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}
@@ -194,6 +227,18 @@ const Bid = () => {
             bid_id={object_id}
           />
         </div>
+
+        {/* Scroll to top button */}
+        {showScrollButton && (
+          <Button
+            variant="ghost"
+            onClick={scrollToTop}
+            className="fixed bottom-8 right-8 bg-primary rounded-full p-3 text-white shadow-lg hover:bg-primary-dark hover:text-white transition-all duration-300 z-50 w-9"
+            aria-label="Scroll to top"
+          >
+            <ArrowUp size={24} />
+          </Button>
+        )}
       </div>
     </div>
   );

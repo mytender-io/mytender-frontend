@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useAuthUser } from "react-auth-kit";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@mui/material";
 import withAuth from "../../routes/withAuth.tsx";
@@ -17,6 +16,7 @@ import PaginationRow from "@/components/PaginationRow.tsx";
 import SearchInput from "@/components/SearchInput.tsx";
 import { Button } from "@/components/ui/button";
 import PlusIcon from "@/components/icons/PlusIcon.tsx";
+import { WelcomeModal } from "./components/WelcomeModal.tsx";
 import {
   Table,
   TableBody,
@@ -32,6 +32,7 @@ import { formatDistanceToNow } from "date-fns";
 import { toast } from "react-toastify";
 import { useLoading } from "@/context/LoadingContext";
 import posthog from "posthog-js";
+
 interface Bid {
   _id: string;
   bid_title: string;
@@ -64,6 +65,7 @@ const Bids = () => {
   const [currentBids, setCurrentBids] = useState<Bid[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [bidToDelete, setBidToDelete] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -484,6 +486,21 @@ const Bids = () => {
 
   const parentPages = [] as Array<{ name: string; path: string }>;
 
+  // Check if this is the user's first visit
+  useEffect(() => {
+    const hasVisitedBefore = localStorage.getItem("hasVisitedBefore");
+    if (!hasVisitedBefore) {
+      setShowWelcomeModal(true);
+    }
+  }, []);
+
+  // Handle welcome modal close
+  const handleWelcomeModalClose = () => {
+    localStorage.setItem("hasVisitedBefore", "true");
+    setShowWelcomeModal(false);
+    posthog.capture("first_visit_completed");
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-14">
@@ -659,6 +676,11 @@ const Bids = () => {
           onConfirm={confirmDeleteBid}
           title="Confirm Delete"
           message="Are you sure you want to delete this tender?"
+        />
+
+        <WelcomeModal
+          isOpen={showWelcomeModal}
+          onClose={handleWelcomeModalClose}
         />
       </div>
     </div>
