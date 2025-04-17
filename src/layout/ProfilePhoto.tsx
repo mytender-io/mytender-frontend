@@ -116,7 +116,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
         localStorage.setItem("cachedToken", tokenRef.current);
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching organization users:", err);
+        console.error("Error fetching organisation users:", err);
         setLoading(false);
       }
     };

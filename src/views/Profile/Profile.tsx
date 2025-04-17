@@ -300,7 +300,7 @@ const ProfilePage = () => {
 
         setOrganizationUsers(response.data);
       } catch (err) {
-        console.error("Error fetching organization users:", err);
+        console.error("Error fetching organisation users:", err);
       }
     };
 

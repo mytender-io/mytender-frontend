@@ -135,7 +135,7 @@ const ProposalPlan = ({
         setOrganizationUsers(response.data);
         setIsOrganizationUsersLoading(false);
       } catch (err) {
-        console.error("Error fetching organization users:", err);
+        console.error("Error fetching organisation users:", err);
         setIsOrganizationUsersLoading(false);
       }
     };
@@ -1337,7 +1337,7 @@ const ProposalPlan = ({
                 <div className="flex flex-col items-center gap-4">
                   <Spinner />
                   <p className="text-muted-foreground">
-                    Loading organization data...
+                    Loading organisation data...
                   </p>
                 </div>
               </div>

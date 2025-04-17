@@ -306,7 +306,7 @@ const UploadZip: React.FC<UploadZipProps> = ({
           <p className="text-sm font-medium">{errorMessage}</p>
           {errorMessage === "Only owners can upload to content library" && (
             <p className="text-xs mt-1">
-              Please contact your organization owner to get upload permissions.
+              Please contact your organisation owner to get upload permissions.
             </p>
           )}
         </div>
