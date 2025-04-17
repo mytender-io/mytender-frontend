@@ -29,9 +29,14 @@ const SubheadingCards = ({
 
   const formatAsBullets = useCallback((text) => {
     if (!text) return "";
-    return text
-      .split(";")
+
+    // Split only by newlines
+    const lines = text.split(/\n+/);
+
+    return lines
       .map((item) => item.trim())
+      .filter((item) => item.length > 0)
+      .map((item) => item.replace(/^[-•]+\s*/, "")) // Remove existing bullet markers
       .join("\n• ");
   }, []);
 
