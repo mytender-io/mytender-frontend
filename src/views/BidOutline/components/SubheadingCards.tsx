@@ -227,9 +227,13 @@ const SubheadingCards = ({
 
             <div className="p-3">
               <DebouncedTextArea
-                value={subheading.extra_instructions}
+                value={
+                  subheading.extra_instructions
+                    ? `• ${formatAsBullets(subheading.extra_instructions)}`
+                    : ""
+                }
                 onChange={(value) => handleInstructionsChange(subIndex, value)}
-                className="w-full bg-transparent focus:outline-none text-gray-600 overflow-y-auto"
+                className="w-full bg-gray-light focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium border-none rounded-lg"
                 placeholder="Please write any extra guidance..."
                 rows={4}
               />
