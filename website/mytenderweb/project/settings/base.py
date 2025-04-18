@@ -19,7 +19,7 @@ SECRET_KEY = NotImplemented
 # SECURITY WARNING: don't run with debug turned on in production! 
 DEBUG = False
 
-ALLOWED_HOSTS = ['mytender.io', 'www.mytender.io', '127.0.0.1', '44.208.84.199', 'localhost']
+ALLOWED_HOSTS = ['mytender.io', 'www.mytender.io', '127.0.0.1', 'localhost']
 import os.path
 
 CSRF_TRUSTED_ORIGINS = ['https://mytender.io', 'https://www.mytender.io']

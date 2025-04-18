@@ -31,8 +31,8 @@ jobs:
           chmod 700 ~/.ssh
           echo "${{ secrets.DEPLOYMENT_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -v 44.208.84.199 >> ~/.ssh/known_hosts
-          ssh -i ~/.ssh/id_rsa ec2-user@44.208.84.199 "cd $TARGET_DIR/sparkai-chatbot-frontend/website && docker-compose down"
-          ssh -i ~/.ssh/id_rsa ec2-user@44.208.84.199 "docker system prune -af"
-           rsync -avz --stats -e "ssh -v -i ~/.ssh/id_rsa" --exclude '.git' --exclude 'node_modules' . ec2-user@44.208.84.199:$TARGET_DIR/sparkai-chatbot-frontend
-          ssh -i ~/.ssh/id_rsa ec2-user@44.208.84.199 "cd $TARGET_DIR/sparkai-chatbot-frontend/website && docker-compose build --no-cache && docker-compose up -d --force-recreate"
+          ssh-keyscan -v mytender.io >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_rsa ec2-user@mytender.io "cd $TARGET_DIR/sparkai-chatbot-frontend/website && docker-compose down"
+          ssh -i ~/.ssh/id_rsa ec2-user@mytender.io "docker system prune -af"
+           rsync -avz --stats -e "ssh -v -i ~/.ssh/id_rsa" --exclude '.git' --exclude 'node_modules' . ec2-user@mytender.io:$TARGET_DIR/sparkai-chatbot-frontend
+          ssh -i ~/.ssh/id_rsa ec2-user@mytender.io "cd $TARGET_DIR/sparkai-chatbot-frontend/website && docker-compose build --no-cache && docker-compose up -d --force-recreate"

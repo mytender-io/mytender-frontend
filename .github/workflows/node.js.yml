@@ -50,7 +50,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOYMENT_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 44.208.84.199 >> ~/.ssh/known_hosts
-          scp -i ~/.ssh/id_rsa -r ./dist/* ec2-user@44.208.84.199:$TARGET_DIR
+          ssh-keyscan mytender.io >> ~/.ssh/known_hosts
+          scp -i ~/.ssh/id_rsa -r ./dist/* ec2-user@mytender.io:$TARGET_DIR
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOYMENT_KEY }}
