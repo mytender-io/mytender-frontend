@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import { formatResponse } from "@/utils/formatResponse";
+import { useUserData } from "@/context/UserDataContext";
 
 interface TenderLibraryChatDialogProps {
   bid_id: string;
@@ -51,6 +52,8 @@ const TenderLibraryChatDialog = ({
 
   // Use internal state if external control props aren't provided
   const [internalOpen, setInternalOpen] = useState(false);
+
+  const { userProfile, organizationUsers, isLoading } = useUserData();
 
   // Determine if we're using controlled or uncontrolled mode
   const isControlled =
@@ -83,7 +86,7 @@ const TenderLibraryChatDialog = ({
 
   const [inputValue, setInputValue] = useState("");
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isChatLoading, setIsChatLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
 
@@ -124,7 +127,7 @@ const TenderLibraryChatDialog = ({
     if (e.key === "Enter") {
       if (isTyping) {
         stopTyping();
-      } else if (!isLoading) {
+      } else if (!isChatLoading) {
         handleSendMessage();
       }
     }
@@ -229,7 +232,7 @@ const TenderLibraryChatDialog = ({
   const sendQuestion = async (question: string) => {
     handleGAEvent("Chatbot", "Submit Question", "Submit Button");
     setQuestionAsked(true);
-    setIsLoading(true);
+    setIsChatLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
 
     // Add a temporary bot message with loading dots
@@ -282,7 +285,7 @@ const TenderLibraryChatDialog = ({
         }
       ]);
     }
-    setIsLoading(false);
+    setIsChatLoading(false);
   };
 
   const handleCopyText = (text: string) => {
@@ -376,7 +379,12 @@ const TenderLibraryChatDialog = ({
                                     className="w-6 h-6 rounded-full object-cover"
                                   />
                                 ) : (
-                                  <ProfilePhoto size="sm" />
+                                  <ProfilePhoto
+                                    size="sm"
+                                    userProfile={userProfile}
+                                    organizationUsers={organizationUsers}
+                                    isLoading={isLoading}
+                                  />
                                 )}
                               </div>
                             )}
@@ -473,7 +481,7 @@ const TenderLibraryChatDialog = ({
             </TooltipProvider>
             <Button
               onClick={handleSendMessage}
-              disabled={isLoading && !isTyping}
+              disabled={isChatLoading && !isTyping}
               size="icon"
               className="h-6 w-6 rounded-full"
             >

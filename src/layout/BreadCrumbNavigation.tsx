@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import SupportChat from "@/components/SupportChat";
 import ProfilePhoto from "@/layout/ProfilePhoto";
+import { useUserData } from "@/context/UserDataContext";
 
 const BreadcrumbNavigation = ({
   currentPage,
@@ -15,6 +16,8 @@ const BreadcrumbNavigation = ({
   rightContent?: ReactNode;
   refreshImage?: boolean;
 }) => {
+  const { userProfile, organizationUsers, isLoading } = useUserData();
+
   return (
     <nav className="flex items-center justify-between w-full rounded-lg">
       <div className="flex items-center gap-2">
@@ -39,8 +42,10 @@ const BreadcrumbNavigation = ({
         <SupportChat />
         <ProfilePhoto
           size="md"
-          refreshImage={refreshImage}
           showTeamMembers={true}
+          userProfile={userProfile}
+          organizationUsers={organizationUsers}
+          isLoading={isLoading}
         />
       </div>
     </nav>

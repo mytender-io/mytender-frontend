@@ -7,6 +7,7 @@ import { cn } from "@/utils";
 import { LoadingProvider } from "@/context/LoadingContext";
 import { USERS_TO_EXCLUDE_IN_POSTHOG } from "@/constants/posthogUsers";
 import { GeneratingTenderInsightProvider } from "@/context/GeneratingTenderInsightContext";
+import { UserDataProvider } from "@/context/UserDataContext";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -99,24 +100,25 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <>
       {isAuthenticated && <AutoLogout />}
-      <div
-        className={cn(
-          "flex h-screen bg-typo-100 pr-2 py-2",
-          sidebarCollapsed ? "pl-20" : "pl-56"
-        )}
-      >
-        <SideBar onCollapseChange={setSidebarCollapsed} />
-        <main className="flex-1 transition-all duration-300 ease-in-out bg-white border border-typo-200 rounded-2xl overflow-x-auto">
-          <LoadingProvider>
-            <GeneratingTenderInsightProvider>
-              {children}
-            </GeneratingTenderInsightProvider>
-          </LoadingProvider>
-        </main>
-      </div>
+      <UserDataProvider>
+        <div
+          className={cn(
+            "flex h-screen bg-typo-100 pr-2 py-2",
+            sidebarCollapsed ? "pl-20" : "pl-56"
+          )}
+        >
+          <SideBar onCollapseChange={setSidebarCollapsed} />
+          <main className="flex-1 transition-all duration-300 ease-in-out bg-white border border-typo-200 rounded-2xl overflow-x-auto">
+            <LoadingProvider>
+              <GeneratingTenderInsightProvider>
+                {children}
+              </GeneratingTenderInsightProvider>
+            </LoadingProvider>
+          </main>
+        </div>
+      </UserDataProvider>
     </>
   );
 };
 
 export default MainLayout;
-

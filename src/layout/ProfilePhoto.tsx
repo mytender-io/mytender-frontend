@@ -1,7 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useAuthUser } from "react-auth-kit";
-import axios from "axios";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
+import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -12,119 +9,43 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/utils";
 
+// Define interfaces for the expected data structures
+interface UserProfile {
+  login?: string;
+  company_logo?: string;
+  email?: string;
+  userType?: string;
+  [key: string]: any; // For any additional properties
+}
+
+interface OrganizationUser {
+  username: string;
+  company_logo?: string;
+  email: string;
+  [key: string]: any; // For any additional properties
+}
+
 interface ProfilePhotoProps {
   size?: "sm" | "md" | "lg";
   className?: string;
-  refreshImage?: boolean;
   showTeamMembers?: boolean;
   showName?: boolean;
   answererId?: string;
+  userProfile?: UserProfile | null;
+  organizationUsers?: OrganizationUser[];
+  isLoading?: boolean;
 }
 
 const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
   size = "md",
   className = "",
   showTeamMembers = false,
-  refreshImage = false,
   showName = false,
-  answererId = ""
+  answererId = "",
+  userProfile = null,
+  organizationUsers = [],
+  isLoading = false
 }) => {
-  const getAuth = useAuthUser();
-  const auth = getAuth();
-  const tokenRef = useRef(auth?.token || "default");
-
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [organizationUsers, setOrganizationUsers] = useState([]);
-
-  // Fetch current user profile if needed
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      if (answererId) return; // Skip if we're trying to show another user's profile
-
-      setLoading(true);
-      try {
-        const profileResponse = await axios.get(
-          `http${HTTP_PREFIX}://${API_URL}/profile`,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`
-            }
-          }
-        );
-        
-        setUserProfile(profileResponse.data);
-        setLoading(false);
-      } catch (err) {
-        console.error("Failed to load profile photo:", err);
-        setLoading(false);
-      }
-    };
-
-    fetchProfileData();
-  }, [answererId, refreshImage]);
-
-  // Fetch organization users when needed
-  useEffect(() => {
-    const fetchOrganizationUsers = async () => {
-      if (!answererId && !showTeamMembers) return; // Skip if we don't need org users
-
-      setLoading(true);
-      try {
-        const formData = new FormData();
-        formData.append("include_pending", "false");
-
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/get_organization_users`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-              "Content-Type": "multipart/form-data"
-            }
-          }
-        );
-        setOrganizationUsers(response.data);
-
-        // If we have an answererId, find and set the matching user profile
-        if (answererId && response.data.length > 0) {
-          const matchedUser = response.data.find(
-            (user) => user.username === answererId
-          );
-          
-          if (matchedUser) {
-            setUserProfile(matchedUser);
-            setUserProfile({
-              login: matchedUser.username,
-              company_logo: matchedUser.company_logo,
-              email: matchedUser.email
-            });
-          } else {
-            // Fallback to displaying initials if no matching user found
-            setUserProfile({
-              login: answererId,
-              company_logo: ""  // Empty string for consistent fallback handling
-            });
-          }
-        }
-
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching organization users:", err);
-        // Fallback for errors
-        if (answererId) {
-          setUserProfile({
-            login: answererId,
-            company_logo: ""
-          });
-        }
-        setLoading(false);
-      }
-    };
-
-    fetchOrganizationUsers();
-  }, [answererId, showTeamMembers]);
-
   // Size classes
   const sizeClasses = {
     sm: "h-8 w-8",
@@ -132,7 +53,7 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
     lg: "h-12 w-12"
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div
         className={cn(
@@ -146,11 +67,35 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
     );
   }
 
+  // Determine which profile to display
+  let displayProfile = userProfile;
+  
+  // If we need to show another user's profile (answererId is provided)
+  if (answererId && organizationUsers.length > 0) {
+    const matchedUser = organizationUsers.find(
+      (user) => user.username === answererId
+    );
+    
+    if (matchedUser) {
+      displayProfile = {
+        login: matchedUser.username,
+        company_logo: matchedUser.company_logo,
+        email: matchedUser.email
+      };
+    } else {
+      // Fallback to displaying initials if no matching user found
+      displayProfile = {
+        login: answererId,
+        company_logo: ""  // Empty string for consistent fallback handling
+      };
+    }
+  }
+
   // Only show up to 3 organisation users
   const displayedUsers = organizationUsers.slice(0, 3);
 
   // Make sure we have a profile to display with consistent fallback
-  const displayProfile = userProfile || {
+  displayProfile = displayProfile || {
     login: answererId || "User",
     company_logo: ""
   };

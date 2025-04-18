@@ -24,6 +24,7 @@ import CopyIcon from "@/components/icons/CopyIcon";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import posthog from "posthog-js";
 import { formatResponse } from "@/utils/formatResponse";
+import { useUserData } from "@/context/UserDataContext";
 
 // Create a global state for chat processing
 const globalChatState = {
@@ -102,7 +103,9 @@ const ChatbotResponse = () => {
 
   const [inputValue, setInputValue] = useState("");
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { userProfile, organizationUsers, isLoading } = useUserData();
+
+  const [isChatLoading, setIsChatLoading] = useState(false);
 
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -171,7 +174,7 @@ const ChatbotResponse = () => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !isLoading) {
+    if (e.key === "Enter" && !isChatLoading) {
       handleSendMessage();
     }
   };
@@ -277,7 +280,7 @@ const ChatbotResponse = () => {
 
   const sendQuestion = async (question: string) => {
     handleGAEvent("Chatbot", "Submit Question", "Submit Button");
-    setIsLoading(true);
+    setIsChatLoading(true);
 
     // Add a temporary bot message with loading dots
     setMessages((prevMessages) => [
@@ -310,7 +313,7 @@ const ChatbotResponse = () => {
     });
 
     // Allow user to navigate away immediately
-    setIsLoading(false);
+    setIsChatLoading(false);
   };
 
   const handleCopyText = (text: string) => {
@@ -405,7 +408,12 @@ const ChatbotResponse = () => {
                                     className="w-6 h-6 rounded-full object-cover"
                                   />
                                 ) : (
-                                  <ProfilePhoto size="sm" />
+                                  <ProfilePhoto
+                                    size="sm"
+                                    userProfile={userProfile}
+                                    organizationUsers={organizationUsers}
+                                    isLoading={isLoading}
+                                  />
                                 )}
                               </div>
                             )}
@@ -543,7 +551,7 @@ const ChatbotResponse = () => {
                 />
                 <Button
                   onClick={handleSendMessage}
-                  disabled={isLoading}
+                  disabled={isChatLoading}
                   size="icon"
                   className="h-6 w-6 rounded-full"
                 >
@@ -567,4 +575,3 @@ const ChatbotResponse = () => {
 // Export the globalChatState to be used elsewhere in the app
 export { globalChatState };
 export default withAuth(ChatbotResponse);
-

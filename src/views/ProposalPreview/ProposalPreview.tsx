@@ -36,6 +36,7 @@ import TextSelectionMenu from "./components/TextSelectionMenu";
 import ProposalToolbar from "./components/ProposalToolbar";
 import MarkReviewReadyButton from "./components/MarkReviewReadyButton";
 import RewriteInputBar from "./components/RewriteInputBar";
+import { useUserData } from "@/context/UserDataContext";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -77,41 +78,15 @@ const ProposalPreview = () => {
   const { outline } = sharedState;
   const [localLoading, setLocalLoading] = useState(false);
 
-  const [organizationUsers, setOrganizationUsers] = useState([]);
   const [isLoadingEvidence, setIsLoadingEvidence] = useState(false);
+
+  const { userProfile, organizationUsers, isLoading } = useUserData();
 
   const [actionType, setActionType] = useState("default");
 
   // Add a ref for the toolbar div
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [toolbarYPosition, setToolbarYPosition] = useState(58);
-
-  useEffect(() => {
-    const fetchOrganizationUsers = async () => {
-      try {
-        // Create form data
-        const formData = new FormData();
-        formData.append("include_pending", "false");
-
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/get_organization_users`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-              "Content-Type": "multipart/form-data"
-            }
-          }
-        );
-
-        setOrganizationUsers(response.data);
-      } catch (err) {
-        console.error("Error fetching organisation users:", err);
-      }
-    };
-
-    fetchOrganizationUsers();
-  }, [tokenRef]);
 
   useEffect(() => {
     // Set local loading when component mounts
@@ -825,6 +800,9 @@ const ProposalPreview = () => {
                               <ProfilePhoto
                                 answererId={section.answerer}
                                 size="sm"
+                                userProfile={userProfile}
+                                organizationUsers={organizationUsers}
+                                isLoading={isLoading}
                               />
                             </div>
                           )}
@@ -1067,6 +1045,9 @@ const ProposalPreview = () => {
                                 size="sm"
                                 showName={true}
                                 answererId={comment.author}
+                                userProfile={userProfile}
+                                organizationUsers={organizationUsers}
+                                isLoading={isLoading}
                               />
                               <p className="text-sm cursor-pointer">
                                 {comment.text}
@@ -1133,6 +1114,9 @@ const ProposalPreview = () => {
                                           size="sm"
                                           showName={true}
                                           answererId={reply.author}
+                                          userProfile={userProfile}
+                                          organizationUsers={organizationUsers}
+                                          isLoading={isLoading}
                                         />
                                         <div>
                                           <p className="text-xs">

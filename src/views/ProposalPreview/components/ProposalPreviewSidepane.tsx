@@ -19,6 +19,7 @@ import {
 import DataTransferHorizontalIcon from "@/components/icons/DataTransferHorizontalIcon";
 import posthog from "posthog-js";
 import { formatResponse } from "@/utils/formatResponse";
+import { useUserData } from "@/context/UserDataContext";
 
 const ProposalPreviewSidepane = ({
   bid_id,
@@ -71,6 +72,8 @@ const ProposalPreviewSidepane = ({
   const messagesContainerRef = useRef(null);
   const inputRef = useRef(null);
   const typingWorkerRef = useRef(null);
+
+  const { userProfile, organizationUsers, isLoading: userDataLoading  } = useUserData();
 
   // Focus the input field when the sidepane opens
   useEffect(() => {
@@ -720,7 +723,12 @@ const ProposalPreviewSidepane = ({
                                   className="w-6 h-6 rounded-full object-cover"
                                 />
                               ) : (
-                                <ProfilePhoto size="sm" />
+                                <ProfilePhoto
+                                  size="sm"
+                                  userProfile={userProfile}
+                                  organizationUsers={organizationUsers}
+                                  isLoading={userDataLoading}
+                                />
                               )}
                             </div>
                           )}
@@ -951,4 +959,3 @@ const ProposalPreviewSidepane = ({
 };
 
 export default ProposalPreviewSidepane;
-
