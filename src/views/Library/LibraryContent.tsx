@@ -1152,7 +1152,7 @@ const LibraryContent = () => {
             </div>
             <div className="flex-1 overflow-y-auto border rounded-lg">
               <div className="relative">
-                <div className="flex items-center p-4 border-b max-h-12 sticky top-0 bg-white z-10">
+                <div className="flex items-center p-4 border-b max-h-12 sticky top-0 bg-white z-9">
                   <div className="flex items-center justify-between w-full">
                     <div>
                       <BreadCrumbs
@@ -1301,4 +1301,3 @@ const LibraryContent = () => {
 };
 
 export default withAuth(LibraryContent);
-
