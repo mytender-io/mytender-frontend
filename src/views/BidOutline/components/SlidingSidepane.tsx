@@ -599,7 +599,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
       />
       <div
         className={cn(
-          "fixed top-0 right-0 w-full max-w-3xl h-full bg-white shadow-lg z-50 rounded-md",
+          "fixed top-0 right-0 w-full max-w-5xl h-full bg-white shadow-lg z-50 rounded-md",
           "transform transition-transform duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
@@ -698,7 +698,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                       <Badge
                         key={idx}
                         className={cn(
-                          "flex items-center gap-1 px-2 py-1 border",
+                          "flex items-center gap-1 px-2 py-1 border text-sm",
                           loadingDocuments[doc.name]
                             ? "bg-yellow-50 text-yellow-700 border-yellow-200"
                             : doc.rawtext
@@ -763,7 +763,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         {complianceBullets.map((requirement, idx) => (
                           <Badge
                             key={idx}
-                            className="bg-status-success_light text-status-success border border-status-success rounded-xl flex items-center gap-1 min-h-8"
+                            className="bg-status-success_light text-status-success border border-status-success rounded-xl flex items-center gap-1 min-h-8 text-sm"
                           >
                             {requirement}
                             <Button
@@ -854,7 +854,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         {winThemeBullets.map((theme, idx) => (
                           <Badge
                             key={idx}
-                            className="bg-status-research_light text-status-research border border-status-research rounded-xl flex items-center gap-1 min-h-8"
+                            className="bg-status-research_light text-status-research border border-status-research rounded-xl flex items-center gap-1 min-h-8 text-sm"
                           >
                             {theme}
                             <Button
@@ -943,7 +943,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         {painPointBullets.map((point, idx) => (
                           <Badge
                             key={idx}
-                            className="bg-status-review_light text-status-review border border-status-review rounded-xl flex items-center gap-1 min-h-8"
+                            className="bg-status-review_light text-status-review border border-status-review rounded-xl flex items-center gap-1 min-h-8 text-sm"
                           >
                             {point}
                             <Button
@@ -1036,7 +1036,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         ).map((factor, idx) => (
                           <Badge
                             key={idx}
-                            className="bg-status-planning_light text-status-planning border border-status-planning rounded-xl flex items-center gap-1 min-h-8"
+                            className="bg-status-planning_light text-status-planning border border-status-planning rounded-xl flex items-center gap-1 min-h-8 text-sm py-2"
                           >
                             {factor}
                             <Button
