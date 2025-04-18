@@ -224,20 +224,17 @@ const SubheadingCards = ({
                 </div>
               </div>
             </div>
-
-            <div className="p-3">
-              <DebouncedTextArea
-                value={
-                  subheading.extra_instructions
-                    ? `• ${formatAsBullets(subheading.extra_instructions)}`
-                    : ""
-                }
-                onChange={(value) => handleInstructionsChange(subIndex, value)}
-                className="w-full bg-gray-light focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium border-none rounded-lg"
-                placeholder="Please write any extra guidance..."
-                rows={4}
-              />
-            </div>
+            <DebouncedTextArea
+              value={
+                subheading.extra_instructions
+                  ? `• ${formatAsBullets(subheading.extra_instructions)}`
+                  : ""
+              }
+              onChange={(value) => handleInstructionsChange(subIndex, value)}
+              className="w-full bg-gray-light focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium border-none rounded-lg"
+              placeholder="Please write any extra guidance..."
+              rows={4}
+            />
           </div>
         ))}
       </div>
