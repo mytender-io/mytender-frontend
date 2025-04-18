@@ -260,7 +260,7 @@ const Bids = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
+        `http${HTTP_PREFIX}://${API_URL}/get_bids_list`,
         {},
         {
           headers: {
@@ -291,7 +291,7 @@ const Bids = () => {
       formData.append("bid_id", bidToDelete);
       try {
         const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/delete_bid/`,
+          `http${HTTP_PREFIX}://${API_URL}/delete_bid`,
           formData,
           {
             headers: {
@@ -347,7 +347,7 @@ const Bids = () => {
       formData.append("bid_id", bidId);
       formData.append("bid_qualification_result", newResult);
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/update_bid_qualification_result/`,
+        `http${HTTP_PREFIX}://${API_URL}/update_bid_qualification_result`,
         formData,
         {
           headers: {
@@ -401,7 +401,7 @@ const Bids = () => {
       formData.append("bid_id", bidId);
       formData.append("status", newStatus);
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/update_bid_status/`,
+        `http${HTTP_PREFIX}://${API_URL}/update_bid_status`,
         formData,
         {
           headers: {
