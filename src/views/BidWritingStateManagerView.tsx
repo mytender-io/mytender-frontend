@@ -315,21 +315,19 @@ const BidManagement: React.FC = () => {
         }
       );
 
-      const { bid_id } = response.data;
+      const { bid_id, timestamp } = response.data;
+
+      console.log("save timestamp");
+      console.log(timestamp);
 
       setSharedState((prev) => ({
         ...prev,
         // isSaved: true,
         isLoading: false,
         saveSuccess: true,
-        object_id: bid_id
+        object_id: bid_id,
+        timestamp: timestamp
       }));
-
-      // Reset isSaved after 3 seconds
-      // setTimeout(
-      //   () => setSharedState((prev) => ({ ...prev, isSaved: false })),
-      //   3000
-      // );
     } catch (error) {
       console.error("Error saving proposal:", error);
       setSharedState((prev) => ({
@@ -446,8 +444,8 @@ const BidManagement: React.FC = () => {
           const localTime = new Date(localTimestamp).getTime();
 
           // Add more detailed logging
-          // console.log("Server timestamp:", serverTimestamp);
-          // console.log("Local timestamp:", localTimestamp);
+          console.log("Server timestamp:", serverTimestamp);
+          console.log("Local timestamp:", localTimestamp);
 
           // If server version is newer
           if (serverTime > localTime) {
@@ -509,10 +507,10 @@ const BidManagement: React.FC = () => {
                     selectedFolders:
                       updatedBid.selectedFolders || prev.selectedFolders,
                     outline: updatedBid.outline
-                     ? // Do a deep copy of the outline array from the server
-                    JSON.parse(JSON.stringify(updatedBid.outline))
-                     : prev.outline,
-                
+                      ? // Do a deep copy of the outline array from the server
+                        JSON.parse(JSON.stringify(updatedBid.outline))
+                      : prev.outline,
+
                     win_themes: updatedBid.win_themes || prev.win_themes,
                     customer_pain_points:
                       updatedBid.customer_pain_points ||
