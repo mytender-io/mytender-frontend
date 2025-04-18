@@ -365,7 +365,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         formData.append("bid_id", sharedState.object_id);
 
         const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/delete_bid/`,
+          `http${HTTP_PREFIX}://${API_URL}/delete_bid`,
           formData,
           {
             headers: {

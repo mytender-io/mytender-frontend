@@ -17,7 +17,7 @@ const FLog = () => {
       setIsLoading(true); // Start loading
       try {
         const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/get_feedback/`,
+          `http${HTTP_PREFIX}://${API_URL}/get_feedback`,
           {},
           {
             headers: {
