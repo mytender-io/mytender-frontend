@@ -38,28 +38,3 @@ export const formatSectionText = (text: string) => {
 
   return formatted;
 };
-
-/**
- * Simple function to add Tailwind classes to existing HTML elements
- * @param {string} html - HTML content
- * @returns {string} - HTML with Tailwind classes
- */
-export const addTailwindClasses = (html: string) => {
-  if (!html) return "";
-
-  // Add classes to common elements
-  return html
-    .replace(/<p>/g, '<p class="mb-4">')
-    .replace(/<h1>/g, '<h1 class="text-2xl font-bold mt-6 mb-3">')
-    .replace(/<h2>/g, '<h2 class="text-xl font-semibold mt-5 mb-2">')
-    .replace(/<h3>/g, '<h3 class="text-lg font-semibold mt-4 mb-2">')
-    .replace(/<ul>/g, '<ul class="list-disc pl-5 mb-4">')
-    .replace(/<ol>/g, '<ol class="list-decimal pl-5 mb-4">')
-    .replace(/<li>/g, '<li class="mb-1">')
-    .replace(/<strong>/g, '<strong class="font-bold">')
-    .replace(/<em>/g, '<em class="italic">')
-    .replace(
-      /<blockquote>/g,
-      '<blockquote class="pl-4 border-l-4 border-gray-300 italic my-4">'
-    );
-};

@@ -77,6 +77,10 @@ export const handleSaveComment = (
     });
   }
 
+  // Get the active editor's updated content so we can save the highlighted text
+  const activeEditor = document.querySelector(`[contenteditable="true"]`);
+  const updatedContent = activeEditor ? activeEditor.innerHTML : null;
+
   // create the new comment
   const newComment: UserComment = {
     id: commentId,
@@ -100,6 +104,10 @@ export const handleSaveComment = (
 
     // Add the new comment
     newOutline[currentSectionIndex].comments.push(newComment);
+
+    if (updatedContent) {
+      newOutline[currentSectionIndex].answer = updatedContent;
+    }
 
     return {
       ...prevState,
