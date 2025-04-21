@@ -184,21 +184,30 @@ export const handleToggleResolution = (
   setSharedState((prevState: any) => {
     const newOutline = [...prevState.outline];
     const sectionComments = newOutline[currentSectionIndex].comments || [];
+    let currentContent = newOutline[currentSectionIndex].answer || "";
 
     const updatedComments = sectionComments.map((comment: UserComment) => {
       if (comment.id === id) {
-        // If resolving the comment, remove the highlight
+        // If resolving the comment, remove the highlight from the HTML string
         if (!comment.resolved) {
-          const commentedSpan = document.querySelector(
+          // Create a temporary div to parse the HTML
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = currentContent;
+
+          // Find the commented span
+          const commentedSpan = tempDiv.querySelector(
             `span.commented-text[data-comment-id="${id}"]`
           );
 
           if (commentedSpan) {
-            // Create a text node with the span's content to replace the span
+            // Replace the span with its text content
             const textNode = document.createTextNode(
               commentedSpan.textContent || ""
             );
             commentedSpan.parentNode?.replaceChild(textNode, commentedSpan);
+
+            // Update the content with the modified HTML
+            currentContent = tempDiv.innerHTML;
           }
         }
 
@@ -209,6 +218,8 @@ export const handleToggleResolution = (
     });
 
     newOutline[currentSectionIndex].comments = updatedComments;
+    // Update the answer with the modified content
+    newOutline[currentSectionIndex].answer = currentContent;
 
     return {
       ...prevState,
