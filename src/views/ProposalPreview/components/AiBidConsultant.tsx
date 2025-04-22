@@ -7,9 +7,23 @@ import {
   TooltipContent
 } from "@/components/ui/tooltip";
 import { Trash, X } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { AiBidConsultantModal } from "./AiBidConsultantModal";
+import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
+import { useAuthUser } from "react-auth-kit";
+import axios from "axios";
+import { BidContext } from "@/views/BidWritingStateManagerView";
+import Lottie from "lottie-react";
+import loadingAnimation from "@/lottie/loadingAnimation.json";
+
+const LoadingState = () => (
+  <div className="h-[600px] flex flex-col gap-4 items-center justify-center">
+    <p>Loading...</p>
+    <Lottie animationData={loadingAnimation} />
+    <p>We’re just loading up our feedback...</p>
+  </div>
+);
 
 interface AiBidConsultantProps {
   onOpenChange: (arg: boolean) => void;
@@ -18,19 +32,28 @@ interface AiBidConsultantProps {
 
 const initial_criterias = [
   {
-    key: "overall_feedback",
+    key: "review_bid_overall_feedback",
+    prompt: "ai_review_overall_feedback",
     question: "Overall Feedback",
     requirements: "Assess where you could improve given the scoring criteria"
   },
   {
-    key: "evidencing",
+    key: "review_bid_evidencing",
+    prompt: "ai_review_evidencing",
     question: "Evidencing",
     requirements: "Find areas where you need to support your claims more"
   },
   {
-    key: "grammar",
-    question: "Grammar",
-    requirements: "Fix spelling and grammar errors"
+    key: "review_bid_structure_and_flow",
+    prompt: "ai_review_structure_and_flow",
+    question: "Structure and Flow",
+    requirements: "Help present the response in a logical way"
+  },
+  {
+    key: "review_bid_clarity_and_persuasiveness",
+    prompt: "ai_bid_review_clarity_and_persuasivness",
+    question: "Clarity and Persuasiveness",
+    requirements: "Make sure it is laid out in a convincying and clear way"
   }
 ];
 
@@ -42,6 +65,12 @@ export const AiBidConsultant = ({
   const [criterias, setCriterias] =
     useState<typeof initial_criterias>(initial_criterias);
   const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<unknown[]>([]);
+  const { sharedState } = useContext(BidContext);
+  const { outline } = sharedState;
+
+  const getAuth = useAuthUser();
+  const auth = getAuth();
 
   if (!open) return null;
 
@@ -53,14 +82,44 @@ export const AiBidConsultant = ({
     }
   };
 
-  const handleStartEvaluation = () => {
+  const handleStartEvaluation = async () => {
     if (!checkedCriterias.length) {
-      toast.error("Plesae select at least one criteria for evaluation");
+      toast.error("Please select at least one criteria for evaluation");
       return;
     }
 
     setLoading(true);
-    setTimeout(() => setLoading(false), 1000);
+
+    try {
+      const results = await Promise.all(
+        checkedCriterias.map(async (c) => {
+          const formData = new FormData();
+          formData.append("question", outline[0]?.question);
+          formData.append("answer", outline[0]?.answer);
+          formData.append("scoring_criteria", "ai_review_evidencing");
+
+          const response = await axios.post(
+            `http${HTTP_PREFIX}://${API_URL}/${c}`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${auth?.token}`,
+                "Content-Type": "application/json"
+              }
+            }
+          );
+
+          return response.data;
+        })
+      );
+
+      setResults(results);
+    } catch (e) {
+      console.error(e);
+      toast.error("An error occurred during evaluation.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteCriteria = (key: string) => {
@@ -70,10 +129,6 @@ export const AiBidConsultant = ({
   return (
     <div className="flex flex-col w-full h-fit bg-white overflow-hidden border border-gray-line">
       <div className="p-3 border-b border-gray-100 flex justify-between items-center">
-        {/* <Button variant="outline" size="sm" className="absolute">
-          View Checks
-        </Button> */}
-
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -106,67 +161,62 @@ export const AiBidConsultant = ({
         </TooltipProvider>
       </div>
 
-      <div className="mt-6 px-6">
-        <p className="text-lg font-medium mb-2">
-          Add question specific criteria for optimal feedback
-        </p>
-        <p className="text-sm text-gray-500">
-          Get much more specific feedback based around the criteria
-        </p>
-        <AiBidConsultantModal setCriterias={setCriterias} />
+      {loading ? (
+        <LoadingState />
+      ) : (
+        <div className="h-[600px]">
+          <div className="mt-6 px-6">
+            <p className="text-lg font-medium mb-2">
+              Add question specific criteria for optimal feedback
+            </p>
+            <p className="text-sm text-gray-500">
+              Get much more specific feedback based around the criteria
+            </p>
+            <AiBidConsultantModal setCriterias={setCriterias} />
 
-        <div className="mt-8 pb-6">
-          <p className="text-lg font-medium mb-2">
-            Click on the checks you would like to run
-          </p>
+            <div className="mt-8 pb-6">
+              <p className="text-lg font-medium mb-2">
+                Click on the checks you would like to run
+              </p>
 
-          <div className="flex flex-col gap-6">
-            {criterias.map((criteria) => (
-              <div key={criteria.key} className="flex gap-3">
-                <Checkbox
-                  checked={checkedCriterias.includes(criteria.key)}
-                  onCheckedChange={() => handleCriteriaSelect(criteria.key)}
-                  className="rounded"
-                />
-                <div className="flex flex-col w-full">
-                  <p className="text-lg font-medium">{criteria.question}</p>
-                  <p className="text-sm text-gray-400">
-                    {criteria.requirements}
-                  </p>
-                </div>
+              <div className="flex flex-col gap-6">
+                {criterias.map((criteria) => (
+                  <div key={criteria.key} className="flex gap-3">
+                    <Checkbox
+                      checked={checkedCriterias.includes(criteria.key)}
+                      onCheckedChange={() => handleCriteriaSelect(criteria.key)}
+                      className="rounded"
+                    />
+                    <div className="flex flex-col w-full">
+                      <p className="text-lg font-medium">{criteria.question}</p>
+                      <p className="text-sm text-gray-400">
+                        {criteria.requirements}
+                      </p>
+                    </div>
 
-                <Button
-                  disabled={loading}
-                  onClick={() => handleDeleteCriteria(criteria.key)}
-                  variant="ghost"
-                  className="hover:bg-transparent border-0 hover:text-orange"
-                >
-                  <Trash />
-                </Button>
+                    <Button
+                      disabled={loading}
+                      onClick={() => handleDeleteCriteria(criteria.key)}
+                      variant="ghost"
+                      className="hover:bg-transparent border-0 hover:text-orange"
+                    >
+                      <Trash />
+                    </Button>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="mt-10 border-t py-6 px-6">
-        {loading ? (
-          <div className="flex justify-start items-center h-full text-2xl tracking-wider leading-none font-semibold">
-            <span className="animate-[blink_1.4s_infinite] text-black">.</span>
-            <span className="animate-[blink_1.4s_infinite_0.2s] text-black">
-              .
-            </span>
-            <span className="animate-[blink_1.4s_infinite_0.4s] text-black">
-              .
-            </span>
+          <div className="mt-10 border-t py-6 px-6">
+            <p className="text-lg">Click here to start the evaluation</p>
+
+            <div className="flex items-center justify-center mt-3">
+              <Button onClick={handleStartEvaluation}>Start Evaluation</Button>
+            </div>
           </div>
-        ) : (
-          <p className="text-lg">Click here to start the evaluation</p>
-        )}
-        <div className="flex items-center justify-center mt-3">
-          <Button onClick={handleStartEvaluation}>Start Evaluation</Button>
         </div>
-      </div>
+      )}
     </div>
   );
 };

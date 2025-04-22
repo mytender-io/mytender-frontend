@@ -29,7 +29,7 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ["@mui/material/Tooltip", "@emotion/styled"]
+    include: ["@mui/material/Tooltip", "@emotion/styled", "lottie-react"]
   },
   server: {
     fs: {
