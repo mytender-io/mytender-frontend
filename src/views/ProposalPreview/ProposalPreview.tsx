@@ -37,6 +37,7 @@ import ProposalToolbar from "./components/ProposalToolbar";
 import MarkReviewReadyButton from "./components/MarkReviewReadyButton";
 import RewriteInputBar from "./components/RewriteInputBar";
 import { useUserData } from "@/context/UserDataContext";
+import GetFeedbackButton from "./components/GetQuestionFeedbackButton";
 
 const ProposalPreview = () => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -795,6 +796,9 @@ const ProposalPreview = () => {
                             "border-b border-gray-line relative last:rounded-b-md"
                           )}
                         >
+
+                          <GetFeedbackButton section={section} tokenRef={tokenRef} />
+
                           {section.answerer && (
                             <div className="absolute right-1 top-2">
                               <ProfilePhoto
