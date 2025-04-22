@@ -317,7 +317,7 @@ const Home = () => {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
+          <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -331,7 +331,7 @@ const Home = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -345,7 +345,7 @@ const Home = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -359,7 +359,7 @@ const Home = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -378,9 +378,9 @@ const Home = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Recent Bids Card */}
-          <Card className="overflow-hidden">
-            <CardHeader className="bg-white pb-2">
-              <div className="flex justify-between items-center">
+          <Card className="bg-white overflow-hidden">
+            <CardHeader className="bg-white pb-4">
+              <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="text-lg">Recent Bids</CardTitle>
                   <CardDescription>
@@ -391,15 +391,15 @@ const Home = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => navigate("/bids")}
-                  className="text-blue-600 hover:text-blue-800 flex items-center"
+                  className="text-blue-600 hover:text-blue-800 flex items-center text-base"
                 >
-                  View all <ChevronRight size={16} />
+                  View all <ChevronRight />
                 </Button>
               </div>
             </CardHeader>
             <CardContent className="px-0 pt-0">
               <div>
-                <div className="grid grid-cols-4 text-xs font-semibold text-gray-hint_text bg-gray-50 px-6 py-2 border-y">
+                <div className="grid grid-cols-4 text-sm font-bold text-gray-hint_text bg-white px-6 py-4 border-y">
                   <div className="col-span-3">Tender Name</div>
                   <div>Status</div>
                 </div>
@@ -422,7 +422,7 @@ const Home = () => {
                         index !== bids.slice(0, 5).length - 1 ? "border-b" : ""
                       }`}
                     >
-                      <div className="col-span-3 truncate">
+                      <div className="col-span-3 truncate flex items-center">
                         <Button
                           variant="link"
                           className="p-0 h-auto text-left font-medium text-blue-600 hover:text-blue-800"
@@ -451,7 +451,7 @@ const Home = () => {
           </Card>
 
           {/* Tasks Card */}
-          <Card className="overflow-hidden">
+          <Card className="bg-white overflow-hidden">
             <CardHeader className="bg-white pb-2">
               <div className="flex justify-between items-center">
                 <div>
@@ -462,7 +462,7 @@ const Home = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="px-0 pt-0">
+            <CardContent className="px-0 pt-0 border-t">
               <div className="max-h-[400px] overflow-y-auto">
                 {tasks.length > 0 ? (
                   tasks.map((task, index) => (
@@ -518,7 +518,7 @@ const Home = () => {
         </div>
 
         {/* Analytics Card */}
-        <Card>
+        <Card className="bg-white">
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
