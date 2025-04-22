@@ -40,6 +40,7 @@ export interface Section {
   choice: string;
   writingplan: string;
   comments: UserComment[];
+  answerFeedback: AnswerFeedback[];
   compliance_requirements: string;
   relevant_evaluation_criteria: string;
   relevant_derived_insights: string;
@@ -62,6 +63,15 @@ export interface UserComment {
     author: string;
     createdAt: string;
   }[];
+}
+
+export interface AnswerFeedback {
+  id: string;
+  feedback: string;
+  reasoning: string;
+  originalText: string;
+  resolved: boolean;
+  sectionId: string;
 }
 
 export interface Contributor {
