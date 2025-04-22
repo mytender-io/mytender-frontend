@@ -31,7 +31,9 @@ const ProposalPreviewSidepane = ({
   onReplace,
   onCancelPrompt,
   actionType,
-  setActionType
+  setActionType,
+  activeFeedback,
+  onFeedbackResolved
 }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -73,7 +75,11 @@ const ProposalPreviewSidepane = ({
   const inputRef = useRef(null);
   const typingWorkerRef = useRef(null);
 
-  const { userProfile, organizationUsers, isLoading: userDataLoading  } = useUserData();
+  const {
+    userProfile,
+    organizationUsers,
+    isLoading: userDataLoading
+  } = useUserData();
 
   // Focus the input field when the sidepane opens
   useEffect(() => {
@@ -151,6 +157,24 @@ const ProposalPreviewSidepane = ({
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
         messagesContainerRef.current.scrollHeight;
+    }
+  };
+
+  const handleAcceptFeedback = () => {
+    if (activeFeedback?.feedback && onReplace) {
+      // Replace the original text with the suggested improved text
+      // But first, call the feedback resolution handler to clean up the state
+      if (onFeedbackResolved) {
+        onFeedbackResolved(activeFeedback.id);
+      }
+      
+      // After a small delay to ensure state update has processed
+      setTimeout(() => {
+        // Now replace with the new content 
+        onReplace(activeFeedback.feedback);
+        
+    
+      }, 50);
     }
   };
 
@@ -666,6 +690,58 @@ const ProposalPreviewSidepane = ({
         </TooltipProvider>
       </div>
 
+      {activeFeedback && (
+        <div className="px-4 pt-4 pb-3 border-t border-gray-200">
+          <h3 className="font-semibold text-lg mb-3">AI Feedback</h3>
+
+          <div className="space-y-4">
+            <div className="bg-red-50 p-3 rounded-md border border-red-100">
+              <p className="text-sm font-medium text-gray-700">
+                Original Text:
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                {activeFeedback.originalText}
+              </p>
+            </div>
+
+            <div className="bg-green-50 p-3 rounded-md border border-green-100">
+              <p className="text-sm font-medium text-gray-700">
+                Suggested Improvement:
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                {activeFeedback.feedback}
+              </p>
+            </div>
+
+            {activeFeedback.reasoning && (
+              <div className="bg-blue-50 p-3 rounded-md border border-blue-100">
+                <p className="text-sm font-medium text-gray-700">Reasoning:</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {activeFeedback.reasoning}
+                </p>
+              </div>
+            )}
+
+            <div className="flex gap-3 justify-end mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onFeedbackResolved?.(activeFeedback.id)}
+              >
+                Dismiss
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleAcceptFeedback}
+              >
+                Accept Suggestion
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col flex-1 overflow-hidden">
         <div className="p-4 flex-1 overflow-y-auto">
           <div className="relative flex flex-col justify-between space-y-4 h-full">
@@ -837,102 +913,40 @@ const ProposalPreviewSidepane = ({
           </div>
         </div>
 
-        <div className="px-3 pt-2 pb-1 border border-gray-line space-y-2 shadow-tooltip rounded-2xl mx-3 mb-3">
-          <div className="flex items-center rounded-full gap-2">
-            <Input
-              ref={inputRef}
-              type="text"
-              placeholder="Send a message..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className={cn(
-                "flex-1 border-none outline-none bg-transparent focus-visible:ring-0 shadow-none text-sm h-8 px-2",
-                actionType === "custom" &&
-                  "border border-orange-500 ring-1 ring-orange-500 focus-visible:ring-1 focus-visible:ring-orange-500"
-              )}
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleClearMessages}
-              className="h-6 w-6 p-0"
-            >
-              <Trash2 className="h-4 w-4 text-gray-400" />
-            </Button>
-            <Button
-              onClick={handleSendMessage}
-              disabled={isLoading}
-              size="icon"
-              className="h-8 w-8 rounded-full bg-orange-500 hover:bg-orange-600"
-            >
-              <Send className="h-4 w-4 text-white" />
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <TooltipProvider delayDuration={0}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={cn(
-                      "text-gray-hint_text rounded-2xl",
-                      activeChatPrompt === "library" && "bg-gray text-white"
-                    )}
-                    onClick={() => {
-                      setActiveChatPrompt("library");
-                    }}
-                  >
-                    Library
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">Search your library</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider delayDuration={0}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={cn(
-                      "text-gray-hint_text rounded-2xl",
-                      activeChatPrompt === "tender_docs" && "bg-gray text-white"
-                    )}
-                    onClick={() => {
-                      setActiveChatPrompt("tender_docs");
-                    }}
-                  >
-                    <FileSearchIcon />
-                    Tender Docs
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">Search tender docs</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider delayDuration={0}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={cn(
-                      "text-gray-hint_text rounded-2xl",
-                      activeChatPrompt === "internet" && "bg-gray text-white"
-                    )}
-                    onClick={() => {
-                      setActiveChatPrompt("internet");
-                    }}
-                  >
-                    <InternetSparkIcon />
-                    Internet
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">Search the internet</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            {actionType === "custom" ? (
+        {!activeFeedback && (
+          <div className="px-3 pt-2 pb-1 border border-gray-line space-y-2 shadow-tooltip rounded-2xl mx-3 mb-3">
+            <div className="flex items-center rounded-full gap-2">
+              <Input
+                ref={inputRef}
+                type="text"
+                placeholder="Send a message..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className={cn(
+                  "flex-1 border-none outline-none bg-transparent focus-visible:ring-0 shadow-none text-sm h-8 px-2",
+                  actionType === "custom" &&
+                    "border border-orange-500 ring-1 ring-orange-500 focus-visible:ring-1 focus-visible:ring-orange-500"
+                )}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleClearMessages}
+                className="h-6 w-6 p-0"
+              >
+                <Trash2 className="h-4 w-4 text-gray-400" />
+              </Button>
+              <Button
+                onClick={handleSendMessage}
+                disabled={isLoading}
+                size="icon"
+                className="h-8 w-8 rounded-full bg-orange-500 hover:bg-orange-600"
+              >
+                <Send className="h-4 w-4 text-white" />
+              </Button>
+            </div>
+            <div className="flex gap-2">
               <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -941,18 +955,87 @@ const ProposalPreviewSidepane = ({
                       size="sm"
                       className={cn(
                         "text-gray-hint_text rounded-2xl",
-                        activeChatPrompt === "custom" && "bg-gray text-white"
+                        activeChatPrompt === "library" && "bg-gray text-white"
                       )}
+                      onClick={() => {
+                        setActiveChatPrompt("library");
+                      }}
                     >
-                      Custom
+                      Library
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="top">Custom Prompt</TooltipContent>
+                  <TooltipContent side="top">
+                    Search your library
+                  </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-            ) : null}
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "text-gray-hint_text rounded-2xl",
+                        activeChatPrompt === "tender_docs" &&
+                          "bg-gray text-white"
+                      )}
+                      onClick={() => {
+                        setActiveChatPrompt("tender_docs");
+                      }}
+                    >
+                      <FileSearchIcon />
+                      Tender Docs
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Search tender docs</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "text-gray-hint_text rounded-2xl",
+                        activeChatPrompt === "internet" && "bg-gray text-white"
+                      )}
+                      onClick={() => {
+                        setActiveChatPrompt("internet");
+                      }}
+                    >
+                      <InternetSparkIcon />
+                      Internet
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    Search the internet
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              {actionType === "custom" ? (
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={cn(
+                          "text-gray-hint_text rounded-2xl",
+                          activeChatPrompt === "custom" && "bg-gray text-white"
+                        )}
+                      >
+                        Custom
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">Custom Prompt</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : null}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

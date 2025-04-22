@@ -85,6 +85,8 @@ const ProposalPreview = () => {
 
   const [actionType, setActionType] = useState("default");
 
+  const [activeFeedback, setActiveFeedback] = useState(null);
+
   // Add a ref for the toolbar div
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [toolbarYPosition, setToolbarYPosition] = useState(58);
@@ -120,6 +122,170 @@ const ProposalPreview = () => {
       // }
     }
   }, [sharedState.outline]);
+
+  const handleFeedbackClick = (feedbackId) => {
+    if (currentSectionIndex !== null) {
+      const currentSection = outline[currentSectionIndex];
+      const feedbackItem = currentSection.answerFeedback?.find(
+        (feedback) => feedback.id === feedbackId
+      );
+
+      if (feedbackItem) {
+        // Set the feedback item as the active feedback
+        setActiveFeedback(feedbackItem);
+
+        // Open the sidepane
+        setSidepaneOpen(true);
+
+        // Highlight this specific feedback span
+        highlightFeedbackText(feedbackId);
+
+        // Track the event
+        posthog.capture("feedback_item_clicked", {
+          feedbackId,
+          sectionId: currentSection.section_id
+        });
+      }
+    }
+  };
+
+  const highlightFeedbackText = (feedbackId) => {
+    // First reset all feedback spans to default green color
+    document.querySelectorAll("span.feedback-text").forEach((span) => {
+      (span as HTMLElement).style.backgroundColor = "rgb(144, 238, 144)"; // Reset to light green
+
+      // Reset all child elements
+      const childElements = span.querySelectorAll("*");
+      childElements.forEach((element) => {
+        (element as HTMLElement).style.backgroundColor = "rgb(144, 238, 144)";
+      });
+    });
+
+    // Then highlight the selected feedback span
+    const feedbackSpan = document.querySelector(
+      `span.feedback-text[data-feedback-id="${feedbackId}"]`
+    );
+
+    if (feedbackSpan) {
+      (feedbackSpan as HTMLElement).style.backgroundColor = "rgb(76, 175, 80)"; // Darker green for active
+
+      // Apply highlighting to all child elements
+      const childElements = feedbackSpan.querySelectorAll("*");
+      childElements.forEach((element) => {
+        (element as HTMLElement).style.backgroundColor = "rgb(76, 175, 80)";
+      });
+    }
+  };
+
+  const handleFeedbackResolved = (feedbackId) => {
+    if (currentSectionIndex !== null) {
+      // First, find the feedback item
+      const currentSection = outline[currentSectionIndex];
+      const feedbackItem = currentSection.answerFeedback?.find(
+        (feedback) => feedback.id === feedbackId
+      );
+
+      if (feedbackItem) {
+        // Update the section content to remove highlighting from HTML
+        // This step needs to be done BEFORE updating the state
+        const editorElement = editorRefs.current[currentSectionIndex];
+
+        if (editorElement) {
+          // Find the feedback span
+          const feedbackSpan = editorElement.querySelector(
+            `span.feedback-text[data-feedback-id="${feedbackId}"]`
+          );
+
+          if (feedbackSpan) {
+            // Create a text node with the original content
+            const textNode = document.createTextNode(feedbackItem.originalText);
+
+            // Replace the span with plain text
+            feedbackSpan.parentNode?.replaceChild(textNode, feedbackSpan);
+
+            // Update the answer content in state with the modified HTML
+            const newContent = editorElement.innerHTML;
+
+            setSharedState((prevState) => {
+              const newOutline = [...prevState.outline];
+              // Update the content first
+              newOutline[currentSectionIndex] = {
+                ...newOutline[currentSectionIndex],
+                answer: newContent
+              };
+
+              // Then mark the feedback as resolved
+              if (newOutline[currentSectionIndex].answerFeedback) {
+                const updatedFeedback = newOutline[
+                  currentSectionIndex
+                ].answerFeedback.map((feedback) =>
+                  feedback.id === feedbackId
+                    ? { ...feedback, resolved: true }
+                    : feedback
+                );
+
+                newOutline[currentSectionIndex] = {
+                  ...newOutline[currentSectionIndex],
+                  answerFeedback: updatedFeedback
+                };
+              }
+
+              return {
+                ...prevState,
+                outline: newOutline
+              };
+            });
+
+            // Reset active feedback
+            setActiveFeedback(null);
+
+            toast.success("Feedback Resolved");
+          }
+        }
+      }
+    }
+  };
+
+ // handle clearing feedback on outside clicks
+  useEffect(() => {
+    // Don't do anything if no active feedback
+    if (!activeFeedback) return;
+
+    const handleClickOutside = (event) => {
+      // Check if the click is inside any feedback span
+      const feedbackSpan = (event.target as Element).closest?.(
+        "span.feedback-text"
+      );
+
+      // Check if the click is inside the sidepane
+      const sidepaneElement = document.querySelector(
+        ".proposal-preview-sidepane"
+      );
+      const isInsideSidepane =
+        sidepaneElement && sidepaneElement.contains(event.target as Node);
+
+      // If not inside feedback or sidepane, clear active feedback
+      if (!feedbackSpan && !isInsideSidepane) {
+        setActiveFeedback(null);
+
+        // Reset all feedback spans to default green color
+        document.querySelectorAll("span.feedback-text").forEach((span) => {
+          (span as HTMLElement).style.backgroundColor = "rgb(144, 238, 144)";
+
+          span.querySelectorAll("*").forEach((element) => {
+            (element as HTMLElement).style.backgroundColor =
+              "rgb(144, 238, 144)";
+          });
+        });
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeFeedback]);
 
   // Function to toggle the sidepane
   const toggleSidepane = () => {
@@ -796,8 +962,11 @@ const ProposalPreview = () => {
                             "border-b border-gray-line relative last:rounded-b-md"
                           )}
                         >
-
-                          <GetFeedbackButton section={section} tokenRef={tokenRef} />
+                          <GetFeedbackButton
+                            section={section}
+                            tokenRef={tokenRef}
+                            sectionIndex={index}
+                          />
 
                           {section.answerer && (
                             <div className="absolute right-1 top-2">
@@ -852,6 +1021,9 @@ const ProposalPreview = () => {
                                   handleTextSelection();
                                 }
                               }}
+                              onFeedbackClick={(feedbackId) =>
+                                handleFeedbackClick(feedbackId)
+                              } // Add this prop
                               disabled={false}
                               editorRef={(el) => {
                                 editorRefs.current[index] = el;
@@ -1200,6 +1372,8 @@ const ProposalPreview = () => {
                     onCancelPrompt={handleCancelPrompt}
                     actionType={actionType}
                     setActionType={setActionType}
+                    activeFeedback={activeFeedback} // Add this prop
+                    onFeedbackResolved={handleFeedbackResolved} // Add this prop
                   />
                 </div>
               )}
