@@ -9,8 +9,25 @@ import { Spinner } from "@/components/ui/spinner";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Clock, FileText, X } from "lucide-react";
+import {
+  CheckCircle,
+  Clock,
+  FileText,
+  X,
+  ChevronRight,
+  TrendingUp,
+  FileCheck,
+  AlertCircle,
+  BarChart3
+} from "lucide-react";
 import { toast } from "react-toastify";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent
+} from "@/components/ui/card";
 
 interface Bid {
   _id: string;
@@ -62,7 +79,9 @@ const Home = () => {
         }
       );
       if (response.data && response.data.bids) {
-        const bidsList = response.data.bids.filter(bid => bid.new_bid_completed !== false);
+        const bidsList = response.data.bids.filter(
+          (bid) => bid.new_bid_completed !== false
+        );
         setBids(bidsList);
 
         // Create a map of bid_id to bid for easier lookup
@@ -257,15 +276,22 @@ const Home = () => {
     });
   };
 
+  // Get counts for stats
+  const getActiveBidsCount = () => bids.length;
+  const getWonBidsCount = () =>
+    bids.filter((b) => b.bid_qualification_result === "won").length || 0;
+  const getLostBidsCount = () =>
+    bids.filter((b) => b.bid_qualification_result === "lost").length || 0;
+
   if (loading) {
     return (
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-14">
+      <div className="flex flex-col h-full bg-gray-50">
+        <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-14 bg-white">
           <BreadcrumbNavigation currentPage="Home" parentPages={parentPages} />
         </div>
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
-            <Spinner size="lg" />
+            <Spinner />
             <p className="text-muted-foreground">Loading your dashboard...</p>
           </div>
         </div>
@@ -274,112 +300,197 @@ const Home = () => {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-14">
+    <div className="flex flex-col h-full bg-gray-50">
+      <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-14 bg-white">
         <BreadcrumbNavigation currentPage="Home" parentPages={parentPages} />
       </div>
-      <div className="flex flex-col py-4 px-6 space-y-4 flex-1 overflow-y-auto">
+
+      <div className="flex flex-col py-6 px-8 space-y-6 flex-1 overflow-y-auto">
         <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <span className="block text-2xl font-semibold">Bid Center</span>
-            <span className="block text-base text-gray-hint_text">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold text-gray-900">Bid Center</h1>
+            <p className="text-gray-hint_text">
               Access all the key analytics of your bidding
-            </span>
+            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Recent Bids Card */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-medium mb-3">Recent Bids</h2>
-            <p className="text-sm text-gray-500 mb-4">
-              Last {Math.min(5, bids.length)} bids by timestamp.
-            </p>
-
-            <div className="space-y-3">
-              <div className="grid grid-cols-4 font-medium text-sm py-2 border-b">
-                <div className="col-span-3">Tender Name</div>
-                <div>Status</div>
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-hint_text">Active Bids</p>
+                  <p className="text-2xl font-bold">{getActiveBidsCount()}</p>
+                </div>
+                <div className="h-12 w-12 bg-blue-50 rounded-full flex items-center justify-center">
+                  <FileCheck className="h-6 w-6 text-blue-500" />
+                </div>
               </div>
+            </CardContent>
+          </Card>
 
-              {bids
-                .sort((a, b) => {
-                  // Sort by timestamp in descending order (newest first)
-                  const timeA = a.timestamp
-                    ? new Date(a.timestamp).getTime()
-                    : 0;
-                  const timeB = b.timestamp
-                    ? new Date(b.timestamp).getTime()
-                    : 0;
-                  return timeB - timeA;
-                })
-                .slice(0, 5)
-                .map((bid) => {
-                  return (
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-hint_text">Bids Won</p>
+                  <p className="text-2xl font-bold">{getWonBidsCount()}</p>
+                </div>
+                <div className="h-12 w-12 bg-green-50 rounded-full flex items-center justify-center">
+                  <CheckCircle className="h-6 w-6 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-hint_text">Bids Lost</p>
+                  <p className="text-2xl font-bold">{getLostBidsCount()}</p>
+                </div>
+                <div className="h-12 w-12 bg-red-50 rounded-full flex items-center justify-center">
+                  <AlertCircle className="h-6 w-6 text-red-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-hint_text">Total Value Won</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    £{calculateTotalWonValue().toLocaleString()}
+                  </p>
+                </div>
+                <div className="h-12 w-12 bg-green-50 rounded-full flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Recent Bids Card */}
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-white pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="text-lg">Recent Bids</CardTitle>
+                  <CardDescription>
+                    Last {Math.min(5, bids.length)} bids by timestamp
+                  </CardDescription>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/bids")}
+                  className="text-blue-600 hover:text-blue-800 flex items-center"
+                >
+                  View all <ChevronRight size={16} />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="px-0 pt-0">
+              <div>
+                <div className="grid grid-cols-4 text-xs font-semibold text-gray-hint_text bg-gray-50 px-6 py-2 border-y">
+                  <div className="col-span-3">Tender Name</div>
+                  <div>Status</div>
+                </div>
+
+                {bids
+                  .sort((a, b) => {
+                    const timeA = a.timestamp
+                      ? new Date(a.timestamp).getTime()
+                      : 0;
+                    const timeB = b.timestamp
+                      ? new Date(b.timestamp).getTime()
+                      : 0;
+                    return timeB - timeA;
+                  })
+                  .slice(0, 5)
+                  .map((bid, index) => (
                     <div
                       key={bid._id}
-                      className="flex items-center justify-between gap-4 py-2"
+                      className={`grid grid-cols-4 px-6 py-3 ${
+                        index !== bids.slice(0, 5).length - 1 ? "border-b" : ""
+                      }`}
                     >
-                      <div className="truncate flex-1">
+                      <div className="col-span-3 truncate">
                         <Button
                           variant="link"
-                          className="p-0 h-auto text-left font-normal"
+                          className="p-0 h-auto text-left font-medium text-blue-600 hover:text-blue-800"
                           onClick={() => navigateToChatbot(bid)}
                         >
                           {bid.bid_title || bid.client_name || "Unnamed Bid"}
                         </Button>
                       </div>
-                      <BidStatusMenu
-                        value={bid.status}
-                        onChange={(value) => updateBidStatus(bid._id, value)}
-                        disabled={false}
-                      />
+                      <div>
+                        <BidStatusMenu
+                          value={bid.status}
+                          onChange={(value) => updateBidStatus(bid._id, value)}
+                          disabled={false}
+                        />
+                      </div>
                     </div>
-                  );
-                })}
+                  ))}
 
-              {bids.length === 0 && (
-                <div className="text-center py-4 text-gray-500">
-                  No bids available
-                </div>
-              )}
-            </div>
-          </div>
+                {bids.length === 0 && (
+                  <div className="text-center py-8 text-gray-hint_text">
+                    No bids available
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Tasks Card */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-medium mb-3">My Tasks</h2>
-            <p className="text-sm text-gray-500 mb-4">
-              Review and complete your assigned tasks
-            </p>
-
-            <div className="h-96 overflow-y-auto pr-1">
-              <div className="space-y-3">
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-white pb-2">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="text-lg">My Tasks</CardTitle>
+                  <CardDescription>
+                    Review and complete your assigned tasks
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="px-0 pt-0">
+              <div className="max-h-[400px] overflow-y-auto">
                 {tasks.length > 0 ? (
-                  tasks.map((task) => (
+                  tasks.map((task, index) => (
                     <div
                       key={task._id}
-                      className="p-3 border rounded-md hover:bg-gray-50 relative group"
+                      className={`px-6 py-3 hover:bg-gray-50 transition-colors relative group ${
+                        index !== tasks.length - 1 ? "border-b" : ""
+                      }`}
                     >
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
                           <div
-                            className="text-sm font-medium text-blue-600 cursor-pointer mb-1"
+                            className="text-sm font-medium text-blue-600 hover:text-blue-800 cursor-pointer"
                             onClick={() => handleTaskClick(task)}
                           >
                             {task.name}
                           </div>
-                          <div className="text-xs text-gray-500 flex items-center gap-1">
-                            <FileText size={12} />
-                            <span className="truncate max-w-[180px]">
-                              {getBidTitle(task.bid_id)}
-                            </span>
-                          </div>
-                          <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                            <Clock size={12} />
-                            <span>
-                              Created {getRelativeTime(task.created_at)}
-                            </span>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1">
+                            <div className="text-xs text-gray-600 flex items-center gap-1">
+                              <FileText size={12} />
+                              <span className="truncate max-w-[180px]">
+                                {getBidTitle(task.bid_id)}
+                              </span>
+                            </div>
+                            <div className="text-xs text-gray-hint_text flex items-center gap-1">
+                              <Clock size={12} />
+                              <span>{getRelativeTime(task.created_at)}</span>
+                            </div>
                           </div>
                         </div>
                         <button
@@ -396,64 +507,92 @@ const Home = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-gray-500 flex flex-col items-center">
-                    <CheckCircle className="mb-2" size={24} />
-                    <div>No pending tasks</div>
+                  <div className="flex flex-col items-center justify-center py-10 text-gray-hint_text gap-2">
+                    <CheckCircle className="text-green-500" size={32} />
+                    <p>No pending tasks</p>
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-
-          {/* Potential Revenue Opportunities Card */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-medium mb-3">
-              Potential Revenue Opportunities
-            </h2>
-            <p className="text-sm text-gray-500 mb-4">
-              Overview of financial potential
-            </p>
-
-            <div className="space-y-6">
-              <div className="flex flex-col items-center justify-center py-4">
-                <div className="text-3xl font-bold text-green-600">
-                  £{calculateTotalWonValue().toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-500 mt-2">
-                  Estimated total value won
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 font-medium text-sm py-2 border-b">
-                  <div>Category</div>
-                  <div className="text-right">Count</div>
-                </div>
-
-                <div className="grid grid-cols-2 text-sm py-2">
-                  <div>Active bids</div>
-                  <div className="text-right">{bids.length}</div>
-                </div>
-
-                <div className="grid grid-cols-2 text-sm py-2">
-                  <div>Bids won</div>
-                  <div className="text-right">
-                    {bids.filter((b) => b.bid_qualification_result === "won")
-                      .length || 0}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 text-sm py-2">
-                  <div>Bids lost</div>
-                  <div className="text-right">
-                    {bids.filter((b) => b.bid_qualification_result === "lost")
-                      .length || 0}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Analytics Card */}
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="text-lg">Bid Analytics</CardTitle>
+                <CardDescription>
+                  Overview of your bidding performance
+                </CardDescription>
+              </div>
+              <BarChart3 className="h-5 w-5 text-gray-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 py-2">
+              <div className="space-y-1">
+                <p className="text-sm text-gray-hint_text">Active bids</p>
+                <p className="text-2xl font-semibold">{getActiveBidsCount()}</p>
+                <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-500 rounded-full"
+                    style={{ width: "100%" }}
+                  ></div>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm text-gray-hint_text">Win rate</p>
+                <p className="text-2xl font-semibold">
+                  {getWonBidsCount() + getLostBidsCount() > 0
+                    ? Math.round(
+                        (getWonBidsCount() /
+                          (getWonBidsCount() + getLostBidsCount())) *
+                          100
+                      )
+                    : 0}
+                  %
+                </p>
+                <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-green-500 rounded-full"
+                    style={{
+                      width: `${
+                        getWonBidsCount() + getLostBidsCount() > 0
+                          ? Math.round(
+                              (getWonBidsCount() /
+                                (getWonBidsCount() + getLostBidsCount())) *
+                                100
+                            )
+                          : 0
+                      }%`
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-sm text-gray-hint_text">Average value</p>
+                <p className="text-2xl font-semibold">
+                  £
+                  {getWonBidsCount() > 0
+                    ? Math.round(
+                        calculateTotalWonValue() / getWonBidsCount()
+                      ).toLocaleString()
+                    : 0}
+                </p>
+                <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-orange-500 rounded-full"
+                    style={{ width: "65%" }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
