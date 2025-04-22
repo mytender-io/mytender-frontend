@@ -39,7 +39,7 @@ import RewriteInputBar from "./components/RewriteInputBar";
 import { useUserData } from "@/context/UserDataContext";
 import GetFeedbackButton from "./components/GetQuestionFeedbackButton";
 
-const ProposalPreview = () => {
+const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
   const activeEditorRef = useRef<HTMLDivElement | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null);
@@ -77,19 +77,12 @@ const ProposalPreview = () => {
 
   // Get sections from shared state
   const { outline } = sharedState;
-  const [localLoading, setLocalLoading] = useState(false);
-
-  const [isLoadingEvidence, setIsLoadingEvidence] = useState(false);
-
   const { userProfile, organizationUsers, isLoading } = useUserData();
 
+  const [localLoading, setLocalLoading] = useState(false);
+  const [isLoadingEvidence, setIsLoadingEvidence] = useState(false);
   const [actionType, setActionType] = useState("default");
-
   const [activeFeedback, setActiveFeedback] = useState(null);
-
-  // Add a ref for the toolbar div
-  const toolbarRef = useRef<HTMLDivElement>(null);
-  const [toolbarYPosition, setToolbarYPosition] = useState(58);
 
   useEffect(() => {
     // Set local loading when component mounts
@@ -246,7 +239,7 @@ const ProposalPreview = () => {
     }
   };
 
- // handle clearing feedback on outside clicks
+  // handle clearing feedback on outside clicks
   useEffect(() => {
     // Don't do anything if no active feedback
     if (!activeFeedback) return;
@@ -289,7 +282,6 @@ const ProposalPreview = () => {
 
   // Function to toggle the sidepane
   const toggleSidepane = () => {
-    setToolbarYPosition(getToolbarYPosition());
     setSidepaneOpen((prevState) => !prevState);
   };
 
@@ -906,18 +898,6 @@ const ProposalPreview = () => {
     setCurrentSectionIndex(index);
   };
 
-  // Then somewhere in your component, you can get the Y position:
-  const getToolbarYPosition = () => {
-    if (toolbarRef.current) {
-      const rect = toolbarRef.current.getBoundingClientRect();
-      // rect.top gives you the distance from the top of the viewport
-      // Add window.scrollY to get the distance from the top of the document
-      const yPosition = rect.top + window.scrollY;
-      return yPosition;
-    }
-    return 0;
-  };
-
   return (
     <div className="proposal-preview-container">
       <div>
@@ -940,10 +920,7 @@ const ProposalPreview = () => {
                 )}
               >
                 <div className="rounded-md bg-white w-full max-w-4xl flex-1">
-                  <div
-                    ref={toolbarRef}
-                    className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-[49]"
-                  >
+                  <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-[49]">
                     <ProposalToolbar
                       activeEditorRef={activeEditorRef}
                       execCommand={execCommand}
@@ -1358,7 +1335,7 @@ const ProposalPreview = () => {
                     "proposal-preview-sidepane w-[450px] overflow-y-auto z-50 sticky -top-4 right-0"
                   )}
                   style={{
-                    maxHeight: `calc(100vh - ${241 - (234 - toolbarYPosition)}px)`
+                    maxHeight: `calc(100vh - ${241 - (yPosition > 180 ? 176 : yPosition)}px)`
                   }}
                 >
                   <ProposalPreviewSidepane

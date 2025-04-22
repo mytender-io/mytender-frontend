@@ -25,7 +25,7 @@ const Bid = () => {
   const location = useLocation();
   const bidData = location.state?.bid || null;
   const contentRef = useRef<HTMLDivElement>(null);
-  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [yPosition, setYPosition] = useState(0);
 
   // Parse query parameters
   const queryParams = new URLSearchParams(location.search);
@@ -74,7 +74,7 @@ const Bid = () => {
   // Handle scroll event to show/hide scroll button
   const handleScroll = () => {
     if (contentRef.current) {
-      setShowScrollButton(contentRef.current.scrollTop > 200);
+      setYPosition(contentRef.current.scrollTop);
     }
   };
 
@@ -219,7 +219,10 @@ const Bid = () => {
             />
           )}
           {activeTab === "/proposal-preview" && (
-            <ProposalPreview showViewOnlyMessage={showViewOnlyMessage} />
+            <ProposalPreview
+              showViewOnlyMessage={showViewOnlyMessage}
+              yPosition={yPosition}
+            />
           )}
           <OutlineInstructionsModal
             show={showModal}
@@ -229,7 +232,7 @@ const Bid = () => {
         </div>
 
         {/* Scroll to top button */}
-        {showScrollButton && (
+        {yPosition > 200 && (
           <Button
             variant="ghost"
             onClick={scrollToTop}
