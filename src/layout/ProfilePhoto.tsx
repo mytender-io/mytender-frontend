@@ -69,13 +69,13 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
 
   // Determine which profile to display
   let displayProfile = userProfile;
-  
+
   // If we need to show another user's profile (answererId is provided)
   if (answererId && organizationUsers.length > 0) {
     const matchedUser = organizationUsers.find(
       (user) => user.username === answererId
     );
-    
+
     if (matchedUser) {
       displayProfile = {
         login: matchedUser.username,
@@ -86,13 +86,18 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
       // Fallback to displaying initials if no matching user found
       displayProfile = {
         login: answererId,
-        company_logo: ""  // Empty string for consistent fallback handling
+        company_logo: "" // Empty string for consistent fallback handling
       };
     }
   }
 
+  // Filter out the current user from organization users
+  const filteredOrganizationUsers = userProfile?.login
+    ? organizationUsers.filter((user) => user.username !== userProfile.login)
+    : organizationUsers;
+
   // Only show up to 3 organisation users
-  const displayedUsers = organizationUsers.slice(0, 3);
+  const displayedUsers = filteredOrganizationUsers.slice(0, 3);
 
   // Make sure we have a profile to display with consistent fallback
   displayProfile = displayProfile || {
@@ -131,7 +136,9 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
               <div>
                 <div className="flex items-center">
                   <div>
-                    <p className="font-semibold">{displayProfile.login || "User"}</p>
+                    <p className="font-semibold">
+                      {displayProfile.login || "User"}
+                    </p>
                     {displayProfile.email && (
                       <p className="text-xs">{displayProfile.email}</p>
                     )}
@@ -188,7 +195,9 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
                   </TooltipTrigger>
                   <TooltipContent>
                     <div>
-                      <p className="font-semibold">{member.username || "User"}</p>
+                      <p className="font-semibold">
+                        {member.username || "User"}
+                      </p>
                       <p className="text-xs">{member.email || ""}</p>
                     </div>
                   </TooltipContent>
