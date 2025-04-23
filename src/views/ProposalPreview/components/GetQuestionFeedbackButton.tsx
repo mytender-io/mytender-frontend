@@ -40,7 +40,6 @@ const GetFeedbackButton = ({
       }
 
       setIsLoading(true);
-      toast.info("Getting feedback...");
       const formData = new FormData();
 
       // Convert the section object to a JSON string

@@ -23,6 +23,7 @@ interface Feedback {
   originalText: string;
   reasoning: string;
   feedback: string;
+  resolved?: boolean;
 }
 
 // Define SelectedPrompts type
@@ -97,21 +98,17 @@ const FeedbackSidepane = ({
     ) as PromptKey[];
   };
 
-  const handleAcceptFeedback = () => {
-    if (
-      activeFeedback?.id &&
-      activeFeedback?.feedback &&
-      onApplyFeedbackImprovement
-    ) {
+  const handleAcceptFeedback = (feedback: Feedback) => {
+    if (feedback?.id && feedback?.feedback && onApplyFeedbackImprovement) {
       // Call the appropriate function with both feedbackId and the improved text
-      onApplyFeedbackImprovement(activeFeedback.id, activeFeedback.feedback);
+      onApplyFeedbackImprovement(feedback.id, feedback.feedback);
     }
   };
 
-  const handleDeclineFeedback = () => {
-    if (activeFeedback?.id && onFeedbackResolved) {
+  const handleDeclineFeedback = (feedback: Feedback) => {
+    if (feedback?.id && onFeedbackResolved) {
       // Just mark as resolved without applying the suggested changes
-      onFeedbackResolved(activeFeedback.id);
+      onFeedbackResolved(feedback.id);
     }
   };
 
@@ -126,6 +123,37 @@ const FeedbackSidepane = ({
     setScoringCriteria(tempCriteria);
     setCriteriaModalOpen(false);
   };
+
+  // Get all feedback for the current section
+  const getAllFeedbackForCurrentSection = () => {
+    if (sectionIndex === null || !outline[sectionIndex]) return [];
+
+    const currentSection = outline[sectionIndex];
+    const allFeedback = currentSection.answerFeedback || [];
+
+    // Filter out resolved feedback
+    return allFeedback.filter((feedback) => !feedback.resolved);
+  };
+
+  // Get all feedback and sort with active feedback first
+  const getSortedFeedback = () => {
+    const allFeedback = getAllFeedbackForCurrentSection();
+
+    if (!activeFeedback) return allFeedback;
+
+    // Sort to put active feedback at top
+    return allFeedback.sort((a, b) => {
+      if (a.id === activeFeedback.id) return -1;
+      if (b.id === activeFeedback.id) return 1;
+      return 0;
+    });
+  };
+
+  // Get the section data for the current section
+  const currentSection = sectionIndex !== null ? outline[sectionIndex] : null;
+
+  // Array of sorted feedback items
+  const sortedFeedback = getSortedFeedback();
 
   // If not open, return null
   if (!open) return null;
@@ -169,8 +197,6 @@ const FeedbackSidepane = ({
             </Tooltip>
           </TooltipProvider>
         </div>
-
-        {/* Content */}
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center space-y-4 py-8 h-full">
@@ -182,57 +208,79 @@ const FeedbackSidepane = ({
                 We're just loading up our feedback...
               </p>
             </div>
-          ) : activeFeedback ? (
+          ) : activeFeedback && sortedFeedback.length > 0 ? (
             <div className="space-y-4">
+              {/* Section heading */}
+              {currentSection && (
+                <div className="text-gray-hint_text font-medium">
+                  <h3 className="text-lg font-bold">
+                    {currentSection.heading}
+                  </h3>
+                </div>
+              )}
               <div className="space-y-4 text-gray-hint_text font-medium">
                 <p>Overall Feedback:</p>
                 <p>
                   Overall this response is well structured, but there are some
                   areas for improvement.
                 </p>
-                <p>Here are some potential edits:</p>
+                <ul className="leading-none">
+                  <li>Saying this</li>
+                  <li>In this way</li>
+                  <li>And here</li>
+                </ul>
+                <p>Here are some potential edits: ({sortedFeedback.length})</p>
               </div>
-              <div className="bg-gray-bg rounded-xl p-3 space-y-3 text-gray-hint_text font-medium">
-                <div className="flex items-center justify-between">
-                  <span>Overall Feedback</span>
-                  {/* Action buttons */}
-                  <div className="flex justify-end gap-2 pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleDeclineFeedback}
-                      className="bg-status-planning_light border-status-planning w-8 rounded-lg"
-                    >
-                      <BinIcon className="text-status-planning" />
-                    </Button>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={handleAcceptFeedback}
-                      className="bg-status-success_light border-status-success w-8 rounded-lg"
-                    >
-                      <CheckIcon className="text-status-success" />
-                    </Button>
+              {/* Render all feedback items */}
+              {sortedFeedback.map((feedback) => (
+                <div
+                  key={feedback.id}
+                  className={cn(
+                    "bg-gray-bg rounded-xl p-3 space-y-3 text-gray-hint_text font-medium"
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>Overall Feedback</span>
+                    {/* Action buttons */}
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeclineFeedback(feedback)}
+                        className="bg-status-planning_light border-status-planning w-8 rounded-lg"
+                      >
+                        <BinIcon className="text-status-planning" />
+                      </Button>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleAcceptFeedback(feedback)}
+                        className="bg-status-success_light border-status-success w-8 rounded-lg"
+                      >
+                        <CheckIcon className="text-status-success" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="border-l-2 border-orange px-3">
+                    <p className="text-sm">{feedback.originalText}</p>
+                  </div>
+                  <p className="text-sm">{feedback.reasoning} for example:</p>
+                  <div className="px-3">
+                    <p className="text-sm">{feedback.feedback}</p>
                   </div>
                 </div>
-                <div className="border-l-2 border-orange px-3">
-                  <p className="text-sm">{activeFeedback.originalText}</p>
-                </div>
-                <p className="text-sm">
-                  {activeFeedback.reasoning} for example:
-                </p>
-                <div className="px-3">
-                  <p className="text-sm">{activeFeedback.feedback}</p>
-                </div>
-              </div>
+              ))}
             </div>
           ) : (
             <div className="space-y-8">
               <div className="flex flex-col gap-2 font-medium">
-                {sectionIndex !== null && (
-                  <span className="text-gray-hint_text text-lg font-bold">
-                    {outline[sectionIndex]?.heading}
-                  </span>
+                {/* Section heading */}
+                {currentSection && (
+                  <div className="text-gray-hint_text font-medium">
+                    <h3 className="text-lg font-bold">
+                      {currentSection.heading}
+                    </h3>
+                  </div>
                 )}
                 <span className="text-gray-hint_text">
                   Add question specific criteria for optimal feedback
