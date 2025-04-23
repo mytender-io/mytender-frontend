@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 import { Spinner } from "@/components/ui/spinner";
 import { Section } from "@/views/BidWritingStateManagerView";
@@ -14,6 +14,9 @@ interface GetFeedbackButtonProps {
   prompts: string[];
   scoringCriteria: string;
   resetScoringCriteria: () => void;
+  onLoadingChange?: (loading: boolean) => void;
+  isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
 }
 
 const GetFeedbackButton = ({
@@ -22,10 +25,11 @@ const GetFeedbackButton = ({
   sectionIndex,
   prompts = [],
   scoringCriteria = "",
-  resetScoringCriteria
+  resetScoringCriteria,
+  isLoading,
+  setIsLoading
 }: GetFeedbackButtonProps) => {
   const { setSharedState } = useContext(BidContext);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleGetSectionFeedback = async () => {
     try {

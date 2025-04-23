@@ -14,6 +14,30 @@ import BinIcon from "@/components/icons/BinIcon";
 import CheckIcon from "@/components/icons/CheckIcon";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/utils";
+import LoadingSpinner from "@/components/icons/LoadingSpinner";
+
+// Define feedback type
+interface Feedback {
+  id: string;
+  originalText: string;
+  reasoning: string;
+  feedback: string;
+}
+
+// Define SelectedPrompts type
+type PromptKey =
+  | "ai_bid_review_clarity_and_persuasivness"
+  | "ai_review_evidencing"
+  | "ai_review_overall_feedback"
+  | "ai_review_structure_and_flow";
+
+interface SelectedPrompts {
+  ai_bid_review_clarity_and_persuasivness: boolean;
+  ai_review_evidencing: boolean;
+  ai_review_overall_feedback: boolean;
+  ai_review_structure_and_flow: boolean;
+}
 
 interface FeedbackSidepaneProps {
   sectionIndex: number | null;
@@ -23,7 +47,7 @@ interface FeedbackSidepaneProps {
     feedbackId: string,
     improvedText: string
   ) => void; // Changed from onReplace
-  activeFeedback: any;
+  activeFeedback: Feedback | null;
   onFeedbackResolved: (feedbackId: string) => void;
 }
 
@@ -42,7 +66,7 @@ const FeedbackSidepane = ({
   const { outline } = sharedState;
 
   // State to track selected prompts - only overall feedback selected by default
-  const [selectedPrompts, setSelectedPrompts] = useState({
+  const [selectedPrompts, setSelectedPrompts] = useState<SelectedPrompts>({
     ai_bid_review_clarity_and_persuasivness: false,
     ai_review_evidencing: false,
     ai_review_overall_feedback: true,
@@ -53,7 +77,10 @@ const FeedbackSidepane = ({
   const [showCriteriaInput, setShowCriteriaInput] = useState(false);
   const [scoringCriteria, setScoringCriteria] = useState("");
 
-  const handleCheckboxChange = (promptKey) => {
+  // Loading state for feedback
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCheckboxChange = (promptKey: PromptKey) => {
     setSelectedPrompts((prev) => ({
       ...prev,
       [promptKey]: !prev[promptKey]
@@ -62,7 +89,9 @@ const FeedbackSidepane = ({
 
   // Get array of selected prompt keys
   const getSelectedPromptsList = () => {
-    return Object.keys(selectedPrompts).filter((key) => selectedPrompts[key]);
+    return Object.keys(selectedPrompts).filter(
+      (key) => selectedPrompts[key as PromptKey]
+    ) as PromptKey[];
   };
 
   const handleAcceptFeedback = () => {
@@ -95,7 +124,12 @@ const FeedbackSidepane = ({
   if (!open) return null;
 
   return (
-    <div className="shadow-lg flex flex-col w-full h-fit bg-white overflow-hidden border border-gray-line">
+    <div
+      className={cn(
+        "shadow-lg flex flex-col w-full bg-white overflow-hidden border border-gray-line min-h-[calc(-241px+100vh)]",
+        activeFeedback ? "h-fit" : "h-[calc(-241px+100vh)]"
+      )}
+    >
       <div className="p-3 border-b border-gray-100 flex justify-between items-center">
         <TooltipProvider delayDuration={0}>
           <Tooltip>
@@ -131,7 +165,17 @@ const FeedbackSidepane = ({
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
-        {activeFeedback ? (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center space-y-4 py-8">
+            <p className="text-lg text-gray-hint_text font-semibold">
+              Loading...
+            </p>
+            <LoadingSpinner />
+            <p className="text-gray-hint_text font-medium">
+              We're just loading up our feedback...
+            </p>
+          </div>
+        ) : activeFeedback ? (
           <div className="space-y-4">
             <div className="space-y-4 text-gray-hint_text font-medium">
               <p>Overall Feedback:</p>
@@ -297,6 +341,8 @@ const FeedbackSidepane = ({
                   prompts={getSelectedPromptsList()}
                   scoringCriteria={scoringCriteria}
                   resetScoringCriteria={() => setScoringCriteria("")}
+                  isLoading={isLoading}
+                  setIsLoading={setIsLoading}
                 />
               </div>
             )}
