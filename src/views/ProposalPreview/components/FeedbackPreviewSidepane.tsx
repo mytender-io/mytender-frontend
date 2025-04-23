@@ -252,7 +252,7 @@ const FeedbackSidepane = ({
                         <BinIcon className="text-status-planning" />
                       </Button>
                       <Button
-                        variant="default"
+                        variant="outline"
                         size="sm"
                         onClick={() => handleAcceptFeedback(feedback)}
                         className="bg-status-success_light border-status-success w-8 rounded-lg"
