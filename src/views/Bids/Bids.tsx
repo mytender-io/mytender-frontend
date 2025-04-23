@@ -32,6 +32,7 @@ import { formatDistanceToNow } from "date-fns";
 import { toast } from "react-toastify";
 import { useLoading } from "@/context/LoadingContext";
 import posthog from "posthog-js";
+import FeedbackDialog from "@/modals/FeedbackDialog.tsx";
 
 interface Bid {
   _id: string;
@@ -85,7 +86,17 @@ const Bids = () => {
     setLoadingMessage
   } = useLoading();
 
-  // Function to check if a bid was edited less than 20 minutes ago and has empty win themes
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [currentBidForFeedback, setCurrentBidForFeedback] = useState<
+    string | null
+  >(null);
+
+  // Add this function to your Bids component
+  const handleFeedbackClick = (bidId: string): void => {
+    setCurrentBidForFeedback(bidId);
+    setShowFeedbackModal(true);
+  };
+
   // Function to check if a bid was recently created and new_bid_completed is false
   const isIncompleteBid = (bid: Bid): boolean => {
     // Check if timestamp exists
@@ -627,7 +638,10 @@ const Bids = () => {
                             </TableCell>
                             <TableCell className="w-[100px] text-right px-4">
                               <EllipsisMenuDashboard
-                                onClick={() => handleDeleteClick(bid._id)}
+                                onDeleteClick={() => handleDeleteClick(bid._id)}
+                                onFeedbackClick={() =>
+                                  handleFeedbackClick(bid._id)
+                                }
                               />
                             </TableCell>
                           </TableRow>
@@ -678,6 +692,12 @@ const Bids = () => {
           message="Are you sure you want to delete this tender?"
         />
 
+        <FeedbackDialog
+          isOpen={showFeedbackModal}
+          onClose={() => setShowFeedbackModal(false)}
+          bidId={currentBidForFeedback || undefined}
+          token={tokenRef.current}
+        />
         <WelcomeModal
           isOpen={showWelcomeModal}
           onClose={handleWelcomeModalClose}

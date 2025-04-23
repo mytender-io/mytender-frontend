@@ -8,14 +8,17 @@ import {
 import { Button } from "@/components/ui/button";
 import ElipsisMenuIcon from "@/components/icons/ElipsisMenuIcon";
 import RecyclebinIcon from "@/components/icons/RecyclebinIcon";
+import FeedbackIcon from "@/components/icons/FeedbackIcon";
 
 interface EllipsisMenuDashboardProps {
-  onClick: () => void;
+  onDeleteClick: () => void;
+  onFeedbackClick: () => void;
   disabled?: boolean;
 }
 
 const EllipsisMenuDashboard: React.FC<EllipsisMenuDashboardProps> = ({
-  onClick,
+  onDeleteClick,
+  onFeedbackClick,
   disabled = false
 }) => {
   return (
@@ -27,13 +30,23 @@ const EllipsisMenuDashboard: React.FC<EllipsisMenuDashboardProps> = ({
             disabled ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
           }`}
         >
-          <ElipsisMenuIcon className={`${disabled ? "text-gray-300" : "text-gray-hint_text"}`} />
+          <ElipsisMenuIcon
+            className={`${disabled ? "text-gray-300" : "text-gray-hint_text"}`}
+          />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[120px]">
-        <DropdownMenuItem onClick={onClick} disabled={disabled}>
+      <DropdownMenuContent className="w-[150px]">
+        <DropdownMenuItem onClick={onDeleteClick} disabled={disabled}>
           <RecyclebinIcon className="text-typo-900" />
           Delete Bid
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer flex items-center gap-2"
+          onClick={onFeedbackClick}
+          disabled={disabled}
+        >
+          <FeedbackIcon className="h-4 w-4" />
+          Add Feedback
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
