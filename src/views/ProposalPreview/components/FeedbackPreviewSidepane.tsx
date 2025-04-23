@@ -69,7 +69,7 @@ const FeedbackSidepane = ({
   if (!open) return null;
 
   return (
-    <div className="shadow-lg flex flex-col w-full h-full bg-white overflow-hidden border border-gray-line">
+    <div className="shadow-lg flex flex-col w-full h-fit bg-white overflow-hidden border border-gray-line">
       <div className="p-3 border-b border-gray-100 flex justify-between items-center">
         <TooltipProvider delayDuration={0}>
           <Tooltip>
@@ -107,18 +107,18 @@ const FeedbackSidepane = ({
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
         {activeFeedback ? (
           <div className="space-y-4">
-            <div className="space-y-2 text-gray-hint_text font-medium">
-              <span className="block">Overall Feedback:</span>
-              <span className="block">
+            <div className="space-y-4 text-gray-hint_text font-medium">
+              <p>Overall Feedback:</p>
+              <p>
                 Overall this response is well structured, but there are some
                 areas for improvement. You did well here:
-              </span>
+              </p>
               <ul className="leading-none">
                 <li>Saying this</li>
                 <li>In this way</li>
                 <li> And here</li>
               </ul>
-              <span>Here are some potential edits: (1)</span>
+              <p>Here are some potential edits: (1)</p>
             </div>
             <div className="bg-gray-bg rounded-xl p-3 space-y-3 text-gray-hint_text font-medium">
               <div className="flex items-center justify-between">
@@ -154,64 +154,70 @@ const FeedbackSidepane = ({
           </div>
         ) : (
           <div className="space-y-8">
-            <div className="flex flex-col gap-1 font-medium">
+            <div className="flex flex-col gap-2 font-medium">
               <span className="text-gray-hint_text">
                 Add question specific criteria for optimal feedback
               </span>
               <span className="text-gray-border1 text-sm">
                 Get much more specific feedback based around the criteria
               </span>
+              <Button
+                variant="outline"
+                className="w-fit text-orange border-orange hover:text-orange-light hover:bg-white mt-2"
+              >
+                Add Criteria
+              </Button>
             </div>
-            <div className="flex flex-col gap-1 font-medium">
+            <div className="space-y-3 font-medium">
               <span className="text-gray-hint_text">
                 Click on the checks you would like to run
               </span>
-              <div className="mt-3 space-y-4">
+              <div className="space-y-4 px-4">
                 <div className="flex items-center gap-2">
                   <Checkbox id="overall-feedback" />
-                  <div className="leading-none">
+                  <div className="leading-tight">
                     <label
                       htmlFor="overall-feedback"
                       className="text-gray-hint_text block"
                     >
                       Overall Feedback
                     </label>
-                    <span className="text-gray-border1 text-xs leading-none">
+                    <span className="text-gray-border1 text-xs">
                       Assess where you could improve given the scoring criteria
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="evidencing" />
-                  <div className="leading-none">
+                  <div className="leading-tight">
                     <label
                       htmlFor="evidencing"
                       className="text-gray-hint_text block"
                     >
                       Evidencing
                     </label>
-                    <span className="text-gray-border1 text-xs leading-none">
+                    <span className="text-gray-border1 text-xs">
                       Find areas where you need to support your claims more
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="grammar" />
-                  <div className="leading-none">
+                  <div className="leading-tight">
                     <label
                       htmlFor="grammar"
                       className="text-gray-hint_text block"
                     >
                       Grammar
                     </label>
-                    <span className="text-gray-border1 text-xs leading-none">
+                    <span className="text-gray-border1 text-xs">
                       Fix spelling and grammar errors
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="custom" />
-                  <div className="leading-none w-full space-y-1.5">
+                  <div className="leading-tight w-full space-y-1.5">
                     <label
                       htmlFor="custom"
                       className="text-gray-hint_text block"
