@@ -1,4 +1,4 @@
-import { useContext, useRef } from "react";
+import { useContext, useRef, useState } from "react";
 import { useAuthUser } from "react-auth-kit";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,26 @@ const FeedbackSidepane = ({
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState } = useContext(BidContext);
   const { outline } = sharedState;
+  
+  // State to track selected prompts - only overall feedback selected by default
+  const [selectedPrompts, setSelectedPrompts] = useState({
+    "ai_bid_review_clarity_and_persuasivness": false,
+    "ai_review_evidencing": false,
+    "ai_review_overall_feedback": true,
+    "ai_review_structure_and_flow": false
+  });
+
+  const handleCheckboxChange = (promptKey) => {
+    setSelectedPrompts(prev => ({
+      ...prev,
+      [promptKey]: !prev[promptKey]
+    }));
+  };
+
+  // Get array of selected prompt keys
+  const getSelectedPromptsList = () => {
+    return Object.keys(selectedPrompts).filter(key => selectedPrompts[key]);
+  };
 
   const handleAcceptFeedback = () => {
     if (activeFeedback?.feedback && onFeedbackResolved) {
@@ -111,14 +131,9 @@ const FeedbackSidepane = ({
               <p>Overall Feedback:</p>
               <p>
                 Overall this response is well structured, but there are some
-                areas for improvement. You did well here:
+                areas for improvement.
               </p>
-              <ul className="leading-none">
-                <li>Saying this</li>
-                <li>In this way</li>
-                <li> And here</li>
-              </ul>
-              <p>Here are some potential edits: (1)</p>
+              <p>Here are some potential edits:</p>
             </div>
             <div className="bg-gray-bg rounded-xl p-3 space-y-3 text-gray-hint_text font-medium">
               <div className="flex items-center justify-between">
@@ -174,7 +189,11 @@ const FeedbackSidepane = ({
               </span>
               <div className="space-y-4 px-4">
                 <div className="flex items-center gap-2">
-                  <Checkbox id="overall-feedback" />
+                  <Checkbox 
+                    id="overall-feedback" 
+                    checked={selectedPrompts["ai_review_overall_feedback"]}
+                    onCheckedChange={() => handleCheckboxChange("ai_review_overall_feedback")}
+                  />
                   <div className="leading-tight">
                     <label
                       htmlFor="overall-feedback"
@@ -188,7 +207,11 @@ const FeedbackSidepane = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Checkbox id="evidencing" />
+                  <Checkbox 
+                    id="evidencing" 
+                    checked={selectedPrompts["ai_review_evidencing"]}
+                    onCheckedChange={() => handleCheckboxChange("ai_review_evidencing")}
+                  />
                   <div className="leading-tight">
                     <label
                       htmlFor="evidencing"
@@ -202,32 +225,39 @@ const FeedbackSidepane = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Checkbox id="grammar" />
+                  <Checkbox 
+                    id="structure-flow" 
+                    checked={selectedPrompts["ai_review_structure_and_flow"]}
+                    onCheckedChange={() => handleCheckboxChange("ai_review_structure_and_flow")}
+                  />
                   <div className="leading-tight">
                     <label
-                      htmlFor="grammar"
+                      htmlFor="structure-flow"
                       className="text-gray-hint_text block"
                     >
-                      Grammar
+                      Structure and Flow
                     </label>
                     <span className="text-gray-border1 text-xs">
-                      Fix spelling and grammar errors
+                      Improve the logical flow and organization of your response
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Checkbox id="custom" />
-                  <div className="leading-tight w-full space-y-1.5">
+                  <Checkbox 
+                    id="clarity" 
+                    checked={selectedPrompts["ai_bid_review_clarity_and_persuasivness"]}
+                    onCheckedChange={() => handleCheckboxChange("ai_bid_review_clarity_and_persuasivness")}
+                  />
+                  <div className="leading-tight">
                     <label
-                      htmlFor="custom"
+                      htmlFor="clarity"
                       className="text-gray-hint_text block"
                     >
-                      Custom
+                      Clarity and persuasiveness
                     </label>
-                    <Input
-                      placeholder="What would you like us to check or anaylse?"
-                      className="h-8"
-                    />
+                    <span className="text-gray-border1 text-xs">
+                      Enhance the clarity and persuasive power of your arguments
+                    </span>
                   </div>
                 </div>
               </div>
@@ -238,6 +268,7 @@ const FeedbackSidepane = ({
                   section={outline[sectionIndex]}
                   tokenRef={tokenRef}
                   sectionIndex={sectionIndex}
+                  prompts={getSelectedPromptsList()}
                 />
               </div>
             )}

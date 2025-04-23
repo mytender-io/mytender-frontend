@@ -6,24 +6,36 @@ import { useContext, useState } from "react";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 import { Spinner } from "@/components/ui/spinner";
 
-const GetFeedbackButton = ({ section, tokenRef, sectionIndex }) => {
+const GetFeedbackButton = ({ section, tokenRef, sectionIndex, prompts = [] }) => {
   const { setSharedState } = useContext(BidContext);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGetSectionFeedback = async () => {
     try {
+      // Don't proceed if no prompts are selected
+      if (prompts.length === 0) {
+        toast.warning("Please select at least one feedback option");
+        return;
+      }
+      
       setIsLoading(true);
       toast.info("Getting feedback...");
       const formData = new FormData();
+      
       // Convert the section object to a JSON string
       formData.append("section", JSON.stringify(section));
       formData.append(
         "scoring_criteria",
         section.relevant_evaluation_criteria || ""
       );
-
+      
+      // Use the prompts passed as a parameter
+      prompts.forEach((prompt) => {
+        formData.append("promptlist", prompt);
+      });
+      
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/review_bid_overall_feedback`,
+        `http${HTTP_PREFIX}://${API_URL}/review_bid`,
         formData,
         {
           headers: {
@@ -32,14 +44,13 @@ const GetFeedbackButton = ({ section, tokenRef, sectionIndex }) => {
           }
         }
       );
-
+      
       // Check if the response contains the updated section
       if (response.data && response.data.updated_section) {
         console.log(response.data.updated_section);
         // Update the shared state with the new section
         setSharedState((prevState) => {
           const newOutline = [...prevState.outline];
-
           // Use the sectionIndex parameter directly if provided
           if (sectionIndex !== undefined) {
             newOutline[sectionIndex] = response.data.updated_section;
@@ -52,13 +63,11 @@ const GetFeedbackButton = ({ section, tokenRef, sectionIndex }) => {
               newOutline[idx] = response.data.updated_section;
             }
           }
-
           return {
             ...prevState,
             outline: newOutline
           };
         });
-
         toast.success("Feedback retrieved and applied successfully");
       } else {
         toast.success("Feedback retrieved successfully");
@@ -70,9 +79,12 @@ const GetFeedbackButton = ({ section, tokenRef, sectionIndex }) => {
       setIsLoading(false);
     }
   };
-
+  
   return (
-    <Button onClick={handleGetSectionFeedback} disabled={isLoading}>
+    <Button 
+      onClick={handleGetSectionFeedback} 
+      disabled={isLoading || prompts.length === 0}
+    >
       {isLoading ? (
         <>
           <Spinner color="text-white" className="h-4 w-4" />
