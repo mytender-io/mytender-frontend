@@ -166,7 +166,7 @@ const FeedbackSidepane = ({
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center space-y-4 py-8">
+          <div className="flex flex-col items-center justify-center space-y-4 py-8 h-full">
             <p className="text-lg text-gray-hint_text font-semibold">
               Loading...
             </p>
