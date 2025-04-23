@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import ProposalPreviewSidepane from "./components/ProposalPreviewSidepane";
+import FeedbackSidepane from "./components/FeedbackPreviewSidepane";
 import ToolSparkIcon from "@/components/icons/ToolSparkIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 import RedoSparkIcon from "@/components/icons/RedoSparkIcon";
@@ -37,7 +38,7 @@ import ProposalToolbar from "./components/ProposalToolbar";
 import MarkReviewReadyButton from "./components/MarkReviewReadyButton";
 import RewriteInputBar from "./components/RewriteInputBar";
 import { useUserData } from "@/context/UserDataContext";
-import GetFeedbackButton from "./components/GetQuestionFeedbackButton";
+import ConsultIcon from "@/components/icons/ConsultIcon";
 
 const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -58,6 +59,7 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
   const [selectedRange, setSelectedRange] = useState<Range | null>(null);
   const [activeComment, setActiveComment] = useState<string | null>(null);
   const [sidepaneOpen, setSidepaneOpen] = useState(false);
+  const [feedbackSidepaneOpen, setFeedbackSidepaneOpen] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number | null>(
     null
@@ -127,8 +129,8 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
         // Set the feedback item as the active feedback
         setActiveFeedback(feedbackItem);
 
-        // Open the sidepane
-        setSidepaneOpen(true);
+        // Open the feedback sidepane
+        setFeedbackSidepaneOpen(true);
 
         // Highlight this specific feedback span
         highlightFeedbackText(feedbackId);
@@ -283,6 +285,12 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
   // Function to toggle the sidepane
   const toggleSidepane = () => {
     setSidepaneOpen((prevState) => !prevState);
+    setFeedbackSidepaneOpen(false);
+  };
+
+  const toggleFeedbackSidepane = () => {
+    setSidepaneOpen(false);
+    setFeedbackSidepaneOpen((prevState) => !prevState);
   };
 
   // Handle rewrite success from child component
@@ -939,12 +947,6 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
                             "border-b border-gray-line relative last:rounded-b-md"
                           )}
                         >
-                          <GetFeedbackButton
-                            section={section}
-                            tokenRef={tokenRef}
-                            sectionIndex={index}
-                          />
-
                           {section.answerer && (
                             <div className="absolute right-1 top-2">
                               <ProfilePhoto
@@ -1329,7 +1331,7 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
                   </div>
                 ) : null}
               </div>
-              {sidepaneOpen && (
+              {(sidepaneOpen || feedbackSidepaneOpen) && (
                 <div
                   className={cn(
                     "proposal-preview-sidepane w-[450px] overflow-y-auto z-50 sticky -top-4 right-0"
@@ -1338,20 +1340,29 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
                     maxHeight: `calc(100vh - ${241 - (yPosition > 180 ? 176 : yPosition)}px)`
                   }}
                 >
-                  <ProposalPreviewSidepane
-                    bid_id={sharedState.object_id}
-                    open={sidepaneOpen}
-                    onOpenChange={setSidepaneOpen}
-                    promptTarget={promptTarget}
-                    promptResult={promptResult}
-                    isLoadingEvidence={isLoadingEvidence}
-                    onReplace={handleReplaceWithPrompt}
-                    onCancelPrompt={handleCancelPrompt}
-                    actionType={actionType}
-                    setActionType={setActionType}
-                    activeFeedback={activeFeedback} // Add this prop
-                    onFeedbackResolved={handleFeedbackResolved} // Add this prop
-                  />
+                  {feedbackSidepaneOpen ? (
+                    <FeedbackSidepane
+                      bid_id={sharedState.object_id}
+                      sectionIndex={currentSectionIndex}
+                      open={feedbackSidepaneOpen}
+                      onOpenChange={setFeedbackSidepaneOpen}
+                      activeFeedback={activeFeedback}
+                      onFeedbackResolved={handleFeedbackResolved}
+                    />
+                  ) : (
+                    <ProposalPreviewSidepane
+                      bid_id={sharedState.object_id}
+                      open={sidepaneOpen}
+                      onOpenChange={setSidepaneOpen}
+                      promptTarget={promptTarget}
+                      promptResult={promptResult}
+                      isLoadingEvidence={isLoadingEvidence}
+                      onReplace={handleReplaceWithPrompt}
+                      onCancelPrompt={handleCancelPrompt}
+                      actionType={actionType}
+                      setActionType={setActionType}
+                    />
+                  )}
                 </div>
               )}
             </div>
@@ -1386,6 +1397,35 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
                   </span>
                   <span className="text-gray-border text-xs">
                     Chat, brainstorm, research
+                  </span>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleFeedbackSidepane}
+                  className="[&_svg]:size-6 text-gray-hint_text"
+                >
+                  <ConsultIcon
+                    className={cn(feedbackSidepaneOpen ? "text-orange" : "")}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="left"
+                className="border-[0.5px] border-gray-line rounded-md p-2 px-1.5 py-1 shadow-tooltip bg-white"
+              >
+                <div className="flex flex-col gap-1">
+                  <span className="text-gray-hint_text font-medium text-sm">
+                    Consult
+                  </span>
+                  <span className="text-gray-border text-xs">
+                    Polish your writing
                   </span>
                 </div>
               </TooltipContent>

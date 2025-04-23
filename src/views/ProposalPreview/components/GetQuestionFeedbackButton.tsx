@@ -76,10 +76,10 @@ const GetFeedbackButton = ({ section, tokenRef, sectionIndex }) => {
       {isLoading ? (
         <>
           <Spinner color="text-white" className="h-4 w-4" />
-          Getting Feedback...
+          Evaluating...
         </>
       ) : (
-        "Get AI Feedback"
+        "Start Evaluation"
       )}
     </Button>
   );

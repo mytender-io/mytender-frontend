@@ -41,7 +41,8 @@ export default {
           bg: "#F3F3F3",
           black: "#1D252C",
           spacer_light: "#EBECEF",
-          border: "#D5DADC"
+          border: "#D5DADC",
+          border1: "#ABA7AF"
         },
         typo: {
           50: "#FAFAFA",
