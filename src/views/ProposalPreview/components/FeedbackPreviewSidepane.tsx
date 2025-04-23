@@ -8,25 +8,26 @@ import {
   TooltipTrigger,
   TooltipProvider
 } from "@/components/ui/tooltip";
-import posthog from "posthog-js";
 import GetFeedbackButton from "./GetQuestionFeedbackButton";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 import BinIcon from "@/components/icons/BinIcon";
 import CheckIcon from "@/components/icons/CheckIcon";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 
 interface FeedbackSidepaneProps {
-  bid_id: string;
   sectionIndex: number | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onApplyFeedbackImprovement: (feedbackId: string, improvedText: string) => void; // Changed from onReplace
+  onApplyFeedbackImprovement: (
+    feedbackId: string,
+    improvedText: string
+  ) => void; // Changed from onReplace
   activeFeedback: any;
   onFeedbackResolved: (feedbackId: string) => void;
 }
 
 const FeedbackSidepane = ({
-  bid_id,
   sectionIndex,
   open,
   onOpenChange,
@@ -48,6 +49,10 @@ const FeedbackSidepane = ({
     ai_review_structure_and_flow: false
   });
 
+  // State for showing criteria input and storing criteria text
+  const [showCriteriaInput, setShowCriteriaInput] = useState(false);
+  const [scoringCriteria, setScoringCriteria] = useState("");
+
   const handleCheckboxChange = (promptKey) => {
     setSelectedPrompts((prev) => ({
       ...prev,
@@ -61,11 +66,13 @@ const FeedbackSidepane = ({
   };
 
   const handleAcceptFeedback = () => {
-    if (activeFeedback?.id && activeFeedback?.feedback && onApplyFeedbackImprovement) {
+    if (
+      activeFeedback?.id &&
+      activeFeedback?.feedback &&
+      onApplyFeedbackImprovement
+    ) {
       // Call the appropriate function with both feedbackId and the improved text
       onApplyFeedbackImprovement(activeFeedback.id, activeFeedback.feedback);
-      
-
     }
   };
 
@@ -73,12 +80,14 @@ const FeedbackSidepane = ({
     if (activeFeedback?.id && onFeedbackResolved) {
       // Just mark as resolved without applying the suggested changes
       onFeedbackResolved(activeFeedback.id);
+    }
+  };
 
-      // Track the event
-      posthog.capture("feedback_declined", {
-        feedbackId: activeFeedback.id,
-        bidId: bid_id
-      });
+  // Function to handle criteria addition
+  const handleAddCriteria = () => {
+    setShowCriteriaInput(!showCriteriaInput);
+    if (showCriteriaInput) {
+      setScoringCriteria("");
     }
   };
 
@@ -176,9 +185,17 @@ const FeedbackSidepane = ({
               <Button
                 variant="outline"
                 className="w-fit text-orange border-orange hover:text-orange-light hover:bg-white mt-2"
+                onClick={handleAddCriteria}
               >
-                Add Criteria
+                {showCriteriaInput ? "Hide Criteria" : "Add Criteria"}
               </Button>
+              {showCriteriaInput && (
+                <Input
+                  placeholder="Enter scoring criteria..."
+                  value={scoringCriteria}
+                  onChange={(e) => setScoringCriteria(e.target.value)}
+                />
+              )}
             </div>
             <div className="space-y-3 font-medium">
               <span className="text-gray-hint_text">
@@ -278,6 +295,8 @@ const FeedbackSidepane = ({
                   tokenRef={tokenRef}
                   sectionIndex={sectionIndex}
                   prompts={getSelectedPromptsList()}
+                  scoringCriteria={scoringCriteria}
+                  resetScoringCriteria={() => setScoringCriteria("")}
                 />
               </div>
             )}

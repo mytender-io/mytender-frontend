@@ -5,8 +5,25 @@ import { toast } from "react-toastify";
 import { useContext, useState } from "react";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 import { Spinner } from "@/components/ui/spinner";
+import { Section } from "@/views/BidWritingStateManagerView";
 
-const GetFeedbackButton = ({ section, tokenRef, sectionIndex, prompts = [] }) => {
+interface GetFeedbackButtonProps {
+  section: Section;
+  tokenRef: React.RefObject<string>;
+  sectionIndex?: number;
+  prompts: string[];
+  scoringCriteria: string;
+  resetScoringCriteria: () => void;
+}
+
+const GetFeedbackButton = ({
+  section,
+  tokenRef,
+  sectionIndex,
+  prompts = [],
+  scoringCriteria = "",
+  resetScoringCriteria
+}: GetFeedbackButtonProps) => {
   const { setSharedState } = useContext(BidContext);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,23 +34,20 @@ const GetFeedbackButton = ({ section, tokenRef, sectionIndex, prompts = [] }) =>
         toast.warning("Please select at least one feedback option");
         return;
       }
-      
+
       setIsLoading(true);
       toast.info("Getting feedback...");
       const formData = new FormData();
-      
+
       // Convert the section object to a JSON string
       formData.append("section", JSON.stringify(section));
-      formData.append(
-        "scoring_criteria",
-        section.relevant_evaluation_criteria || ""
-      );
-      
+      formData.append("scoring_criteria", scoringCriteria || "");
+
       // Use the prompts passed as a parameter
       prompts.forEach((prompt) => {
         formData.append("promptlist", prompt);
       });
-      
+
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/review_bid`,
         formData,
@@ -44,7 +58,7 @@ const GetFeedbackButton = ({ section, tokenRef, sectionIndex, prompts = [] }) =>
           }
         }
       );
-      
+
       // Check if the response contains the updated section
       if (response.data && response.data.updated_section) {
         console.log(response.data.updated_section);
@@ -69,6 +83,7 @@ const GetFeedbackButton = ({ section, tokenRef, sectionIndex, prompts = [] }) =>
           };
         });
         toast.success("Feedback retrieved and applied successfully");
+        resetScoringCriteria();
       } else {
         toast.success("Feedback retrieved successfully");
       }
@@ -79,10 +94,10 @@ const GetFeedbackButton = ({ section, tokenRef, sectionIndex, prompts = [] }) =>
       setIsLoading(false);
     }
   };
-  
+
   return (
-    <Button 
-      onClick={handleGetSectionFeedback} 
+    <Button
+      onClick={handleGetSectionFeedback}
       disabled={isLoading || prompts.length === 0}
     >
       {isLoading ? (

@@ -1230,7 +1230,6 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
                 >
                   {feedbackSidepaneOpen ? (
                     <FeedbackSidepane
-                      bid_id={sharedState.object_id}
                       sectionIndex={currentSectionIndex}
                       open={feedbackSidepaneOpen}
                       onOpenChange={setFeedbackSidepaneOpen}
