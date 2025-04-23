@@ -39,6 +39,11 @@ import MarkReviewReadyButton from "./components/MarkReviewReadyButton";
 import RewriteInputBar from "./components/RewriteInputBar";
 import { useUserData } from "@/context/UserDataContext";
 import ConsultIcon from "@/components/icons/ConsultIcon";
+import {
+  handleApplyFeedbackImprovement,
+  handleFeedbackClick,
+  handleFeedbackResolved
+} from "./feedbackFunctions";
 
 const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -117,129 +122,6 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
       // }
     }
   }, [sharedState.outline]);
-
-  const handleFeedbackClick = (feedbackId) => {
-    if (currentSectionIndex !== null) {
-      const currentSection = outline[currentSectionIndex];
-      const feedbackItem = currentSection.answerFeedback?.find(
-        (feedback) => feedback.id === feedbackId
-      );
-
-      if (feedbackItem) {
-        // Set the feedback item as the active feedback
-        setActiveFeedback(feedbackItem);
-
-        // Open the feedback sidepane
-        setFeedbackSidepaneOpen(true);
-
-        // Highlight this specific feedback span
-        highlightFeedbackText(feedbackId);
-
-        // Track the event
-        posthog.capture("feedback_item_clicked", {
-          feedbackId,
-          sectionId: currentSection.section_id
-        });
-      }
-    }
-  };
-
-  const highlightFeedbackText = (feedbackId) => {
-    // First reset all feedback spans to default green color
-    document.querySelectorAll("span.feedback-text").forEach((span) => {
-      (span as HTMLElement).style.backgroundColor = "rgb(144, 238, 144)"; // Reset to light green
-
-      // Reset all child elements
-      const childElements = span.querySelectorAll("*");
-      childElements.forEach((element) => {
-        (element as HTMLElement).style.backgroundColor = "rgb(144, 238, 144)";
-      });
-    });
-
-    // Then highlight the selected feedback span
-    const feedbackSpan = document.querySelector(
-      `span.feedback-text[data-feedback-id="${feedbackId}"]`
-    );
-
-    if (feedbackSpan) {
-      (feedbackSpan as HTMLElement).style.backgroundColor = "rgb(76, 175, 80)"; // Darker green for active
-
-      // Apply highlighting to all child elements
-      const childElements = feedbackSpan.querySelectorAll("*");
-      childElements.forEach((element) => {
-        (element as HTMLElement).style.backgroundColor = "rgb(76, 175, 80)";
-      });
-    }
-  };
-
-  const handleFeedbackResolved = (feedbackId) => {
-    if (currentSectionIndex !== null) {
-      // First, find the feedback item
-      const currentSection = outline[currentSectionIndex];
-      const feedbackItem = currentSection.answerFeedback?.find(
-        (feedback) => feedback.id === feedbackId
-      );
-
-      if (feedbackItem) {
-        // Update the section content to remove highlighting from HTML
-        // This step needs to be done BEFORE updating the state
-        const editorElement = editorRefs.current[currentSectionIndex];
-
-        if (editorElement) {
-          // Find the feedback span
-          const feedbackSpan = editorElement.querySelector(
-            `span.feedback-text[data-feedback-id="${feedbackId}"]`
-          );
-
-          if (feedbackSpan) {
-            // Create a text node with the original content
-            const textNode = document.createTextNode(feedbackItem.originalText);
-
-            // Replace the span with plain text
-            feedbackSpan.parentNode?.replaceChild(textNode, feedbackSpan);
-
-            // Update the answer content in state with the modified HTML
-            const newContent = editorElement.innerHTML;
-
-            setSharedState((prevState) => {
-              const newOutline = [...prevState.outline];
-              // Update the content first
-              newOutline[currentSectionIndex] = {
-                ...newOutline[currentSectionIndex],
-                answer: newContent
-              };
-
-              // Then mark the feedback as resolved
-              if (newOutline[currentSectionIndex].answerFeedback) {
-                const updatedFeedback = newOutline[
-                  currentSectionIndex
-                ].answerFeedback.map((feedback) =>
-                  feedback.id === feedbackId
-                    ? { ...feedback, resolved: true }
-                    : feedback
-                );
-
-                newOutline[currentSectionIndex] = {
-                  ...newOutline[currentSectionIndex],
-                  answerFeedback: updatedFeedback
-                };
-              }
-
-              return {
-                ...prevState,
-                outline: newOutline
-              };
-            });
-
-            // Reset active feedback
-            setActiveFeedback(null);
-
-            toast.success("Feedback Resolved");
-          }
-        }
-      }
-    }
-  };
 
   // handle clearing feedback on outside clicks
   useEffect(() => {
@@ -1001,8 +883,14 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
                                 }
                               }}
                               onFeedbackClick={(feedbackId) =>
-                                handleFeedbackClick(feedbackId)
-                              } // Add this prop
+                                handleFeedbackClick(
+                                  feedbackId,
+                                  currentSectionIndex,
+                                  outline,
+                                  setActiveFeedback,
+                                  setFeedbackSidepaneOpen
+                                )
+                              }
                               disabled={false}
                               editorRef={(el) => {
                                 editorRefs.current[index] = el;
@@ -1346,9 +1234,28 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
                       sectionIndex={currentSectionIndex}
                       open={feedbackSidepaneOpen}
                       onOpenChange={setFeedbackSidepaneOpen}
-                      onReplace={handleReplaceWithPrompt}
+                      onApplyFeedbackImprovement={(feedbackId, improvedText) =>
+                        handleApplyFeedbackImprovement(
+                          feedbackId,
+                          improvedText,
+                          currentSectionIndex,
+                          editorRefs,
+                          outline,
+                          setSharedState,
+                          setActiveFeedback
+                        )
+                      }
                       activeFeedback={activeFeedback}
-                      onFeedbackResolved={handleFeedbackResolved}
+                      onFeedbackResolved={(feedbackId) =>
+                        handleFeedbackResolved(
+                          feedbackId,
+                          currentSectionIndex,
+                          editorRefs,
+                          outline,
+                          setSharedState,
+                          setActiveFeedback
+                        )
+                      }
                     />
                   ) : (
                     <ProposalPreviewSidepane
@@ -1438,4 +1345,4 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
   );
 };
 
-export default withAuth(ProposalPreview);
+export default ProposalPreview;

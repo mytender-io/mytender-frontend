@@ -20,7 +20,7 @@ interface FeedbackSidepaneProps {
   sectionIndex: number | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onReplace: (text: string) => void;
+  onApplyFeedbackImprovement: (feedbackId: string, improvedText: string) => void; // Changed from onReplace
   activeFeedback: any;
   onFeedbackResolved: (feedbackId: string) => void;
 }
@@ -30,7 +30,7 @@ const FeedbackSidepane = ({
   sectionIndex,
   open,
   onOpenChange,
-  onReplace,
+  onApplyFeedbackImprovement,
   activeFeedback,
   onFeedbackResolved
 }: FeedbackSidepaneProps) => {
@@ -61,18 +61,11 @@ const FeedbackSidepane = ({
   };
 
   const handleAcceptFeedback = () => {
-    if (activeFeedback?.feedback && onReplace) {
-      // Replace the original text with the suggested improved text
-      // But first, call the feedback resolution handler to clean up the state
-      if (onFeedbackResolved) {
-        onFeedbackResolved(activeFeedback.id);
-      }
+    if (activeFeedback?.id && activeFeedback?.feedback && onApplyFeedbackImprovement) {
+      // Call the appropriate function with both feedbackId and the improved text
+      onApplyFeedbackImprovement(activeFeedback.id, activeFeedback.feedback);
+      
 
-      // After a small delay to ensure state update has processed
-      setTimeout(() => {
-        // Now replace with the new content
-        onReplace(activeFeedback.feedback);
-      }, 50);
     }
   };
 
