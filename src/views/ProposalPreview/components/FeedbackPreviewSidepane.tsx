@@ -14,13 +14,13 @@ import { BidContext } from "@/views/BidWritingStateManagerView";
 import BinIcon from "@/components/icons/BinIcon";
 import CheckIcon from "@/components/icons/CheckIcon";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 
 interface FeedbackSidepaneProps {
   bid_id: string;
   sectionIndex: number | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onReplace: (text: string) => void;
   activeFeedback: any;
   onFeedbackResolved: (feedbackId: string) => void;
 }
@@ -30,6 +30,7 @@ const FeedbackSidepane = ({
   sectionIndex,
   open,
   onOpenChange,
+  onReplace,
   activeFeedback,
   onFeedbackResolved
 }: FeedbackSidepaneProps) => {
@@ -38,17 +39,17 @@ const FeedbackSidepane = ({
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState } = useContext(BidContext);
   const { outline } = sharedState;
-  
+
   // State to track selected prompts - only overall feedback selected by default
   const [selectedPrompts, setSelectedPrompts] = useState({
-    "ai_bid_review_clarity_and_persuasivness": false,
-    "ai_review_evidencing": false,
-    "ai_review_overall_feedback": true,
-    "ai_review_structure_and_flow": false
+    ai_bid_review_clarity_and_persuasivness: false,
+    ai_review_evidencing: false,
+    ai_review_overall_feedback: true,
+    ai_review_structure_and_flow: false
   });
 
   const handleCheckboxChange = (promptKey) => {
-    setSelectedPrompts(prev => ({
+    setSelectedPrompts((prev) => ({
       ...prev,
       [promptKey]: !prev[promptKey]
     }));
@@ -56,19 +57,22 @@ const FeedbackSidepane = ({
 
   // Get array of selected prompt keys
   const getSelectedPromptsList = () => {
-    return Object.keys(selectedPrompts).filter(key => selectedPrompts[key]);
+    return Object.keys(selectedPrompts).filter((key) => selectedPrompts[key]);
   };
 
   const handleAcceptFeedback = () => {
-    if (activeFeedback?.feedback && onFeedbackResolved) {
-      // Call the feedback resolution handler
-      onFeedbackResolved(activeFeedback.id);
+    if (activeFeedback?.feedback && onReplace) {
+      // Replace the original text with the suggested improved text
+      // But first, call the feedback resolution handler to clean up the state
+      if (onFeedbackResolved) {
+        onFeedbackResolved(activeFeedback.id);
+      }
 
-      // Track the event
-      posthog.capture("feedback_accepted", {
-        feedbackId: activeFeedback.id,
-        bidId: bid_id
-      });
+      // After a small delay to ensure state update has processed
+      setTimeout(() => {
+        // Now replace with the new content
+        onReplace(activeFeedback.feedback);
+      }, 50);
     }
   };
 
@@ -189,10 +193,12 @@ const FeedbackSidepane = ({
               </span>
               <div className="space-y-4 px-4">
                 <div className="flex items-center gap-2">
-                  <Checkbox 
-                    id="overall-feedback" 
+                  <Checkbox
+                    id="overall-feedback"
                     checked={selectedPrompts["ai_review_overall_feedback"]}
-                    onCheckedChange={() => handleCheckboxChange("ai_review_overall_feedback")}
+                    onCheckedChange={() =>
+                      handleCheckboxChange("ai_review_overall_feedback")
+                    }
                   />
                   <div className="leading-tight">
                     <label
@@ -207,10 +213,12 @@ const FeedbackSidepane = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Checkbox 
-                    id="evidencing" 
+                  <Checkbox
+                    id="evidencing"
                     checked={selectedPrompts["ai_review_evidencing"]}
-                    onCheckedChange={() => handleCheckboxChange("ai_review_evidencing")}
+                    onCheckedChange={() =>
+                      handleCheckboxChange("ai_review_evidencing")
+                    }
                   />
                   <div className="leading-tight">
                     <label
@@ -225,10 +233,12 @@ const FeedbackSidepane = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Checkbox 
-                    id="structure-flow" 
+                  <Checkbox
+                    id="structure-flow"
                     checked={selectedPrompts["ai_review_structure_and_flow"]}
-                    onCheckedChange={() => handleCheckboxChange("ai_review_structure_and_flow")}
+                    onCheckedChange={() =>
+                      handleCheckboxChange("ai_review_structure_and_flow")
+                    }
                   />
                   <div className="leading-tight">
                     <label
@@ -243,10 +253,16 @@ const FeedbackSidepane = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Checkbox 
-                    id="clarity" 
-                    checked={selectedPrompts["ai_bid_review_clarity_and_persuasivness"]}
-                    onCheckedChange={() => handleCheckboxChange("ai_bid_review_clarity_and_persuasivness")}
+                  <Checkbox
+                    id="clarity"
+                    checked={
+                      selectedPrompts["ai_bid_review_clarity_and_persuasivness"]
+                    }
+                    onCheckedChange={() =>
+                      handleCheckboxChange(
+                        "ai_bid_review_clarity_and_persuasivness"
+                      )
+                    }
                   />
                   <div className="leading-tight">
                     <label

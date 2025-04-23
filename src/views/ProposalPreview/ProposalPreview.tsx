@@ -1346,6 +1346,7 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
                       sectionIndex={currentSectionIndex}
                       open={feedbackSidepaneOpen}
                       onOpenChange={setFeedbackSidepaneOpen}
+                      onReplace={handleReplaceWithPrompt}
                       activeFeedback={activeFeedback}
                       onFeedbackResolved={handleFeedbackResolved}
                     />
