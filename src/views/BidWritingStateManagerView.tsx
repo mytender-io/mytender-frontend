@@ -24,6 +24,11 @@ export interface HighlightedDocument {
   folder: string;
 }
 
+export interface FeedbackSummaries {
+  type: string;
+  content: string;
+}
+
 export interface Section {
   section_id: string;
   heading: string;
@@ -47,6 +52,7 @@ export interface Section {
   relevant_differentiation_factors: string;
   highlightedDocuments: HighlightedDocument[];
   review_ready: boolean;
+  feedback_summaries: FeedbackSummaries[];
 }
 
 export interface UserComment {
@@ -70,6 +76,7 @@ export interface AnswerFeedback {
   feedback: string;
   reasoning: string;
   originalText: string;
+  feedbackType: string;
   resolved: boolean;
   sectionId: string;
 }

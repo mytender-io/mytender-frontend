@@ -219,16 +219,22 @@ const FeedbackSidepane = ({
                 </div>
               )}
               <div className="space-y-4 text-gray-hint_text font-medium">
-                <p>Overall Feedback:</p>
-                <p>
-                  Overall this response is well structured, but there are some
-                  areas for improvement.
-                </p>
-                <ul className="leading-none">
-                  <li>Saying this</li>
-                  <li>In this way</li>
-                  <li>And here</li>
-                </ul>
+                {currentSection.feedback_summaries &&
+                currentSection.feedback_summaries.length > 0 ? (
+                  <div className="space-y-3">
+                    {currentSection.feedback_summaries.map((summary, index) => (
+                      <div key={index} className="bg-gray-50 p-3 rounded-md">
+                        <p className="font-semibold text-gray-700 mb-1 capitalize">
+                          {summary.type}:
+                        </p>
+                        <p className="text-gray-600">{summary.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p></p>
+                )}
+
                 <p>Here are some potential edits: ({sortedFeedback.length})</p>
               </div>
               {/* Render all feedback items */}
@@ -240,7 +246,7 @@ const FeedbackSidepane = ({
                   )}
                 >
                   <div className="flex items-center justify-between">
-                    <span>Overall Feedback</span>
+                    <span>{feedback.feedbackType}</span>
                     {/* Action buttons */}
                     <div className="flex justify-end gap-2 pt-2">
                       <Button
@@ -382,7 +388,7 @@ const FeedbackSidepane = ({
                         htmlFor="clarity"
                         className="text-gray-hint_text block"
                       >
-                        Clarity and persuasiveness
+                        Clarity and Persuasiveness
                       </label>
                       <span className="text-gray-border1 text-xs">
                         Enhance the clarity and persuasive power of your
