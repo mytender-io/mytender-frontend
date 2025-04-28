@@ -287,9 +287,9 @@ const ProposalPreviewSidepane = ({
 
     try {
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question`,
+        `http${HTTP_PREFIX}://${API_URL}/question_choice_2`,
         {
-          choice: "2", // Default choice for tender docs questions
+          // choice: "2", // Default choice for tender docs questions
           broadness: "8", // Default broadness
           input_text: question,
           extra_instructions: backgroundInfo,

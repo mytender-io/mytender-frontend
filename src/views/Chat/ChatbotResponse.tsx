@@ -38,9 +38,8 @@ const globalChatState = {
 
     try {
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question`,
+        `http${HTTP_PREFIX}://${API_URL}/question_choice_2`,
         {
-          choice: "2",
           broadness: "8",
           input_text: question,
           extra_instructions: "",
