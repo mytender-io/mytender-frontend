@@ -10,7 +10,9 @@ import posthog from "posthog-js";
 import { UpdateChecker } from "./components/UpdateChecker";
 import "react-toastify/dist/ReactToastify.css";
 import { StatusLabelsProvider } from "./views/Bids/components/BidStatusMenu";
-import { Auth0Provider } from '@auth0/auth0-react';
+import { Auth0Provider } from "@auth0/auth0-react";
+import TabNotificationContainer from "./layout/TabNotificationContainer";
+import { NotificationProvider } from "./context/NotificationContext";
 const auth0Config = {
   domain: import.meta.env.VITE_REACT_APP_AUTH0_DOMAIN,
   clientId: import.meta.env.VITE_REACT_APP_AUTH0_CLIENT_ID,
@@ -29,29 +31,28 @@ const AppContent = () => {
   return (
     <BrowserRouter>
       <StatusLabelsProvider>
-        <UpdateChecker />
-        <Routing />
+        <NotificationProvider>
+          <TabNotificationContainer />
+          <UpdateChecker />
+          <Routing />
+        </NotificationProvider>
       </StatusLabelsProvider>
     </BrowserRouter>
   );
 };
 
-
 const App = () => {
-
   return (
-
     <AuthProvider authType={"localstorage"} authName={"sparkaichatbot"}>
       {/* <Auth0ProviderWithConfig> */}
       <Auth0Provider
-            domain={auth0Config.domain}
-            clientId={auth0Config.clientId}
-            responseType="code"  // Enforce Authorization Code flow
-            useRefreshTokens={true}  // Optional, for SPA security
-            scope="openid profile email offline_access"  // Ensure offline_access is included
-            redirectUri={auth0Config.redirectUri}
+        domain={auth0Config.domain}
+        clientId={auth0Config.clientId}
+        responseType="code" // Enforce Authorization Code flow
+        useRefreshTokens={true} // Optional, for SPA security
+        scope="openid profile email offline_access" // Ensure offline_access is included
+        redirectUri={auth0Config.redirectUri}
       >
-
         <AppContent />
       </Auth0Provider>
       {/* </Auth0ProviderWithConfig> */}
@@ -70,4 +71,3 @@ const App = () => {
 };
 
 export default App;
-

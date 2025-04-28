@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/utils";
 import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal";
+import { useNotification } from "@/context/NotificationContext";
 
 interface NewTenderModalProps {
   show: boolean;
@@ -62,6 +63,8 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   const [currentStep, setCurrentStep] = useState<Step>("details");
 
   const navigate = useNavigate();
+
+  const { triggerNotification } = useNotification();
 
   const progressInterval = useRef(null);
 
@@ -272,6 +275,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
 
       // Navigate after updating shared state
       navigate("/bids");
+      triggerNotification();
       resetForm();
       onSuccess();
     } catch (err) {
