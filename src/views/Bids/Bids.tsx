@@ -115,7 +115,9 @@ const Bids = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    fetchPaginatedBids();
   };
+
   // Sorting bids based on the selected criteria
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: "timestamp",
@@ -267,30 +269,43 @@ const Bids = () => {
     });
   };
 
-  const fetchBids = async () => {
+  const fetchPaginatedBids = async () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
-        {},
+        `http${HTTP_PREFIX}://${API_URL}/get_bids_paginated`,
+        {
+          page: currentPage,
+          page_size: pageSize
+        },
         {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`
           }
         }
       );
+
+      console.log(response.data);
+
       if (response.data && response.data.bids) {
-        setBids(response.data.bids);
+        // Set the current bids directly
+        setCurrentBids(response.data.bids);
+
+        // Update total number of bids for pagination
+        const totalBids = response.data.pagination.total;
+        setBids(Array(totalBids).fill({})); // Just to update the length property
       }
     } catch (error) {
-      console.error("Error fetching bids:", error);
+      console.error("Error fetching paginated bids:", error);
+      toast.error("Failed to load tenders");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchBids();
+    // Initial fetch of paginated bids
+    fetchPaginatedBids();
     localStorage.removeItem("lastActiveBid");
   }, []);
 
@@ -461,7 +476,7 @@ const Bids = () => {
 
   const handleSuccess = () => {
     handleModalClose();
-    fetchBids();
+    fetchPaginatedBids();
   };
 
   const SkeletonRow = () => (
@@ -677,7 +692,7 @@ const Bids = () => {
           onHide={handleModalClose}
           onSuccess={handleSuccess}
           existingBids={bids}
-          fetchBids={fetchBids}
+          fetchBids={fetchPaginatedBids}
           isGeneratingOutline={isGeneratingOutline}
           setIsGeneratingOutline={setIsGeneratingOutline}
           setProgress={setProgress}
