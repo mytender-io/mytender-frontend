@@ -49,6 +49,7 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { Info, EyeIcon, EyeOffIcon } from "lucide-react";
+import { useUserData } from "@/context/UserDataContext";
 
 const ProfilePage = () => {
   const getAuth = useAuthUser();
@@ -74,7 +75,8 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [inviteError, setInviteError] = useState("");
   const [inviteSuccess, setInviteSuccess] = useState("");
-  const [organizationUsers, setOrganizationUsers] = useState([]);
+
+    const { organizationUsers } = useUserData();
 
   const [companyObjectivesSaveState, setCompanyObjectivesSaveState] =
     useState("normal");
@@ -101,9 +103,10 @@ const ProfilePage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const loadAllData = async () => {
       try {
-        const response = await axios.get(
+        // First, fetch user profile data
+        const profileResponse = await axios.get(
           `http${HTTP_PREFIX}://${API_URL}/profile`,
           {
             headers: {
@@ -111,33 +114,34 @@ const ProfilePage = () => {
             }
           }
         );
-
+  
         setFormData({
-          username: response.data.login || "",
-          email: response.data.email || "",
-          region: response.data.region || "",
-          company: response.data.company || "",
-          jobRole: response.data.jobRole || "",
-          userType: response.data.userType || "",
-          licences: response.data.licenses || 0,
-          productName: response.data.product_name || "",
-          companyObjectives: response.data.company_objectives || "",
-          toneOfVoice: response.data.tone_of_voice || "",
-          profilePicture: response.data.company_logo || ""
+          username: profileResponse.data.login || "",
+          email: profileResponse.data.email || "",
+          region: profileResponse.data.region || "",
+          company: profileResponse.data.company || "",
+          jobRole: profileResponse.data.jobRole || "",
+          userType: profileResponse.data.userType || "",
+          licences: profileResponse.data.licenses || 0,
+          productName: profileResponse.data.product_name || "",
+          companyObjectives: profileResponse.data.company_objectives || "",
+          toneOfVoice: profileResponse.data.tone_of_voice || "",
+          profilePicture: profileResponse.data.company_logo || ""
         });
-
-        // Fetch company objectives using the new endpoint
-        fetchCompanyObjectives();
-
+  
+        // Now fetch company objectives
+        await fetchCompanyObjectives();
+        
+        // Only set loading to false when all data is fetched
         setLoading(false);
       } catch (err) {
-        console.log(err);
+        console.error("Failed to load profile data:", err);
         toast.error("Failed to load profile data");
         setLoading(false);
       }
     };
-
-    fetchUserData();
+  
+    loadAllData();
   }, [tokenRef]);
 
   // New function to fetch company objectives using the dedicated endpoint
@@ -158,12 +162,13 @@ const ProfilePage = () => {
         ...prev,
         companyObjectives: response.data.company_objectives || ""
       }));
+
+    
     } catch (err) {
       console.error("Failed to fetch company objectives:", err);
       toast.error("Failed to load company objectives");
     }
   };
-
   // New function to handle saving company objectives using the dedicated endpoint
   const handleSaveCompanyObjectives = async (
     e: React.FormEvent<HTMLFormElement>
@@ -227,18 +232,6 @@ const ProfilePage = () => {
       const refreshFormData = new FormData();
       refreshFormData.append("include_pending", "true");
 
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_organization_users`,
-        refreshFormData,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "multipart/form-data"
-          }
-        }
-      );
-
-      setOrganizationUsers(response.data);
     } catch (err) {
       console.error("Error changing user permissions:", err);
       if (err.response && err.response.data && err.response.data.detail) {
@@ -280,34 +273,6 @@ const ProfilePage = () => {
       setTimeout(() => setSaveState("normal"), 2000); // Reset after 2 seconds
     }, 1000);
   };
-
-  useEffect(() => {
-    const fetchOrganizationUsers = async () => {
-      try {
-        const formData = new FormData();
-        formData.append("include_pending", "true");
-
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/get_organization_users`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-              "Content-Type": "multipart/form-data"
-            }
-          }
-        );
-
-        setOrganizationUsers(response.data);
-      } catch (err) {
-        console.error("Error fetching organisation users:", err);
-      }
-    };
-
-    if (formData.userType === "owner") {
-      fetchOrganizationUsers();
-    }
-  }, [formData.userType]);
 
   const handleInviteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
