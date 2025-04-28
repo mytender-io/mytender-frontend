@@ -86,7 +86,7 @@
     "react-toastify": "^11.0.1-react17",
     "react-tooltip": "^5.25.0",
     "rehype-raw": "^7.0.0",
-    "remark-gfm": "^4.0.0",
+    "remark-gfm": "^3.0.1",
     "tailwind-merge": "^2.6.0",
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss-animate": "^1.0.7"

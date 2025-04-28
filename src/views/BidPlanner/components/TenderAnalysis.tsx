@@ -100,51 +100,6 @@ const LoadingState = () => {
   );
 };
 
-const CustomTable = ({ content }: { content: string }) => {
-  const parseTable = (text: string) => {
-    const lines = text.split("\n").filter((line: string) => line.trim());
-    const headers = lines[0]
-      .split("|")
-      .map((cell: string) => cell.trim())
-      .filter(Boolean);
-    const dataRows = lines
-      .slice(2)
-      .map((line) =>
-        line
-          .split("|")
-          .map((cell: string) => cell.trim())
-          .filter(Boolean)
-      )
-      .filter((row: string[]) => row.length > 0);
-    return { headers, rows: dataRows };
-  };
-
-  const { headers, rows } = parseTable(content);
-
-  return (
-    <div className={cn("w-full my-4 rounded-md border")}>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {headers.map((header: string, index: number) => (
-              <TableHead key={index}>{header}</TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((row: string[], rowIndex: number) => (
-            <TableRow key={rowIndex}>
-              {row.map((cell: string, cellIndex: number) => (
-                <TableCell key={cellIndex}>{cell}</TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-};
-
 const TenderAnalysis = () => {
   const [currentTabIndex, setCurrentTabIndex] = useState<number>(0);
   // const [loadingBidTab, setLoadingBidTab] = useState(null);
@@ -484,82 +439,100 @@ const TenderAnalysis = () => {
     const sections = content.split(/(?=\n\d+\.|#)/);
 
     return sections.map((section, index) => {
-      if (section.includes("|")) {
-        const parts = section.split(
-          /(\n.*\|.*\n[\s|-]+\|.*[\s\S]*?)(?=\n\n|\n(?=\d+\.|#)|$)/
-        );
-
-        return parts.map((part, partIndex) => {
-          if (part.includes("|") && part.includes("-|-")) {
-            return <CustomTable key={`${index}-${partIndex}`} content={part} />;
-          }
-          return (
-            <div key={`${index}-${partIndex}`}>
-              {/* Increased margin bottom */}
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  p: ({ node, ...props }) => <p {...props} />,
-                  h1: ({ node, ...props }) => (
-                    <h1
-                      style={{
-                        lineHeight: "2"
-                      }}
-                      {...props}
-                    />
-                  ),
-                  h2: ({ node, ...props }) => (
-                    <h2
-                      style={{
-                        lineHeight: "2"
-                      }}
-                      {...props}
-                    />
-                  ),
-                  // Add more spacing between list items
-                  li: ({ node, ...props }) => (
-                    <li style={{ lineHeight: "2" }} {...props} />
-                  ),
-                  // Add spacing around lists
-                  ul: ({ node, ...props }) => <ul {...props} />,
-                  ol: ({ node, ...props }) => <ol {...props} />
-                }}
-              >
-                {part}
-              </ReactMarkdown>
-            </div>
-          );
-        });
-      }
-
       return (
-        <div key={index}>
-          {/* Increased margin bottom */}
+        <div key={index} className="pb-4">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
-              p: ({ node, ...props }) => <p {...props} />,
+              p: ({ node, ...props }) => <p className="mb-4" {...props} />,
               h1: ({ node, ...props }) => (
                 <h1
+                  className="text-2xl font-bold mb-4 mt-6"
                   style={{
-                    lineHeight: "2"
+                    lineHeight: "1.5"
                   }}
                   {...props}
                 />
               ),
               h2: ({ node, ...props }) => (
                 <h2
+                  className="text-xl font-bold mb-3 mt-5"
                   style={{
-                    lineHeight: "2"
+                    lineHeight: "1.5"
                   }}
                   {...props}
                 />
               ),
-              li: ({ node, ...props }) => (
-                <li style={{ lineHeight: "2" }} {...props} />
+              h3: ({ node, ...props }) => (
+                <h3
+                  className="text-lg font-bold mb-3 mt-4"
+                  style={{
+                    lineHeight: "1.5"
+                  }}
+                  {...props}
+                />
               ),
-              ul: ({ node, ...props }) => <ul {...props} />,
-              ol: ({ node, ...props }) => <ol {...props} />
+              h4: ({ node, ...props }) => (
+                <h4 className="text-base font-bold mb-2 mt-4" {...props} />
+              ),
+              // Add more spacing between list items
+              li: ({ node, ...props }) => (
+                <li className="my-1" style={{ lineHeight: "1.6" }} {...props} />
+              ),
+              // Add spacing and styling for lists
+              ul: ({ node, ...props }) => (
+                <ul className="list-disc pl-6 mb-4 mt-2" {...props} />
+              ),
+              ol: ({ node, ...props }) => (
+                <ol className="list-decimal pl-6 mb-4 mt-2" {...props} />
+              ),
+              // Style tables properly
+              table: ({ node, ...props }) => (
+                <table
+                  className="w-full border-collapse mb-6 border border-gray-300"
+                  {...props}
+                />
+              ),
+              thead: ({ node, ...props }) => (
+                <thead className="bg-gray-100" {...props} />
+              ),
+              tbody: ({ node, ...props }) => <tbody {...props} />,
+              tr: ({ node, ...props }) => (
+                <tr className="border-b border-gray-300" {...props} />
+              ),
+              th: ({ node, ...props }) => (
+                <th
+                  className="border border-gray-300 px-4 py-2 text-left font-semibold"
+                  {...props}
+                />
+              ),
+              td: ({ node, ...props }) => (
+                <td className="border border-gray-300 px-4 py-2" {...props} />
+              ),
+              // Style blockquotes
+              blockquote: ({ node, ...props }) => (
+                <blockquote
+                  className="pl-4 border-l-4 border-gray-300 italic my-4"
+                  {...props}
+                />
+              ),
+              // Style code blocks
+              code: ({ node, inline, ...props }) =>
+                inline ? (
+                  <code
+                    className="bg-gray-100 px-1 rounded font-mono text-sm"
+                    {...props}
+                  />
+                ) : (
+                  <code
+                    className="block bg-gray-100 p-4 rounded font-mono text-sm my-4 overflow-auto"
+                    {...props}
+                  />
+                ),
+              // Style horizontal rules
+              hr: ({ node, ...props }) => (
+                <hr className="my-6 border-t border-gray-300" {...props} />
+              )
             }}
           >
             {section}
@@ -766,4 +739,3 @@ const TenderAnalysis = () => {
 };
 
 export default TenderAnalysis;
-
