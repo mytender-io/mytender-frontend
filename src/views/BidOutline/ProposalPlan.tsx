@@ -53,6 +53,7 @@ import { cn, calculateCharacterLength } from "@/utils";
 import SelectOrganisationUserButton from "@/buttons/SelectOrganisationUserButton";
 import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 import LengthUnitDropdown from "./components/LengthUnitDropdown";
+import { useUserData } from "@/context/UserDataContext";
 
 interface ProposalPlanProps {
   openTask: (taskId: string | null, sectionIndex: string) => void;
@@ -86,10 +87,9 @@ const ProposalPlan = ({
 
   const { object_id, contributors, outline } = sharedState;
 
-  const [organizationUsers, setOrganizationUsers] = useState([]);
-  const [isOrganizationUsersLoading, setIsOrganizationUsersLoading] =
-    useState(true);
-
+  
+  // Use the UserDataContext hook to get organization users
+  const { organizationUsers, isLoading: isOrganizationUsersLoading } = useUserData();
   // const currentUserPermission = contributors[auth.email] || "viewer";
 
   const [contextMenu, setContextMenu] = useState<Record<string, number> | null>(
@@ -112,36 +112,7 @@ const ProposalPlan = ({
   // Add state for the dropdown selection
   const [lengthUnit, setLengthUnit] = useState("words");
 
-  useEffect(() => {
-    const fetchOrganizationUsers = async () => {
-      try {
-        setIsOrganizationUsersLoading(true);
 
-        // Create form data
-        const formData = new FormData();
-        formData.append("include_pending", "false");
-
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/get_organization_users`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-              "Content-Type": "multipart/form-data"
-            }
-          }
-        );
-
-        setOrganizationUsers(response.data);
-        setIsOrganizationUsersLoading(false);
-      } catch (err) {
-        console.error("Error fetching organisation users:", err);
-        setIsOrganizationUsersLoading(false);
-      }
-    };
-
-    fetchOrganizationUsers();
-  }, [tokenRef]);
 
   useEffect(() => {
     if (taskToOpen && sectionIndex && openTask) {
