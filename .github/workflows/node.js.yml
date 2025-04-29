@@ -17,7 +17,8 @@ jobs:
       - name: Install Dependencies
         run: |
           rm -rf node_modules
-          npm install --legacy-peer-deps
+          rm -f package-lock.json
+          npm install --legacy-peer-deps --no-optional
       - name: Run Tests
         run: npm test
   build:
@@ -32,7 +33,8 @@ jobs:
       - name: Install Dependencies
         run: |
           rm -rf node_modules
-          npm install --legacy-peer-deps
+          rm -f package-lock.json
+          npm install --legacy-peer-deps --no-optional
       - name: Build
         run: |
           if [ "${{ github.ref }}" == "refs/heads/dev" ] || [ "${{ github.ref }}" == "refs/heads/experimental" ]; then
