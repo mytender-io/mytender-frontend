@@ -16,7 +16,9 @@ jobs:
           node-version: "20"
       - name: Install Dependencies
         run: |
-          npm ci
+          rm -rf node_modules
+          rm -f package-lock.json
+          npm install --no-optional
       - name: Run Tests
         run: npm test
   build:
@@ -29,7 +31,10 @@ jobs:
         with:
           node-version: "20"
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          rm -rf node_modules
+          rm -f package-lock.json
+          npm install --no-optional
       - name: Build
         run: |
           if [ "${{ github.ref }}" == "refs/heads/dev" ] || [ "${{ github.ref }}" == "refs/heads/experimental" ]; then
