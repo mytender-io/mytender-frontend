@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { BidContext, Section } from "@/views/BidWritingStateManagerView";
 import BidTitle from "@/components/BidTitle";
 import GenerateProposalModal from "@/modals/GenerateProposalModal";
@@ -26,6 +27,8 @@ const BidNavbar: React.FC<{
   activeTab,
   handleTabClick
 }) => {
+  const navigate = useNavigate();
+
   const { sharedState } = useContext(BidContext);
 
   const baseNavLinkStyles =
@@ -131,6 +134,13 @@ const BidNavbar: React.FC<{
               <Button variant="outline" onClick={handleRegenerateClick}>
                 <PlusIcon />
                 New Outline
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate("/questionnaire")}
+              >
+                <PlusIcon />
+                Add Questionnaire
               </Button>
               <GenerateProposalModal
                 bid_id={object_id}

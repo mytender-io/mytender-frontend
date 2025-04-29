@@ -15,23 +15,55 @@ interface PaginationRowProps {
   pageSize: number;
   totalRecords: number;
   onPageChange: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+  pageSizeOptions?: number[];
 }
 
 const PaginationRow: React.FC<PaginationRowProps> = ({
   currentPage,
   pageSize,
   totalRecords,
-  onPageChange
+  onPageChange,
+  onPageSizeChange,
+  pageSizeOptions = [10, 25, 50, 100]
 }) => {
   const totalPages = Math.ceil(totalRecords / pageSize);
   const startRecord = (currentPage - 1) * pageSize + 1;
   const endRecord = Math.min(currentPage * pageSize, totalRecords);
 
+  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newPageSize = Number(e.target.value);
+    if (onPageSizeChange) {
+      onPageSizeChange(newPageSize);
+      // Reset to first page when changing page size
+      onPageChange(1);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-      <span className="text-sm text-typo-900">
-        Showing {startRecord} to {endRecord} of {totalRecords} records
-      </span>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <span className="text-sm text-typo-900">
+          Showing {startRecord} to {endRecord} of {totalRecords} records
+        </span>
+        {onPageSizeChange && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-typo-900">Show</span>
+            <select
+              value={pageSize}
+              onChange={handlePageSizeChange}
+              className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm"
+            >
+              {pageSizeOptions.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+            <span className="text-sm text-typo-900">per page</span>
+          </div>
+        )}
+      </div>
       <Pagination className="mx-0 w-fit">
         <PaginationContent>
           <PaginationItem>

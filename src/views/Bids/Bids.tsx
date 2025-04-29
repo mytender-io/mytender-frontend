@@ -3,7 +3,6 @@ import { useAuthUser } from "react-auth-kit";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import { useNavigate } from "react-router-dom";
-import { Skeleton } from "@mui/material";
 import withAuth from "../../routes/withAuth.tsx";
 import NewTenderModal from "./components/NewTenderModal.tsx";
 import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
@@ -17,6 +16,7 @@ import SearchInput from "@/components/SearchInput.tsx";
 import { Button } from "@/components/ui/button";
 import PlusIcon from "@/components/icons/PlusIcon.tsx";
 import { WelcomeModal } from "./components/WelcomeModal.tsx";
+import SkeletonRow from "./components/SkeletonRow.tsx";
 import {
   Table,
   TableBody,
@@ -400,7 +400,7 @@ const Bids = () => {
 
   const updateBidStatus = async (
     bidId: string,
-    newStatus: any
+    newStatus: Bid["status"]
   ): Promise<void> => {
     try {
       posthog.capture("update_bid_status", {
@@ -464,37 +464,6 @@ const Bids = () => {
     fetchBids();
   };
 
-  const SkeletonRow = () => (
-    <TableRow>
-      <TableCell className="px-4">
-        <Skeleton variant="text" width="100%" />
-      </TableCell>
-      <TableCell className="px-4">
-        <Skeleton variant="text" width="100%" />
-      </TableCell>
-      <TableCell className="px-4">
-        <Skeleton variant="text" width="100%" />
-      </TableCell>
-      <TableCell className="px-4">
-        <Skeleton variant="text" width="100%" />
-      </TableCell>
-      <TableCell className="px-4">
-        <Skeleton variant="text" width="100%" />
-      </TableCell>
-      <TableCell className="px-4">
-        <Skeleton variant="text" width="100%" />
-      </TableCell>
-      <TableCell className="w-[100px] px-4">
-        <Skeleton
-          variant="rounded"
-          width={20}
-          height={20}
-          className="ml-auto"
-        />
-      </TableCell>
-    </TableRow>
-  );
-
   const parentPages = [] as Array<{ name: string; path: string }>;
 
   // Check if this is the user's first visit
@@ -546,117 +515,115 @@ const Bids = () => {
           </div>
         </div>
         {viewType === "table" ? (
-          <div className="flex flex-col justify-between flex-1 overflow-y-auto spface-y-2">
-            <div className="space-y-4">
-              <div className="border border-typo-200 rounded-lg overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHead
-                          key={header.key}
-                          className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none"
-                          onClick={() => requestSort(header.key)}
-                          style={{ width: header.width }}
-                        >
-                          <div className="flex items-center gap-2">
-                            {header.label}
-                            {getSortIcon(header.key)}
-                          </div>
-                        </TableHead>
-                      ))}
-                      <TableHead className="w-[100px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4 select-none">
-                        Action
+          <div className="flex flex-col justify-between flex-1 overflow-y-auto space-y-4">
+            <div className="border border-typo-200 rounded-lg overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHead
+                        key={header.key}
+                        className="text-sm text-typo-900 font-semibold py-3.5 px-4 cursor-pointer select-none"
+                        onClick={() => requestSort(header.key)}
+                        style={{ width: header.width }}
+                      >
+                        <div className="flex items-center gap-2">
+                          {header.label}
+                          {getSortIcon(header.key)}
+                        </div>
                       </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {loading ? (
-                      Array(14)
-                        .fill(0)
-                        .map((_, index) => <SkeletonRow key={index} />)
-                    ) : currentBids.length > 0 ? (
-                      currentBids.map((bid) => {
-                        return (
-                          <TableRow key={bid._id}>
-                            <TableCell className="px-4 group">
-                              {/* For all bids, use a span that we can control the click behavior on */}
-                              <span
-                                className={`block truncate w-full ${
-                                  isIncompleteBid(bid)
-                                    ? "text-gray-300 cursor-not-allowed"
-                                    : "text-gray-hint_text cursor-pointer hover:text-orange hover:font-bold transition-colors duration-200"
-                                }`}
-                                onClick={(e) => {
-                                  // Only navigate for complete bids
-                                  if (!isIncompleteBid(bid)) {
-                                    navigateToChatbot(bid);
-                                  } else {
-                                    // For incomplete bids, just show the toast and don't navigate
-                                    e.preventDefault();
-                                    toast.info(
-                                      "This tender is still being created. Please try again later."
-                                    );
-                                  }
-                                }}
-                              >
-                                {bid.bid_title}
-                              </span>
-                            </TableCell>
-                            <TableCell className="px-4">
-                              {bid.timestamp
-                                ? formatDistanceToNow(new Date(bid.timestamp), {
-                                    addSuffix: true,
-                                    locale: customLocale
-                                  })
-                                : ""}
-                            </TableCell>
-                            <TableCell className="px-4">£{bid.value}</TableCell>
-                            <TableCell className="px-4">
-                              {bid.submission_deadline &&
-                              !isNaN(Date.parse(bid.submission_deadline))
-                                ? new Date(
-                                    bid.submission_deadline
-                                  ).toLocaleDateString()
-                                : ""}
-                            </TableCell>
-                            <TableCell className="px-4">
-                              <BidStatusMenu
-                                value={bid.status}
-                                onChange={(value) => {
-                                  updateBidStatus(bid._id, value);
-                                }}
-                              />
-                            </TableCell>
-                            <TableCell className="px-4">
-                              <BidResultDropdown
-                                value={bid.bid_qualification_result}
-                                onChange={(value) => {
-                                  updateBidQualificationResult(bid._id, value);
-                                }}
-                              />
-                            </TableCell>
-                            <TableCell className="w-[100px] text-right px-4">
-                              <EllipsisMenuDashboard
-                                onDeleteClick={() => handleDeleteClick(bid._id)}
-                                onFeedbackClick={() =>
-                                  handleFeedbackClick(bid._id)
+                    ))}
+                    <TableHead className="w-[100px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4 select-none">
+                      Action
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    Array(14)
+                      .fill(0)
+                      .map((_, index) => <SkeletonRow key={index} />)
+                  ) : currentBids.length > 0 ? (
+                    currentBids.map((bid) => {
+                      return (
+                        <TableRow key={bid._id}>
+                          <TableCell className="px-4 group">
+                            {/* For all bids, use a span that we can control the click behavior on */}
+                            <span
+                              className={`block truncate w-full ${
+                                isIncompleteBid(bid)
+                                  ? "text-gray-300 cursor-not-allowed"
+                                  : "text-gray-hint_text cursor-pointer hover:text-orange hover:font-bold transition-colors duration-200"
+                              }`}
+                              onClick={(e) => {
+                                // Only navigate for complete bids
+                                if (!isIncompleteBid(bid)) {
+                                  navigateToChatbot(bid);
+                                } else {
+                                  // For incomplete bids, just show the toast and don't navigate
+                                  e.preventDefault();
+                                  toast.info(
+                                    "This tender is still being created. Please try again later."
+                                  );
                                 }
-                              />
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell className="text-center py-4" colSpan={7}>
-                          No matching tenders found
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+                              }}
+                            >
+                              {bid.bid_title}
+                            </span>
+                          </TableCell>
+                          <TableCell className="px-4">
+                            {bid.timestamp
+                              ? formatDistanceToNow(new Date(bid.timestamp), {
+                                  addSuffix: true,
+                                  locale: customLocale
+                                })
+                              : ""}
+                          </TableCell>
+                          <TableCell className="px-4">£{bid.value}</TableCell>
+                          <TableCell className="px-4">
+                            {bid.submission_deadline &&
+                            !isNaN(Date.parse(bid.submission_deadline))
+                              ? new Date(
+                                  bid.submission_deadline
+                                ).toLocaleDateString()
+                              : ""}
+                          </TableCell>
+                          <TableCell className="px-4">
+                            <BidStatusMenu
+                              value={bid.status}
+                              onChange={(value) => {
+                                updateBidStatus(bid._id, value);
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell className="px-4">
+                            <BidResultDropdown
+                              value={bid.bid_qualification_result}
+                              onChange={(value) => {
+                                updateBidQualificationResult(bid._id, value);
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell className="w-[100px] text-right px-4">
+                            <EllipsisMenuDashboard
+                              onDeleteClick={() => handleDeleteClick(bid._id)}
+                              onFeedbackClick={() =>
+                                handleFeedbackClick(bid._id)
+                              }
+                            />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  ) : (
+                    <TableRow>
+                      <TableCell className="text-center py-4" colSpan={7}>
+                        No matching tenders found
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </div>
             <PaginationRow
               currentPage={currentPage}
