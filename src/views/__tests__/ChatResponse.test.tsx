@@ -6,9 +6,8 @@ const authenticatedAxios = await getAuthenticatedAxios();
 describe("Quick Question", () => {
   it("sends question and receives response from API", async () => {
     const questionResponse = await authenticatedAxios.post(
-      `https://dev.mytender.io:7861/question`,
+      `https://dev.mytender.io:7861/question_choice_2`,
       {
-        choice: "2",
         broadness: "2",
         input_text: "Test question",
         extra_instructions: "user: Previous question\nbot: Previous answer",

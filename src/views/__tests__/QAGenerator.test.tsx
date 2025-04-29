@@ -6,14 +6,12 @@ const authenticatedAxios = await getAuthenticatedAxios();
 describe("QA Generator Component", () => {
   it("sends a question to the library chat API", async () => {
     const questionResponse = await authenticatedAxios.post(
-      `https://dev.mytender.io:7861/question`,
+      `https://dev.mytender.io:7861/question_choice_2`,
       {
-        choice: "2",
         broadness: "4",
         input_text: "What are the key features of our products?",
         extra_instructions: "",
         datasets: ["default"],
-        bid_id: ""
       },
       {
         headers: {
