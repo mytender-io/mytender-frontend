@@ -184,7 +184,7 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
       </TooltipProvider>
 
       <Dialog open={dialogOpened}>
-        <DialogContent showClose={false} className="sm:max-w-[425px] bg-white">
+        <DialogContent showClose={false} className="sm:max-w-xl bg-white">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
               Add Competitors
@@ -194,7 +194,7 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="max-h-40 space-y-4 overflow-y-auto">
+            <div className="max-h-80 space-y-2 overflow-y-auto">
               {competitorsUrl.map((url, i) =>
                 editingIndex === i ? (
                   <Input
@@ -203,22 +203,25 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
                     onBlur={(e) => handleSaveEditBlur(e, i)}
                     onKeyDown={(e) => handleSaveEditKeyDown(e, i)}
                     autoFocus
-                    className="!border-0 !shadow-none focus-visible:!ring-0"
+                    className="!shadow-none focus-visible:!ring-0"
                   />
                 ) : (
-                  <div key={i} className="flex w-full justify-between">
-                    <button
-                      type="button"
-                      className="flex gap-2 items-center text-orange w-full text-left"
+                  <div
+                    key={i}
+                    className="flex w-full items-center justify-between"
+                  >
+                    <Button
+                      variant="link"
+                      className="flex gap-2 items-center text-orange text-left justify-start py-0 h-fit whitespace-pre-line break-all"
                       onClick={() => handleEditUrl(i)}
                     >
                       <Check />
                       {url}
-                    </button>
+                    </Button>
                     <Button
+                      variant="ghost"
                       disabled={loading}
                       onClick={() => handleDeleteUrl(i)}
-                      variant="ghost"
                       className="hover:bg-transparent border-0"
                     >
                       <Trash />
@@ -235,14 +238,13 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
                     ref={inputRef}
                     placeholder="Type Competitor URL..."
                     onKeyDown={handleAddUrlKeyDown}
-                    className="!border-0 !shadow-none focus-visible:!ring-0"
+                    className="!shadow-none focus-visible:!ring-0 pr-14"
                     onClick={() => setOpen(true)}
                     onChange={(e) => setUrl(e.target.value)}
                   />
-
                   <Button
                     variant="ghost"
-                    className="absolute top-0 right-0 text-sm py-4 hover:bg-transparent hover:text-orange-600 border-0 justify-start text-orange font-semibold"
+                    className="absolute top-1/2 -translate-y-1/2 right-0 text-sm py-4 hover:bg-transparent hover:text-orange-600 border-0 justify-start text-orange font-semibold"
                     onClick={() => handleAddUrlToSetAndHistory(url)}
                   >
                     Add
@@ -264,10 +266,11 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
                         <X />
                       </Button>
                     </div>
-                    <div className="flex flex-col max-h-36  overflow-y-auto border rounded-md mt-2">
+                    <div className="flex flex-col max-h-36 overflow-y-auto border rounded-md mt-2">
                       {recentSearches.map((s, i) => (
-                        <button
-                          className="text-left p-2 hover:bg-gray-50 rounded border-b last:border-b-0"
+                        <Button
+                          variant="ghost"
+                          className="text-left p-2 hover:bg-gray-50 rounded border-b last:border-b-0 break-all whitespace-pre-line h-fit justify-start"
                           onClick={() => {
                             setCompetitorsUrl((prev) => [s, ...prev]);
                             setInputVisible(false);
@@ -275,7 +278,7 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
                           key={i}
                         >
                           {s}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>
@@ -322,4 +325,3 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
 };
 
 export default AddCompetitors;
-
