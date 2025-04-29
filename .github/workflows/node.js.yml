@@ -32,7 +32,9 @@ jobs:
           node-version: "20"
       - name: Install Dependencies
         run: |
+          rm -rf node_modules
           npm ci
+          npm install @rollup/rollup-linux-x64-gnu --no-save
       - name: Build
         run: |
           if [ "${{ github.ref }}" == "refs/heads/dev" ] || [ "${{ github.ref }}" == "refs/heads/experimental" ]; then
