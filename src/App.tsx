@@ -13,6 +13,7 @@ import { StatusLabelsProvider } from "./views/Bids/components/BidStatusMenu";
 import { Auth0Provider } from "@auth0/auth0-react";
 import TabNotificationContainer from "./layout/TabNotificationContainer";
 import { NotificationProvider } from "./context/NotificationContext";
+
 const auth0Config = {
   domain: import.meta.env.VITE_REACT_APP_AUTH0_DOMAIN,
   clientId: import.meta.env.VITE_REACT_APP_AUTH0_CLIENT_ID,

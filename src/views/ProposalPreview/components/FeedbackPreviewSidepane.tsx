@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef, useState, useEffect } from "react";
 import { useAuthUser } from "react-auth-kit";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -65,6 +65,9 @@ const FeedbackSidepane = ({
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState } = useContext(BidContext);
   const { outline } = sharedState;
+
+  // Add ref for feedback container
+  const feedbackContainerRef = useRef<HTMLDivElement>(null);
 
   // State to track selected prompts - only overall feedback selected by default
   const [selectedPrompts, setSelectedPrompts] = useState<SelectedPrompts>({
@@ -135,25 +138,21 @@ const FeedbackSidepane = ({
     return allFeedback.filter((feedback) => !feedback.resolved);
   };
 
-  // Get all feedback and sort with active feedback first
-  const getSortedFeedback = () => {
-    const allFeedback = getAllFeedbackForCurrentSection();
-
-    if (!activeFeedback) return allFeedback;
-
-    // Sort to put active feedback at top
-    return allFeedback.sort((a, b) => {
-      if (a.id === activeFeedback.id) return -1;
-      if (b.id === activeFeedback.id) return 1;
-      return 0;
-    });
-  };
-
   // Get the section data for the current section
   const currentSection = sectionIndex !== null ? outline[sectionIndex] : null;
 
   // Array of sorted feedback items
-  const sortedFeedback = getSortedFeedback();
+  const allFeedback = getAllFeedbackForCurrentSection();
+
+  // Add effect to scroll to active feedback when it changes
+  useEffect(() => {
+    if (activeFeedback && feedbackContainerRef.current) {
+      const feedbackElement = document.getElementById(activeFeedback.id);
+      if (feedbackElement) {
+        feedbackElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }, [activeFeedback]);
 
   // If not open, return null
   if (!open) return null;
@@ -197,7 +196,10 @@ const FeedbackSidepane = ({
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+        <div
+          className="flex-1 overflow-y-auto px-4 py-3 space-y-4"
+          ref={feedbackContainerRef}
+        >
           {isLoading ? (
             <div className="flex flex-col items-center justify-center space-y-4 py-8 h-full">
               <p className="text-lg text-gray-hint_text font-semibold">
@@ -208,7 +210,7 @@ const FeedbackSidepane = ({
                 We're just loading up our feedback...
               </p>
             </div>
-          ) : activeFeedback && sortedFeedback.length > 0 ? (
+          ) : activeFeedback && allFeedback.length > 0 ? (
             <div className="space-y-4">
               {/* Section heading */}
               {currentSection && (
@@ -235,15 +237,16 @@ const FeedbackSidepane = ({
                   <p></p>
                 )}
 
-                <p>Here are some potential edits: ({sortedFeedback.length})</p>
+                <p>Here are some potential edits: ({allFeedback.length})</p>
               </div>
               {/* Render all feedback items */}
-              {sortedFeedback.map((feedback) => (
+              {allFeedback.map((feedback) => (
                 <div
                   key={feedback.id}
                   className={cn(
                     "bg-gray-bg rounded-xl p-3 space-y-3 text-gray-hint_text font-medium"
                   )}
+                  id={feedback.id}
                 >
                   <div className="flex items-center justify-between">
                     <span>{feedback.feedbackType}</span>

@@ -7,13 +7,17 @@ interface NotificationContextType {
   markAsRead: () => void;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+const NotificationContext = createContext<NotificationContextType | undefined>(
+  undefined
+);
 
-export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
+  children
+}) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const triggerNotification = () => {
-    setUnreadCount(prev => prev + 1);
+    setUnreadCount((prev) => prev + 1);
   };
 
   const markAsRead = () => {
@@ -21,7 +25,9 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   return (
-    <NotificationContext.Provider value={{ unreadCount, triggerNotification, markAsRead }}>
+    <NotificationContext.Provider
+      value={{ unreadCount, triggerNotification, markAsRead }}
+    >
       {children}
     </NotificationContext.Provider>
   );
@@ -30,7 +36,9 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
 export const useNotification = (): NotificationContextType => {
   const context = useContext(NotificationContext);
   if (context === undefined) {
-    throw new Error("useNotification must be used within a NotificationProvider");
+    throw new Error(
+      "useNotification must be used within a NotificationProvider"
+    );
   }
   return context;
 };
