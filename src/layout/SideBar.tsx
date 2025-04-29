@@ -324,7 +324,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                 </span>
               )}
             </Link>
-            <Link
+            {/* <Link
               to="https://discord.gg/rzBmsWjR"
               className="flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3 bg-transparent"
               target="_blank"
@@ -340,7 +340,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                   Community Chat
                 </span>
               )}
-            </Link>
+            </Link> */}
           </div>
         </div>
 
