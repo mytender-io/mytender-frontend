@@ -21,7 +21,7 @@ import { BidContext, SharedState } from "@/views/BidWritingStateManagerView";
 import axios from "axios";
 import { Check, Plus, Trash, X } from "lucide-react";
 import posthog from "posthog-js";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useAuthUser } from "react-auth-kit";
 import { toast } from "react-toastify";
 
@@ -45,27 +45,34 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
   const [inputVisible, setInputVisible] = useState(true);
   const [dialogOpened, setDialogOpened] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
   const inputRef = useRef(null);
 
   const { sharedState } = useContext(BidContext);
 
-  // Retrieve recent searches (if any) or default to an empty array.
-  const recentSearches: string[] = JSON.parse(
-    localStorage.getItem("competitor_urls") || "[]"
-  );
-
-  const { object_id } = sharedState;
+  const { object_id, competitor_urls = [] } = sharedState;
 
   const getAuth = useAuthUser();
   const auth = getAuth();
 
+  // get the compitor urls from the shared state and set this to the local competitor url state
+  useEffect(() => {
+    if (competitor_urls && competitor_urls.length > 0) {
+      setCompetitorsUrl(competitor_urls);
+      setInputVisible(competitor_urls.length === 0);
+    }
+  }, []);
+
+  // every time local state changes update the shared states
+  useEffect(() => {
+    setSharedState((prev) => ({
+      ...prev,
+      competitor_urls: competitorsUrl
+    }));
+  }, [competitorsUrl, setSharedState]);
+
   const handleAddUrlToSetAndHistory = (url: string) => {
     setCompetitorsUrl((prev) => [url, ...prev]);
-    localStorage.setItem(
-      "competitor_urls",
-      JSON.stringify([url, ...recentSearches])
-    );
+
     setInputVisible(false);
   };
 
@@ -239,7 +246,6 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
                     placeholder="Type Competitor URL..."
                     onKeyDown={handleAddUrlKeyDown}
                     className="!shadow-none focus-visible:!ring-0 pr-14"
-                    onClick={() => setOpen(true)}
                     onChange={(e) => setUrl(e.target.value)}
                   />
                   <Button
@@ -250,39 +256,6 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
                     Add
                   </Button>
                 </div>
-
-                {open && (
-                  <div className="px-3 mt-2">
-                    <div className="flex justify-between items-center">
-                      <p className="text-gray-500 text-sm">Recent searches:</p>
-                      <Button
-                        variant="ghost"
-                        className="text-sm py-4 hover:bg-transparent border-0 justify-start text-[#575859] font-semibold p-0"
-                        onClick={() => {
-                          setOpen(false);
-                          inputRef?.current.focus();
-                        }}
-                      >
-                        <X />
-                      </Button>
-                    </div>
-                    <div className="flex flex-col max-h-36 overflow-y-auto border rounded-md mt-2">
-                      {recentSearches.map((s, i) => (
-                        <Button
-                          variant="ghost"
-                          className="text-left p-2 hover:bg-gray-50 rounded border-b last:border-b-0 break-all whitespace-pre-line h-fit justify-start"
-                          onClick={() => {
-                            setCompetitorsUrl((prev) => [s, ...prev]);
-                            setInputVisible(false);
-                          }}
-                          key={i}
-                        >
-                          {s}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
@@ -292,7 +265,9 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
                 className="hover:bg-transparent border-0 justify-start text-[#575859] font-semibold"
                 onClick={() => {
                   setInputVisible(true);
-                  inputRef?.current.focus();
+                  if (inputRef?.current) {
+                    inputRef.current.focus();
+                  }
                 }}
               >
                 + Add Competitor

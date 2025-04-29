@@ -118,6 +118,7 @@ export interface SharedState {
   win_themes: string[];
   customer_pain_points: string[];
   differentiating_factors: string[];
+  competitor_urls: string[];
   solution: Solution;
   selectedCaseStudies: HighlightedDocument[]; // Array of highlighted document objects
   tone_of_voice: string;
@@ -158,6 +159,7 @@ const defaultState: BidContextType = {
     win_themes: [],
     customer_pain_points: [],
     differentiating_factors: [],
+    competitor_urls: [],
     solution: {
       // Initialize solution with empty values
       product: "",
@@ -243,6 +245,7 @@ const BidManagement: React.FC = () => {
         win_themes,
         customer_pain_points,
         differentiating_factors,
+        competitor_urls,
         solution,
         selectedCaseStudies, // Include the selectedCaseStudies
         tone_of_voice, // Include tone_of_voice
@@ -305,6 +308,8 @@ const BidManagement: React.FC = () => {
         "differentiating_factors",
         JSON.stringify(differentiating_factors || [])
       );
+
+      formData.append("competitor_urls", JSON.stringify(competitor_urls || []));
 
       formData.append(
         "solution",
@@ -405,6 +410,7 @@ const BidManagement: React.FC = () => {
     sharedState.selectedFolders,
     sharedState.win_themes,
     sharedState.differentiating_factors,
+    sharedState.competitor_urls,
     sharedState.customer_pain_points,
     sharedState.tone_of_voice, // Add tone_of_voice as a dependency
     sharedState.new_bid_completed,
@@ -535,6 +541,8 @@ const BidManagement: React.FC = () => {
                     differentiating_factors:
                       updatedBid.differentiating_factors ||
                       prev.differentiating_factors,
+                    competitor_urls:
+                      updatedBid.competitor_urls || prev.competitor_urls,
                     solution: updatedBid.solution || prev.solution,
                     selectedCaseStudies:
                       updatedBid.selectedCaseStudies ||
