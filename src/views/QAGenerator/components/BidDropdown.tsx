@@ -21,7 +21,7 @@ const BidDropdown = ({ onBidSelect, token }) => {
     setLoading(true);
     try {
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
+        `http${HTTP_PREFIX}://${API_URL}/get_bids_list`,
         {},
         {
           headers: {

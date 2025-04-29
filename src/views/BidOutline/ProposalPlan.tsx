@@ -131,7 +131,7 @@ const ProposalPlan = ({
           // Create a synthetic event object with preventDefault method
           // to avoid errors in handleRowClick
           const syntheticEvent = {
-            preventDefault: () => {},
+            preventDefault: () => { },
             target: document.createElement("div") // Create a dummy element
           };
 
@@ -425,8 +425,8 @@ const ProposalPlan = ({
       const compliance_requirements =
         section.subheadings.length > 0
           ? section.subheadings.map(
-              (subheading) => section.compliance_requirements
-            )
+            (subheading) => section.compliance_requirements
+          )
           : [""];
 
       const answer = await sendQuestionToChatbot(
@@ -643,25 +643,25 @@ const ProposalPlan = ({
       };
 
       // Only include selectedChoices and wordAmounts if choice is not "3a"
-      if (choice !== "3a") {
-        setIsPreviewLoading(true);
-        if (selectedChoices) {
-          requestBody.selected_choices = selectedChoices;
-        }
-        if (wordAmounts) {
-          requestBody.word_amount = wordAmount;
-        }
-        if (wordAmounts) {
-          requestBody.compliance_requirements = compliance_requirements;
-          console.log("compliance");
-          console.log(compliance_requirements);
-        }
-      } else {
-        setIsLoading(true);
+      // if (choice !== "3a") {
+      setIsPreviewLoading(true);
+      if (selectedChoices) {
+        requestBody.selected_choices = selectedChoices;
       }
+      if (wordAmounts) {
+        requestBody.word_amount = wordAmount;
+      }
+      if (wordAmounts) {
+        requestBody.compliance_requirements = compliance_requirements;
+        console.log("compliance");
+        console.log(compliance_requirements);
+      }
+      // } else {
+      //   setIsLoading(true);
+      // }
 
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question`,
+        `http${HTTP_PREFIX}://${API_URL}/question_choice_3b`,
         requestBody,
         {
           headers: {
@@ -678,31 +678,31 @@ const ProposalPlan = ({
         choice
       });
 
-      if (choice === "3a") {
-        let choicesArray = [];
-        try {
-          if (result.data && result.data.includes(";")) {
-            choicesArray = result.data
-              .split(";")
-              .map((choice) => choice.trim());
-          }
-          if (choicesArray.length === 0 && typeof result.data === "string") {
-            choicesArray = result.data
-              .split("\n")
-              .filter((line) => /^\d+\./.test(line.trim()))
-              .map((line) => line.replace(/^\d+\.\s*/, "").trim());
-          }
-          console.log("Parsed choices:", choicesArray);
-          if (choicesArray.length === 0) {
-            throw new Error("Failed to parse API response into choices");
-          }
-        } catch (error) {
-          console.error("Error processing API response:", error);
-        }
-        setApiChoices(choicesArray);
-      } else {
-        return result.data;
-      }
+      // if (choice === "3a") {
+      //   let choicesArray = [];
+      //   try {
+      //     if (result.data && result.data.includes(";")) {
+      //       choicesArray = result.data
+      //         .split(";")
+      //         .map((choice) => choice.trim());
+      //     }
+      //     if (choicesArray.length === 0 && typeof result.data === "string") {
+      //       choicesArray = result.data
+      //         .split("\n")
+      //         .filter((line) => /^\d+\./.test(line.trim()))
+      //         .map((line) => line.replace(/^\d+\.\s*/, "").trim());
+      //     }
+      //     console.log("Parsed choices:", choicesArray);
+      //     if (choicesArray.length === 0) {
+      //       throw new Error("Failed to parse API response into choices");
+      //     }
+      //   } catch (error) {
+      //     console.error("Error processing API response:", error);
+      //   }
+      //   setApiChoices(choicesArray);
+      // } else {
+      return result.data;
+      // }
     } catch (error) {
       console.error("Error sending question:", error);
       posthog.capture("chatbot_response_failed", {
@@ -946,8 +946,8 @@ const ProposalPlan = ({
               message,
               subject,
               token: tokenRef.current,
-              onSuccess: () => {},
-              onError: (error) => {}
+              onSuccess: () => { },
+              onError: (error) => { }
             });
 
             // Track task creation with posthog
@@ -1031,8 +1031,8 @@ const ProposalPlan = ({
               message,
               subject,
               token: tokenRef.current,
-              onSuccess: () => {},
-              onError: (error) => {}
+              onSuccess: () => { },
+              onError: (error) => { }
             });
 
             // Track task creation with posthog

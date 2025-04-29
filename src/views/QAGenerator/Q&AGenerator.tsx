@@ -750,12 +750,12 @@ const QAGenerator = () => {
 
   const [inputValue, setInputValue] = useState("");
 
-  const [bidPilotchoice, setBidPilotChoice] = useState("2");
-  const [bidPilotbroadness, setBidPilotBroadness] = useState("4");
+  // const [bidPilotchoice, setBidPilotChoice] = useState("2");
+  // const [bidPilotbroadness, setBidPilotBroadness] = useState("4");
   const [isBidPilotLoading, setIsBidPilotLoading] = useState(false);
 
   const [choice, setChoice] = useState("3a");
-  const [broadness, setBroadness] = useState("4");
+  // const [broadness, setBroadness] = useState("4");
 
   const [isLoading, setIsLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
@@ -974,16 +974,16 @@ const QAGenerator = () => {
       .map((msg) => `${msg.type}: ${msg.text}`)
       .join("\n");
     console.log(chatHistory);
-    console.log(bidPilotbroadness);
-    console.log(bidPilotchoice);
+    // console.log(bidPilotbroadness);
+    // console.log(bidPilotchoice);
     console.log(selectedBidId);
 
     try {
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question`,
+        `http${HTTP_PREFIX}://${API_URL}/question_choice_2`,
         {
-          choice: bidPilotchoice,
-          broadness: bidPilotbroadness,
+          // choice: bidPilotchoice,
+          broadness: "4",
           input_text: question,
           extra_instructions: chatHistory,
           datasets: ["default"],
@@ -1033,10 +1033,10 @@ const QAGenerator = () => {
 
     try {
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question`,
+        `http${HTTP_PREFIX}://${API_URL}/question_choice_3a`,
         {
-          choice: choice,
-          broadness: broadness,
+          // choice: choice,//3a
+          broadness: "4",
           input_text: inputText,
           extra_instructions: "",
           datasets: selectedFolders,
@@ -1202,7 +1202,7 @@ const QAGenerator = () => {
         `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
         {
           choice: "3b",
-          broadness: broadness,
+          broadness: "4",
           input_text: inputText,
           extra_instructions: "",
           selected_choices: selectedChoices,
