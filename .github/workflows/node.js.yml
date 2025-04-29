@@ -35,6 +35,7 @@ jobs:
           rm -rf node_modules
           rm -f package-lock.json
           npm install --legacy-peer-deps --no-optional
+          npm install @rollup/rollup-linux-x64-gnu --no-save
       - name: Build
         run: |
           if [ "${{ github.ref }}" == "refs/heads/dev" ] || [ "${{ github.ref }}" == "refs/heads/experimental" ]; then
