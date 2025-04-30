@@ -76,16 +76,14 @@ export const refineResponse = (prompt: string, message: IMessage, history: IMess
 export const askLibraryChatQuestion = async (token: string, request: IMessageRequest): Promise<IMessage> => {
   try {
     const result = await axios.post(
-      apiURL("question"),
+      apiURL("question_choice_2"),
       {
-        choice: BID_PILOT_CHOICE,
         broadness: BID_PILOT_BROADNESS,
         input_text: request.isRefine
           ? `${request.instructionText};\n\n ${request.refineInstruction}`
           : request.instructionText,
         extra_instructions: normalizeChatHistory(request.messages),
         datasets: ["default"],
-        bid_id: request?.tenderBid?._id || "sharedState.object_id",
       },
       {
         headers: {
@@ -162,7 +160,7 @@ export const askCopilot = async (token: string, request: IMessageRequest): Promi
           request.isRefine ? request.refineInstruction : request.instructionText
         ),
         datasets: [],
-        bid_id: "32212",
+        bid_id: request?.tenderBid?._id || "sharedState.object_id",
       },
       {
         headers: {
