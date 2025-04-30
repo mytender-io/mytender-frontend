@@ -30,14 +30,24 @@ const DebouncedContentEditable: React.FC<DebouncedContentEditableProps> = ({
   const localRef = useRef<HTMLDivElement>(null);
   const debouncedCallback = useRef<NodeJS.Timeout | null>(null);
   const isInitialMount = useRef(true);
+  const formattedContentRef = useRef<string | null>(null);
 
   // Only set the initial HTML content on the first render
+  // Replace your existing initial mount effect with this
   useEffect(() => {
     if (isInitialMount.current && localRef.current) {
-      localRef.current.innerHTML = formatSectionText(content || "");
+      const formattedContent = formatSectionText(content || "");
+      formattedContentRef.current = formattedContent;
+      localRef.current.innerHTML = formattedContent;
+
+      // If the formatted content is different from the original, update the parent state
+      if (formattedContent !== content) {
+        onChange(formattedContent);
+      }
+
       isInitialMount.current = false;
     }
-  }, [content]);
+  }, [content, onChange]);
 
   // Handle external content updates without losing cursor position
   useEffect(() => {
