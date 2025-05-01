@@ -129,6 +129,13 @@ const Bid = () => {
           selectedFolders = ["default"];
         }
 
+        const competitor_urls = Array.isArray(bidData?.competitor_urls)
+          ? bidData.competitor_urls
+          : [];
+
+        console.log("loading competitor urls");
+        console.log(bidData?.competitor_urls);
+
         return {
           ...prevState,
           bidInfo: bidData?.bid_title || "",
@@ -158,7 +165,7 @@ const Bid = () => {
           win_themes: bidData?.win_themes || [],
           customer_pain_points: bidData?.customer_pain_points || [],
           differentiating_factors: bidData?.differentiating_factors || [],
-          competitor_urls: bidData?.competitor_urls || [],
+          competitor_urls: competitor_urls,
           selectedCaseStudies: bidData?.selectedCaseStudies || [],
           solution: bidData?.solution || {
             product: "",

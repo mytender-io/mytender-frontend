@@ -50,6 +50,9 @@ const AddCompetitors = ({ setTabContent, setSharedState }: Props) => {
   const { sharedState } = useContext(BidContext);
 
   const { object_id, competitor_urls = [] } = sharedState;
+  
+  console.log("competitor urls");
+  console.log(competitor_urls);
 
   const getAuth = useAuthUser();
   const auth = getAuth();

@@ -309,6 +309,8 @@ const BidManagement: React.FC = () => {
         JSON.stringify(differentiating_factors || [])
       );
 
+      console.log("saving competitor_urls");
+      console.log(competitor_urls);
       formData.append("competitor_urls", JSON.stringify(competitor_urls || []));
 
       formData.append(
