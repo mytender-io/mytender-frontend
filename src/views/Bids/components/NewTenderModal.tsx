@@ -191,6 +191,16 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         contributors: auth.email ? { [auth.email]: "admin" } : {},
         new_bid_completed: false
       }));
+
+      console.log("bid_id", sharedState.object_id);
+
+      // Check if the bid has been created successfully
+      if (!sharedState.object_id || sharedState.object_id === "") {
+        toast.warning(
+          "The bid is still being created. Please wait a moment and try again."
+        );
+        return;
+      }
       setCurrentStep("documents");
     } else if (currentStep === "documents") {
       if (!isDocumentsStepValid()) {
