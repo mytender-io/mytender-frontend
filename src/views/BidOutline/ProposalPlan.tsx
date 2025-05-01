@@ -87,9 +87,9 @@ const ProposalPlan = ({
 
   const { object_id, contributors, outline } = sharedState;
 
-  
   // Use the UserDataContext hook to get organization users
-  const { organizationUsers, isLoading: isOrganizationUsersLoading } = useUserData();
+  const { organizationUsers, isLoading: isOrganizationUsersLoading } =
+    useUserData();
   // const currentUserPermission = contributors[auth.email] || "viewer";
 
   const [contextMenu, setContextMenu] = useState<Record<string, number> | null>(
@@ -112,8 +112,6 @@ const ProposalPlan = ({
   // Add state for the dropdown selection
   const [lengthUnit, setLengthUnit] = useState("words");
 
-
-
   useEffect(() => {
     if (taskToOpen && sectionIndex && openTask) {
       // First, register a slight delay to ensure sections are rendered
@@ -131,7 +129,7 @@ const ProposalPlan = ({
           // Create a synthetic event object with preventDefault method
           // to avoid errors in handleRowClick
           const syntheticEvent = {
-            preventDefault: () => { },
+            preventDefault: () => {},
             target: document.createElement("div") // Create a dummy element
           };
 
@@ -338,13 +336,19 @@ const ProposalPlan = ({
     return () => document.removeEventListener("click", handleClickOutside);
   }, [contextMenu, handleClickOutside]);
 
-  const handleAddSection = async () => {
-    if (!object_id || selectedRowIndex === null) return;
+  const handleAddSection = async (targetIndex?: number) => {
+    // If targetIndex is provided, use it; otherwise use selectedRowIndex from context menu
+    const insertIndex =
+      targetIndex !== undefined ? targetIndex + 1 : selectedRowIndex;
+
+    // Return early if no object_id or no valid index to insert at
+    if (!object_id || insertIndex === null) return;
 
     const newSection = {
       heading: "New Section",
       word_count: 250,
       reviewer: "",
+      answerer: "",
       status: "Not Started" as const,
       subsections: 0,
       question: "",
@@ -367,7 +371,7 @@ const ProposalPlan = ({
       );
 
       const updatedOutline = [...sharedState.outline];
-      updatedOutline.splice(selectedRowIndex, 0, {
+      updatedOutline.splice(insertIndex, 0, {
         ...newSection,
         section_id: uuid
       });
@@ -376,11 +380,18 @@ const ProposalPlan = ({
         ...prevState,
         outline: updatedOutline
       }));
+
+      // Show success toast
+      toast.success("New section added");
     } catch (err) {
       console.error("Error adding section:", err);
       toast.error("Failed to add section");
     }
-    setContextMenu(null);
+
+    // Only clear context menu if this was triggered from context menu
+    if (targetIndex === undefined) {
+      setContextMenu(null);
+    }
   };
 
   const handleDeleteSection = async (
@@ -425,8 +436,8 @@ const ProposalPlan = ({
       const compliance_requirements =
         section.subheadings.length > 0
           ? section.subheadings.map(
-            (subheading) => section.compliance_requirements
-          )
+              (subheading) => section.compliance_requirements
+            )
           : [""];
 
       const answer = await sendQuestionToChatbot(
@@ -946,8 +957,8 @@ const ProposalPlan = ({
               message,
               subject,
               token: tokenRef.current,
-              onSuccess: () => { },
-              onError: (error) => { }
+              onSuccess: () => {},
+              onError: (error) => {}
             });
 
             // Track task creation with posthog
@@ -1031,8 +1042,8 @@ const ProposalPlan = ({
               message,
               subject,
               token: tokenRef.current,
-              onSuccess: () => { },
-              onError: (error) => { }
+              onSuccess: () => {},
+              onError: (error) => {}
             });
 
             // Track task creation with posthog
@@ -1217,6 +1228,7 @@ const ProposalPlan = ({
             onDelete={() => handleDeleteClick(section, index)}
             onMoveDown={() => handleMoveSection(index, "down")}
             onMoveUp={() => handleMoveSection(index, "up")}
+            onAddSection={() => handleAddSection(index)} 
             isFirst={index === 0}
             isLast={index === outline.length - 1}
           />

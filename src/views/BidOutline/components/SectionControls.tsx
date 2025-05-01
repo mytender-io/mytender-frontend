@@ -10,7 +10,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowUp,
   faArrowDown,
-  faTrash
+  faTrash,
+  faPlus
 } from "@fortawesome/free-solid-svg-icons";
 import ElipsisMenuIcon from "@/components/icons/ElipsisMenuIcon";
 
@@ -18,6 +19,7 @@ interface SectionControlsProps {
   onDelete: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onAddSection?: () => void; // New prop for adding a section
   isFirst: boolean;
   isLast: boolean;
 }
@@ -26,6 +28,7 @@ const SectionControls: React.FC<SectionControlsProps> = ({
   onDelete,
   onMoveUp,
   onMoveDown,
+  onAddSection,
   isFirst,
   isLast
 }) => {
@@ -47,6 +50,12 @@ const SectionControls: React.FC<SectionControlsProps> = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40">
+          {onAddSection && (
+            <DropdownMenuItem onClick={handleAction(onAddSection)}>
+              <FontAwesomeIcon icon={faPlus} className="mr-2 h-4 w-4" />
+              Add Section
+            </DropdownMenuItem>
+          )}
           {!isFirst && (
             <DropdownMenuItem onClick={handleAction(onMoveUp)}>
               <FontAwesomeIcon icon={faArrowUp} className="mr-2 h-4 w-4" />
