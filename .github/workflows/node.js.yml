@@ -15,10 +15,7 @@ jobs:
         with:
           node-version: "20"
       - name: Install Dependencies
-        run: |
-          rm -rf node_modules
-          npm ci
-          npm install @rollup/rollup-linux-x64-gnu --no-save
+        run: npm install
       - name: Run Tests
         run: npm test
   build:
@@ -30,11 +27,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "20"
-      - name: Install Dependencies
+      - name: Clean Install Dependencies
         run: |
-          rm -rf node_modules
-          npm ci
-          npm install @rollup/rollup-linux-x64-gnu --no-save
+          npm install
       - name: Build
         run: |
           if [ "${{ github.ref }}" == "refs/heads/dev" ] || [ "${{ github.ref }}" == "refs/heads/experimental" ]; then

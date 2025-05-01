@@ -20,13 +20,13 @@ const LogoutIcon: React.FC<IconProps> = ({
         <path
           id="Rectangle 177466"
           stroke="currentColor"
-          d="M7 4V1h15v18l-9.5 3.5V19H7v-"
+          d="M7 4V1h15v18l-9.5 3.5V19H7V4"
           strokeWidth="1"
         ></path>
         <path
           id="Rectangle 177467"
           stroke="currentColor"
-          d="m22 1 -9.5 3.5v18"
+          d="m22 1-9.5 3.5v18"
           strokeWidth="1"
         ></path>
         <path
