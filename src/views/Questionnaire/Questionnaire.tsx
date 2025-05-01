@@ -1,6 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import { useAuthUser } from "react-auth-kit";
-import * as XLSX from "xlsx";
 import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
 import withAuth from "../../routes/withAuth.tsx";
 import { Button } from "@/components/ui/button";
@@ -25,50 +24,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import ElipsisMenuIcon from "@/components/icons/ElipsisMenuIcon";
 import RecyclebinIcon from "@/components/icons/RecyclebinIcon";
-import { toast } from "react-toastify";
 import { cn } from "@/utils/index.ts";
 import PaginationRow from "@/components/PaginationRow";
 import SkeletonRow from "../Bids/components/SkeletonRow.tsx";
-
-interface Question {
-  id: string;
-  question: string;
-  answer: string;
-  collaborator: string;
-  approved: boolean;
-  isNew?: boolean;
-}
-
-// Dummy data for initial display
-const dummyQuestions: Question[] = [
-  {
-    id: "1",
-    question: "What is your company's approach to sustainability?",
-    answer:
-      "Our company implements a comprehensive sustainability program that includes reducing carbon emissions, minimizing waste, and sourcing materials responsibly.",
-    collaborator: "Jane Smith",
-    approved: true
-  },
-  {
-    id: "2",
-    question: "Describe your quality assurance process.",
-    answer:
-      "We have a rigorous QA process that includes multiple testing phases, peer reviews, and automated testing to ensure consistent quality.",
-    collaborator: "John Doe",
-    approved: false
-  },
-  {
-    id: "3",
-    question: "What certifications does your company hold?",
-    answer:
-      "Our company holds ISO 9001, ISO 14001, and industry-specific certifications that demonstrate our commitment to quality and standards compliance.",
-    collaborator: "Robert Johnson",
-    approved: true
-  }
-];
+import {
+  BidContext,
+  QuestionnaireQuestion
+} from "../BidWritingStateManagerView.tsx";
+import { addQuestion, autofillAnswers, handleImportQuestionnaire, downloadTemplate, handleQuestionChange, handleAnswerChange, handleApprovalChange, finalizeQuestion, cancelNewQuestion, deleteQuestion } from "./questionnaireFunctions.tsx";
 
 const Questionnaire = () => {
-  const [questions, setQuestions] = useState<Question[]>(dummyQuestions);
+  const { sharedState, setSharedState } = useContext(BidContext);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -78,6 +44,9 @@ const Questionnaire = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+
+  // Get questions from shared state
+  const questions = sharedState.questionnaire || [];
 
   // Calculate pagination values
   const indexOfLastItem = currentPage * pageSize;
@@ -89,181 +58,14 @@ const Questionnaire = () => {
     setCurrentPage(page);
   };
 
-  // Add an empty question to the list
-  const addQuestion = () => {
-    const newQuestion: Question = {
-      id: Date.now().toString(),
-      question: "",
-      answer: "",
-      collaborator: auth?.fullName || "Current User",
-      approved: false,
-      isNew: true
-    };
-    const updatedQuestions = [...questions, newQuestion];
-    setQuestions(updatedQuestions);
-
-    // Go to the last page if the new question would be there
-    const newTotalPages = Math.ceil(updatedQuestions.length / pageSize);
-    if (currentPage < newTotalPages) {
-      setCurrentPage(newTotalPages);
-    }
-  };
-
-  // Handle question text change (only for new questions)
-  const handleQuestionChange = (id: string, value: string) => {
-    setQuestions(
-      questions.map((q) => (q.id === id ? { ...q, question: value } : q))
-    );
-  };
-
-  // Handle answer text change
-  const handleAnswerChange = (id: string, value: string) => {
-    setQuestions(
-      questions.map((q) => (q.id === id ? { ...q, answer: value } : q))
-    );
-  };
-
-  // Handle approval status change
-  const handleApprovalChange = (id: string, value: boolean) => {
-    setQuestions(
-      questions.map((q) => (q.id === id ? { ...q, approved: value } : q))
-    );
-  };
-
-  // Delete a question
-  const deleteQuestion = (id: string) => {
-    const updatedQuestions = questions.filter((q) => q.id !== id);
-    setQuestions(updatedQuestions);
-
-    // Adjust current page if needed (e.g., if we deleted the last item on the last page)
-    const newTotalPages = Math.ceil(updatedQuestions.length / pageSize);
-    if (currentPage > newTotalPages && newTotalPages > 0) {
-      setCurrentPage(newTotalPages);
-    }
-
-    toast.success("Question deleted");
-  };
-
-  // Cancel adding a new question
-  const cancelNewQuestion = (id: string) => {
-    setQuestions(questions.filter((q) => q.id !== id));
-  };
-
-  // Finalize a new question (remove isNew flag)
-  const finalizeQuestion = (id: string) => {
-    setQuestions(
-      questions.map((q) => (q.id === id ? { ...q, isNew: false } : q))
-    );
-    toast.success("Question saved");
-  };
-
-  // Handle file selection and automatically upload
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const selectedFile = e.target.files[0];
-      setFile(selectedFile);
-
-      // Automatically process the file after selection
-      setLoading(true);
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        try {
-          const data = event.target?.result;
-          const workbook = XLSX.read(data, { type: "binary" });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-
-          // Convert to JSON with headers
-          const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-          // Map the Excel data to our Question interface
-          const parsedQuestions: Question[] = jsonData.map(
-            (row: Record<string, unknown>, index) => ({
-              id: (Date.now() + index).toString(),
-              question: row.question || row.Question || "",
-              answer: row.answer || row.Answer || "",
-              collaborator:
-                row.collaborator ||
-                row.Collaborator ||
-                auth?.fullName ||
-                "Current User",
-              approved: Boolean(row.approved || row.Approved || false),
-              isNew: false
-            })
-          );
-
-          setQuestions(parsedQuestions);
-          setCurrentPage(1); // Reset to first page after import
-          toast.success("File uploaded and processed successfully");
-        } catch (error) {
-          console.error("Error parsing Excel file:", error);
-          toast.error("Error parsing Excel file. Please check the format.");
-        } finally {
-          setLoading(false);
-          setFile(null);
-          if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-          }
-        }
-      };
-
-      reader.onerror = () => {
-        toast.error("Error reading file");
-        setLoading(false);
-        setFile(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-      };
-
-      reader.readAsBinaryString(selectedFile);
-    }
-  };
-
-  // Generate dummy answers using fixed responses
-  const autofillAnswers = () => {
-    const dummyAnswers = [
-      "Our company has extensive experience in this area with proven results.",
-      "We follow industry best practices and maintain rigorous standards.",
-      "Our team of experts has developed innovative solutions to address this requirement.",
-      "We have a comprehensive approach that ensures quality and compliance.",
-      "Our methodology incorporates regular reviews and continuous improvement."
-    ];
-
-    setLoading(true);
-
-    setTimeout(() => {
-      const updatedQuestions = questions.map((q) => ({
-        ...q,
-        answer:
-          q.answer ||
-          dummyAnswers[Math.floor(Math.random() * dummyAnswers.length)]
-      }));
-
-      setQuestions(updatedQuestions);
-      setLoading(false);
-      toast.success("Answers generated successfully");
-    }, 1000); // Simulate API delay
-  };
-
-  // Download an Excel template
-  const downloadTemplate = () => {
-    const templateData = [
-      {
-        Question: "Enter your question here",
-        Answer: "Enter your answer here",
-        Collaborator: "Enter collaborator name",
-        Approved: false
-      }
-    ];
-
-    const worksheet = XLSX.utils.json_to_sheet(templateData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Questionnaire");
-
-    // Generate Excel file
-    XLSX.writeFile(workbook, "questionnaire_template.xlsx");
+  // Update the shared state with new questions
+  const updateSharedStateQuestions = (
+    updatedQuestions: QuestionnaireQuestion[]
+  ) => {
+    setSharedState((prev) => ({
+      ...prev,
+      questionnaire: updatedQuestions
+    }));
   };
 
   const parentPages = [] as Array<{ name: string; path: string }>;
@@ -283,12 +85,29 @@ const Questionnaire = () => {
       </div>
       <div className="flex flex-col flex-1 px-6 py-4 overflow-y-auto">
         <div className="flex justify-end gap-3 mb-6">
-          <Button variant="link" onClick={addQuestion} className="text-orange">
+          <Button 
+            variant="link" 
+            onClick={() => addQuestion(
+              questions, 
+              updateSharedStateQuestions, 
+              setCurrentPage, 
+              currentPage, 
+              pageSize, 
+              auth
+            )} 
+            className="text-orange"
+          >
             <PlusIcon /> Add Question
           </Button>
           <Button
             variant="link"
-            onClick={autofillAnswers}
+            onClick={() => autofillAnswers(
+              questions,
+              sharedState,
+              updateSharedStateQuestions,
+              setLoading,
+              auth
+            )}
             className="text-orange"
           >
             <FastIcon /> Autofill Answers
@@ -297,7 +116,16 @@ const Questionnaire = () => {
             <input
               type="file"
               ref={fileInputRef}
-              onChange={handleFileChange}
+              onChange={(e) => handleImportQuestionnaire(
+                e,
+                sharedState,
+                updateSharedStateQuestions,
+                setCurrentPage,
+                setLoading,
+                setFile,
+                fileInputRef,
+                auth
+              )}
               className="hidden"
               accept=".xlsx,.xls"
             />
@@ -311,7 +139,11 @@ const Questionnaire = () => {
           </>
           <Button
             variant="link"
-            onClick={downloadTemplate}
+            onClick={() => downloadTemplate(
+              sharedState,
+              setLoading,
+              auth
+            )}
             className="text-orange"
           >
             <Download /> Download Import Template
@@ -369,7 +201,9 @@ const Questionnaire = () => {
                               onChange={(e) =>
                                 handleQuestionChange(
                                   question.id,
-                                  e.target.value
+                                  e.target.value,
+                                  questions,
+                                  updateSharedStateQuestions
                                 )
                               }
                               placeholder="Enter question..."
@@ -383,7 +217,12 @@ const Questionnaire = () => {
                         <Input
                           value={question.answer}
                           onChange={(e) =>
-                            handleAnswerChange(question.id, e.target.value)
+                            handleAnswerChange(
+                              question.id,
+                              e.target.value,
+                              questions,
+                              updateSharedStateQuestions
+                            )
                           }
                           className={cn(
                             !question.isNew && "border-0 shadow-none"
@@ -399,7 +238,12 @@ const Questionnaire = () => {
                           <Checkbox
                             checked={question.approved}
                             onCheckedChange={(checked) =>
-                              handleApprovalChange(question.id, !!checked)
+                              handleApprovalChange(
+                                question.id,
+                                !!checked,
+                                questions,
+                                updateSharedStateQuestions
+                              )
                             }
                           />
                         </div>
@@ -409,7 +253,11 @@ const Questionnaire = () => {
                           {question.isNew ? (
                             <div className="flex gap-2">
                               <Button
-                                onClick={() => finalizeQuestion(question.id)}
+                                onClick={() => finalizeQuestion(
+                                  question.id,
+                                  questions,
+                                  updateSharedStateQuestions
+                                )}
                                 disabled={!question.question.trim()}
                                 size="sm"
                                 variant="default"
@@ -417,7 +265,11 @@ const Questionnaire = () => {
                                 Save
                               </Button>
                               <Button
-                                onClick={() => cancelNewQuestion(question.id)}
+                                onClick={() => cancelNewQuestion(
+                                  question.id,
+                                  questions,
+                                  updateSharedStateQuestions
+                                )}
                                 size="sm"
                                 variant="outline"
                               >
@@ -439,7 +291,14 @@ const Questionnaire = () => {
                                 className="w-[150px]"
                               >
                                 <DropdownMenuItem
-                                  onClick={() => deleteQuestion(question.id)}
+                                  onClick={() => deleteQuestion(
+                                    question.id,
+                                    questions,
+                                    updateSharedStateQuestions,
+                                    setCurrentPage,
+                                    currentPage,
+                                    pageSize
+                                  )}
                                 >
                                   <RecyclebinIcon className="h-4 w-4" />
                                   Delete Question

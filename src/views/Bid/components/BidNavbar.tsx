@@ -135,13 +135,13 @@ const BidNavbar: React.FC<{
                 <PlusIcon />
                 New Outline
               </Button>
-              {/* <Button
+               <Button
                 variant="outline"
                 onClick={() => navigate("/questionnaire")}
               >
                 <PlusIcon />
                 Add Questionnaire
-              </Button> */}
+              </Button> 
               <GenerateProposalModal
                 bid_id={object_id}
                 handleTabClick={handleTabClick}

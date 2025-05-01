@@ -91,6 +91,15 @@ export interface Solution {
   approach: string;
 }
 
+export interface QuestionnaireQuestion {
+  id: string;
+  question: string;
+  answer: string;
+  collaborator: string;
+  approved: boolean;
+  isNew?: boolean;
+}
+
 export interface SharedState {
   bidInfo: string;
   opportunity_information: string;
@@ -122,6 +131,7 @@ export interface SharedState {
   solution: Solution;
   selectedCaseStudies: HighlightedDocument[]; // Array of highlighted document objects
   tone_of_voice: string;
+  questionnaire: QuestionnaireQuestion[];
   new_bid_completed: boolean;
   isExternalUpdate?: boolean; // Flag to prevent autosave after server update
 }
