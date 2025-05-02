@@ -167,6 +167,7 @@ const Bid = () => {
           differentiating_factors: bidData?.differentiating_factors || [],
           competitor_urls: competitor_urls,
           selectedCaseStudies: bidData?.selectedCaseStudies || [],
+          questionnaire: bidData?.questionnaire || [],
           solution: bidData?.solution || {
             product: "",
             features: "",

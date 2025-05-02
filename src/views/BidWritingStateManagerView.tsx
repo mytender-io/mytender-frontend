@@ -177,6 +177,7 @@ const defaultState: BidContextType = {
       approach: ""
     },
     selectedCaseStudies: [], // Initialize with an empty array
+    questionnaire: [],
     tone_of_voice: "", // Initialize tone_of_voice with empty string
     new_bid_completed: true,
     isExternalUpdate: false
@@ -258,6 +259,7 @@ const BidManagement: React.FC = () => {
         competitor_urls,
         solution,
         selectedCaseStudies, // Include the selectedCaseStudies
+        questionnaire,
         tone_of_voice, // Include tone_of_voice
         new_bid_completed
       } = stateCopy;
@@ -328,11 +330,12 @@ const BidManagement: React.FC = () => {
         JSON.stringify(solution || { product: "", features: "", approach: "" })
       );
 
-      // Add selectedCaseStudies to the form data
       formData.append(
         "selectedCaseStudies",
         JSON.stringify(selectedCaseStudies || [])
       );
+
+      formData.append("questionnaire", JSON.stringify(questionnaire || []));
 
       if (object_id) {
         appendFormData("object_id", object_id);
@@ -375,6 +378,7 @@ const BidManagement: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log("dependency updated");
     if (sharedState.isExternalUpdate) {
       console.log("Skipping autosave - update came from server");
 
@@ -428,6 +432,7 @@ const BidManagement: React.FC = () => {
     sharedState.new_bid_completed,
     JSON.stringify(sharedState.solution),
     JSON.stringify(sharedState.selectedCaseStudies),
+    sharedState.questionnaire,
     JSON.stringify(
       sharedState.outline.map((s) => ({
         id: s.section_id,
@@ -559,6 +564,8 @@ const BidManagement: React.FC = () => {
                     selectedCaseStudies:
                       updatedBid.selectedCaseStudies ||
                       prev.selectedCaseStudies,
+                    questionnaire:
+                      updatedBid.questionnaire || prev.questionnaire,
                     tone_of_voice:
                       updatedBid.tone_of_voice || prev.tone_of_voice,
                     new_bid_completed:

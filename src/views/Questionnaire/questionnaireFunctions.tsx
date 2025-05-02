@@ -8,7 +8,6 @@ export const handleImportQuestionnaire = async (
   e: React.ChangeEvent<HTMLInputElement>,
   sharedState: any,
   updateSharedStateQuestions: (questions: QuestionnaireQuestion[]) => void,
-  setCurrentPage: (page: number) => void,
   setLoading: (loading: boolean) => void,
   setFile: (file: File | null) => void,
   fileInputRef: React.RefObject<HTMLInputElement>,
@@ -40,7 +39,6 @@ export const handleImportQuestionnaire = async (
       if (result.data.success && result.data.questions) {
         // Use the server-processed questions
         updateSharedStateQuestions(result.data.questions);
-        setCurrentPage(1); // Reset to first page after import
         toast.success("File uploaded and processed successfully");
       } else {
         toast.error(result.data.message || "Failed to process questionnaire");
@@ -166,28 +164,19 @@ export const downloadTemplate = async (
 export const addQuestion = (
   questions: QuestionnaireQuestion[],
   updateSharedStateQuestions: (questions: QuestionnaireQuestion[]) => void,
-  setCurrentPage: (page: number) => void,
-  currentPage: number,
-  pageSize: number,
   auth: any
 ) => {
   const newQuestion: QuestionnaireQuestion = {
     id: Date.now().toString(),
     question: "",
     answer: "",
-    collaborator: auth?.fullName || "Current User",
+    collaborator: auth?.email || "Current User",
     approved: false,
     isNew: true
   };
 
   const updatedQuestions = [...questions, newQuestion];
   updateSharedStateQuestions(updatedQuestions);
-
-  // Go to the last page if the new question would be there
-  const newTotalPages = Math.ceil(updatedQuestions.length / pageSize);
-  if (currentPage < newTotalPages) {
-    setCurrentPage(newTotalPages);
-  }
 };
 
 // Handle question text change (only for new questions)
@@ -233,19 +222,10 @@ export const handleApprovalChange = (
 export const deleteQuestion = (
   id: string,
   questions: QuestionnaireQuestion[],
-  updateSharedStateQuestions: (questions: QuestionnaireQuestion[]) => void,
-  setCurrentPage: (page: number) => void,
-  currentPage: number,
-  pageSize: number
+  updateSharedStateQuestions: (questions: QuestionnaireQuestion[]) => void
 ) => {
   const updatedQuestions = questions.filter((q) => q.id !== id);
   updateSharedStateQuestions(updatedQuestions);
-
-  // Adjust current page if needed (e.g., if we deleted the last item on the last page)
-  const newTotalPages = Math.ceil(updatedQuestions.length / pageSize);
-  if (currentPage > newTotalPages && newTotalPages > 0) {
-    setCurrentPage(newTotalPages);
-  }
 
   toast.success("Question deleted");
 };

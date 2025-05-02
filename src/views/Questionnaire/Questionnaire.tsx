@@ -1,4 +1,4 @@
-import React, { useState, useRef, useContext } from "react";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import { useAuthUser } from "react-auth-kit";
 import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation.tsx";
 import withAuth from "../../routes/withAuth.tsx";
@@ -25,13 +25,24 @@ import {
 import ElipsisMenuIcon from "@/components/icons/ElipsisMenuIcon";
 import RecyclebinIcon from "@/components/icons/RecyclebinIcon";
 import { cn } from "@/utils/index.ts";
-import PaginationRow from "@/components/PaginationRow";
 import SkeletonRow from "../Bids/components/SkeletonRow.tsx";
 import {
   BidContext,
   QuestionnaireQuestion
 } from "../BidWritingStateManagerView.tsx";
-import { addQuestion, autofillAnswers, handleImportQuestionnaire, downloadTemplate, handleQuestionChange, handleAnswerChange, handleApprovalChange, finalizeQuestion, cancelNewQuestion, deleteQuestion } from "./questionnaireFunctions.tsx";
+import {
+  addQuestion,
+  autofillAnswers,
+  handleImportQuestionnaire,
+  downloadTemplate,
+  handleQuestionChange,
+  handleAnswerChange,
+  handleApprovalChange,
+  finalizeQuestion,
+  cancelNewQuestion,
+  deleteQuestion
+} from "./questionnaireFunctions.tsx";
+import SaveStatus from "../Bid/components/SaveStatus.tsx";
 
 const Questionnaire = () => {
   const { sharedState, setSharedState } = useContext(BidContext);
@@ -41,31 +52,35 @@ const Questionnaire = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  // Local state for questionnaire
+  const [localQuestions, setLocalQuestions] = useState<QuestionnaireQuestion[]>(
+    []
+  );
 
-  // Get questions from shared state
-  const questions = sharedState.questionnaire || [];
-
-  // Calculate pagination values
-  const indexOfLastItem = currentPage * pageSize;
-  const indexOfFirstItem = indexOfLastItem - pageSize;
-  const currentQuestions = questions.slice(indexOfFirstItem, indexOfLastItem);
-
-  // Handle page changes
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  // Update the shared state with new questions
+  // Update both local state and shared state with new questions
   const updateSharedStateQuestions = (
     updatedQuestions: QuestionnaireQuestion[]
   ) => {
+    // Update local state immediately for UI responsiveness
+    setLocalQuestions(updatedQuestions);
+    console.log(updatedQuestions);
+    // Update shared state for persistence
     setSharedState((prev) => ({
       ...prev,
       questionnaire: updatedQuestions
     }));
+    console.log(sharedState.questionnaire);
+
+    console.log("updated shared state");
+
+  };
+
+  // Handle add question click
+  const handleAddQuestion = () => {
+    console.log("Add Question button clicked");
+    console.log("Current questions before add:", localQuestions);
+
+    addQuestion(localQuestions, updateSharedStateQuestions, auth);
   };
 
   const parentPages = [] as Array<{ name: string; path: string }>;
@@ -85,29 +100,28 @@ const Questionnaire = () => {
       </div>
       <div className="flex flex-col flex-1 px-6 py-4 overflow-y-auto">
         <div className="flex justify-end gap-3 mb-6">
-          <Button 
-            variant="link" 
-            onClick={() => addQuestion(
-              questions, 
-              updateSharedStateQuestions, 
-              setCurrentPage, 
-              currentPage, 
-              pageSize, 
-              auth
-            )} 
+          <SaveStatus
+            isLoading={sharedState.isLoading}
+            saveSuccess={sharedState.saveSuccess}
+          />
+          <Button
+            variant="link"
+            onClick={handleAddQuestion}
             className="text-orange"
           >
             <PlusIcon /> Add Question
           </Button>
           <Button
             variant="link"
-            onClick={() => autofillAnswers(
-              questions,
-              sharedState,
-              updateSharedStateQuestions,
-              setLoading,
-              auth
-            )}
+            onClick={() =>
+              autofillAnswers(
+                localQuestions,
+                sharedState,
+                updateSharedStateQuestions,
+                setLoading,
+                auth
+              )
+            }
             className="text-orange"
           >
             <FastIcon /> Autofill Answers
@@ -116,16 +130,17 @@ const Questionnaire = () => {
             <input
               type="file"
               ref={fileInputRef}
-              onChange={(e) => handleImportQuestionnaire(
-                e,
-                sharedState,
-                updateSharedStateQuestions,
-                setCurrentPage,
-                setLoading,
-                setFile,
-                fileInputRef,
-                auth
-              )}
+              onChange={(e) =>
+                handleImportQuestionnaire(
+                  e,
+                  sharedState,
+                  updateSharedStateQuestions,
+                  setLoading,
+                  setFile,
+                  fileInputRef,
+                  auth
+                )
+              }
               className="hidden"
               accept=".xlsx,.xls"
             />
@@ -139,11 +154,7 @@ const Questionnaire = () => {
           </>
           <Button
             variant="link"
-            onClick={() => downloadTemplate(
-              sharedState,
-              setLoading,
-              auth
-            )}
+            onClick={() => downloadTemplate(sharedState, setLoading, auth)}
             className="text-orange"
           >
             <Download /> Download Import Template
@@ -180,7 +191,7 @@ const Questionnaire = () => {
                   Array(14)
                     .fill(0)
                     .map((_, index) => <SkeletonRow key={index} rowCount={6} />)
-                ) : currentQuestions.length === 0 ? (
+                ) : localQuestions.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-4">
                       No questions added yet. Add a question or import a
@@ -188,11 +199,9 @@ const Questionnaire = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  currentQuestions.map((question, index) => (
+                  localQuestions.map((question, index) => (
                     <TableRow key={question.id}>
-                      <TableCell className="px-4">
-                        {indexOfFirstItem + index + 1}
-                      </TableCell>
+                      <TableCell className="px-4">{index + 1}</TableCell>
                       <TableCell className="px-4">
                         {question.isNew ? (
                           <div className="flex items-center gap-2">
@@ -202,7 +211,7 @@ const Questionnaire = () => {
                                 handleQuestionChange(
                                   question.id,
                                   e.target.value,
-                                  questions,
+                                  localQuestions,
                                   updateSharedStateQuestions
                                 )
                               }
@@ -220,7 +229,7 @@ const Questionnaire = () => {
                             handleAnswerChange(
                               question.id,
                               e.target.value,
-                              questions,
+                              localQuestions,
                               updateSharedStateQuestions
                             )
                           }
@@ -241,7 +250,7 @@ const Questionnaire = () => {
                               handleApprovalChange(
                                 question.id,
                                 !!checked,
-                                questions,
+                                localQuestions,
                                 updateSharedStateQuestions
                               )
                             }
@@ -253,11 +262,13 @@ const Questionnaire = () => {
                           {question.isNew ? (
                             <div className="flex gap-2">
                               <Button
-                                onClick={() => finalizeQuestion(
-                                  question.id,
-                                  questions,
-                                  updateSharedStateQuestions
-                                )}
+                                onClick={() =>
+                                  finalizeQuestion(
+                                    question.id,
+                                    localQuestions,
+                                    updateSharedStateQuestions
+                                  )
+                                }
                                 disabled={!question.question.trim()}
                                 size="sm"
                                 variant="default"
@@ -265,11 +276,13 @@ const Questionnaire = () => {
                                 Save
                               </Button>
                               <Button
-                                onClick={() => cancelNewQuestion(
-                                  question.id,
-                                  questions,
-                                  updateSharedStateQuestions
-                                )}
+                                onClick={() =>
+                                  cancelNewQuestion(
+                                    question.id,
+                                    localQuestions,
+                                    updateSharedStateQuestions
+                                  )
+                                }
                                 size="sm"
                                 variant="outline"
                               >
@@ -291,14 +304,13 @@ const Questionnaire = () => {
                                 className="w-[150px]"
                               >
                                 <DropdownMenuItem
-                                  onClick={() => deleteQuestion(
-                                    question.id,
-                                    questions,
-                                    updateSharedStateQuestions,
-                                    setCurrentPage,
-                                    currentPage,
-                                    pageSize
-                                  )}
+                                  onClick={() =>
+                                    deleteQuestion(
+                                      question.id,
+                                      localQuestions,
+                                      updateSharedStateQuestions
+                                    )
+                                  }
                                 >
                                   <RecyclebinIcon className="h-4 w-4" />
                                   Delete Question
@@ -314,15 +326,6 @@ const Questionnaire = () => {
               </TableBody>
             </Table>
           </div>
-          {/* Pagination Controls */}
-          {questions.length > 0 && (
-            <PaginationRow
-              currentPage={currentPage}
-              pageSize={pageSize}
-              totalRecords={questions.length}
-              onPageChange={handlePageChange}
-            />
-          )}
         </div>
       </div>
     </div>
