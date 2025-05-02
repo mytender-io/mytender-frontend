@@ -97,6 +97,49 @@ const Bids = () => {
     setShowFeedbackModal(true);
   };
 
+  const duplicateBid = async (bidId: string): Promise<void> => {
+    try {
+      posthog.capture("duplicate_bid", { bid_id: bidId });
+      toast.warning("Duplicating Bid...");
+
+      const formData = new FormData();
+      formData.append("object_id", bidId);
+
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/duplicate_bid/`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      if (response.data && response.data.status === "success") {
+        // Fetch the updated list of bids to include the new duplicate
+        await fetchBids();
+        toast.success("Bid duplicated successfully");
+      } else {
+        toast.error("Failed to duplicate bid");
+      }
+    } catch (err) {
+      console.error("Error duplicating bid:", err);
+      if (axios.isAxiosError(err)) {
+        if (err.response) {
+          // Display the exact error message from the backend
+          const errorMessage =
+            err.response.data?.detail || "Failed to duplicate bid";
+          toast.error(errorMessage);
+        } else if (err.request) {
+          toast.error("No response received from server. Please try again.");
+        }
+      } else {
+        toast.error("Error duplicating bid. Please try again.");
+      }
+    }
+  };
+
   // Function to check if a bid was recently created and new_bid_completed is false
   const isIncompleteBid = (bid: Bid): boolean => {
     // Check if timestamp exists
@@ -610,6 +653,7 @@ const Bids = () => {
                               onFeedbackClick={() =>
                                 handleFeedbackClick(bid._id)
                               }
+                              onDuplicateClick={() => duplicateBid(bid._id)}
                             />
                           </TableCell>
                         </TableRow>
