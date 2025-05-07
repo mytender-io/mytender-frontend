@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import Logo from "../resources/images/mytender.io_badge.png";
+import Logo from "/images/mytender.io_badge.png";
 import {
   ChevronLeft,
   ChevronRight,
   HomeIcon,
-  UserRound,
-  MessageCircle
+  UserRound
+  // MessageCircle
+  // ClipboardList
 } from "lucide-react";
 // import HomeIcon from "@/components/icons/HomeIcon";
 import DashboardIcon from "@/components/icons/DashboardIcon";
@@ -51,7 +52,9 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(initialCollapsedState);
   const [isHovering, setIsHovering] = useState(false);
 
-  const isActive = (path: string): boolean => location.pathname === path;
+  const isActive = (path: string): boolean =>
+    location.pathname === path ||
+    (path !== "/" && location.pathname.startsWith(path + "/"));
 
   useEffect(() => {
     const storedBid = localStorage.getItem("lastActiveBid");
@@ -200,6 +203,34 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                 </span>
               )}
             </Link>
+            {/* <Link
+              to="/bid-capture"
+              className="flex items-center hover:bg-typo-200 bg-transparent rounded-md px-3 py-2 gap-3"
+            >
+              <ClipboardList
+                className={cn(
+                  "min-w-5 min-h-5",
+                  isActive("/bid-capture")
+                    ? "text-orange"
+                    : "text-gray-hint_text"
+                )}
+                strokeWidth={isActive("/bid-capture") ? 2 : 1}
+                width={20}
+                height={20}
+              />
+              {!isCollapsed && (
+                <span
+                  className={cn(
+                    "text-sm font-medium whitespace-nowrap",
+                    isActive("/bid-capture")
+                      ? "text-orange font-bold"
+                      : "text-gray-hint_text"
+                  )}
+                >
+                  Bid Capture
+                </span>
+              )}
+            </Link> */}
             <Link
               to="/library"
               className="flex items-center hover:bg-typo-200 rounded-md px-3 py-2 gap-3 bg-transparent"

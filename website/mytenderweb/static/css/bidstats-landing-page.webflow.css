@@ -2410,7 +2410,7 @@ figcaption {
 .navbar-brand:before {
   content: "";
   display: inline-block;
-  background: url("../images/mytender.io_badge.png") no-repeat center center;
+  background: url("/images/mytender.io_badge.png") no-repeat center center;
   background-size: contain;
   /* Adjust as needed */
   width: 50px;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, Typography, Avatar, Grid } from "@mui/material";
-import sidebarIcon from "../resources/images/mytender.io_badge.png";
+import sidebarIcon from "/images/mytender.io_badge.png";
 
 const VideoCard = ({ videoUrl, videoTitle, channelName, views, time }) => {
   console.log("Video URL:", videoUrl); // Debugging step

@@ -19,6 +19,8 @@ import posthog from "posthog-js";
 import Bid from "@/views/Bid/Bid";
 import Home from "@/views/Home/Home.tsx";
 import Questionnaire from "@/views/Questionnaire/Questionnaire.tsx";
+import BidCapture from "@/views/BidCapture/BidCapture.tsx";
+import BidDetail from "@/views/BidCapture/BidDetail.tsx";
 
 function Routing() {
   const location = useLocation();
@@ -57,6 +59,8 @@ function Routing() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/question-answer" element={<QAGenerator />} />
           <Route path="/questionnaire" element={<Questionnaire />} />
+          <Route path="/bid-capture" element={<BidCapture />} />
+          <Route path="/bid-capture/:id" element={<BidDetail />} />
 
           <Route element={<BidManagement />}>
             {/* context manager which give the component access to the shared state (the bid they are working on) */}
