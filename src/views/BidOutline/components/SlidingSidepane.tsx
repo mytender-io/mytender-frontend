@@ -726,7 +726,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
               )}
 
               <div className="space-y-2">
-                <span className="text-lg font-semibold">Question</span>
+                <span className="font-medium">Question</span>
                 <DebouncedTextArea
                   value={section.question}
                   onChange={(value) =>
