@@ -199,7 +199,7 @@ const SubheadingCards = ({
                   <DebouncedTextArea
                     value={subheading.title}
                     onChange={(value) => handleTitleChange(subIndex, value)}
-                    className="w-full bg-transparent resize-none focus:outline-none border-none focus:ring-0 focus-visible:ring-0 shadow-none min-h-6 p-1 font-bold md:text-base"
+                    className="w-full bg-transparent resize-none focus:outline-none border-none focus:ring-0 focus-visible:ring-0 shadow-none min-h-6 p-1 font-medium md:text-base"
                     placeholder="Write the name of the subtopic..."
                     rows={1}
                   />
@@ -231,9 +231,9 @@ const SubheadingCards = ({
                   : ""
               }
               onChange={(value) => handleInstructionsChange(subIndex, value)}
-              className="w-full bg-gray-light focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium border-none rounded-lg md:text-base"
+              className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium border-none md:text-base shadow-none"
               placeholder="Please write any extra guidance..."
-              rows={4}
+              rows={10}
             />
           </div>
         ))}

@@ -1,6 +1,6 @@
 import React from "react";
 import MeshGradient from "@/components/mesh-gradient/MeshGradient";
-import Logo from "@/resources/images/logo.png";
+import Logo from "/images/logo.png";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
