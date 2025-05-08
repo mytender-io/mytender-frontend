@@ -2,6 +2,7 @@ import { config } from "dotenv";
 import { resolve } from "path";
 import { beforeAll, afterAll } from "vitest";
 import axios from "axios";
+import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 
 // Load environment variables from .env.test if running locally
 if (!process.env.CI) {
@@ -17,7 +18,7 @@ export async function getAuthToken() {
   }
 
   try {
-    const response = await axios.post(`https://dev.mytender.io:7861/login`, {
+    const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/login`, {
       email: process.env.TEST_USERNAME,
       password: process.env.TEST_PASSWORD
     });

@@ -14,6 +14,13 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "20"
+      - name: Set API URL based on branch
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/dev" ] || [ "${{ github.ref }}" == "refs/heads/experimental" ]; then
+            echo "VITE_REACT_APP_API_URL=dev.mytender.io:7861" >> $GITHUB_ENV
+          else
+            echo "VITE_REACT_APP_API_URL=app.mytender.io:7860" >> $GITHUB_ENV
+          fi
       - name: Install Dependencies
         run: npm install
       - name: Run Tests
@@ -27,6 +34,13 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "20"
+      - name: Set API URL based on branch
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/dev" ] || [ "${{ github.ref }}" == "refs/heads/experimental" ]; then
+            echo "VITE_REACT_APP_API_URL=dev.mytender.io:7861" >> $GITHUB_ENV
+          else
+            echo "VITE_REACT_APP_API_URL=app.mytender.io:7860" >> $GITHUB_ENV
+          fi
       - name: Clean Install Dependencies
         run: |
           npm install

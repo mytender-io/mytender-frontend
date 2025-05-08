@@ -1,12 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { getAuthenticatedAxios } from "../../test/setup";
+import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 
 const authenticatedAxios = await getAuthenticatedAxios();
+const baseUrl = `http${HTTP_PREFIX}://${API_URL}`;
 
 describe("QA Generator Component", () => {
   it("sends a question to the library chat API", async () => {
     const questionResponse = await authenticatedAxios.post(
-      `https://dev.mytender.io:7861/question_choice_2`,
+      `${baseUrl}/question_choice_2`,
       {
         broadness: "4",
         input_text: "What are the key features of our products?",
@@ -31,7 +33,7 @@ describe("QA Generator Component", () => {
 
   it("sends a multi-step question to generate subsections", async () => {
     const multistepResponse = await authenticatedAxios.post(
-      `https://dev.mytender.io:7861/question_multistep`,
+      `${baseUrl}/question_multistep`,
       {
         choice: "3b",
         broadness: "4",
@@ -65,7 +67,7 @@ describe("QA Generator Component", () => {
 
   it("uses copilot to refine text", async () => {
     const copilotResponse = await authenticatedAxios.post(
-      `https://dev.mytender.io:7861/copilot`,
+      `${baseUrl}/copilot`,
       {
         input_text: "Our company provides excellent service.",
         extra_instructions: "",
@@ -91,7 +93,7 @@ describe("QA Generator Component", () => {
 
   it("performs an internet search using perplexity", async () => {
     const perplexityResponse = await authenticatedAxios.post(
-      `https://dev.mytender.io:7861/perplexity`,
+      `${baseUrl}/perplexity`,
       {
         input_text: "What are the latest trends in renewable energy?",
         dataset: "default"
