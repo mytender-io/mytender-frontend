@@ -164,7 +164,7 @@ const SelectFilePopup = ({
               </span>
             </DialogTitle>
           </DialogHeader>
-          <div className="p-4">
+          <div className="mt-4">
             <SelectFile
               onFileSelect={handleFileSelection}
               initialSelectedFiles={selectedFiles}

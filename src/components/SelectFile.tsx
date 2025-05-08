@@ -179,6 +179,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
 
   const handleFolderClick = (folderPath) => {
     setActiveFolder(folderPath);
+    setCurrentPage(1);
     if (!folderContents[folderPath]) {
       fetchFolderContents(folderPath);
     }
@@ -402,7 +403,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
   };
 
   return (
-    <Card className="h-[22.5rem] bg-white rounded-md shadow-sm p-4">
+    <Card className="h-[22.5rem] bg-white rounded-md shadow-sm p-4 pt-0">
       <CardContent className="h-full p-0 overflow-y-auto">
         <div className="flex flex-col overflow-auto space-y-2">
           <div className="flex justify-between items-center mb-0 min-h-10">
