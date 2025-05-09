@@ -140,7 +140,7 @@ const Home = () => {
       formData.append("status", newStatus);
 
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/update_bid_status/`,
+        `http${HTTP_PREFIX}://${API_URL}/update_bid_status`,
         formData,
         {
           headers: {

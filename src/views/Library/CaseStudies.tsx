@@ -353,7 +353,7 @@ const CaseStudies = () => {
             folder={folder}
             get_collections={get_collections}
             onClose={onClose}
-            apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile/`}
+            apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile`}
             descriptionText="Upload previous bids here for the AI to use as context in the Q&A Generator. This might take a while for large documents because we need to convert the documents into a format the AI can understand so sit tight!"
           />
         </div>
@@ -566,7 +566,7 @@ const CaseStudies = () => {
     formData.append("unique_id", uniqueId);
     try {
       await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/delete_template_entry/`,
+        `http${HTTP_PREFIX}://${API_URL}/delete_template_entry`,
         formData,
         {
           headers: {
@@ -593,7 +593,7 @@ const CaseStudies = () => {
       formData.append("profile_name", folderTitle);
       try {
         await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/delete_template/`,
+          `http${HTTP_PREFIX}://${API_URL}/delete_template`,
           formData,
           {
             headers: {
