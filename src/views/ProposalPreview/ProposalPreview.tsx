@@ -1,12 +1,11 @@
 import { useContext, useRef, useState, useEffect } from "react";
 import { useAuthUser } from "react-auth-kit";
-import withAuth from "../../routes/withAuth";
 import { BidContext } from "../BidWritingStateManagerView";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { Check, Download } from "lucide-react";
+import { Check, Download, TextIcon } from "lucide-react";
 import "./ProposalPreview.css";
 import {
   TooltipContent,
@@ -81,6 +80,10 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
     sectionIndex: number | null;
     content: any | null;
   }>({ sectionIndex: null, content: null });
+  const [wordAdjustSectionIndex, setWordAdjustSectionIndex] = useState<
+    number | null
+  >(null);
+  const [targetWordCount, setTargetWordCount] = useState<number>(0);
 
   // Get sections from shared state
   const { outline } = sharedState;
@@ -788,6 +791,38 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
     setCurrentSectionIndex(index);
   };
 
+  const handleWordAdjustClick = (index: number) => {
+    if (wordAdjustSectionIndex === index) {
+      setWordAdjustSectionIndex(null);
+    } else {
+      setWordAdjustSectionIndex(index);
+      // Set initial target word count based on current section
+      const currentWords = outline[index].word_count;
+      setTargetWordCount(currentWords);
+    }
+  };
+
+  const handleAdjustToWordCount = (
+    sectionIndex: number,
+    targetCount: number
+  ) => {
+    setSharedState((prevState) => {
+      const newOutline = [...prevState.outline];
+      newOutline[sectionIndex] = {
+        ...newOutline[sectionIndex],
+        word_count: targetCount
+      };
+      return {
+        ...prevState,
+        outline: newOutline,
+        isSaved: false
+      };
+    });
+    setTargetWordCount(0);
+    toast.success(`Section adjusted to approximately ${targetCount} words`);
+    setWordAdjustSectionIndex(null);
+  };
+
   return (
     <div className="proposal-preview-container">
       <div>
@@ -934,6 +969,14 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
                               >
                                 <RedoSparkIcon /> Rewrite
                               </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleWordAdjustClick(index)}
+                                className="text-xs text-gray-hint_text"
+                              >
+                                <TextIcon size={14} /> Adjust Words
+                              </Button>
                               <MarkReviewReadyButton
                                 section={section}
                                 index={index}
@@ -943,6 +986,66 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
                                 setSharedState={setSharedState}
                               />
                             </div>
+
+                            {/* Word count adjustment input */}
+                            {wordAdjustSectionIndex === index && (
+                              <div className="mt-2 p-3 border border-gray-200 rounded-md bg-gray-50">
+                                <div className="flex items-center gap-3">
+                                  <div className="flex-1">
+                                    <div className="text-sm mb-1">
+                                      Target word count:
+                                    </div>
+                                    <input
+                                      type="number"
+                                      value={targetWordCount}
+                                      onChange={(e) =>
+                                        setTargetWordCount(
+                                          parseInt(e.target.value) || 0
+                                        )
+                                      }
+                                      className="w-full px-3 py-1 border border-gray-300 rounded"
+                                      min="50"
+                                      max="5000"
+                                    />
+                                  </div>
+                                  <div>
+                                    <div className="text-sm mb-1">Current:</div>
+                                    <div className="text-sm font-medium">
+                                      {section.word_count} words
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex justify-end gap-2 mt-3">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      setWordAdjustSectionIndex(null)
+                                    }
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    variant="default"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleAdjustToWordCount(
+                                        index,
+                                        targetWordCount
+                                      )
+                                    }
+                                    disabled={
+                                      targetWordCount <= 0 || localLoading
+                                    }
+                                  >
+                                    {localLoading ? (
+                                      <Spinner className="w-4 h-4 mr-2" />
+                                    ) : null}
+                                    Adjust
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
                           </div>
 
                           {/* Show a meta info box with section details */}

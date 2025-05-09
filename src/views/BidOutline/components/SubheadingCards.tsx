@@ -231,7 +231,7 @@ const SubheadingCards = ({
                   : ""
               }
               onChange={(value) => handleInstructionsChange(subIndex, value)}
-              className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium border-none md:text-base shadow-none"
+              className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-gray-line rounded-lg !leading-relaxed"
               placeholder="Please write any extra guidance..."
               rows={10}
             />
