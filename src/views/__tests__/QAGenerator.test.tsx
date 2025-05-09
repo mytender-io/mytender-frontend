@@ -13,7 +13,7 @@ describe("QA Generator Component", () => {
         broadness: "4",
         input_text: "What are the key features of our products?",
         extra_instructions: "",
-        datasets: ["default"],
+        datasets: ["default"]
       },
       {
         headers: {
@@ -42,11 +42,6 @@ describe("QA Generator Component", () => {
         selected_choices: ["Environmental Impact", "Social Responsibility"],
         datasets: ["default"],
         word_amounts: ["250", "250"],
-        compliance_requirements: ["", ""],
-        evaluation_criteria: ["", ""],
-        derived_insights: ["", ""],
-        differentiating_factors: ["", ""],
-        writingplans: ["", ""],
         bid_id: ""
       },
       {

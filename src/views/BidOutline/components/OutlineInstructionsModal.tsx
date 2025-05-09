@@ -155,6 +155,8 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
         selected_files: selectedFiles
       });
 
+      console.log(response.data.outline);
+
       setSharedState((prevState) => ({
         ...prevState,
         outline: response.data?.outline || [],

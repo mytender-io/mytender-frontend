@@ -1190,12 +1190,6 @@ const QAGenerator = () => {
       console.log("selectedChoices");
       console.log(selectedChoices);
       console.log(word_amounts);
-      const compliance_requirements = Array(word_amounts.length).fill("");
-      const evaluation_criteria = Array(word_amounts.length).fill("");
-      const derived_insights = Array(word_amounts.length).fill("");
-      const differentiating_factors = Array(word_amounts.length).fill("");
-      const writingplans = Array(word_amounts.length).fill("");
-      console.log(compliance_requirements);
       console.log(selectedBidId);
 
       const result = await axios.post(
@@ -1208,11 +1202,6 @@ const QAGenerator = () => {
           selected_choices: selectedChoices,
           datasets: selectedFolders,
           word_amounts,
-          compliance_requirements: compliance_requirements,
-          evaluation_criteria: evaluation_criteria,
-          derived_insights: derived_insights,
-          differentiating_factors: differentiating_factors,
-          writingplans: writingplans,
           bid_id: selectedBidId
         },
         {
