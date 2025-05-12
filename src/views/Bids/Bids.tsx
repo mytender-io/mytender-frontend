@@ -33,6 +33,7 @@ import { toast } from "react-toastify";
 import { useLoading } from "@/context/LoadingContext";
 import posthog from "posthog-js";
 import FeedbackDialog from "@/modals/FeedbackDialog.tsx";
+import { useUserData } from "@/context/UserDataContext.tsx";
 
 interface Bid {
   _id: string;
@@ -76,6 +77,7 @@ const Bids = () => {
   const tokenRef = useRef(auth?.token || "default");
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const { userProfile } = useUserData();
 
   const [viewType, setViewType] = useState("table"); // or 'kanban'
 
@@ -511,17 +513,33 @@ const Bids = () => {
 
   // Check if this is the user's first visit
   useEffect(() => {
-    const hasVisitedBefore = localStorage.getItem("hasVisitedBefore");
-    if (!hasVisitedBefore) {
-      setShowWelcomeModal(true);
+    if (userProfile) {
+      const hasVisitedBefore = userProfile?.tutorial_complete;
+      if (!hasVisitedBefore) {
+        setShowWelcomeModal(true);
+      }
     }
-  }, []);
+  }, [userProfile]);
 
-  // Handle welcome modal close
-  const handleWelcomeModalClose = () => {
-    localStorage.setItem("hasVisitedBefore", "true");
+  const markTutorialComplete = async (token: string) => {
+    try {
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/tutorial_complete`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+    } catch (err) {
+      console.error("Failed to mark tutorial as complete:", err);
+    }
+  };
+
+  const handleTutorialComplete = () => {
+    markTutorialComplete(tokenRef.current);
     setShowWelcomeModal(false);
-    posthog.capture("first_visit_completed");
   };
 
   return (
@@ -711,7 +729,7 @@ const Bids = () => {
         />
         <WelcomeModal
           isOpen={showWelcomeModal}
-          onClose={handleWelcomeModalClose}
+          onClose={handleTutorialComplete}
         />
       </div>
     </div>
