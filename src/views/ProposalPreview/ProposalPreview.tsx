@@ -824,7 +824,9 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
   };
 
   return (
-    <div className="proposal-preview-container">
+    <div
+      className={`proposal-preview-container ${!feedbackSidepaneOpen ? "feedback-pane-closed" : ""}`}
+    >
       <div>
         {localLoading ? (
           <div className="flex justify-center items-center h-full">

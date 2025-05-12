@@ -79,3 +79,7 @@ h4,
 h5 {
   width: fit-content;
 }
+
+.proposal-preview-container.feedback-pane-closed .feedback-text {
+  background: none !important;
+}
