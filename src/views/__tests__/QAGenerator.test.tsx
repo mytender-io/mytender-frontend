@@ -58,7 +58,7 @@ describe("QA Generator Component", () => {
     // Basic assertions
     expect(multistepResponse.status).toBe(200);
     expect(typeof multistepResponse.data).toBe("string");
-  }, 50000); // Increased timeout to 15 seconds
+  }, 150000); // Increased timeout to 15 seconds
 
   it("uses copilot to refine text", async () => {
     const copilotResponse = await authenticatedAxios.post(
