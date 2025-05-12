@@ -733,7 +733,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     handleSectionChange(index, "question", value)
                   }
                   rows={3}
-                  className="border-gray-border min-h-16 font-medium"
+                  className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-gray-line rounded-lg !leading-relaxed"
                   placeholder="Add in the question here"
                 />
               </div>
