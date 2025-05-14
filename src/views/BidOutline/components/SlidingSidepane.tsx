@@ -636,9 +636,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     <ChevronLeft />
                     Prev
                   </Button>
-                  {/* <span>
-                    Question {index + 1} of {totalSections}
-                  </span> */}
+                
                   <Button
                     variant="ghost"
                     size="icon"
@@ -735,6 +733,18 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   rows={3}
                   className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-gray-line rounded-lg !leading-relaxed"
                   placeholder="Add in the question here"
+                />
+              </div>
+               <div className="space-y-2">
+                <span className="font-medium">Writing Plan</span>
+                <DebouncedTextArea
+                  value={section.writingplan}
+                  onChange={(value) =>
+                    handleSectionChange(index, "writingplan", value)
+                  }
+                  rows={12}
+                  className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-gray-line rounded-lg !leading-relaxed"
+                  placeholder="Add in the writing plan here"
                 />
               </div>
               <SubheadingCards

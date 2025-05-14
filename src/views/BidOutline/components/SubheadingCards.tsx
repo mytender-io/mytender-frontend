@@ -176,7 +176,6 @@ const SubheadingCards = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="font-medium">Writing Plan</span>
         <div className="flex items-center">
           <Button variant="outline" size="icon" onClick={handleAddSubheading}>
             <PlusIcon className="w-4 h-4" />
@@ -224,7 +223,7 @@ const SubheadingCards = ({
                 </div>
               </div>
             </div>
-            <DebouncedTextArea
+            {/* <DebouncedTextArea
               value={
                 subheading.extra_instructions
                   ? `• ${formatAsBullets(subheading.extra_instructions)}`
@@ -234,7 +233,7 @@ const SubheadingCards = ({
               className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-gray-line rounded-lg !leading-relaxed"
               placeholder="Please write any extra guidance..."
               rows={10}
-            />
+            /> */}
           </div>
         ))}
       </div>

@@ -1228,7 +1228,7 @@ const ProposalPlan = ({
             onDelete={() => handleDeleteClick(section, index)}
             onMoveDown={() => handleMoveSection(index, "down")}
             onMoveUp={() => handleMoveSection(index, "up")}
-            onAddSection={() => handleAddSection(index)} 
+            onAddSection={() => handleAddSection(index)}
             isFirst={index === 0}
             isLast={index === outline.length - 1}
           />
