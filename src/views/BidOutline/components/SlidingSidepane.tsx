@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import { MarkdownRenderer } from "@/components/Markdown";
 
 interface HighlightedDocument {
   name: string;
@@ -636,7 +637,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     <ChevronLeft />
                     Prev
                   </Button>
-                
                   <Button
                     variant="ghost"
                     size="icon"
@@ -735,24 +735,18 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   placeholder="Add in the question here"
                 />
               </div>
-               <div className="space-y-2">
+              <div className="space-y-2">
                 <span className="font-medium">Writing Plan</span>
-                <DebouncedTextArea
-                  value={section.writingplan}
-                  onChange={(value) =>
-                    handleSectionChange(index, "writingplan", value)
-                  }
-                  rows={12}
-                  className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-gray-line rounded-lg !leading-relaxed"
-                  placeholder="Add in the writing plan here"
-                />
+                <div className="p-2 border border-gray-line rounded-lg">
+                  <MarkdownRenderer content={section.writingplan} />
+                </div>
               </div>
-              <SubheadingCards
+              {/* <SubheadingCards
                 section={section}
                 index={index}
                 handleSectionChange={handleSectionChange}
                 handleDeleteSubheading={handleDeleteSubheading}
-              />
+              /> */}
               <div className="space-y-6">
                 <div className="space-y-2 min-h-10">
                   <span

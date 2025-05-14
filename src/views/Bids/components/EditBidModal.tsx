@@ -50,7 +50,6 @@ const EditBidModal: React.FC<EditBidModalProps> = ({
   };
 
   useEffect(() => {
-    console.log(currentDeadline);
     setValue(currentValue || "");
     setDeadline(
       currentDeadline
