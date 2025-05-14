@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { useAuthUser } from "react-auth-kit";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
@@ -34,6 +34,8 @@ import { useLoading } from "@/context/LoadingContext";
 import posthog from "posthog-js";
 import FeedbackDialog from "@/modals/FeedbackDialog.tsx";
 import { useUserData } from "@/context/UserDataContext.tsx";
+import EditBidModal from "./components/EditBidModal.tsx";
+import { BidContext } from "../BidWritingStateManagerView.tsx";
 
 interface Bid {
   _id: string;
@@ -61,6 +63,7 @@ interface SortConfig {
 }
 
 const Bids = () => {
+  const { setSharedState } = useContext(BidContext);
   const [bids, setBids] = useState<Bid[]>([]);
   const [filteredBids, setFilteredBids] = useState<Bid[]>([]);
   const [sortedBids, setSortedBids] = useState<Bid[]>([]);
@@ -92,6 +95,9 @@ const Bids = () => {
   const [currentBidForFeedback, setCurrentBidForFeedback] = useState<
     string | null
   >(null);
+
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [bidToEdit, setBidToEdit] = useState<Bid | null>(null);
 
   // Add this function to your Bids component
   const handleFeedbackClick = (bidId: string): void => {
@@ -542,6 +548,56 @@ const Bids = () => {
     setShowWelcomeModal(false);
   };
 
+  // Function to update bid details (value and deadline)
+  const updateBidDetails = async (data: {
+    value: string;
+    submission_deadline: string;
+  }): Promise<void> => {
+    if (!bidToEdit) return;
+
+    setSharedState((prevState) => {
+      return {
+        ...prevState,
+        submission_deadline: data.submission_deadline,
+        value: data.value
+      };
+    });
+
+    try {
+      setBids((prevBids) =>
+        prevBids.map((bid) =>
+          bid._id === bidToEdit._id
+            ? {
+                ...bid,
+                value: data.value,
+                submission_deadline: data.submission_deadline
+              }
+            : bid
+        )
+      );
+
+      toast.success("Bid details updated successfully");
+    } catch (err) {
+      console.log(err);
+      toast.error("Error updating bid details. Please try again.");
+    }
+  };
+
+  const handleEditClick = (bid: Bid): void => {
+    console.log("bid", bid);
+    setBidToEdit(bid);
+    if (bid) {
+      setSharedState((prevState) => {
+        return {
+          ...prevState,
+          object_id: bid?._id || "",
+          timestamp: bid?.timestamp || ""
+        };
+      });
+    }
+    setShowEditModal(true);
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-14">
@@ -672,6 +728,7 @@ const Bids = () => {
                                 handleFeedbackClick(bid._id)
                               }
                               onDuplicateClick={() => duplicateBid(bid._id)}
+                              onEditClick={() => handleEditClick(bid)}
                             />
                           </TableCell>
                         </TableRow>
@@ -727,6 +784,15 @@ const Bids = () => {
           bidId={currentBidForFeedback || undefined}
           token={tokenRef.current}
         />
+
+        <EditBidModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSave={updateBidDetails}
+          currentValue={bidToEdit?.value || ""}
+          currentDeadline={bidToEdit?.submission_deadline || ""}
+        />
+
         <WelcomeModal
           isOpen={showWelcomeModal}
           onClose={handleTutorialComplete}

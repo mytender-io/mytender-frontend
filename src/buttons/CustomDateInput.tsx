@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 
 const CustomDateInput = ({
@@ -6,6 +6,11 @@ const CustomDateInput = ({
   onChange,
   disabled = false,
   defaultValue = new Date().toISOString().split("T")[0] // Default to current date
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  defaultValue?: string;
 }) => {
   const dateInputRef = useRef(null);
   const [displayValue, setDisplayValue] = useState("");
@@ -21,7 +26,7 @@ const CustomDateInput = ({
     }
   }, [value, defaultValue]);
 
-  const formatDate = (date) => {
+  const formatDate = (date: Date) => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();

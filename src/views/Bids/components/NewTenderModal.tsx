@@ -569,7 +569,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                       </Label>
                       <CustomDateInput
                         value={deadline}
-                        onChange={(value) => setDeadline(value)}
+                        onChange={(value: string) => setDeadline(value)}
                         defaultValue={new Date().toISOString().split("T")[0]}
                       />
                     </div>

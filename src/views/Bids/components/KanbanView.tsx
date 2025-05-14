@@ -8,7 +8,15 @@ import { Button } from "@/components/ui/button";
 
 interface KanbanViewProps {
   bids: any[];
-  updateBidStatus: (bidId: string, newStatus: string) => Promise<void>;
+  updateBidStatus: (
+    bidId: string,
+    newStatus:
+      | "Identification"
+      | "Capture Planning"
+      | "First Review"
+      | "Final Review"
+      | "Submitted"
+  ) => Promise<void>;
   navigateToChatbot: (bid: any) => void;
 }
 
@@ -93,7 +101,15 @@ const KanbanView: React.FC<KanbanViewProps> = ({
     setLocalBids(bidsRef.current);
 
     try {
-      await updateBidStatus(draggedBid._id, newStatus);
+      await updateBidStatus(
+        draggedBid._id,
+        newStatus as
+          | "Identification"
+          | "Capture Planning"
+          | "First Review"
+          | "Final Review"
+          | "Submitted"
+      );
     } catch (error) {
       console.error("Failed to update status:", error);
       // Revert both ref and state on failure
