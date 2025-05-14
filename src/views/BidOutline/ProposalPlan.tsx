@@ -1,16 +1,9 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 import { BidContext, Section, Subheading } from "../BidWritingStateManagerView";
 import StatusMenu from "../../buttons/StatusMenu";
-import SectionMenu from "../../buttons/SectionMenu";
 import posthog from "posthog-js";
 import ProposalSidepane from "./components/SlidingSidepane";
 // import ReviewerDropdown from "./components/ReviewerDropdown";
@@ -87,15 +80,8 @@ const ProposalPlan = ({
 
   const { object_id, contributors, outline } = sharedState;
 
-  // Use the UserDataContext hook to get organization users
   const { organizationUsers, isLoading: isOrganizationUsersLoading } =
     useUserData();
-  // const currentUserPermission = contributors[auth.email] || "viewer";
-
-  const [contextMenu, setContextMenu] = useState<Record<string, number> | null>(
-    null
-  );
-  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [selectedSections, setSelectedSections] = useState(new Set());
 
@@ -307,39 +293,8 @@ const ProposalPlan = ({
     });
   };
 
-  const handleContextMenu = (
-    e: React.MouseEvent<HTMLTableRowElement, MouseEvent>,
-    index: number
-  ) => {
-    e.preventDefault();
-    setContextMenu({ x: e.clientX, y: e.clientY });
-    setSelectedRowIndex(index);
-
-    posthog.capture("context_menu_opened", {
-      sectionId: outline[index].section_id,
-      bidId: object_id
-    });
-  };
-
-  const handleClickOutside = useCallback(
-    (e) => {
-      if (contextMenu && !e.target.closest(".context-menu")) {
-        setContextMenu(null);
-        setSelectedRowIndex(null);
-      }
-    },
-    [contextMenu]
-  );
-
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, [contextMenu, handleClickOutside]);
-
-  const handleAddSection = async (targetIndex?: number) => {
-    // If targetIndex is provided, use it; otherwise use selectedRowIndex from context menu
-    const insertIndex =
-      targetIndex !== undefined ? targetIndex + 1 : selectedRowIndex;
+  const handleAddSection = async (targetIndex: number) => {
+    const insertIndex = targetIndex + 1;
 
     // Return early if no object_id or no valid index to insert at
     if (!object_id || insertIndex === null) return;
@@ -386,33 +341,6 @@ const ProposalPlan = ({
     } catch (err) {
       console.error("Error adding section:", err);
       toast.error("Failed to add section");
-    }
-
-    // Only clear context menu if this was triggered from context menu
-    if (targetIndex === undefined) {
-      setContextMenu(null);
-    }
-  };
-
-  const handleDeleteSection = async (
-    sectionId: string,
-    sectionIndex: number
-  ) => {
-    try {
-      posthog.capture("proposal_section_delete_started", {
-        bidId: object_id,
-        sectionId,
-        sectionIndex
-      });
-
-      await deleteSection(sectionId, sectionIndex);
-    } catch (err) {
-      console.log(err);
-      posthog.capture("proposal_section_delete_failed", {
-        bidId: object_id,
-        sectionId,
-        error: err.message
-      });
     }
   };
 
@@ -1331,16 +1259,6 @@ const ProposalPlan = ({
               title="Delete Section"
               message="Are you sure you want to delete this section? This action cannot be undone."
             />
-
-            {contextMenu && (
-              <SectionMenu
-                x={contextMenu.x}
-                y={contextMenu.y}
-                onClose={() => setContextMenu(null)}
-                onAddSection={handleAddSection}
-                onDeleteSection={handleDeleteSection}
-              />
-            )}
 
             {selectedSection !== null && !isOrganizationUsersLoading && (
               <ProposalSidepane

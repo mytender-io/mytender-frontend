@@ -27,8 +27,6 @@ const BidNavbar: React.FC<{
   activeTab,
   handleTabClick
 }) => {
-  const navigate = useNavigate();
-
   const { sharedState } = useContext(BidContext);
 
   const baseNavLinkStyles =
