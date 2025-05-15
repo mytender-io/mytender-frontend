@@ -602,6 +602,8 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     );
   };
 
+  const [editingWritingPlan, setEditingWritingPlan] = useState(false);
+
   if (!section) return null;
 
   return (
@@ -802,10 +804,37 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
               </div>
               {section.writingplan && section.writingplan.trim() ? (
                 <div className="space-y-2">
-                  <span className="font-medium">Writing Plan</span>
-                  <div className="p-2 border border-gray-line rounded-lg">
-                    <MarkdownRenderer content={section.writingplan} />
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-medium">Writing Plan</span>
+                    {editingWritingPlan && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setEditingWritingPlan(false)}
+                        className="ml-auto"
+                      >
+                        Save
+                      </Button>
+                    )}
                   </div>
+                  {editingWritingPlan ? (
+                    <DebouncedTextArea
+                      value={section.writingplan}
+                      onChange={(value) =>
+                        handleSectionChange(index, "writingplan", value)
+                      }
+                      className="w-full focus:outline-none focus-visible:ring-0 font-mono"
+                      placeholder="Enter Markdown content here..."
+                      rows={20}
+                    />
+                  ) : (
+                    <div
+                      onClick={() => setEditingWritingPlan(true)}
+                      className="px-2 border border-gray-line rounded-lg cursor-pointer"
+                    >
+                      <MarkdownRenderer content={section.writingplan} />
+                    </div>
+                  )}
                 </div>
               ) : null}
               {/* <SubheadingCards
