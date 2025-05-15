@@ -474,15 +474,7 @@ const ProposalPlan = ({
           [field]: value,
           status: "In Progress"
         };
-
-        // Track automatic status change
-        posthog.capture("proposal_section_status_auto_changed", {
-          bidId: object_id,
-          sectionIndex: index,
-          previousStatus: "Not Started",
-          newStatus: "In Progress",
-          triggerField: field
-        });
+        
       } else {
         newOutline[index] = {
           ...newOutline[index],
@@ -498,24 +490,6 @@ const ProposalPlan = ({
 
       // Wait for state to update
       await new Promise((resolve) => setTimeout(resolve, 0));
-
-      // Track status changes
-      if (field === "status") {
-        posthog.capture("proposal_section_status_changed", {
-          bidId: object_id,
-          sectionIndex: index,
-          newStatus: value
-        });
-      }
-
-      // Track answer changes
-      if (field === "answer") {
-        posthog.capture("proposal_section_answer_updated", {
-          bidId: object_id,
-          sectionIndex: index,
-          answerLength: value.length
-        });
-      }
 
       return true; // Indicate successful update
     } catch (error) {

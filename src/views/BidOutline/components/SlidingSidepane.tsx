@@ -94,19 +94,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     }));
   };
 
-  // Initialize highlighted documents specifically for this section
-  const [highlightedDocuments, setHighlightedDocuments] = useState<
-    HighlightedDocument[]
-  >(() => {
-    // Ensure we're getting the correct highlighted documents for this specific section
-    return section?.highlightedDocuments || [];
-  });
-  // Whenever the section prop changes, update the local state
-  useEffect(() => {
-    setHighlightedDocuments(section?.highlightedDocuments || []);
-    console.log(section);
-  }, [section]);
-
   // For tracking loading states of document content fetching
   const [loadingDocuments, setLoadingDocuments] = useState<{
     [key: string]: boolean;
@@ -148,8 +135,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     }
   };
 
-  // This is a partial implementation showing only the changes needed for the highlightedDocuments logic
-
+  // Update the handleSaveSelectedFiles function
   const handleSaveSelectedFiles = async (selectedFilesWithMetadata) => {
     console.log("Received files with metadata:", selectedFilesWithMetadata);
 
@@ -159,13 +145,8 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     }
 
     // Convert to HighlightedDocument objects with the correct rawtext
-    const documentObjects: HighlightedDocument[] = await Promise.all(
+    const documentObjects = await Promise.all(
       selectedFilesWithMetadata.map(async (file) => {
-        // Try to find existing document to preserve its rawtext if already fetched
-        const existingDoc = highlightedDocuments.find(
-          (doc) => doc.name === file.filename
-        );
-
         // If existing document has rawtext, use it; otherwise, fetch the content
         const rawtext = await getFileContent(file.filename, file.folder);
 
@@ -177,21 +158,60 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
       })
     );
 
-    // Update the state and section with the new document objects
-    setHighlightedDocuments(documentObjects);
+    // Update section through parent's change handler directly without setting local state
     handleSectionChange(index, "highlightedDocuments", documentObjects);
   };
 
-  const handleRemoveDocument = (document: HighlightedDocument) => {
-    const updatedDocs = highlightedDocuments.filter(
+  // Update the handleRemoveDocument function
+  const handleRemoveDocument = (document) => {
+    // Filter the document from the section's highlightedDocuments
+    const updatedDocs = section.highlightedDocuments.filter(
       (doc) => doc.name !== document.name
     );
 
-    // Update local state
-    setHighlightedDocuments(updatedDocs);
-
     // Update section through parent's change handler
     handleSectionChange(index, "highlightedDocuments", updatedDocs);
+  };
+
+  // Update the handleSaveSelectedTenderFiles function
+  const handleSaveSelectedTenderFiles = async (selectedFilesWithMetadata) => {
+    console.log(
+      "Received tender files with metadata:",
+      selectedFilesWithMetadata
+    );
+
+    if (!selectedFilesWithMetadata || selectedFilesWithMetadata.length === 0) {
+      console.log("No tender files selected, keeping existing documents");
+      return;
+    }
+
+    // Convert to HighlightedDocument objects with the correct rawtext
+    const documentObjects = await Promise.all(
+      selectedFilesWithMetadata.map(async (file) => {
+        // If existing document has rawtext, use it; otherwise, fetch the content
+        const rawtext = await getFileContent(file.filename, file.folder);
+
+        return {
+          name: file.filename,
+          folder: file.folder,
+          rawtext: rawtext
+        };
+      })
+    );
+
+    // Update section through parent's change handler directly
+    handleSectionChange(index, "highlightedTenderDocuments", documentObjects);
+  };
+
+  // Update the handleRemoveTenderDocument function
+  const handleRemoveTenderDocument = (document) => {
+    // Filter the document from the section's highlightedTenderDocuments
+    const updatedDocs = section.highlightedTenderDocuments.filter(
+      (doc) => doc.name !== document.name
+    );
+
+    // Update section through parent's change handler
+    handleSectionChange(index, "highlightedTenderDocuments", updatedDocs);
   };
 
   // Function to remove a win theme
@@ -231,11 +251,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     // Update section through parent's change handler
     handleSectionChange(index, "relevant_derived_insights", updatedPainPoints);
   };
-
-  // Get just the file names for the SelectFilePopup component
-  const selectedFileNames = useMemo(() => {
-    return highlightedDocuments.map((doc) => doc.name);
-  }, [highlightedDocuments]);
 
   // Function to parse bullet points into an array
   const parseBulletPoints = (text: string): string[] => {
@@ -637,6 +652,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                     <ChevronLeft />
                     Prev
                   </Button>
+
                   <Button
                     variant="ghost"
                     size="icon"
@@ -667,7 +683,17 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   />
                   <SelectFilePopup
                     onSaveSelectedFiles={handleSaveSelectedFiles}
-                    initialSelectedFiles={selectedFileNames}
+                    initialSelectedFiles={
+                      section?.highlightedDocuments?.map((doc) => doc.name) ||
+                      []
+                    }
+                    onSaveSelectedTenderFiles={handleSaveSelectedTenderFiles}
+                    initialTenderSelectedFiles={
+                      section?.highlightedTenderDocuments?.map(
+                        (doc) => doc.name
+                      ) || []
+                    }
+                    bid_id={sharedState.object_id}
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -688,11 +714,13 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 </div>
               </div>
 
-              {/* Selected Files Display */}
-              {highlightedDocuments.length > 0 && (
+              {section?.highlightedDocuments?.length > 0 && (
                 <div className="space-y-2 min-h-10">
+                  <span className="text-xs font-medium text-gray-500">
+                    Content Library Documents:
+                  </span>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {highlightedDocuments.map((doc, idx) => (
+                    {section.highlightedDocuments.map((doc, idx) => (
                       <Badge
                         key={idx}
                         className={cn(
@@ -723,6 +751,43 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 </div>
               )}
 
+              {section?.highlightedTenderDocuments?.length > 0 && (
+                <div className="mt-2 mb-1">
+                  <span className="text-xs font-medium text-gray-500">
+                    Tender Documents:
+                  </span>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {section.highlightedTenderDocuments.map((doc, idx) => (
+                      <Badge
+                        key={`tender-${idx}`}
+                        className={cn(
+                          "flex items-center gap-1 px-2 py-1 border text-sm",
+                          loadingDocuments[doc.name]
+                            ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                            : doc.rawtext
+                              ? "bg-purple-50 text-purple-700 border-purple-200"
+                              : "bg-indigo-50 text-indigo-700 border-indigo-200"
+                        )}
+                      >
+                        <FileIcon className="h-3 w-3" />
+                        <span className="max-w-xs truncate">{doc.name}</span>
+                        {loadingDocuments[doc.name] && (
+                          <span className="ml-1 text-xs">(loading...)</span>
+                        )}
+                        <Button
+                          onClick={() => handleRemoveTenderDocument(doc)}
+                          variant="ghost"
+                          size="icon"
+                          className="ml-1 h-4 w-4 p-0"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <span className="font-medium">Question</span>
                 <DebouncedTextArea
@@ -735,12 +800,14 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   placeholder="Add in the question here"
                 />
               </div>
-              <div className="space-y-2">
-                <span className="font-medium">Writing Plan</span>
-                <div className="p-2 border border-gray-line rounded-lg">
-                  <MarkdownRenderer content={section.writingplan} />
+              {section.writingplan && section.writingplan.trim() ? (
+                <div className="space-y-2">
+                  <span className="font-medium">Writing Plan</span>
+                  <div className="p-2 border border-gray-line rounded-lg">
+                    <MarkdownRenderer content={section.writingplan} />
+                  </div>
                 </div>
-              </div>
+              ) : null}
               {/* <SubheadingCards
                 section={section}
                 index={index}
