@@ -24,7 +24,37 @@ ReactGA4.initialize("G-X8S1ZMRM3C");
 // Initialize PostHog
 posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
   api_host: "https://eu.i.posthog.com",
-  person_profiles: "identified_only"
+  person_profiles: "identified_only",
+  loaded: (ph) => {
+    let checkInterval
+
+    // Called every time a new session starts
+    ph.onSessionId((sessionId) => {
+      clearInterval(checkInterval)
+
+      // Setup a check for the recording completion condition
+      checkInterval = setInterval(() => {
+        const { 
+          lastActivityTimestamp, 
+          sessionId 
+        } = ph.sessionManager.checkAndGetSessionAndWindowId(true)
+          
+        const sinceLastActivity = Math.abs(new Date().getTime() - lastActivityTimestamp)
+        const fiveMinutesInMillis = 5 * 60 * 1000
+        
+        if (sinceLastActivity > fiveMinutesInMillis) {
+          // Send an event to trigger the Slack notification
+          ph.capture('recording_completed', {
+            sessionURL: ph.get_session_replay_url({ withTimestamp: true }),
+            sessionId: sessionId,
+          })
+
+          // Only send notification once
+          clearInterval(checkInterval)
+        }
+      }, 5000)
+    })
+  }
 });
 
 // Create a separate component for the authenticated content
