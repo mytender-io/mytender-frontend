@@ -25,27 +25,29 @@ ReactGA4.initialize("G-X8S1ZMRM3C");
 posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
   api_host: "https://eu.i.posthog.com",
   person_profiles: "identified_only",
-  loaded: (ph) => {
+  loaded: () => {
     let checkInterval
 
     // Called every time a new session starts
-    ph.onSessionId((sessionId) => {
+    posthog.onSessionId((sessionId) => {
       clearInterval(checkInterval)
 
       // Setup a check for the recording completion condition
       checkInterval = setInterval(() => {
+        // Use the global posthog instance
         const { 
           lastActivityTimestamp, 
-          sessionId 
-        } = ph.sessionManager.checkAndGetSessionAndWindowId(true)
+          sessionId: currentSessionId 
+        } = posthog.sessionManager.checkAndGetSessionAndWindowId(true)
           
         const sinceLastActivity = Math.abs(new Date().getTime() - lastActivityTimestamp)
         const fiveMinutesInMillis = 5 * 60 * 1000
         
         if (sinceLastActivity > fiveMinutesInMillis) {
+          console.log("Session idle detected, sending event");
           // Send an event to trigger the Slack notification
-          ph.capture('recording_completed', {
-            sessionURL: ph.get_session_replay_url({ withTimestamp: true }),
+          posthog.capture('session_idle_for_five_minutes', {
+            sessionURL: posthog.get_session_replay_url({ withTimestamp: true }),
             sessionId: sessionId,
           })
 
