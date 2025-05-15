@@ -673,17 +673,17 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                 <Button
                   type="button"
                   onClick={handleNextStep}
-                  // disabled={isBidCreating}
+                  disabled={isBidCreating}
                 >
-                  {/* {isBidCreating ? (
+                {isBidCreating ? (
                     <>
                       <Spinner className="mr-2 h-4 w-4" color="text-white" />
                       Creating Bid...
                     </>
                   ) : (
                     "Next Step →"
-                  )} */}
-                  Next Step →
+                  )} 
+                
                 </Button>
               ) : currentStep === "questions" ? (
                 <Button type="submit" disabled={isGeneratingOutline}>
