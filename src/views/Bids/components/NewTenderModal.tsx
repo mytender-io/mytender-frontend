@@ -23,6 +23,7 @@ import { cn } from "@/utils";
 import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal";
 import { useNotification } from "@/context/NotificationContext";
 import { Spinner } from "@/components/ui/spinner";
+import { Dictionary } from "lodash";
 
 interface NewTenderModalProps {
   show: boolean;
@@ -177,7 +178,36 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     }
   };
 
-  const handleNextStep = () => {
+  // Function to create a new bid
+  const createNewBid = async (bidData) => {
+    try {
+      const formData = new FormData();
+      formData.append("bid_title", bidData.bidInfo);
+      formData.append("value", bidData.value);
+      formData.append("submission_deadline", bidData.submission_deadline);
+      formData.append("new_bid_completed", bidData.new_bid_completed);
+
+      // Make the POST request to the endpoint
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/create_new_bid`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error("Error creating new bid:", error);
+      throw error;
+    }
+  };
+
+  // Modified handleNextStep function
+  const handleNextStep = async () => {
     if (currentStep === "details") {
       if (!clientName) {
         setErrorMessage("Tender name cannot be empty.");
@@ -188,27 +218,34 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       // Set loading state to true
       setIsBidCreating(true);
 
-      setSharedState((prevState) => ({
-        ...prevState,
+      // Prepare bid data
+      const bidData = {
         bidInfo: clientName,
         value: contractValue,
         submission_deadline: deadline,
-        original_creator: auth.email,
-        contributors: auth.email ? { [auth.email]: "admin" } : {},
         new_bid_completed: false
-      }));
+      };
 
-      setIsBidCreating(true);
-      if (!sharedState.object_id || sharedState.object_id === "") {
-        toast.warning(
-          "The bid is still being created. Please wait a couple seconds and try again."
+      try {
+        // Call the createNewBid function
+        const result = await createNewBid(bidData);
+
+        // Update shared state with the response data
+        setSharedState((prevState) => ({
+          ...prevState,
+          ...bidData,
+          object_id: result.bid_id, // Store the returned bid_id
+          timestamp: result.timestamp // Store the timestamp
+        }));
+
+        setIsBidCreating(false);
+        setCurrentStep("documents");
+      } catch (error) {
+        setIsBidCreating(false);
+        toast.error(
+          `Failed to create bid: ${error.response?.data?.detail || error.message}`
         );
-
-        return;
       }
-      setIsBidCreating(false);
-      setCurrentStep("documents");
-
     } else if (currentStep === "documents") {
       if (!isDocumentsStepValid()) {
         toast.error("Please upload at least one document");
@@ -223,7 +260,6 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       setCurrentStep("questions");
     }
   };
-
   // Handle keyboard events
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -283,12 +319,6 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       const response = await outlinePromise;
 
       console.log("outline final submit");
-      console.log(response.data.outline);
-      console.log(response.data.tender_summary);
-      console.log(response.data.evaluation_criteria);
-      console.log(response.data.pain_points);
-      console.log(response.data.differentiation_opportunities);
-      console.log(response.data?.newbid_completed);
 
       // Navigate after updating shared state
       navigate("/bids");
@@ -322,11 +352,9 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       // Reset shared state to initial values while preserving user info
       setSharedState({
         ...initialModalState,
-        original_creator: auth?.email || "",
-        contributors: auth?.email ? { [auth?.email]: "admin" } : {}
       });
     }
-  }, [show, auth?.email, setSharedState]);
+  }, [show]);
 
   // Separate form reset logic
   const resetForm = () => {
@@ -377,7 +405,6 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     }
   };
 
-  // Handle confirmed close
   // Handle confirmed close with bid deletion
   const handleConfirmedClose = async () => {
     try {
@@ -656,7 +683,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                   ) : (
                     "Next Step →"
                   )} */}
-                   Next Step →
+                  Next Step →
                 </Button>
               ) : currentStep === "questions" ? (
                 <Button type="submit" disabled={isGeneratingOutline}>
