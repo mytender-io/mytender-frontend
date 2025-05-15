@@ -22,6 +22,7 @@ import {
 import { cn } from "@/utils";
 import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal";
 import { useNotification } from "@/context/NotificationContext";
+import { Spinner } from "@/components/ui/spinner";
 
 interface NewTenderModalProps {
   show: boolean;
@@ -61,6 +62,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectedFolders, setSelectedFolders] = useState([]);
   const [currentStep, setCurrentStep] = useState<Step>("details");
+  const [isBidCreating, setIsBidCreating] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -182,6 +184,10 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         return;
       }
       setErrorMessage(""); // Clear error message if validation passes
+
+      // Set loading state to true
+      setIsBidCreating(true);
+
       setSharedState((prevState) => ({
         ...prevState,
         bidInfo: clientName,
@@ -192,16 +198,17 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
         new_bid_completed: false
       }));
 
-      console.log("bid_id", sharedState.object_id);
-
-      // Check if the bid has been created successfully
+      setIsBidCreating(true);
       if (!sharedState.object_id || sharedState.object_id === "") {
         toast.warning(
-          "The bid is still being created. Please wait a moment and try again."
+          "The bid is still being created. Please wait a couple seconds and try again."
         );
+
         return;
       }
+      setIsBidCreating(false);
       setCurrentStep("documents");
+
     } else if (currentStep === "documents") {
       if (!isDocumentsStepValid()) {
         toast.error("Please upload at least one document");
@@ -310,6 +317,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       setSelectedFiles([]);
       setSelectedFolders([]);
       setCurrentStep("details");
+      setIsBidCreating(false);
 
       // Reset shared state to initial values while preserving user info
       setSharedState({
@@ -634,7 +642,23 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
               >
                 Back
               </Button>
-              {currentStep === "questions" ? (
+              {currentStep === "details" ? (
+                <Button
+                  type="button"
+                  onClick={handleNextStep}
+                  // disabled={isBidCreating}
+                >
+                  {/* {isBidCreating ? (
+                    <>
+                      <Spinner className="mr-2 h-4 w-4" color="text-white" />
+                      Creating Bid...
+                    </>
+                  ) : (
+                    "Next Step →"
+                  )} */}
+                   Next Step →
+                </Button>
+              ) : currentStep === "questions" ? (
                 <Button type="submit" disabled={isGeneratingOutline}>
                   {isGeneratingOutline ? "Creating..." : "Create Tender"}
                 </Button>
