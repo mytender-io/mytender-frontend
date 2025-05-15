@@ -51,6 +51,7 @@ export interface Section {
   relevant_derived_insights: string;
   relevant_differentiation_factors: string;
   highlightedDocuments: HighlightedDocument[];
+  highlightedTenderDocuments: HighlightedDocument[];
   review_ready: boolean;
   feedback_summaries: FeedbackSummaries[];
 }

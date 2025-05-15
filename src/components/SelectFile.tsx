@@ -79,7 +79,8 @@ const SelectFile: React.FC<SelectFileProps> = ({
       const folders = availableCollections.filter(
         (collection: string) =>
           !collection.includes("FORWARDSLASH") &&
-          !collection.startsWith("TenderLibrary_")
+          !collection.startsWith("TenderLibrary_") &&
+          collection !== "default"
       );
 
       // Sort the folders to put "default" first
