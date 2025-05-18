@@ -47,42 +47,198 @@ interface TenderInsightData {
   summary?: string;
 }
 
-const LoadingState = () => {
+// Define a type for the loading step
+interface LoadingStep {
+  icon: React.ElementType;
+  text: string;
+}
+
+// Define loading steps for each category
+const summariseTenderSteps: LoadingStep[] = [
+  { icon: Search, text: "Scanning tender document structure..." },
+  { icon: Filter, text: "Identifying key sections and clauses..." },
+  { icon: FileText, text: "Extracting core requirements and objectives..." },
+  { icon: Gauge, text: "Analyzing document length and complexity..." },
+  { icon: Brain, text: "Parsing main topics and themes..." },
+  { icon: Sparkles, text: "Generating initial summary draft..." },
+  { icon: FileSearch, text: "Cross-referencing information for consistency..." },
+  { icon: Lightbulb, text: "Refining summary for clarity and conciseness..." },
+  { icon: Target, text: "Highlighting critical action points..." },
+  { icon: CheckCircle2, text: "Finalizing tender overview..." },
+  { icon: Search, text: "Indexing document content for quick access..." },
+  { icon: Filter, text: "Filtering out boilerplate and standard terms..." },
+  { icon: FileText, text: "Detailing specific deliverables mentioned..." },
+  { icon: Gauge, text: "Assessing submission deadlines and milestones..." },
+  { icon: Brain, text: "Connecting related concepts across document..." },
+  { icon: Sparkles, text: "Structuring summary with key headings..." },
+  { icon: FileSearch, text: "Verifying numerical data and figures..." },
+  { icon: Lightbulb, text: "Ensuring summary captures client's tone..." },
+  { icon: Target, text: "Isolating implicit needs and expectations..." },
+  { icon: CheckCircle2, text: "Preparing executive summary version..." }
+];
+
+const winThemesSteps: LoadingStep[] = [
+  { icon: Scale, text: "Analyzing evaluation criteria..." },
+  { icon: Target, text: "Identifying key client success metrics..." },
+  { icon: Telescope, text: "Researching client's strategic priorities..." },
+  { icon: Crosshair, text: "Mapping our strengths to client needs..." },
+  { icon: Brain, text: "Brainstorming compelling value propositions..." },
+  { icon: Star, text: "Defining unique selling points (USPs)..." },
+  { icon: Lightbulb, text: "Crafting core messaging for win themes..." },
+  { icon: ClipboardCheck, text: "Aligning win themes with tender requirements..." },
+  { icon: ChartBar, text: "Developing supporting evidence for themes..." },
+  { icon: CheckCircle2, text: "Finalizing impactful win strategy..." },
+  { icon: Scale, text: "Deconstructing scoring mechanism..." },
+  { icon: Target, text: "Understanding client's desired outcomes..." },
+  { icon: Telescope, text: "Investigating client's past projects and vendors..." },
+  { icon: Crosshair, text: "Highlighting our proven track record..." },
+  { icon: Brain, text: "Developing 'golden threads' for the bid..." },
+  { icon: Star, text: "Articulating benefits of our USPs..." },
+  { icon: Lightbulb, text: "Testing theme resonance and impact..." },
+  { icon: ClipboardCheck, text: "Ensuring themes address all key criteria..." },
+  { icon: ChartBar, text: "Quantifying benefits and ROI for client..." },
+  { icon: CheckCircle2, text: "Embedding win themes throughout proposal..." }
+];
+
+const painPointsSteps: LoadingStep[] = [
+  { icon: FileSearch, text: "Reviewing client background information..." },
+  { icon: Filter, text: "Identifying stated and unstated client challenges..." },
+  { icon: Telescope, text: "Analyzing market context for client pressures..." },
+  { icon: Search, text: "Looking for expressions of need or dissatisfaction..." },
+  { icon: Brain, text: "Mapping challenges to potential solutions..." },
+  { icon: Gauge, text: "Understanding the impact of identified pain points..." },
+  { icon: Target, text: "Prioritizing most critical client issues..." },
+  { icon: Lightbulb, text: "Empathizing with client perspective..." },
+  { icon: ChartBar, text: "Gathering insights on problem severity..." },
+  { icon: CheckCircle2, text: "Consolidating list of key client pain points..." },
+  { icon: FileSearch, text: "Examining client's annual reports and publications..." },
+  { icon: Filter, text: "Distinguishing between symptoms and root causes..." },
+  { icon: Telescope, text: "Assessing industry trends affecting the client..." },
+  { icon: Search, text: "Searching for client feedback or public statements..." },
+  { icon: Brain, text: "Validating solutions against client constraints..." },
+  { icon: Gauge, text: "Quantifying the cost of inaction for client..." },
+  { icon: Target, text: "Focusing on pain points we can uniquely solve..." },
+  { icon: Lightbulb, text: "Articulating pain points in client's language..." },
+  { icon: ChartBar, text: "Corroborating pain points with multiple sources..." },
+  { icon: CheckCircle2, text: "Structuring solutions around resolved pain points..." }
+];
+
+const differentiationFactorsSteps: LoadingStep[] = [
+  { icon: ChartBar, text: "Analyzing competitive landscape overview..." },
+  { icon: Telescope, text: "Identifying key competitor strengths and weaknesses..." },
+  { icon: Scale, text: "Benchmarking our capabilities against rivals..." },
+  { icon: Search, text: "Pinpointing gaps in competitor offerings..." },
+  { icon: Sparkles, text: "Highlighting our unique technological advantages..." },
+  { icon: Lightbulb, text: "Showcasing our innovative approaches..." },
+  { icon: Star, text: "Emphasizing superior service or quality..." },
+  { icon: FileText, text: "Leveraging past successes and testimonials..." },
+  { icon: Brain, text: "Defining clear differentiating messages..." },
+  { icon: CheckCircle2, text: "Preparing strategy to outperform competition..." },
+  { icon: ChartBar, text: "Mapping competitor positioning and strategies..." },
+  { icon: Telescope, text: "Researching competitor client feedback..." },
+  { icon: Scale, text: "Identifying our relative market position..." },
+  { icon: Search, text: "Exploring unmet client needs in the market..." },
+  { icon: Sparkles, text: "Detailing our intellectual property and patents..." },
+  { icon: Lightbulb, text: "Illustrating our agile and adaptive methodologies..." },
+  { icon: Star, text: "Providing evidence of customer satisfaction..." },
+  { icon: FileText, text: "Crafting case studies that highlight differentiation..." },
+  { icon: Brain, text: "Developing counter-arguments to competitor claims..." },
+  { icon: CheckCircle2, text: "Integrating differentiators into value proposition..." }
+];
+
+const complianceRequirementsSteps: LoadingStep[] = [
+  { icon: FileSearch, text: "Scanning for mandatory requirements sections..." },
+  { icon: Filter, text: "Extracting all compliance-related clauses..." },
+  { icon: ClipboardCheck, text: "Creating detailed compliance checklist..." },
+  { icon: FileText, text: "Verifying document submission formats..." },
+  { icon: Scale, text: "Checking for legal and regulatory obligations..." },
+  { icon: Brain, text: "Cross-referencing against internal policies..." },
+  { icon: Crosshair, text: "Identifying potential compliance risks..." },
+  { icon: Target, text: "Confirming all necessary certifications..." },
+  { icon: Sparkles, text: "Preparing compliance matrix..." },
+  { icon: CheckCircle2, text: "Final review of all compliance documentation..." },
+  { icon: FileSearch, text: "Searching for specific formatting and submission guidelines..." },
+  { icon: Filter, text: "Categorizing compliance items (e.g., technical, legal)..." },
+  { icon: ClipboardCheck, text: "Assigning responsibility for each compliance item..." },
+  { icon: FileText, text: "Ensuring all appendices and attachments are correct..." },
+  { icon: Scale, text: "Validating against latest industry standards..." },
+  { icon: Brain, text: "Reviewing internal QA procedures for compliance..." },
+  { icon: Crosshair, text: "Developing mitigation plans for compliance risks..." },
+  { icon: Target, text: "Gathering proof of certifications and qualifications..." },
+  { icon: Sparkles, text: "Populating compliance matrix with evidence links..." },
+  { icon: CheckCircle2, text: "Performing peer review of compliance checklist..." }
+];
+
+const genericLoadingSteps: LoadingStep[] = [
+  { icon: Search, text: "Scanning tender documents..." },
+  { icon: Filter, text: "Filtering relevant sections..." },
+  { icon: FileText, text: "Extracting key requirements..." },
+  { icon: Target, text: "Identifying evaluation criteria..." },
+  { icon: Brain, text: "Processing requirements..." },
+  { icon: Crosshair, text: "Detecting critical success factors..." },
+  { icon: ChartBar, text: "Analysing competitive landscape..." },
+  { icon: Gauge, text: "Evaluating market positioning..." },
+  { icon: Telescope, text: "Exploring strategic opportunities..." },
+  { icon: Lightbulb, text: "Generating innovative insights..." },
+  { icon: CheckCircle2, text: "Finalizing recommendations..." },
+  { icon: Sparkles, text: "Polishing final output..." },
+  { icon: Search, text: "Deep scanning annexes and addenda..." },
+  { icon: Filter, text: "Prioritizing high-value sections..." },
+  { icon: FileText, text: "Deconstructing complex requirements..." },
+  { icon: Target, text: "Aligning criteria with solution capabilities..." },
+  { icon: Brain, text: "Synthesizing diverse data inputs..." },
+  { icon: Crosshair, text: "Mapping success factors to bid strategy..." },
+  { icon: ChartBar, text: "Projecting potential bid outcomes..." },
+  { icon: Gauge, text: "Calibrating strategic fit with tender..." },
+  { icon: Telescope, text: "Uncovering latent needs and possibilities..." },
+  { icon: Lightbulb, text: "Structuring insights for clarity..." },
+  { icon: CheckCircle2, text: "Validating recommendations with data..." },
+  { icon: Sparkles, text: "Ensuring compelling narrative flow..." }
+];
+
+export type LoadingCategory = 
+  | "Summarise Tender" 
+  | "Win Themes" 
+  | "Pain Points" 
+  | "Differentiation Factors" 
+  | "Compliance Requirements" 
+  | "Generic";
+
+interface LoadingStateProps {
+  loadingCategory: LoadingCategory;
+}
+
+const LoadingState = ({ loadingCategory }: LoadingStateProps) => {
   const [activeStep, setActiveStep] = useState(0);
-  const steps = [
-    { icon: Search, text: "Scanning tender documents..." },
-    { icon: Filter, text: "Filtering relevant sections..." },
-    { icon: FileText, text: "Extracting key requirements..." },
-    { icon: Target, text: "Identifying evaluation criteria..." },
-    { icon: Brain, text: "Processing requirements..." },
-    { icon: Crosshair, text: "Detecting critical success factors..." },
-    { icon: ChartBar, text: "Analysing competitive landscape..." },
-    { icon: Gauge, text: "Evaluating market positioning..." },
-    { icon: Telescope, text: "Exploring strategic opportunities..." },
-    { icon: Lightbulb, text: "Generating innovative insights..." },
-    { icon: FileSearch, text: "Cross-referencing tender documents..." },
-    { icon: Telescope, text: "Identifying hidden opportunities..." },
-    { icon: ClipboardCheck, text: "Verifying compliance checklist..." },
-    { icon: Scale, text: "Weighing risk factors..." },
-    { icon: Target, text: "Pinpointing client's core needs..." },
-    { icon: Brain, text: "Synthesizing complex data points..." },
-    { icon: Lightbulb, text: "Formulating unique selling propositions..." },
-    { icon: Sparkles, text: "Refining strategic approach..." },
-    { icon: ChartBar, text: "Visualizing success pathways..." },
-    { icon: CheckCircle2, text: "Preparing final strategic overview..." },
-    { icon: CheckCircle2, text: "Finalizing recommendations..." },
-    { icon: Sparkles, text: "Polishing final output..." }
-  ];
+
+  const getStepsForCategory = (category: LoadingCategory): LoadingStep[] => {
+    switch (category) {
+      case "Summarise Tender":
+        return summariseTenderSteps;
+      case "Win Themes":
+        return winThemesSteps;
+      case "Pain Points":
+        return painPointsSteps;
+      case "Differentiation Factors":
+        return differentiationFactorsSteps;
+      case "Compliance Requirements":
+        return complianceRequirementsSteps;
+      default:
+        return genericLoadingSteps; // Fallback to generic steps
+    }
+  };
+
+  const steps = getStepsForCategory(loadingCategory);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
-    }, 2500);
+    }, 2500); // User updated this value
     return () => clearInterval(interval);
-  }, []);
+  }, [steps]); // Add steps to dependency array to re-init if category changes while loading (though unlikely)
 
   return (
-    <div className={cn("w-80")}>
+    <div className={cn("w-96")}>
       <div className={cn("flex flex-col space-y-3")}>
         <div className="p-2">
           {steps.map((step, index) => {
@@ -602,7 +758,7 @@ const TenderAnalysis = () => {
                         "absolute top-14 left-0 z-10 bg-white rounded-lg shadow-2xl"
                       )}
                     >
-                      <LoadingState />
+                      <LoadingState loadingCategory={tab.name as LoadingCategory} />
                     </div>
                   )}
                   <TabIcon
