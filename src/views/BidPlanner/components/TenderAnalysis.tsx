@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect, useRef } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { API_URL, HTTP_PREFIX } from "../../../helper/Constants";
 import { BidContext } from "../../BidWritingStateManagerView";
 import { useAuthUser } from "react-auth-kit";
@@ -32,6 +32,21 @@ import InterrogateTenderDialog from "./InterrogateTender";
 import AddCompetitors from "./AddCompetitors";
 import { useGeneratingTenderInsightContext } from "@/context/GeneratingTenderInsightContext";
 
+interface TabData {
+  name: string;
+  Icon: React.ElementType;
+  prompt: string;
+  stateKey: string;
+  summaryKey?: string;
+  extract_insights_prompt?: string;
+}
+
+interface TenderInsightData {
+  requirements?: string;
+  analysis?: string;
+  summary?: string;
+}
+
 const LoadingState = () => {
   const [activeStep, setActiveStep] = useState(0);
   const steps = [
@@ -45,6 +60,16 @@ const LoadingState = () => {
     { icon: Gauge, text: "Evaluating market positioning..." },
     { icon: Telescope, text: "Exploring strategic opportunities..." },
     { icon: Lightbulb, text: "Generating innovative insights..." },
+    { icon: FileSearch, text: "Cross-referencing tender documents..." },
+    { icon: Telescope, text: "Identifying hidden opportunities..." },
+    { icon: ClipboardCheck, text: "Verifying compliance checklist..." },
+    { icon: Scale, text: "Weighing risk factors..." },
+    { icon: Target, text: "Pinpointing client's core needs..." },
+    { icon: Brain, text: "Synthesizing complex data points..." },
+    { icon: Lightbulb, text: "Formulating unique selling propositions..." },
+    { icon: Sparkles, text: "Refining strategic approach..." },
+    { icon: ChartBar, text: "Visualizing success pathways..." },
+    { icon: CheckCircle2, text: "Preparing final strategic overview..." },
     { icon: CheckCircle2, text: "Finalizing recommendations..." },
     { icon: Sparkles, text: "Polishing final output..." }
   ];
@@ -52,7 +77,7 @@ const LoadingState = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
-    }, 1265.625);
+    }, 2500);
     return () => clearInterval(interval);
   }, []);
 
@@ -108,6 +133,9 @@ const TenderAnalysis = () => {
   const mounted = useRef(false);
   const regenerateBtnRef = useRef<HTMLButtonElement | null>(null);
 
+  // Add a type for the shared state keys to satisfy the compiler for computed property names
+  type SharedStateKeys = keyof typeof sharedState;
+
   const [editMode, setEditMode] = useState<number | null>(null);
   const [editContent, setEditContent] = useState<string>("");
 
@@ -128,7 +156,7 @@ const TenderAnalysis = () => {
     4: compliance_requirements || ""
   });
 
-  const tabs = [
+  const tabs: TabData[] = [
     {
       name: "Summarise Tender",
       Icon: FileText,
@@ -188,7 +216,7 @@ const TenderAnalysis = () => {
     compliance_requirements
   ]);
 
-  const handleTabChange = (_, newValue: number) => {
+  const handleTabChange = (_event: unknown, newValue: number) => {
     if (loadingBidTab !== null) {
       toast.warning("Please wait until the current generation completes.");
       return;
@@ -197,7 +225,7 @@ const TenderAnalysis = () => {
     setCurrentTabIndex(newValue); // Only handle the tab switch
   };
 
-  const assign_insights_to_questions = async (bid_intel_type, tab) => {
+  const assign_insights_to_questions = async (bid_intel_type: string | undefined, tab: TabData) => {
     // Return early if no extract_insights_prompt exists on the tab
     if (!tab.extract_insights_prompt) {
       return;
@@ -210,8 +238,13 @@ const TenderAnalysis = () => {
 
     const formData = new FormData();
     formData.append("bid_id", object_id);
-    formData.append("bid_intel_type", bid_intel_type);
-    formData.append("extract_insights_prompt", tab.extract_insights_prompt);
+    if (bid_intel_type) {
+      formData.append("bid_intel_type", bid_intel_type);
+    }
+    // Ensure extract_insights_prompt is a string before appending
+    if (tab.extract_insights_prompt) {
+      formData.append("extract_insights_prompt", tab.extract_insights_prompt);
+    }
 
     const result = await axios.post(
       `http${HTTP_PREFIX}://${API_URL}/assign_insights_to_outline_questions`,
@@ -230,7 +263,7 @@ const TenderAnalysis = () => {
     }));
   };
 
-  const handleTabClick = async (index) => {
+  const handleTabClick = async (index: number) => {
     if (loadingBidTab !== null) {
       toast.warning("Please wait until the current generation completes.");
       return;
@@ -277,33 +310,40 @@ const TenderAnalysis = () => {
 
       const generatedContent = result.data.requirements || result.data.analysis;
       setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
-      setSharedState((prev) => ({ ...prev, [tab.stateKey]: generatedContent }));
+      setSharedState((prev) => ({ ...prev, [tab.stateKey as SharedStateKeys]: generatedContent }));
 
       // Only update summary if it exists in response and we have a summaryKey
       if (result.data.summary && tab.summaryKey) {
         setSharedState((prev) => ({
           ...prev,
-          [tab.summaryKey]: result.data.summary
+          [tab.summaryKey as SharedStateKeys]: result.data.summary
         }));
       }
 
       // Pass the tab object to assign_insights_to_questions
       await assign_insights_to_questions(tab.summaryKey, tab);
       toast.success("Generated successfully!");
-    } catch (err) {
-      console.log(err);
-      const errorMsg =
-        err.response?.status === 404
-          ? "No documents found in the tender library. Please upload documents before generating"
-          : "An error occurred while generating. Please try again.";
-      if (err.response?.status === 404) toast.warning(errorMsg);
-      else toast.error(errorMsg);
+    } catch (error) {
+      console.log(error);
+      let errorMsg = "An error occurred while generating. Please try again.";
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response?.status === 404) {
+          errorMsg =
+            "No documents found in the tender library. Please upload documents before generating";
+          toast.warning(errorMsg);
+        } else {
+          toast.error(errorMsg);
+        }
+      } else {
+        toast.error(errorMsg);
+      }
     } finally {
       setLoadingBidTab(null);
     }
   };
 
-  const handleCompliance = async (index) => {
+  const handleCompliance = async (index: number) => {
     if (!object_id) {
       toast.warning("Please save the bid first.");
       return;
@@ -333,19 +373,27 @@ const TenderAnalysis = () => {
         setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
         setSharedState((prev) => ({
           ...prev,
-          [tab.stateKey]: generatedContent
+          [tab.stateKey as SharedStateKeys]: generatedContent
         }));
 
         toast.success("Compliance requirements generated successfully!");
       }
-    } catch (err) {
+    } catch (error) {
       if (mounted.current) {
-        const errorMsg =
-          err.response?.status === 404
-            ? "No documents found in the tender library. Please upload documents before generating"
-            : "An error occurred while generating compliance requirements. Please try again.";
-        if (err.response?.status === 404) toast.warning(errorMsg);
-        else toast.error(errorMsg);
+        let errorMsg =
+          "An error occurred while generating compliance requirements. Please try again.";
+        if (axios.isAxiosError(error)) {
+          const axiosError = error as AxiosError;
+          if (axiosError.response?.status === 404) {
+            errorMsg =
+              "No documents found in the tender library. Please upload documents before generating";
+            toast.warning(errorMsg);
+          } else {
+            toast.error(errorMsg);
+          }
+        } else {
+          toast.error(errorMsg);
+        }
       }
     } finally {
       if (mounted.current) {
@@ -354,7 +402,7 @@ const TenderAnalysis = () => {
     }
   };
 
-  const handleRegenerateClick = async (index, event) => {
+  const handleRegenerateClick = async (index: number, event: React.MouseEvent) => {
     event.stopPropagation();
     if (!object_id) {
       toast.warning("Please save the bid first.");
@@ -398,7 +446,7 @@ const TenderAnalysis = () => {
       setTabContent((prev) => ({ ...prev, [index]: editContent }));
       setSharedState((prev) => ({
         ...prev,
-        [tab.stateKey]: editContent
+        [tab.stateKey as SharedStateKeys]: editContent
       }));
       setEditMode(null);
       toast.success("Content updated successfully!");
@@ -447,9 +495,10 @@ const TenderAnalysis = () => {
         object_id
       ) {
         const tab = tabs[loadingBidTab];
+        const insightData = tenderInsight.data as TenderInsightData;
 
         const generatedContent =
-          tenderInsight.data.requirements || tenderInsight.data.analysis;
+          insightData.requirements || insightData.analysis;
 
         setTabContent((prev) => ({
           ...prev,
@@ -457,13 +506,13 @@ const TenderAnalysis = () => {
         }));
         setSharedState((prev) => ({
           ...prev,
-          [tab.stateKey]: generatedContent
+          [tab.stateKey as SharedStateKeys]: generatedContent
         }));
 
-        if (tenderInsight.data.summary && tab.summaryKey) {
+        if (insightData.summary && tab.summaryKey) {
           setSharedState((prev) => ({
             ...prev,
-            [tab.summaryKey]: tenderInsight.data.summary
+            [tab.summaryKey as SharedStateKeys]: insightData.summary
           }));
         }
 
@@ -502,21 +551,25 @@ const TenderAnalysis = () => {
           </Button>
 
           {/* We use the `open` prop to control the dialog state */}
-          <TenderLibraryChatDialog
-            bid_id={object_id}
-            open={chatDialogOpen}
-            onOpenChange={setChatDialogOpen}
-          />
+          {object_id && (
+            <TenderLibraryChatDialog
+              bid_id={object_id}
+              open={chatDialogOpen}
+              onOpenChange={setChatDialogOpen}
+            />
+          )}
 
-          <InterrogateTenderDialog
-            bid_id={object_id}
-            triggerComponent={
-              <Button>
-                <Search className="h-5 w-5 text-white" />
-                Query Docs
-              </Button>
-            }
-          />
+          {object_id && (
+            <InterrogateTenderDialog
+              bid_id={object_id}
+              triggerComponent={
+                <Button>
+                  <Search className="h-5 w-5 text-white" />
+                  Query Docs
+                </Button>
+              }
+            />
+          )}
         </div>
       </div>
       <div className={cn("h-full border border-gray-line rounded-md mb-4")}>
@@ -543,7 +596,7 @@ const TenderAnalysis = () => {
                   )}
                   disabled={loadingBidTab !== null && loadingBidTab !== index}
                 >
-                  {loadingBidTab === index && (
+                  {loadingBidTab === index && object_id && (
                     <div
                       className={cn(
                         "absolute top-14 left-0 z-10 bg-white rounded-lg shadow-2xl"
@@ -568,7 +621,7 @@ const TenderAnalysis = () => {
                       onClick={(e) => handleRegenerateClick(index, e)}
                       variant="ghost"
                       size="icon"
-                      disabled={loadingBidTab !== null}
+                      disabled={loadingBidTab !== null || !object_id}
                       className={cn(
                         "bg-gray-line hover:bg-orange-100 hover:text-orange h-6 w-6 min-w-6",
                         currentTabIndex === index &&
@@ -593,7 +646,7 @@ const TenderAnalysis = () => {
                 className="h-full pt-0 mt-0"
               >
                 <div className={cn("relative px-8 py-4 h-full")}>
-                  {tab.stateKey === "differentiation_opportunities" && (
+                  {tab.stateKey === "differentiation_opportunities" && object_id && (
                     <AddCompetitors
                       setTabContent={setTabContent}
                       setSharedState={setSharedState}
