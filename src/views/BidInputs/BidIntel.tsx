@@ -335,6 +335,7 @@ const BidIntel = ({
         userProfile={userProfile}
         organizationUsers={organizationUsers}
         isLoading={isLoading}
+        bid_id={sharedState.object_id}
       />
 
       {/* Solution Accordion */}

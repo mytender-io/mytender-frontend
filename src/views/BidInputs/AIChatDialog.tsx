@@ -23,6 +23,7 @@ import ThumbdownIcon from "@/components/icons/ThumbdownIcon";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
+import { formatResponse } from "@/utils/formatResponse"; // Import the same formatter as TenderLibraryChatDialog
 
 interface Message {
   type: "user" | "bot";
@@ -45,6 +46,7 @@ interface AIChatDialogProps {
   userProfile: any;
   organizationUsers: any;
   isLoading: boolean;
+  bid_id?: string; // Added bid_id as an optional prop
 }
 
 const AIChatDialog = ({
@@ -55,7 +57,8 @@ const AIChatDialog = ({
   auth,
   userProfile,
   organizationUsers,
-  isLoading
+  isLoading,
+  bid_id // Default to empty string if not provided
 }: AIChatDialogProps) => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -185,7 +188,7 @@ const AIChatDialog = ({
 
     if (inputValue.trim() !== "") {
       setMessages([...messages, { type: "user", text: inputValue }]);
-      sendQuestion();
+      sendQuestion(inputValue);
       setInputValue("");
     }
   };
@@ -226,8 +229,8 @@ const AIChatDialog = ({
     onOpenChange(false);
   };
 
-  // Send question to tender library API
-  const sendQuestion = async () => {
+  // Send question to tender library API - using the same endpoint as TenderLibraryChatDialog
+  const sendQuestion = async (question: string) => {
     setIsChatLoading(true);
 
     // Add a temporary bot message with loading dots
@@ -236,14 +239,26 @@ const AIChatDialog = ({
       { type: "bot", text: "loading" }
     ]);
 
+    const backgroundInfo = messages
+      .map((msg) => `${msg.type}: ${msg.text}`)
+      .join("\n");
+
+    console.log("conversational history");
+    console.log(backgroundInfo);
+
     try {
+      // Use the same endpoint and request structure as TenderLibraryChatDialog
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question_choice_2`,
+        `http${HTTP_PREFIX}://${API_URL}/ask_tender_library_question`,
         {
-          broadness: "8",
-          input_text: inputValue,
-          extra_instructions: "",
-          datasets: ["default"]
+          question: question,
+          chat_history: backgroundInfo,
+          bid_id: bid_id || "", // Use bid_id if provided, otherwise empty string
+          // Add any additional context about pain points and win themes
+          additional_context: JSON.stringify({
+            current_pain_points: items.painPoints,
+            current_win_themes: items.winThemes
+          })
         },
         {
           headers: {
@@ -253,15 +268,15 @@ const AIChatDialog = ({
       );
 
       // Replace loading message with actual response
-      const response = result.data;
+      const formattedResponse = formatResponse(result.data);
 
       setMessages((prevMessages) => [
         ...prevMessages.slice(0, -1),
-        { type: "bot", text: response }
+        { type: "bot", text: formattedResponse }
       ]);
 
       // Start typing animation
-      typeMessage(response);
+      typeMessage(formattedResponse);
     } catch (error) {
       console.error("Error sending tender docs question:", error);
 
