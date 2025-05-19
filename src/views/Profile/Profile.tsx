@@ -76,7 +76,7 @@ const ProfilePage = () => {
   const [inviteError, setInviteError] = useState("");
   const [inviteSuccess, setInviteSuccess] = useState("");
 
-    const { organizationUsers } = useUserData();
+  const { organizationUsers } = useUserData();
 
   const [companyObjectivesSaveState, setCompanyObjectivesSaveState] =
     useState("normal");
@@ -114,7 +114,7 @@ const ProfilePage = () => {
             }
           }
         );
-  
+
         setFormData({
           username: profileResponse.data.login || "",
           email: profileResponse.data.email || "",
@@ -128,10 +128,10 @@ const ProfilePage = () => {
           toneOfVoice: profileResponse.data.tone_of_voice || "",
           profilePicture: profileResponse.data.company_logo || ""
         });
-  
+
         // Now fetch company objectives
         await fetchCompanyObjectives();
-        
+
         // Only set loading to false when all data is fetched
         setLoading(false);
       } catch (err) {
@@ -140,7 +140,7 @@ const ProfilePage = () => {
         setLoading(false);
       }
     };
-  
+
     loadAllData();
   }, [tokenRef]);
 
@@ -162,8 +162,6 @@ const ProfilePage = () => {
         ...prev,
         companyObjectives: response.data.company_objectives || ""
       }));
-
-    
     } catch (err) {
       console.error("Failed to fetch company objectives:", err);
       toast.error("Failed to load company objectives");
@@ -231,7 +229,6 @@ const ProfilePage = () => {
       // Refresh the user list
       const refreshFormData = new FormData();
       refreshFormData.append("include_pending", "true");
-
     } catch (err) {
       console.error("Error changing user permissions:", err);
       if (err.response && err.response.data && err.response.data.detail) {
@@ -817,27 +814,22 @@ const ProfilePage = () => {
                           )}
                         </div>
                       </div>
-                      {isEditingObjectives ? (
+                      {companyObjectives ? (
                         <Textarea
                           name="companyObjectives"
                           value={companyObjectives}
                           onChange={(e) => setCompanyObjectives(e.target.value)}
-                          className="min-h-[150px]"
+                          className="min-h-[150px] disabled:opacity-80"
                           placeholder="Enter your company objectives here..."
+                          disabled={!isEditingObjectives}
                         />
                       ) : (
                         <div
                           className={cn(
-                            "min-h-[150px] h-[150px] p-8 bg-gray-50 text-gray-500 border border-gray-200 rounded-md",
-                            companyObjectives
-                              ? "overflow-y-auto"
-                              : "flex items-center justify-center"
+                            "flex items-center justify-center first-letter:min-h-[150px] h-[150px] px-3 py-2 border border-input rounded-md text-sm"
                           )}
-                          style={{ wordBreak: "break-word" }}
                         >
-                          {companyObjectives
-                            ? companyObjectives
-                            : "No company objectives available."}
+                          No company objectives available.
                         </div>
                       )}
                     </form>
