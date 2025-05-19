@@ -21,6 +21,8 @@ import CopyIcon from "@/components/icons/CopyIcon";
 import ThumbupIcon from "@/components/icons/ThumbupIcon";
 import ThumbdownIcon from "@/components/icons/ThumbdownIcon";
 import ProfilePhoto from "@/layout/ProfilePhoto";
+import axios from "axios";
+import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 
 interface Message {
   type: "user" | "bot";
@@ -188,11 +190,6 @@ const AIChatDialog = ({
     }
   };
 
-  // Mock suggestions generator
-  const generateMockSuggestions = () => {
-    return "Here are my suggestions for your bid:\n\n*Customer Pain Points:*\n1. Consider adding a point about difficulty with current solution scalability\n2. The pain point about budget constraints could be more specific\n3. Add a point about integration issues with existing systems\n\n*Win Themes:*\n1. Your win theme about cost savings could be strengthened with specific metrics\n2. Consider adding a theme about your proven implementation methodology\n3. Highlight your unique approach to post-implementation support";
-  };
-
   // Handle updating with AI suggestions
   const handleUpdateWithAISuggestions = () => {
     // Process bot responses to extract suggestions
@@ -229,7 +226,7 @@ const AIChatDialog = ({
     onOpenChange(false);
   };
 
-  // Simulate API call to process message
+  // Send question to tender library API
   const sendQuestion = async () => {
     setIsChatLoading(true);
 
@@ -239,21 +236,50 @@ const AIChatDialog = ({
       { type: "bot", text: "loading" }
     ]);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      // This would be replaced with actual API call
-      const mockResponse = `I've analyzed your bid proposal content and here are my suggestions:\n\n${generateMockSuggestions()}`;
+    try {
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/question_choice_2`,
+        {
+          broadness: "8",
+          input_text: inputValue,
+          extra_instructions: "",
+          datasets: ["default"]
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${auth?.token}`
+          }
+        }
+      );
 
       // Replace loading message with actual response
+      const response = result.data;
+
       setMessages((prevMessages) => [
         ...prevMessages.slice(0, -1),
-        { type: "bot", text: mockResponse }
+        { type: "bot", text: response }
       ]);
 
       // Start typing animation
-      typeMessage(mockResponse);
-      setIsChatLoading(false);
-    }, 1500);
+      typeMessage(response);
+    } catch (error) {
+      console.error("Error sending tender docs question:", error);
+
+      // Replace the loading message with an error message
+      setMessages((prevMessages) => [
+        ...prevMessages.slice(0, -1),
+        {
+          type: "bot",
+          text:
+            error.response?.status === 400
+              ? "Message failed, please contact support..."
+              : error.message ||
+                "An error occurred while processing your request"
+        }
+      ]);
+    }
+
+    setIsChatLoading(false);
   };
 
   // Handle key events
