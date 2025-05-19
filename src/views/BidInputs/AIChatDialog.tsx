@@ -193,40 +193,52 @@ const AIChatDialog = ({
     }
   };
 
-  // Handle updating with AI suggestions
-  const handleUpdateWithAISuggestions = () => {
-    // Process bot responses to extract suggestions
-    const allSuggestions = messages
-      .filter((msg) => msg.type === "bot")
-      .flatMap((msg) => msg.text.split("\n"))
-      .filter((line) => /^\d+\./.test(line.trim()));
+  const handleUpdateWithAISuggestions = async () => {
+    try {
+      // Show loading state
+      toast.info("Processing suggestions...");
 
-    const painPointSuggestions = allSuggestions
-      .filter((line) => {
-        const lowerCaseLine = line.toLowerCase();
-        return (
-          lowerCaseLine.includes("pain") ||
-          (lowerCaseLine.includes("customer") && !lowerCaseLine.includes("win"))
-        );
-      })
-      .map((line) => line.replace(/^\d+\.\s*/, "").trim())
-      .filter((line) => line.length > 0);
+      // Extract all conversation messages to send to the API
+      const conversationHistory = messages
+        .map((msg) => `${msg.type}: ${msg.text}`)
+        .join("\n");
 
-    const winThemeSuggestions = allSuggestions
-      .filter((line) => {
-        const lowerCaseLine = line.toLowerCase();
-        return lowerCaseLine.includes("win") || lowerCaseLine.includes("theme");
-      })
-      .map((line) => line.replace(/^\d+\.\s*/, "").trim())
-      .filter((line) => line.length > 0);
+      // Call the specialized endpoint for extracting suggestions
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/apply_bid_input_suggestions`,
+        {
+          chat_history: conversationHistory,
+          bid_id: bid_id || ""
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${auth?.token}`
+          }
+        }
+      );
 
-    if (painPointSuggestions.length === 0 && winThemeSuggestions.length === 0) {
-      toast.error("No valid suggestions found in the conversation");
-      return;
+      // Extract pain points and win themes from the response
+      const { pain_points = [], win_themes = [] } = result.data;
+
+      // Verify we got something back
+      if (pain_points.length === 0 && win_themes.length === 0) {
+        toast.warning("No suggestions were found in the conversation");
+        return;
+      }
+
+      // Apply the suggestions
+      onApplySuggestions(pain_points, win_themes);
+
+      // Close the dialog and show success message
+      onOpenChange(false);
+      toast.success(`Win themes and pain points updated`);
+    } catch (error) {
+      console.error("Error applying suggestions:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to process suggestions. Please try again."
+      );
     }
-
-    onApplySuggestions(painPointSuggestions, winThemeSuggestions);
-    onOpenChange(false);
   };
 
   // Send question to tender library API - using the same endpoint as TenderLibraryChatDialog
