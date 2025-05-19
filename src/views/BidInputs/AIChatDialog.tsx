@@ -249,16 +249,11 @@ const AIChatDialog = ({
     try {
       // Use the same endpoint and request structure as TenderLibraryChatDialog
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/ask_tender_library_question`,
+        `http${HTTP_PREFIX}://${API_URL}/ask_bid_inputs_question`,
         {
           question: question,
           chat_history: backgroundInfo,
-          bid_id: bid_id || "", // Use bid_id if provided, otherwise empty string
-          // Add any additional context about pain points and win themes
-          additional_context: JSON.stringify({
-            current_pain_points: items.painPoints,
-            current_win_themes: items.winThemes
-          })
+          bid_id: bid_id || ""
         },
         {
           headers: {
