@@ -24,6 +24,7 @@ import ProfilePhoto from "@/layout/ProfilePhoto";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import { formatResponse } from "@/utils/formatResponse"; // Import the same formatter as TenderLibraryChatDialog
+import { Spinner } from "@/components/ui/spinner";
 
 interface Message {
   type: "user" | "bot";
@@ -72,6 +73,7 @@ const AIChatDialog = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const typingWorkerRef = useRef<number | null>(null);
   const fullResponseRef = useRef<string>("");
+  const [isApplying, setIsApplying] = useState(false);
 
   // Initialize with system greeting when the dialog opens
   useEffect(() => {
@@ -197,7 +199,7 @@ const AIChatDialog = ({
     try {
       // Show loading state
       toast.info("Processing suggestions...");
-
+      setIsApplying(true);
       // Extract all conversation messages to send to the API
       const conversationHistory = messages
         .map((msg) => `${msg.type}: ${msg.text}`)
@@ -231,13 +233,14 @@ const AIChatDialog = ({
 
       // Close the dialog and show success message
       onOpenChange(false);
-      toast.success(`Win themes and pain points updated`);
     } catch (error) {
       console.error("Error applying suggestions:", error);
       toast.error(
         error.response?.data?.message ||
           "Failed to process suggestions. Please try again."
       );
+    } finally {
+      setIsApplying(false);
     }
   };
 
@@ -556,8 +559,15 @@ const AIChatDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleUpdateWithAISuggestions}>
-            Apply Suggestions
+          <Button onClick={handleUpdateWithAISuggestions} disabled={isApplying}>
+            {isApplying ? (
+              <>
+                <Spinner color="text-white" />
+                Processing...
+              </>
+            ) : (
+              "Apply Suggestions"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
