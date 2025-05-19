@@ -61,7 +61,10 @@ const summariseTenderSteps: LoadingStep[] = [
   { icon: Gauge, text: "Analyzing document length and complexity..." },
   { icon: Brain, text: "Parsing main topics and themes..." },
   { icon: Sparkles, text: "Generating initial summary draft..." },
-  { icon: FileSearch, text: "Cross-referencing information for consistency..." },
+  {
+    icon: FileSearch,
+    text: "Cross-referencing information for consistency..."
+  },
   { icon: Lightbulb, text: "Refining summary for clarity and conciseness..." },
   { icon: Target, text: "Highlighting critical action points..." },
   { icon: CheckCircle2, text: "Finalizing tender overview..." },
@@ -85,12 +88,18 @@ const winThemesSteps: LoadingStep[] = [
   { icon: Brain, text: "Brainstorming compelling value propositions..." },
   { icon: Star, text: "Defining unique selling points (USPs)..." },
   { icon: Lightbulb, text: "Crafting core messaging for win themes..." },
-  { icon: ClipboardCheck, text: "Aligning win themes with tender requirements..." },
+  {
+    icon: ClipboardCheck,
+    text: "Aligning win themes with tender requirements..."
+  },
   { icon: ChartBar, text: "Developing supporting evidence for themes..." },
   { icon: CheckCircle2, text: "Finalizing impactful win strategy..." },
   { icon: Scale, text: "Deconstructing scoring mechanism..." },
   { icon: Target, text: "Understanding client's desired outcomes..." },
-  { icon: Telescope, text: "Investigating client's past projects and vendors..." },
+  {
+    icon: Telescope,
+    text: "Investigating client's past projects and vendors..."
+  },
   { icon: Crosshair, text: "Highlighting our proven track record..." },
   { icon: Brain, text: "Developing 'golden threads' for the bid..." },
   { icon: Star, text: "Articulating benefits of our USPs..." },
@@ -102,48 +111,96 @@ const winThemesSteps: LoadingStep[] = [
 
 const painPointsSteps: LoadingStep[] = [
   { icon: FileSearch, text: "Reviewing client background information..." },
-  { icon: Filter, text: "Identifying stated and unstated client challenges..." },
+  {
+    icon: Filter,
+    text: "Identifying stated and unstated client challenges..."
+  },
   { icon: Telescope, text: "Analyzing market context for client pressures..." },
-  { icon: Search, text: "Looking for expressions of need or dissatisfaction..." },
+  {
+    icon: Search,
+    text: "Looking for expressions of need or dissatisfaction..."
+  },
   { icon: Brain, text: "Mapping challenges to potential solutions..." },
-  { icon: Gauge, text: "Understanding the impact of identified pain points..." },
+  {
+    icon: Gauge,
+    text: "Understanding the impact of identified pain points..."
+  },
   { icon: Target, text: "Prioritizing most critical client issues..." },
   { icon: Lightbulb, text: "Empathizing with client perspective..." },
   { icon: ChartBar, text: "Gathering insights on problem severity..." },
-  { icon: CheckCircle2, text: "Consolidating list of key client pain points..." },
-  { icon: FileSearch, text: "Examining client's annual reports and publications..." },
+  {
+    icon: CheckCircle2,
+    text: "Consolidating list of key client pain points..."
+  },
+  {
+    icon: FileSearch,
+    text: "Examining client's annual reports and publications..."
+  },
   { icon: Filter, text: "Distinguishing between symptoms and root causes..." },
-  { icon: Telescope, text: "Assessing industry trends affecting the client..." },
-  { icon: Search, text: "Searching for client feedback or public statements..." },
+  {
+    icon: Telescope,
+    text: "Assessing industry trends affecting the client..."
+  },
+  {
+    icon: Search,
+    text: "Searching for client feedback or public statements..."
+  },
   { icon: Brain, text: "Validating solutions against client constraints..." },
   { icon: Gauge, text: "Quantifying the cost of inaction for client..." },
   { icon: Target, text: "Focusing on pain points we can uniquely solve..." },
   { icon: Lightbulb, text: "Articulating pain points in client's language..." },
-  { icon: ChartBar, text: "Corroborating pain points with multiple sources..." },
-  { icon: CheckCircle2, text: "Structuring solutions around resolved pain points..." }
+  {
+    icon: ChartBar,
+    text: "Corroborating pain points with multiple sources..."
+  },
+  {
+    icon: CheckCircle2,
+    text: "Structuring solutions around resolved pain points..."
+  }
 ];
 
 const differentiationFactorsSteps: LoadingStep[] = [
   { icon: ChartBar, text: "Analyzing competitive landscape overview..." },
-  { icon: Telescope, text: "Identifying key competitor strengths and weaknesses..." },
+  {
+    icon: Telescope,
+    text: "Identifying key competitor strengths and weaknesses..."
+  },
   { icon: Scale, text: "Benchmarking our capabilities against rivals..." },
   { icon: Search, text: "Pinpointing gaps in competitor offerings..." },
-  { icon: Sparkles, text: "Highlighting our unique technological advantages..." },
+  {
+    icon: Sparkles,
+    text: "Highlighting our unique technological advantages..."
+  },
   { icon: Lightbulb, text: "Showcasing our innovative approaches..." },
   { icon: Star, text: "Emphasizing superior service or quality..." },
   { icon: FileText, text: "Leveraging past successes and testimonials..." },
   { icon: Brain, text: "Defining clear differentiating messages..." },
-  { icon: CheckCircle2, text: "Preparing strategy to outperform competition..." },
+  {
+    icon: CheckCircle2,
+    text: "Preparing strategy to outperform competition..."
+  },
   { icon: ChartBar, text: "Mapping competitor positioning and strategies..." },
   { icon: Telescope, text: "Researching competitor client feedback..." },
   { icon: Scale, text: "Identifying our relative market position..." },
   { icon: Search, text: "Exploring unmet client needs in the market..." },
-  { icon: Sparkles, text: "Detailing our intellectual property and patents..." },
-  { icon: Lightbulb, text: "Illustrating our agile and adaptive methodologies..." },
+  {
+    icon: Sparkles,
+    text: "Detailing our intellectual property and patents..."
+  },
+  {
+    icon: Lightbulb,
+    text: "Illustrating our agile and adaptive methodologies..."
+  },
   { icon: Star, text: "Providing evidence of customer satisfaction..." },
-  { icon: FileText, text: "Crafting case studies that highlight differentiation..." },
+  {
+    icon: FileText,
+    text: "Crafting case studies that highlight differentiation..."
+  },
   { icon: Brain, text: "Developing counter-arguments to competitor claims..." },
-  { icon: CheckCircle2, text: "Integrating differentiators into value proposition..." }
+  {
+    icon: CheckCircle2,
+    text: "Integrating differentiators into value proposition..."
+  }
 ];
 
 const complianceRequirementsSteps: LoadingStep[] = [
@@ -156,17 +213,44 @@ const complianceRequirementsSteps: LoadingStep[] = [
   { icon: Crosshair, text: "Identifying potential compliance risks..." },
   { icon: Target, text: "Confirming all necessary certifications..." },
   { icon: Sparkles, text: "Preparing compliance matrix..." },
-  { icon: CheckCircle2, text: "Final review of all compliance documentation..." },
-  { icon: FileSearch, text: "Searching for specific formatting and submission guidelines..." },
-  { icon: Filter, text: "Categorizing compliance items (e.g., technical, legal)..." },
-  { icon: ClipboardCheck, text: "Assigning responsibility for each compliance item..." },
-  { icon: FileText, text: "Ensuring all appendices and attachments are correct..." },
+  {
+    icon: CheckCircle2,
+    text: "Final review of all compliance documentation..."
+  },
+  {
+    icon: FileSearch,
+    text: "Searching for specific formatting and submission guidelines..."
+  },
+  {
+    icon: Filter,
+    text: "Categorizing compliance items (e.g., technical, legal)..."
+  },
+  {
+    icon: ClipboardCheck,
+    text: "Assigning responsibility for each compliance item..."
+  },
+  {
+    icon: FileText,
+    text: "Ensuring all appendices and attachments are correct..."
+  },
   { icon: Scale, text: "Validating against latest industry standards..." },
   { icon: Brain, text: "Reviewing internal QA procedures for compliance..." },
-  { icon: Crosshair, text: "Developing mitigation plans for compliance risks..." },
-  { icon: Target, text: "Gathering proof of certifications and qualifications..." },
-  { icon: Sparkles, text: "Populating compliance matrix with evidence links..." },
-  { icon: CheckCircle2, text: "Performing peer review of compliance checklist..." }
+  {
+    icon: Crosshair,
+    text: "Developing mitigation plans for compliance risks..."
+  },
+  {
+    icon: Target,
+    text: "Gathering proof of certifications and qualifications..."
+  },
+  {
+    icon: Sparkles,
+    text: "Populating compliance matrix with evidence links..."
+  },
+  {
+    icon: CheckCircle2,
+    text: "Performing peer review of compliance checklist..."
+  }
 ];
 
 const genericLoadingSteps: LoadingStep[] = [
@@ -196,12 +280,12 @@ const genericLoadingSteps: LoadingStep[] = [
   { icon: Sparkles, text: "Ensuring compelling narrative flow..." }
 ];
 
-export type LoadingCategory = 
-  | "Summarise Tender" 
-  | "Win Themes" 
-  | "Pain Points" 
-  | "Differentiation Factors" 
-  | "Compliance Requirements" 
+export type LoadingCategory =
+  | "Summarise Tender"
+  | "Win Themes"
+  | "Pain Points"
+  | "Differentiation Factors"
+  | "Compliance Requirements"
   | "Generic";
 
 interface LoadingStateProps {
@@ -381,7 +465,10 @@ const TenderAnalysis = () => {
     setCurrentTabIndex(newValue); // Only handle the tab switch
   };
 
-  const assign_insights_to_questions = async (bid_intel_type: string | undefined, tab: TabData) => {
+  const assign_insights_to_questions = async (
+    bid_intel_type: string | undefined,
+    tab: TabData
+  ) => {
     // Return early if no extract_insights_prompt exists on the tab
     if (!tab.extract_insights_prompt) {
       return;
@@ -466,7 +553,10 @@ const TenderAnalysis = () => {
 
       const generatedContent = result.data.requirements || result.data.analysis;
       setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
-      setSharedState((prev) => ({ ...prev, [tab.stateKey as SharedStateKeys]: generatedContent }));
+      setSharedState((prev) => ({
+        ...prev,
+        [tab.stateKey as SharedStateKeys]: generatedContent
+      }));
 
       // Only update summary if it exists in response and we have a summaryKey
       if (result.data.summary && tab.summaryKey) {
@@ -558,7 +648,10 @@ const TenderAnalysis = () => {
     }
   };
 
-  const handleRegenerateClick = async (index: number, event: React.MouseEvent) => {
+  const handleRegenerateClick = async (
+    index: number,
+    event: React.MouseEvent
+  ) => {
     event.stopPropagation();
     if (!object_id) {
       toast.warning("Please save the bid first.");
@@ -591,10 +684,10 @@ const TenderAnalysis = () => {
     }
   };
 
-  const handleEditClick = (index: number, content: string) => {
-    setEditMode(index);
-    setEditContent(content);
-  };
+  // const handleEditClick = (index: number, content: string) => {
+  //   setEditMode(index);
+  //   setEditContent(content);
+  // };
 
   const handleSaveEdit = async (index: number) => {
     try {
@@ -612,23 +705,23 @@ const TenderAnalysis = () => {
   };
 
   const renderContent = (content: string, index: number) => {
-    if (editMode === index) {
-      return (
-        <div className="flex flex-col gap-4 h-full">
-          <textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            className="w-full flex-1 p-4 border rounded-md font-mono outline-none"
-          />
-          <div className="flex gap-2">
-            <Button onClick={() => handleSaveEdit(index)}>Save</Button>
-            <Button variant="outline" onClick={() => setEditMode(null)}>
-              Cancel
-            </Button>
-          </div>
-        </div>
-      );
-    }
+    // if (editMode === index) {
+    //   return (
+    //     <div className="flex flex-col gap-4 h-full">
+    //       <textarea
+    //         value={editContent}
+    //         onChange={(e) => setEditContent(e.target.value)}
+    //         className="w-full flex-1 p-4 border rounded-md font-mono outline-none"
+    //       />
+    //       <div className="flex gap-2">
+    //         <Button onClick={() => handleSaveEdit(index)}>Save</Button>
+    //         <Button variant="outline" onClick={() => setEditMode(null)}>
+    //           Cancel
+    //         </Button>
+    //       </div>
+    //     </div>
+    //   );
+    // }
 
     return (
       <div key={index} className="pb-4">
@@ -758,7 +851,9 @@ const TenderAnalysis = () => {
                         "absolute top-14 left-0 z-10 bg-white rounded-lg shadow-2xl"
                       )}
                     >
-                      <LoadingState loadingCategory={tab.name as LoadingCategory} />
+                      <LoadingState
+                        loadingCategory={tab.name as LoadingCategory}
+                      />
                     </div>
                   )}
                   <TabIcon
@@ -802,13 +897,14 @@ const TenderAnalysis = () => {
                 className="h-full pt-0 mt-0"
               >
                 <div className={cn("relative px-8 py-4 h-full")}>
-                  {tab.stateKey === "differentiation_opportunities" && object_id && (
-                    <AddCompetitors
-                      setTabContent={setTabContent}
-                      setSharedState={setSharedState}
-                    />
-                  )}
-                  {editMode !== index && (
+                  {tab.stateKey === "differentiation_opportunities" &&
+                    object_id && (
+                      <AddCompetitors
+                        setTabContent={setTabContent}
+                        setSharedState={setSharedState}
+                      />
+                    )}
+                  {/* {editMode !== index && (
                     <div className="text-right mb-4">
                       <Button
                         variant="outline"
@@ -823,7 +919,7 @@ const TenderAnalysis = () => {
                         Edit
                       </Button>
                     </div>
-                  )}
+                  )} */}
                   {renderContent(
                     tabContent[index as keyof typeof tabContent] || "",
                     index
