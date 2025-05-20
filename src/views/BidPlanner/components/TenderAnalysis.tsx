@@ -67,12 +67,7 @@ const summariseTenderSteps: LoadingStep[] = [
   },
   { icon: Lightbulb, text: "Refining summary for clarity and conciseness..." },
   { icon: Target, text: "Highlighting critical action points..." },
-  { icon: CheckCircle2, text: "Finalizing tender overview..." },
-  { icon: Search, text: "Indexing document content for quick access..." },
-  { icon: Filter, text: "Filtering out boilerplate and standard terms..." },
-  { icon: FileText, text: "Detailing specific deliverables mentioned..." },
-  { icon: Gauge, text: "Assessing submission deadlines and milestones..." },
-  { icon: Brain, text: "Connecting related concepts across document..." },
+
   { icon: Sparkles, text: "Structuring summary with key headings..." },
   { icon: FileSearch, text: "Verifying numerical data and figures..." },
   { icon: Lightbulb, text: "Ensuring summary captures client's tone..." },
@@ -92,16 +87,6 @@ const winThemesSteps: LoadingStep[] = [
     icon: ClipboardCheck,
     text: "Aligning win themes with tender requirements..."
   },
-  { icon: ChartBar, text: "Developing supporting evidence for themes..." },
-  { icon: CheckCircle2, text: "Finalizing impactful win strategy..." },
-  { icon: Scale, text: "Deconstructing scoring mechanism..." },
-  { icon: Target, text: "Understanding client's desired outcomes..." },
-  {
-    icon: Telescope,
-    text: "Investigating client's past projects and vendors..."
-  },
-  { icon: Crosshair, text: "Highlighting our proven track record..." },
-  { icon: Brain, text: "Developing 'golden threads' for the bid..." },
   { icon: Star, text: "Articulating benefits of our USPs..." },
   { icon: Lightbulb, text: "Testing theme resonance and impact..." },
   { icon: ClipboardCheck, text: "Ensuring themes address all key criteria..." },
@@ -111,20 +96,8 @@ const winThemesSteps: LoadingStep[] = [
 
 const painPointsSteps: LoadingStep[] = [
   { icon: FileSearch, text: "Reviewing client background information..." },
-  {
-    icon: Filter,
-    text: "Identifying stated and unstated client challenges..."
-  },
   { icon: Telescope, text: "Analyzing market context for client pressures..." },
-  {
-    icon: Search,
-    text: "Looking for expressions of need or dissatisfaction..."
-  },
   { icon: Brain, text: "Mapping challenges to potential solutions..." },
-  {
-    icon: Gauge,
-    text: "Understanding the impact of identified pain points..."
-  },
   { icon: Target, text: "Prioritizing most critical client issues..." },
   { icon: Lightbulb, text: "Empathizing with client perspective..." },
   { icon: ChartBar, text: "Gathering insights on problem severity..." },
@@ -133,17 +106,8 @@ const painPointsSteps: LoadingStep[] = [
     text: "Consolidating list of key client pain points..."
   },
   {
-    icon: FileSearch,
-    text: "Examining client's annual reports and publications..."
-  },
-  { icon: Filter, text: "Distinguishing between symptoms and root causes..." },
-  {
     icon: Telescope,
     text: "Assessing industry trends affecting the client..."
-  },
-  {
-    icon: Search,
-    text: "Searching for client feedback or public statements..."
   },
   { icon: Brain, text: "Validating solutions against client constraints..." },
   { icon: Gauge, text: "Quantifying the cost of inaction for client..." },
@@ -152,25 +116,13 @@ const painPointsSteps: LoadingStep[] = [
   {
     icon: ChartBar,
     text: "Corroborating pain points with multiple sources..."
-  },
-  {
-    icon: CheckCircle2,
-    text: "Structuring solutions around resolved pain points..."
   }
 ];
 
 const differentiationFactorsSteps: LoadingStep[] = [
   { icon: ChartBar, text: "Analyzing competitive landscape overview..." },
-  {
-    icon: Telescope,
-    text: "Identifying key competitor strengths and weaknesses..."
-  },
   { icon: Scale, text: "Benchmarking our capabilities against rivals..." },
   { icon: Search, text: "Pinpointing gaps in competitor offerings..." },
-  {
-    icon: Sparkles,
-    text: "Highlighting our unique technological advantages..."
-  },
   { icon: Lightbulb, text: "Showcasing our innovative approaches..." },
   { icon: Star, text: "Emphasizing superior service or quality..." },
   { icon: FileText, text: "Leveraging past successes and testimonials..." },
@@ -187,20 +139,9 @@ const differentiationFactorsSteps: LoadingStep[] = [
     icon: Sparkles,
     text: "Detailing our intellectual property and patents..."
   },
-  {
-    icon: Lightbulb,
-    text: "Illustrating our agile and adaptive methodologies..."
-  },
+
   { icon: Star, text: "Providing evidence of customer satisfaction..." },
-  {
-    icon: FileText,
-    text: "Crafting case studies that highlight differentiation..."
-  },
-  { icon: Brain, text: "Developing counter-arguments to competitor claims..." },
-  {
-    icon: CheckCircle2,
-    text: "Integrating differentiators into value proposition..."
-  }
+
 ];
 
 const complianceRequirementsSteps: LoadingStep[] = [
