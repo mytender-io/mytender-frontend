@@ -258,7 +258,10 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     return text
       .split("\n")
       .map((line) => line.trim())
-      .filter((line) => line.startsWith("-") || line.startsWith("•"))
+      .filter(
+        (line) =>
+          line.startsWith("-") || line.startsWith("•") || line.startsWith("*")
+      )
       .map((line) => line.substring(1).trim())
       .filter(Boolean);
   };
