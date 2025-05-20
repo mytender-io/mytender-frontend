@@ -216,40 +216,6 @@ const complianceRequirementsSteps: LoadingStep[] = [
   {
     icon: CheckCircle2,
     text: "Final review of all compliance documentation..."
-  },
-  {
-    icon: FileSearch,
-    text: "Searching for specific formatting and submission guidelines..."
-  },
-  {
-    icon: Filter,
-    text: "Categorizing compliance items (e.g., technical, legal)..."
-  },
-  {
-    icon: ClipboardCheck,
-    text: "Assigning responsibility for each compliance item..."
-  },
-  {
-    icon: FileText,
-    text: "Ensuring all appendices and attachments are correct..."
-  },
-  { icon: Scale, text: "Validating against latest industry standards..." },
-  { icon: Brain, text: "Reviewing internal QA procedures for compliance..." },
-  {
-    icon: Crosshair,
-    text: "Developing mitigation plans for compliance risks..."
-  },
-  {
-    icon: Target,
-    text: "Gathering proof of certifications and qualifications..."
-  },
-  {
-    icon: Sparkles,
-    text: "Populating compliance matrix with evidence links..."
-  },
-  {
-    icon: CheckCircle2,
-    text: "Performing peer review of compliance checklist..."
   }
 ];
 
@@ -614,7 +580,8 @@ const TenderAnalysis = () => {
       );
 
       if (mounted.current) {
-        const generatedContent = result.data.requirements;
+        console.log(result.data);
+        const generatedContent = result.data;
         console.log(generatedContent);
         setTabContent((prev) => ({ ...prev, [index]: generatedContent }));
         setSharedState((prev) => ({
