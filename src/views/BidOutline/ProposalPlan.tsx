@@ -47,17 +47,22 @@ import SelectOrganisationUserButton from "@/buttons/SelectOrganisationUserButton
 import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 import LengthUnitDropdown from "./components/LengthUnitDropdown";
 import { useUserData } from "@/context/UserDataContext";
-
+import PlusIcon from "@/components/icons/PlusIcon";
+import GenerateProposalModal from "@/modals/GenerateProposalModal";
 interface ProposalPlanProps {
   openTask: (taskId: string | null, sectionIndex: string) => void;
   taskToOpen: string | null;
   sectionIndex: string | null;
+  handleRegenerateClick: () => void;
+  handleTabClick: (path: string) => void;
 }
 
 const ProposalPlan = ({
   openTask,
   taskToOpen,
-  sectionIndex
+  sectionIndex,
+  handleRegenerateClick,
+  handleTabClick
 }: ProposalPlanProps) => {
   const outlineSectionsRef = useRef<Record<string, any>>({});
 
@@ -474,7 +479,6 @@ const ProposalPlan = ({
           [field]: value,
           status: "In Progress"
         };
-        
       } else {
         newOutline[index] = {
           ...newOutline[index],
@@ -1154,72 +1158,84 @@ const ProposalPlan = ({
                 </div>
               </div>
             ) : (
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[60px] py-3.5 px-4">
-                        <div className="flex justify-end">
-                          <Checkbox
-                            checked={selectedSections.size === outline.length}
-                            onCheckedChange={(checked: boolean) =>
-                              handleSelectAll(checked)
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
-                        Section
-                      </TableHead>
-                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                        Question Type
-                      </TableHead>
-                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                        Status
-                      </TableHead>
-                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                        <div className="flex items-center justify-center">
-                          <LengthUnitDropdown
-                            value={lengthUnit}
-                            onChange={(value) => setLengthUnit(value)}
-                          />
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                        Answerer
-                      </TableHead>
-                      <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                        Reviewer
-                      </TableHead>
-                      <TableHead className="w-[60px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4">
-                        Action
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                    onDragStart={handleDragStart}
-                    modifiers={[restrictToVerticalAxis]}
-                  >
-                    <SortableContext
-                      items={outline.map((section) => section.section_id)}
-                      strategy={verticalListSortingStrategy}
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-end flex-shrink-0 gap-2">
+                  <Button variant="outline" onClick={handleRegenerateClick}>
+                    <PlusIcon />
+                    New Outline
+                  </Button>
+                  <GenerateProposalModal
+                    bid_id={object_id}
+                    handleTabClick={handleTabClick}
+                  />
+                </div>
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[60px] py-3.5 px-4">
+                          <div className="flex justify-end">
+                            <Checkbox
+                              checked={selectedSections.size === outline.length}
+                              onCheckedChange={(checked: boolean) =>
+                                handleSelectAll(checked)
+                              }
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
+                          Section
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                          Question Type
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                          Status
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                          <div className="flex items-center justify-center">
+                            <LengthUnitDropdown
+                              value={lengthUnit}
+                              onChange={(value) => setLengthUnit(value)}
+                            />
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                          Answerer
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                          Reviewer
+                        </TableHead>
+                        <TableHead className="w-[60px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4">
+                          Action
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                      onDragStart={handleDragStart}
+                      modifiers={[restrictToVerticalAxis]}
                     >
-                      <TableBody>
-                        {outline.map((section, index) => (
-                          <SortableTableRow
-                            key={section.section_id}
-                            section={section}
-                            index={index}
-                          />
-                        ))}
-                      </TableBody>
-                    </SortableContext>
-                  </DndContext>
-                </Table>
+                      <SortableContext
+                        items={outline.map((section) => section.section_id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <TableBody>
+                          {outline.map((section, index) => (
+                            <SortableTableRow
+                              key={section.section_id}
+                              section={section}
+                              index={index}
+                            />
+                          ))}
+                        </TableBody>
+                      </SortableContext>
+                    </DndContext>
+                  </Table>
+                </div>
               </div>
             )}
 

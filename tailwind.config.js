@@ -17,7 +17,8 @@ export default {
           ultra_light: "#FFF0E6",
           hover: "#cc6614",
           border: "#DC6E14",
-          focus: "#FFC492"
+          focus: "#FFC492",
+          active: "#FFF0E4"
         },
         status: {
           success_light: "#E0F5E9",

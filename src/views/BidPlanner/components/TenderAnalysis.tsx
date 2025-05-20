@@ -140,8 +140,7 @@ const differentiationFactorsSteps: LoadingStep[] = [
     text: "Detailing our intellectual property and patents..."
   },
 
-  { icon: Star, text: "Providing evidence of customer satisfaction..." },
-
+  { icon: Star, text: "Providing evidence of customer satisfaction..." }
 ];
 
 const complianceRequirementsSteps: LoadingStep[] = [
@@ -597,20 +596,20 @@ const TenderAnalysis = () => {
   //   setEditContent(content);
   // };
 
-  const handleSaveEdit = async (index: number) => {
-    try {
-      const tab = tabs[index];
-      setTabContent((prev) => ({ ...prev, [index]: editContent }));
-      setSharedState((prev) => ({
-        ...prev,
-        [tab.stateKey as SharedStateKeys]: editContent
-      }));
-      setEditMode(null);
-      toast.success("Content updated successfully!");
-    } catch (err) {
-      toast.error("Failed to save changes");
-    }
-  };
+  // const handleSaveEdit = async (index: number) => {
+  //   try {
+  //     const tab = tabs[index];
+  //     setTabContent((prev) => ({ ...prev, [index]: editContent }));
+  //     setSharedState((prev) => ({
+  //       ...prev,
+  //       [tab.stateKey as SharedStateKeys]: editContent
+  //     }));
+  //     setEditMode(null);
+  //     toast.success("Content updated successfully!");
+  //   } catch (err) {
+  //     toast.error("Failed to save changes");
+  //   }
+  // };
 
   const renderContent = (content: string, index: number) => {
     // if (editMode === index) {
@@ -797,7 +796,7 @@ const TenderAnalysis = () => {
               );
             })}
           </TabsList>
-          <div className={cn("h-[calc(100vh-10rem)] overflow-y-auto")}>
+          <div>
             {tabs.map((tab, index) => (
               <TabsContent
                 key={index}
