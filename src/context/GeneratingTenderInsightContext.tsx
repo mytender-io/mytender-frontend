@@ -91,4 +91,3 @@ export const useGeneratingTenderInsightContext =
     }
     return context;
   };
-

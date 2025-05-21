@@ -261,7 +261,7 @@ const LoadingState = ({ loadingCategory }: LoadingStateProps) => {
   );
 };
 
-const TenderAnalysis = () => {
+const TenderAnalysis = ({ activeSubTab }: { activeSubTab: string }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState<number>(0);
   // const [loadingBidTab, setLoadingBidTab] = useState(null);
   const {

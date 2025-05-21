@@ -7,10 +7,10 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ExpandIcon from "@/components/icons/ExpandIcon";
 
-const BidPlanner = () => {
+const BidPlanner = ({ activeSubTab }: { activeSubTab: string }) => {
   const { sharedState } = useContext(BidContext);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
-  const { object_id} = sharedState;
+  const { object_id } = sharedState;
   const handleOpenLibrary = () => setIsLibraryOpen(true);
 
   return (
@@ -37,7 +37,7 @@ const BidPlanner = () => {
       </Dialog>
 
       <div className="max-w-6xl mx-auto w-full flex-1">
-        <TenderAnalysis />
+        <TenderAnalysis activeSubTab={activeSubTab} />
       </div>
     </>
   );

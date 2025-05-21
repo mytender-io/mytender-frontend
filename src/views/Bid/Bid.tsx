@@ -13,7 +13,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/utils";
 import { ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import CollapsibleHeader from "./components/CollapsibleHeader";
 
 const Bid = () => {
   const { sharedState, setSharedState } = useContext(BidContext);
@@ -42,6 +41,8 @@ const Bid = () => {
     }
     return "/bid-extractor";
   });
+
+  const [activeSubTab, setActiveSubTab] = useState("summarise-tender");
 
   const [showModal, setShowModal] = useState(false);
 
@@ -99,6 +100,10 @@ const Bid = () => {
     setTimeout(() => {
       setActiveTab(path);
     }, 300); // 300ms matches our CSS transition time
+  };
+
+  const handleSubTabClick = (subTab: string) => {
+    setActiveSubTab(subTab);
   };
 
   const handleRegenerateClick = () => {
@@ -193,54 +198,43 @@ const Bid = () => {
           parentPages={parentPages}
         />
       </div>
-      <div ref={contentRef} className="flex flex-1 overflow-y-auto relative">
+      <div className="flex flex-1 overflow-y-auto relative">
         <div className="w-60 min-w-60 h-full border-r border-gray-line">
-          <BidNavbar activeTab={activeTab} handleTabClick={handleTabClick} />
+          <BidNavbar
+            activeTab={activeTab}
+            activeSubTab={activeSubTab}
+            handleTabClick={handleTabClick}
+            handleSubTabClick={handleSubTabClick}
+          />
         </div>
-        <div className="flex flex-col h-full flex-1 overflow-y-auto">
-          <CollapsibleHeader>
-            <span className="text-xl font-semibold text-gray-hint_text">
-              {activeTab === "/bid-extractor" && "Tender Insights"}
-              {activeTab === "/bid-intel" && "Bid Inputs"}
-              {activeTab === "/proposal-planner" && "Bid Outline"}
-              {activeTab === "/proposal-preview" && "Bid Enhancer"}
-            </span>
-            <span className="text-gray-hint_text">
-              {activeTab === "/bid-extractor" &&
-                "Please detail how you would implement a positive impact on the surrounding local community for the contract?"}
-              {activeTab === "/bid-intel" &&
-                "Create all of the bid inputs to have as inputs into the bid response "}
-              {activeTab === "/proposal-planner" &&
-                "Create all of the bid inputs to have as inputs into the bid response "}
-              {activeTab === "/proposal-preview" && "Bid Enhancer"}
-            </span>
-          </CollapsibleHeader>
-          <div className="flex flex-col gap-4 h-full flex-1 py-4 px-6 overflow-y-auto">
-            {activeTab === "/bid-extractor" && <BidPlanner />}
-            {activeTab === "/bid-intel" && (
-              <BidIntel showViewOnlyMessage={showViewOnlyMessage} />
-            )}
-            {activeTab === "/proposal-planner" && (
-              <ProposalPlan
-                openTask={openTask}
-                taskToOpen={shouldOpenTask ? taskId : null}
-                sectionIndex={shouldOpenTask ? sectionIndex : null}
-                handleRegenerateClick={handleRegenerateClick}
-                handleTabClick={handleTabClick}
-              />
-            )}
-            {activeTab === "/proposal-preview" && (
-              <ProposalPreview yPosition={yPosition} />
-            )}
-            <OutlineInstructionsModal
-              show={showModal}
-              onHide={() => setShowModal(false)}
-              bid_id={object_id}
+        <div
+          className="flex flex-col gap-4 h-full flex-1 py-4 px-6 overflow-y-auto"
+          ref={contentRef}
+        >
+          {activeTab === "/bid-extractor" && (
+            <BidPlanner activeSubTab={activeSubTab} />
+          )}
+          {activeTab === "/bid-intel" && (
+            <BidIntel showViewOnlyMessage={showViewOnlyMessage} />
+          )}
+          {activeTab === "/proposal-planner" && (
+            <ProposalPlan
+              openTask={openTask}
+              taskToOpen={shouldOpenTask ? taskId : null}
+              sectionIndex={shouldOpenTask ? sectionIndex : null}
+              handleRegenerateClick={handleRegenerateClick}
+              handleTabClick={handleTabClick}
             />
-          </div>
+          )}
+          {activeTab === "/proposal-preview" && (
+            <ProposalPreview yPosition={yPosition} />
+          )}
+          <OutlineInstructionsModal
+            show={showModal}
+            onHide={() => setShowModal(false)}
+            bid_id={object_id}
+          />
         </div>
-
-        {/* Scroll to top button */}
         {yPosition > 200 && (
           <Button
             variant="ghost"
