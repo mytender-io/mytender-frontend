@@ -42,7 +42,7 @@ const Bid = () => {
     return "/bid-extractor";
   });
 
-  const [activeSubTab, setActiveSubTab] = useState("summarise-tender");
+  const [activeSubTab, setActiveSubTab] = useState("tender_summary");
 
   const [showModal, setShowModal] = useState(false);
 
@@ -212,7 +212,10 @@ const Bid = () => {
           ref={contentRef}
         >
           {activeTab === "/bid-extractor" && (
-            <BidPlanner activeSubTab={activeSubTab} />
+            <BidPlanner
+              activeSubTab={activeSubTab}
+              setActiveSubTab={setActiveSubTab}
+            />
           )}
           {activeTab === "/bid-intel" && (
             <BidIntel showViewOnlyMessage={showViewOnlyMessage} />

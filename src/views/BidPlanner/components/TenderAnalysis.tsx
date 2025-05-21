@@ -31,15 +31,7 @@ import TenderLibraryChatDialog from "@/views/BidPlanner/components/TenderLibrary
 import InterrogateTenderDialog from "./InterrogateTender";
 import AddCompetitors from "./AddCompetitors";
 import { useGeneratingTenderInsightContext } from "@/context/GeneratingTenderInsightContext";
-
-interface TabData {
-  name: string;
-  Icon: React.ElementType;
-  prompt: string;
-  stateKey: string;
-  summaryKey?: string;
-  extract_insights_prompt?: string;
-}
+import { TabData, tenderTabs, getTabIndexByStateKey } from "../../../utils/tenderTabsConfig";
 
 interface TenderInsightData {
   requirements?: string;
@@ -261,7 +253,13 @@ const LoadingState = ({ loadingCategory }: LoadingStateProps) => {
   );
 };
 
-const TenderAnalysis = ({ activeSubTab }: { activeSubTab: string }) => {
+const TenderAnalysis = ({
+  activeSubTab,
+  setActiveSubTab
+}: {
+  activeSubTab: string;
+  setActiveSubTab: (subTab: string) => void;
+}) => {
   const [currentTabIndex, setCurrentTabIndex] = useState<number>(0);
   // const [loadingBidTab, setLoadingBidTab] = useState(null);
   const {
@@ -302,45 +300,18 @@ const TenderAnalysis = ({ activeSubTab }: { activeSubTab: string }) => {
     4: compliance_requirements || ""
   });
 
-  const tabs: TabData[] = [
-    {
-      name: "Summarise Tender",
-      Icon: FileText,
-      prompt: "generate_summarise_tender",
-      stateKey: "tender_summary"
-    },
-    {
-      name: "Win Themes",
-      Icon: Scale,
-      prompt: "generate_evaluation_criteria",
-      stateKey: "evaluation_criteria",
-      summaryKey: "win_themes",
-      extract_insights_prompt: "extract_section_evaluation_criteria"
-    },
-    {
-      name: "Pain Points",
-      Icon: Lightbulb,
-      prompt: "generate_customer_painpoints",
-      stateKey: "derive_insights",
-      summaryKey: "customer_pain_points",
-      extract_insights_prompt: "extract_section_derive_insights"
-    },
-    {
-      name: "Differentiation Factors",
-      Icon: Star,
-      prompt: "generate_differentiation_opportunities",
-      stateKey: "differentiation_opportunities",
-      summaryKey: "differentiating_factors",
-      extract_insights_prompt: "extract_differentiation_factors"
-    },
-    {
-      name: "Compliance Requirements",
-      Icon: ClipboardCheck,
-      prompt: "generate_compliance",
-      stateKey: "compliance_requirements",
-      extract_insights_prompt: "extract_compliance_requirements"
+  // Use the shared tabs configuration
+  const tabs = tenderTabs;
+
+  // Set initial tab based on activeSubTab prop
+  useEffect(() => {
+    if (activeSubTab) {
+      const tabIndex = getTabIndexByStateKey(activeSubTab);
+      if (loadingBidTab === null) {
+        setCurrentTabIndex(tabIndex);
+      }
     }
-  ];
+  }, [activeSubTab, loadingBidTab]);
 
   useEffect(() => {
     mounted.current = true;
@@ -369,6 +340,7 @@ const TenderAnalysis = ({ activeSubTab }: { activeSubTab: string }) => {
     }
 
     setCurrentTabIndex(newValue); // Only handle the tab switch
+    setActiveSubTab(tabs[newValue].stateKey);
   };
 
   const assign_insights_to_questions = async (

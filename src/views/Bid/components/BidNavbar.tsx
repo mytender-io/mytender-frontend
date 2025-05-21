@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 // import { BidContext } from "@/views/BidWritingStateManagerView";
 import { cn } from "@/utils";
+import { tenderTabs } from "@/utils/tenderTabsConfig";
 
 const BidNavbar: React.FC<{
   activeTab: string;
@@ -31,55 +32,20 @@ const BidNavbar: React.FC<{
         Tender Insights
       </span>
 
-      {activeTab === "/bid-extractor" && (
-        <div className="flex flex-col ml-2 mb-2 border-l border-gray-200">
+      <div className="flex flex-col ml-1 border-l border-gray-200">
+        {tenderTabs.map((tab, index) => (
           <span
+            key={index}
             className={cn(
               baseSubTabStyles,
-              activeSubTab === "summarise-tender" && activeSubTabStyles
+              activeSubTab === tab.stateKey && activeSubTabStyles
             )}
-            onClick={() => handleSubTabClick("summarise-tender")}
+            onClick={() => handleSubTabClick(tab.stateKey)}
           >
-            Summarise tender
+            {tab.name}
           </span>
-          <span
-            className={cn(
-              baseSubTabStyles,
-              activeSubTab === "win-themes" && activeSubTabStyles
-            )}
-            onClick={() => handleSubTabClick("win-themes")}
-          >
-            Win themes
-          </span>
-          <span
-            className={cn(
-              baseSubTabStyles,
-              activeSubTab === "pain-points" && activeSubTabStyles
-            )}
-            onClick={() => handleSubTabClick("pain-points")}
-          >
-            Pain points
-          </span>
-          <span
-            className={cn(
-              baseSubTabStyles,
-              activeSubTab === "differentiation-factors" && activeSubTabStyles
-            )}
-            onClick={() => handleSubTabClick("differentiation-factors")}
-          >
-            Differentiation factors
-          </span>
-          <span
-            className={cn(
-              baseSubTabStyles,
-              activeSubTab === "compliance-requirements" && activeSubTabStyles
-            )}
-            onClick={() => handleSubTabClick("compliance-requirements")}
-          >
-            Compliance requirements
-          </span>
-        </div>
-      )}
+        ))}
+      </div>
 
       <span
         className={cn(
