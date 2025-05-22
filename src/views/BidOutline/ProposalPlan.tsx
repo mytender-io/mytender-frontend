@@ -55,6 +55,7 @@ interface ProposalPlanProps {
   sectionIndex: string | null;
   handleRegenerateClick: () => void;
   handleTabClick: (path: string) => void;
+  activeSubTab?: string;
 }
 
 const ProposalPlan = ({
@@ -62,7 +63,8 @@ const ProposalPlan = ({
   taskToOpen,
   sectionIndex,
   handleRegenerateClick,
-  handleTabClick
+  handleTabClick,
+  activeSubTab = ""
 }: ProposalPlanProps) => {
   const outlineSectionsRef = useRef<Record<string, any>>({});
 
@@ -119,20 +121,40 @@ const ProposalPlan = ({
         if (!isNaN(index) && index >= 0 && index < outline.length) {
           // Create a synthetic event object with preventDefault method
           // to avoid errors in handleRowClick
-          const syntheticEvent = {
-            preventDefault: () => {},
-            target: document.createElement("div") // Create a dummy element
-          };
+          // const syntheticEvent = {
+          //   preventDefault: () => {},
+          //   target: document.createElement("div") // Create a dummy element
+          // };
 
-          // Call handleRowClick with our synthetic event
-          handleRowClick(syntheticEvent, index);
-
+          // // Call handleRowClick with our synthetic event
+          // handleRowClick(syntheticEvent, index);
+          // Set the selected section directly
+          setSelectedSection(index);
           // Set the sidepane to be open
           setIsSidepaneOpen(true);
         }
       }, 500); // Short delay to ensure components are rendered
     }
   }, [taskToOpen, sectionIndex, openTask, outline.length]);
+
+  // Update useEffect to respond to section-specific activeSubTab values
+  useEffect(() => {
+    // Check if the activeSubTab matches any section ID, indicating we should jump to that section
+    if (activeSubTab && outline && outline.length > 0) {
+      
+      // Find the section index by section_id
+      const sectionIndex = outline.findIndex(section => section.section_id === activeSubTab);
+      
+      if (sectionIndex !== -1) {
+        // Scroll to the section
+        scrollToSection(String(sectionIndex));
+        
+        // Open the sidepane for this section
+        setSelectedSection(sectionIndex);
+        setIsSidepaneOpen(true);
+      }
+    }
+  }, [activeSubTab, outline]);
 
   // Function to scroll to a specific section
   const scrollToSection = (index: string) => {
@@ -986,7 +1008,7 @@ const ProposalPlan = ({
       <TableRow
         ref={(el) => {
           setNodeRef(el);
-          registerSectionRef(index, el);
+          registerSectionRef(index.toString(), el);
         }}
         style={style}
         className={cn(
@@ -995,7 +1017,6 @@ const ProposalPlan = ({
           isOver && "border-t border-orange"
         )}
         onClick={(e) => handleRowClick(e, index)}
-        onContextMenu={(e) => handleContextMenu(e, index)}
       >
         <TableCell className="w-[60px] px-4" data-checkbox>
           <div className="flex items-center gap-2">

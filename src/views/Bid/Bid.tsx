@@ -99,11 +99,29 @@ const Bid = () => {
     // Delay navigation to allow animation to play
     setTimeout(() => {
       setActiveTab(path);
+      
+      // If switching to the proposal planner tab, set the default subtab
+      if (path === "/proposal-planner") {
+        setActiveSubTab("");
+      }
     }, 300); // 300ms matches our CSS transition time
   };
 
   const handleSubTabClick = (subTab: string) => {
-    setActiveSubTab(subTab);
+    // Make sure we're on the proposal planner tab if clicking on a section ID
+    const isSection = outline && outline.some(section => section.section_id === subTab);
+    
+    if (isSection && activeTab !== "/proposal-planner") {
+      // If clicking on a section but not on the proposal planner tab, switch to it first
+      setActiveTab("/proposal-planner");
+      // Short delay to ensure tab switch happens before setting subtab
+      setTimeout(() => {
+        setActiveSubTab(subTab);
+      }, 50);
+    } else {
+      // Regular behavior for other subtabs
+      setActiveSubTab(subTab);
+    }
   };
 
   const handleRegenerateClick = () => {
@@ -227,6 +245,7 @@ const Bid = () => {
               sectionIndex={shouldOpenTask ? sectionIndex : null}
               handleRegenerateClick={handleRegenerateClick}
               handleTabClick={handleTabClick}
+              activeSubTab={activeSubTab}
             />
           )}
           {activeTab === "/proposal-preview" && (
