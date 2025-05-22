@@ -6,8 +6,7 @@ import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation";
 import { toast } from "react-toastify";
 import BidPlanner from "../BidPlanner/BidPlanner";
 import BidIntel from "../BidInputs/BidIntel";
-import ProposalPlan from "../BidOutline/ProposalPlan";
-import ProposalPreview from "../ProposalPreview/ProposalPreview";
+import ProposalWorkspace from "./components/ProposalWorkspace";
 import OutlineInstructionsModal from "../BidOutline/components/OutlineInstructionsModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/utils";
@@ -99,18 +98,26 @@ const Bid = () => {
     // Delay navigation to allow animation to play
     setTimeout(() => {
       setActiveTab(path);
-      
-      // If switching to the proposal planner tab, set the default subtab
-      if (path === "/proposal-planner") {
-        setActiveSubTab("");
+
+      // If switching to the proposal workspace, ensure the correct subtab
+      if (path === "/proposal-planner" || path === "/proposal-preview") {
+        // Only reset the subtab if we're not already in the proposal workspace
+        const isAlreadyInProposalWorkspace =
+          activeTab === "/proposal-planner" ||
+          activeTab === "/proposal-preview";
+
+        if (!isAlreadyInProposalWorkspace) {
+          setActiveSubTab("");
+        }
       }
     }, 300); // 300ms matches our CSS transition time
   };
 
   const handleSubTabClick = (subTab: string) => {
     // Make sure we're on the proposal planner tab if clicking on a section ID
-    const isSection = outline && outline.some(section => section.section_id === subTab);
-    
+    const isSection =
+      outline && outline.some((section) => section.section_id === subTab);
+
     if (isSection && activeTab !== "/proposal-planner") {
       // If clicking on a section but not on the proposal planner tab, switch to it first
       setActiveTab("/proposal-planner");
@@ -225,10 +232,7 @@ const Bid = () => {
             handleSubTabClick={handleSubTabClick}
           />
         </div>
-        <div
-          className="flex flex-col gap-4 h-full flex-1 py-4 px-6 overflow-y-auto"
-          ref={contentRef}
-        >
+        <div className="h-full flex-1 overflow-y-auto" ref={contentRef}>
           {activeTab === "/bid-extractor" && (
             <BidPlanner
               activeSubTab={activeSubTab}
@@ -238,18 +242,18 @@ const Bid = () => {
           {activeTab === "/bid-intel" && (
             <BidIntel showViewOnlyMessage={showViewOnlyMessage} />
           )}
-          {activeTab === "/proposal-planner" && (
-            <ProposalPlan
+          {(activeTab === "/proposal-planner" ||
+            activeTab === "/proposal-preview") && (
+            <ProposalWorkspace
               openTask={openTask}
               taskToOpen={shouldOpenTask ? taskId : null}
               sectionIndex={shouldOpenTask ? sectionIndex : null}
               handleRegenerateClick={handleRegenerateClick}
               handleTabClick={handleTabClick}
               activeSubTab={activeSubTab}
+              yPosition={yPosition}
+              activeTab={activeTab}
             />
-          )}
-          {activeTab === "/proposal-preview" && (
-            <ProposalPreview yPosition={yPosition} />
           )}
           <OutlineInstructionsModal
             show={showModal}

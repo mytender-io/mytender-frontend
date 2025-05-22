@@ -240,7 +240,7 @@ const BidIntel = ({
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-4 px-6 py-4">
       <Button onClick={handleOpenAIModal} className="mx-auto mb-4">
         <Sparkles />
         AI Input Editing
@@ -392,7 +392,7 @@ const BidIntel = ({
           </Accordion>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

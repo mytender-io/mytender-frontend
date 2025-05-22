@@ -20,7 +20,7 @@ const BidPlanner = ({
   const handleOpenLibrary = () => setIsLibraryOpen(true);
 
   return (
-    <>
+    <div className="flex flex-col gap-4 px-6 py-4">
       <Button
         onClick={handleOpenLibrary}
         variant="outline"
@@ -48,7 +48,7 @@ const BidPlanner = ({
           setActiveSubTab={setActiveSubTab}
         />
       </div>
-    </>
+    </div>
   );
 };
 

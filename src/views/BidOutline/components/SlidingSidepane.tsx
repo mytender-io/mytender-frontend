@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import DebouncedTextArea from "./DebouncedTextArea";
-import SubheadingCards from "./SubheadingCards";
+// import SubheadingCards from "./SubheadingCards";
 import {
   BidContext,
   Contributor,

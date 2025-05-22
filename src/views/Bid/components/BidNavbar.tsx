@@ -20,9 +20,10 @@ const BidNavbar: React.FC<{
     "pl-8 py-2 cursor-pointer text-sm text-gray-600 hover:text-gray-900 transition-all duration-200 -ml-0.5";
   const activeSubTabStyles =
     "font-semibold text-orange-600 border-l-2 border-orange-500";
-    
+
   // Limit to max 20 sections to avoid overwhelming the UI
-  const displayOutline = outline && outline.length > 0 ? outline.slice(0, 20) : [];
+  const displayOutline =
+    outline && outline.length > 0 ? outline.slice(0, 20) : [];
   const hasMoreSections = outline && outline.length > 20;
 
   return (
@@ -61,16 +62,19 @@ const BidNavbar: React.FC<{
       >
         Bid Inputs
       </span>
+
       <span
         className={cn(
           baseNavLinkStyles,
-          activeTab === "/proposal-planner" && activeNavLinkStyles
+          (activeTab === "/proposal-planner" ||
+            activeTab === "/proposal-preview") &&
+            activeNavLinkStyles
         )}
         onClick={() => handleTabClick("/proposal-planner")}
       >
-        Bid Outline
+        Proposal Workspace
       </span>
-      
+
       {displayOutline.length > 0 && (
         <div className="flex flex-col ml-2 border-l border-gray-200 max-h-80 overflow-y-auto">
           {displayOutline.map((section, index) => (
@@ -83,7 +87,9 @@ const BidNavbar: React.FC<{
               onClick={() => handleSubTabClick(section.section_id)}
               title={section.heading}
             >
-              {section.heading.length > 25 ? section.heading.substring(0, 25) + "..." : section.heading}
+              {section.heading.length > 25
+                ? section.heading.substring(0, 25) + "..."
+                : section.heading}
             </span>
           ))}
           {hasMoreSections && (
@@ -93,16 +99,6 @@ const BidNavbar: React.FC<{
           )}
         </div>
       )}
-      
-      <span
-        className={cn(
-          baseNavLinkStyles,
-          activeTab === "/proposal-preview" && activeNavLinkStyles
-        )}
-        onClick={() => handleTabClick("/proposal-preview")}
-      >
-        Bid Enhancer
-      </span>
     </div>
   );
 };
