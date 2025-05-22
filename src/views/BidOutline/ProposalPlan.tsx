@@ -55,7 +55,7 @@ interface ProposalPlanProps {
   sectionIndex: string | null;
   handleRegenerateClick: () => void;
   handleTabClick: (path: string) => void;
-  activeSubTab?: string;
+  activeSection?: string;
 }
 
 const ProposalPlan = ({
@@ -64,7 +64,7 @@ const ProposalPlan = ({
   sectionIndex,
   handleRegenerateClick,
   handleTabClick,
-  activeSubTab = ""
+  activeSection = ""
 }: ProposalPlanProps) => {
   const outlineSectionsRef = useRef<Record<string, any>>({});
 
@@ -137,13 +137,13 @@ const ProposalPlan = ({
     }
   }, [taskToOpen, sectionIndex, openTask, outline.length]);
 
-  // Update useEffect to respond to section-specific activeSubTab values
+  // Update useEffect to respond to section-specific activeSection values
   useEffect(() => {
-    // Check if the activeSubTab matches any section ID, indicating we should jump to that section
-    if (activeSubTab && outline && outline.length > 0) {
+    // Check if the activeSection matches any section ID, indicating we should jump to that section
+    if (activeSection && outline && outline.length > 0) {
       
       // Find the section index by section_id
-      const sectionIndex = outline.findIndex(section => section.section_id === activeSubTab);
+      const sectionIndex = outline.findIndex(section => section.section_id === activeSection);
       
       if (sectionIndex !== -1) {
         // Scroll to the section
@@ -154,7 +154,7 @@ const ProposalPlan = ({
         setIsSidepaneOpen(true);
       }
     }
-  }, [activeSubTab, outline]);
+  }, [activeSection, outline]);
 
   // Function to scroll to a specific section
   const scrollToSection = (index: string) => {

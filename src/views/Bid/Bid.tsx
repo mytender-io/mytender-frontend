@@ -42,6 +42,7 @@ const Bid = () => {
   });
 
   const [activeSubTab, setActiveSubTab] = useState("tender_summary");
+  const [activeSection, setActiveSection] = useState("");
 
   const [showModal, setShowModal] = useState(false);
 
@@ -107,27 +108,32 @@ const Bid = () => {
           activeTab === "/proposal-preview";
 
         if (!isAlreadyInProposalWorkspace) {
-          setActiveSubTab("");
+          setActiveSection("");
         }
       }
     }, 300); // 300ms matches our CSS transition time
   };
 
   const handleSubTabClick = (subTab: string) => {
+    // Regular behavior for tender subtabs
+    setActiveSubTab(subTab);
+  };
+
+  const handleSectionClick = (sectionId: string) => {
     // Make sure we're on the proposal planner tab if clicking on a section ID
     const isSection =
-      outline && outline.some((section) => section.section_id === subTab);
+      outline && outline.some((section) => section.section_id === sectionId);
 
     if (isSection && activeTab !== "/proposal-planner") {
       // If clicking on a section but not on the proposal planner tab, switch to it first
       setActiveTab("/proposal-planner");
       // Short delay to ensure tab switch happens before setting subtab
       setTimeout(() => {
-        setActiveSubTab(subTab);
+        setActiveSection(sectionId);
       }, 50);
     } else {
-      // Regular behavior for other subtabs
-      setActiveSubTab(subTab);
+      // Set the active section
+      setActiveSection(sectionId);
     }
   };
 
@@ -228,8 +234,10 @@ const Bid = () => {
           <BidNavbar
             activeTab={activeTab}
             activeSubTab={activeSubTab}
+            activeSection={activeSection}
             handleTabClick={handleTabClick}
             handleSubTabClick={handleSubTabClick}
+            handleSectionClick={handleSectionClick}
           />
         </div>
         <div className="h-full flex-1 overflow-y-auto" ref={contentRef}>
@@ -250,7 +258,7 @@ const Bid = () => {
               sectionIndex={shouldOpenTask ? sectionIndex : null}
               handleRegenerateClick={handleRegenerateClick}
               handleTabClick={handleTabClick}
-              activeSubTab={activeSubTab}
+              activeSection={activeSection}
               yPosition={yPosition}
               activeTab={activeTab}
             />

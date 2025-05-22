@@ -11,7 +11,7 @@ interface ProposalWorkspaceProps {
   sectionIndex: string | null;
   handleRegenerateClick: () => void;
   handleTabClick: (path: string) => void;
-  activeSubTab: string;
+  activeSection: string;
   yPosition: number;
   activeTab?: string;
 }
@@ -22,7 +22,7 @@ const ProposalWorkspace = ({
   sectionIndex,
   handleRegenerateClick,
   handleTabClick,
-  activeSubTab,
+  activeSection,
   yPosition,
   activeTab
 }: ProposalWorkspaceProps) => {
@@ -79,7 +79,7 @@ const ProposalWorkspace = ({
               sectionIndex={sectionIndex}
               handleRegenerateClick={handleRegenerateClick}
               handleTabClick={handleTabClick}
-              activeSubTab={activeSubTab}
+              activeSection={activeSection}
             />
           </TabsContent>
           <TabsContent

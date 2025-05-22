@@ -3,12 +3,23 @@ import { BidContext } from "@/views/BidWritingStateManagerView";
 import { cn } from "@/utils";
 import { tenderTabs } from "@/utils/tenderTabsConfig";
 
-const BidNavbar: React.FC<{
-  activeTab: string;
-  activeSubTab: string;
-  handleTabClick: (path: string) => void;
-  handleSubTabClick: (subTab: string) => void;
-}> = ({ activeTab, activeSubTab, handleTabClick, handleSubTabClick }) => {
+interface BidNavbarProps {
+  activeTab?: string;
+  activeSubTab?: string;
+  activeSection?: string;
+  handleTabClick?: (path: string) => void;
+  handleSubTabClick?: (subTab: string) => void;
+  handleSectionClick?: (sectionId: string) => void;
+}
+
+const BidNavbar: React.FC<BidNavbarProps> = ({
+  activeTab = "",
+  activeSubTab = "tender_summary",
+  activeSection = "",
+  handleTabClick = () => {},
+  handleSubTabClick = () => {},
+  handleSectionClick = () => {}
+}) => {
   const { sharedState } = useContext(BidContext);
   const { outline } = sharedState;
 
@@ -82,9 +93,9 @@ const BidNavbar: React.FC<{
               key={section.section_id}
               className={cn(
                 baseSubTabStyles,
-                activeSubTab === section.section_id && activeSubTabStyles
+                activeSection === section.section_id && activeSubTabStyles
               )}
-              onClick={() => handleSubTabClick(section.section_id)}
+              onClick={() => handleSectionClick(section.section_id)}
               title={section.heading}
             >
               {section.heading.length > 25
