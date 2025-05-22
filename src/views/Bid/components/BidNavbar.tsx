@@ -28,7 +28,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
   const activeNavLinkStyles = "bg-orange-active font-bold shadow-sm";
 
   const baseSubTabStyles =
-    "pl-8 py-2 cursor-pointer text-sm text-gray-600 hover:text-gray-900 transition-all duration-200 -ml-0.5";
+    "pl-4 py-2 cursor-pointer text-sm text-gray-600 hover:text-gray-900 transition-all duration-200 -ml-0.5";
   const activeSubTabStyles =
     "font-semibold text-orange-600 border-l-2 border-orange-500";
 
@@ -87,7 +87,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
       </span>
 
       {displayOutline.length > 0 && (
-        <div className="flex flex-col ml-2 border-l border-gray-200 max-h-80 overflow-y-auto">
+        <div className="flex flex-col ml-2 border-l border-gray-200">
           {displayOutline.map((section, index) => (
             <span
               key={section.section_id}
@@ -104,7 +104,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
             </span>
           ))}
           {hasMoreSections && (
-            <div className="text-xs text-gray-500 italic pl-8 pt-1">
+            <div className="text-xs text-gray-500 italic pl-4 pt-1">
               + {outline.length - 20} more sections
             </div>
           )}
