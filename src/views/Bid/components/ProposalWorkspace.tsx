@@ -132,20 +132,20 @@ const ProposalWorkspace = ({
       >
         {/* Collapsible Header */}
         <CollapsibleHeader>
-          <TabsList className="w-full max-w-md mx-auto mb-2">
-            <TabsTrigger value="plan" className="flex-1">
+          <TabsList className="w-full max-w-md mx-auto mb-2 h-11">
+            <TabsTrigger value="plan" className="flex-1 h-full">
               Plan
             </TabsTrigger>
-            <TabsTrigger value="write" className="flex-1">
+            <TabsTrigger value="write" className="flex-1 h-full">
               Write
             </TabsTrigger>
           </TabsList>
-          <span className="text-gray-hint_text">
+          <span className="text-gray-hint_text max-w-3xl mx-auto text-center inline-block">
             Please detail how you would implement a positive impact on the
             surrounding local community for the contract?
           </span>
           {activeSection && activeSectionIndex !== null && (
-            <div className="absolute top-1/2 left-4 -translate-y-1/2 flex flex-col items-center justify-center">
+            <div className="absolute top-1/2 left-3 -translate-y-1/2 flex flex-col gap-2 items-center justify-center">
               <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
