@@ -53,7 +53,7 @@ const ProposalWorkspace = ({
       >
         {/* Collapsible Header */}
         <CollapsibleHeader>
-          <TabsList className="w-full max-w-md mx-auto">
+          <TabsList className="w-full max-w-md mx-auto mb-2">
             <TabsTrigger value="plan" className="flex-1">
               Plan
             </TabsTrigger>
@@ -86,7 +86,10 @@ const ProposalWorkspace = ({
             value="write"
             className="mt-0 flex-1 overflow-auto h-full"
           >
-            <ProposalPreview yPosition={yPosition} />
+            <ProposalPreview
+              yPosition={yPosition}
+              activeSection={activeSection}
+            />
           </TabsContent>
         </div>
       </Tabs>

@@ -44,7 +44,13 @@ import {
   handleFeedbackResolved
 } from "./feedbackFunctions";
 
-const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
+const ProposalPreview = ({
+  yPosition,
+  activeSection
+}: {
+  yPosition: number;
+  activeSection: string;
+}) => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
   const activeEditorRef = useRef<HTMLDivElement | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null);
@@ -859,11 +865,13 @@ const ProposalPreview = ({ yPosition }: { yPosition: number }) => {
                   >
                     {outline.length > 0 ? (
                       // Display sections from the outline
-                      outline.map((section, index) => (
-                        <div
-                          key={section.section_id}
-                          className={cn(
-                            "border-b border-gray-line relative last:rounded-b-md"
+                      outline
+                        .filter((section) => section.section_id === activeSection)
+                        .map((section, index) => (
+                          <div
+                            key={section.section_id}
+                            className={cn(
+                            "border-b border-gray-line relative"
                           )}
                         >
                           {section.answerer && (

@@ -83,7 +83,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
         )}
         onClick={() => handleTabClick("/proposal-planner")}
       >
-        Proposal Workspace
+        Bid Outline
       </span>
 
       {displayOutline.length > 0 && (
