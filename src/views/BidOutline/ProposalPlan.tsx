@@ -298,7 +298,7 @@ const ProposalPlan = ({
     // Otherwise, open the sidepane
     e.preventDefault();
     setSelectedSection(index);
-    
+
     handleActiveSectionChange(outline[index].section_id);
     setApiChoices([]);
   };
@@ -1150,163 +1150,159 @@ const ProposalPlan = ({
   };
 
   return (
-    <>
-      <div className="mb-4">
-        {outline.length === 0 ? null : (
-          <div className="h-full">
-            {isOrganizationUsersLoading ? (
-              <div className="flex items-center justify-center w-full h-64">
-                <div className="flex flex-col items-center gap-4">
-                  <Spinner />
-                  <p className="text-muted-foreground">
-                    Loading organisation data...
-                  </p>
-                </div>
+    <div>
+      {outline.length === 0 ? null : (
+        <div className="h-full">
+          {isOrganizationUsersLoading ? (
+            <div className="flex items-center justify-center w-full h-64">
+              <div className="flex flex-col items-center gap-4">
+                <Spinner />
+                <p className="text-muted-foreground">
+                  Loading organisation data...
+                </p>
               </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-end flex-shrink-0 gap-2 max-w-7xl mx-auto mb-4">
-                  <Button variant="outline" onClick={handleRegenerateClick}>
-                    <PlusIcon />
-                    New Outline
-                  </Button>
-                  <GenerateProposalModal
-                    bid_id={object_id}
-                    handleTabClick={handleTabClick}
-                  />
-                </div>
-                {activeSectionId === "" && (
-                  <div className="rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-[60px] py-3.5 px-4">
-                            <div className="flex justify-end">
-                              <Checkbox
-                                checked={
-                                  selectedSections.size === outline.length
-                                }
-                                onCheckedChange={(checked: boolean) =>
-                                  handleSelectAll(checked)
-                                }
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                            </div>
-                          </TableHead>
-                          <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
-                            Section
-                          </TableHead>
-                          <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                            Question Type
-                          </TableHead>
-                          <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                            Status
-                          </TableHead>
-                          <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                            <div className="flex items-center justify-center">
-                              <LengthUnitDropdown
-                                value={lengthUnit}
-                                onChange={(value) => setLengthUnit(value)}
-                              />
-                            </div>
-                          </TableHead>
-                          <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                            Answerer
-                          </TableHead>
-                          <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                            Reviewer
-                          </TableHead>
-                          <TableHead className="w-[60px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4">
-                            Action
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                        onDragStart={handleDragStart}
-                        modifiers={[restrictToVerticalAxis]}
-                      >
-                        <SortableContext
-                          items={outline.map((section) => section.section_id)}
-                          strategy={verticalListSortingStrategy}
-                        >
-                          <TableBody>
-                            {outline.map((section, index) => (
-                              <SortableTableRow
-                                key={section.section_id}
-                                section={section}
-                                index={index}
-                              />
-                            ))}
-                          </TableBody>
-                        </SortableContext>
-                      </DndContext>
-                    </Table>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <DeleteConfirmationDialog
-              isOpen={showDeleteDialog}
-              onClose={() => {
-                setShowDeleteDialog(false);
-                setSectionToDelete(null);
-              }}
-              onConfirm={handleConfirmDelete}
-              title="Delete Section"
-              message="Are you sure you want to delete this section? This action cannot be undone."
-            />
-
-            {activeSectionId &&
-              selectedSection !== null &&
-              !isOrganizationUsersLoading && (
-                <ProposalSidepane
-                  section={outline[selectedSection]}
-                  index={selectedSection}
-                  isLoading={isLoading}
-                  isPreviewLoading={isPreviewLoading}
-                  handleEditClick={handleEditClick}
-                  handleSectionChange={handleSectionChange}
-                  sendQuestionToChatbot={sendQuestionToChatbot}
-                  apiChoices={apiChoices}
-                  selectedChoices={selectedChoices}
-                  submitSelections={submitSelections}
-                  handleDeleteSubheading={handleDeleteSubheading}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-end flex-shrink-0 gap-2 max-w-7xl mx-auto mb-4">
+                <Button variant="outline" onClick={handleRegenerateClick}>
+                  <PlusIcon />
+                  New Outline
+                </Button>
+                <GenerateProposalModal
+                  bid_id={object_id}
+                  handleTabClick={handleTabClick}
                 />
+              </div>
+              {activeSectionId === "" && (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[60px] py-3.5 px-4">
+                          <div className="flex justify-end">
+                            <Checkbox
+                              checked={selectedSections.size === outline.length}
+                              onCheckedChange={(checked: boolean) =>
+                                handleSelectAll(checked)
+                              }
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
+                          Section
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                          Question Type
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                          Status
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                          <div className="flex items-center justify-center">
+                            <LengthUnitDropdown
+                              value={lengthUnit}
+                              onChange={(value) => setLengthUnit(value)}
+                            />
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                          Answerer
+                        </TableHead>
+                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
+                          Reviewer
+                        </TableHead>
+                        <TableHead className="w-[60px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4">
+                          Action
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                      onDragStart={handleDragStart}
+                      modifiers={[restrictToVerticalAxis]}
+                    >
+                      <SortableContext
+                        items={outline.map((section) => section.section_id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <TableBody>
+                          {outline.map((section, index) => (
+                            <SortableTableRow
+                              key={section.section_id}
+                              section={section}
+                              index={index}
+                            />
+                          ))}
+                        </TableBody>
+                      </SortableContext>
+                    </DndContext>
+                  </Table>
+                </div>
               )}
+            </div>
+          )}
 
-            {selectedSections.size > 0 && !isOrganizationUsersLoading && (
-              <BulkControls
-                selectedCount={selectedSections.size}
-                onClose={() => setSelectedSections(new Set())}
-                onUpdateSections={handleBulkUpdate}
-                onDeleteSections={handleBulkDelete}
-                contributors={contributors}
-                onRevert={handleRevert}
-                canRevert={canRevert}
+          <DeleteConfirmationDialog
+            isOpen={showDeleteDialog}
+            onClose={() => {
+              setShowDeleteDialog(false);
+              setSectionToDelete(null);
+            }}
+            onConfirm={handleConfirmDelete}
+            title="Delete Section"
+            message="Are you sure you want to delete this section? This action cannot be undone."
+          />
+
+          {activeSectionId &&
+            selectedSection !== null &&
+            !isOrganizationUsersLoading && (
+              <ProposalSidepane
+                section={outline[selectedSection]}
+                index={selectedSection}
+                isLoading={isLoading}
+                isPreviewLoading={isPreviewLoading}
+                handleEditClick={handleEditClick}
+                handleSectionChange={handleSectionChange}
+                sendQuestionToChatbot={sendQuestionToChatbot}
+                apiChoices={apiChoices}
+                selectedChoices={selectedChoices}
+                submitSelections={submitSelections}
+                handleDeleteSubheading={handleDeleteSubheading}
               />
             )}
 
-            {/* Add DragOverlay for better visual feedback */}
-            <DragOverlay>
-              {activeId ? (
-                <TableRow className="bg-background border shadow-md">
-                  <TableCell colSpan={4} className="px-4">
-                    {
-                      outline.find((section) => section.section_id === activeId)
-                        ?.heading
-                    }
-                  </TableCell>
-                </TableRow>
-              ) : null}
-            </DragOverlay>
-          </div>
-        )}
-      </div>
-    </>
+          {selectedSections.size > 0 && !isOrganizationUsersLoading && (
+            <BulkControls
+              selectedCount={selectedSections.size}
+              onClose={() => setSelectedSections(new Set())}
+              onUpdateSections={handleBulkUpdate}
+              onDeleteSections={handleBulkDelete}
+              contributors={contributors}
+              onRevert={handleRevert}
+              canRevert={canRevert}
+            />
+          )}
+
+          {/* Add DragOverlay for better visual feedback */}
+          <DragOverlay>
+            {activeId ? (
+              <TableRow className="bg-background border shadow-md">
+                <TableCell colSpan={4} className="px-4">
+                  {
+                    outline.find((section) => section.section_id === activeId)
+                      ?.heading
+                  }
+                </TableCell>
+              </TableRow>
+            ) : null}
+          </DragOverlay>
+        </div>
+      )}
+    </div>
   );
 };
 export default ProposalPlan;

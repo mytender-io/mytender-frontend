@@ -72,7 +72,7 @@ const ProposalWorkspace = ({
   };
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col h-full w-full pb-4">
       {/* Tabs for switching between Plan and Write views */}
       <Tabs
         defaultValue={activeView}
@@ -87,16 +87,17 @@ const ProposalWorkspace = ({
       >
         {/* Collapsible Header */}
         <CollapsibleHeader disableCollapse>
-          <TabsList className="w-full max-w-md mx-auto mb-2 h-12">
-            <TabsTrigger 
-              value="plan" 
+          <TabsList className="w-full max-w-md mx-auto h-12">
+            <TabsTrigger
+              value="plan"
               className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
             >
               Plan
             </TabsTrigger>
-            <TabsTrigger 
-              value="write" 
+            <TabsTrigger
+              value="write"
               className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
+              disabled={!activeSectionId}
             >
               Write
             </TabsTrigger>
