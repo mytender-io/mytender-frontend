@@ -3,11 +3,9 @@ import ProposalPlan from "@/views/BidOutline/ProposalPlan";
 import ProposalPreview from "@/views/ProposalPreview/ProposalPreview";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CollapsibleHeader from "./CollapsibleHeader";
-import { BidContext, Section } from "@/views/BidWritingStateManagerView";
+import { BidContext } from "@/views/BidWritingStateManagerView";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import StatusMenu from "@/buttons/StatusMenu";
-import { toast } from "react-toastify";
 
 interface ProposalWorkspaceProps {
   openTask: (taskId: string | null, sectionIndex: string | null) => void;
@@ -32,7 +30,7 @@ const ProposalWorkspace = ({
   yPosition,
   activeTab
 }: ProposalWorkspaceProps) => {
-  const { sharedState, setSharedState } = useContext(BidContext);
+  const { sharedState } = useContext(BidContext);
   const { outline } = sharedState;
 
   const totalSections = outline.length;
@@ -41,7 +39,6 @@ const ProposalWorkspace = ({
     null
   );
   const [activeView, setActiveView] = useState<"plan" | "write">("plan");
-  const [activeSection, setActiveSection] = useState<Section | null>(null);
 
   // Initialize the active view based on the activeTab prop
   useEffect(() => {
@@ -58,7 +55,6 @@ const ProposalWorkspace = ({
     );
     if (index !== -1) {
       setActiveSectionIndex(index);
-      setActiveSection(outline[index]);
       handleActiveSectionChange(outline[index].section_id);
     }
   }, [activeSectionId, outline]);
@@ -72,47 +68,6 @@ const ProposalWorkspace = ({
     if (newIndex >= 0 && newIndex < outline.length) {
       setActiveSectionIndex(newIndex);
       handleActiveSectionChange(outline[newIndex].section_id);
-    }
-  };
-
-  const handleSectionChange = async (
-    index: number,
-    field: keyof Section,
-    value: any
-  ) => {
-    console.log("handleSectionChange", index, field, value);
-    try {
-      // Create new outline by properly spreading nested objects
-      const newOutline = [...sharedState.outline];
-
-      // If changing a field other than status and current status is "Not Started", update status to "In Progress"
-      if (field !== "status" && newOutline[index].status === "Not Started") {
-        newOutline[index] = {
-          ...newOutline[index],
-          [field]: value,
-          status: "In Progress"
-        };
-      } else {
-        newOutline[index] = {
-          ...newOutline[index],
-          [field]: value
-        };
-      }
-
-      // Update state using callback to ensure we have latest state
-      setSharedState((prevState) => ({
-        ...prevState,
-        outline: newOutline
-      }));
-
-      // Wait for state to update
-      await new Promise((resolve) => setTimeout(resolve, 0));
-
-      return true; // Indicate successful update
-    } catch (error) {
-      console.error("Error updating section:", error);
-      toast.error("Failed to update section");
-      return false;
     }
   };
 
@@ -144,8 +99,8 @@ const ProposalWorkspace = ({
             Please detail how you would implement a positive impact on the
             surrounding local community for the contract?
           </span>
-          {activeSection && activeSectionIndex !== null && (
-            <div className="absolute top-1/2 left-3 -translate-y-1/2 flex flex-col gap-2 items-center justify-center">
+          {activeSectionIndex !== null && (
+            <div className="absolute top-10 left-3 -translate-y-1/2 flex flex-col gap-2 items-center justify-center">
               <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
@@ -169,12 +124,6 @@ const ProposalWorkspace = ({
                   <ChevronRight />
                 </Button>
               </div>
-              <StatusMenu
-                value={activeSection.status}
-                onChange={(value) =>
-                  handleSectionChange(activeSectionIndex, "status", value)
-                }
-              />
             </div>
           )}
         </CollapsibleHeader>

@@ -34,8 +34,6 @@ interface HighlightedDocument {
 interface ProposalSidepaneProps {
   section: Section;
   index: number;
-  isOpen: boolean;
-  onClose: () => void;
   isLoading: boolean;
   isPreviewLoading: boolean;
   handleEditClick: (section: Section, index: number) => void;
@@ -61,8 +59,6 @@ interface ProposalSidepaneProps {
 const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   section,
   index,
-  isOpen,
-  onClose,
   handleSectionChange,
   handleDeleteSubheading
 }) => {
@@ -599,277 +595,246 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   if (!section) return null;
 
   return (
-    <>
-      <div
-        className={cn(
-          "fixed inset-0 bg-black/30 z-40 transition-opacity duration-300",
-          isOpen ? "opacity-100 visible" : "opacity-0 invisible"
-        )}
-        onClick={onClose}
-      />
-      <div
-        className={cn(
-          "fixed top-0 right-0 w-full max-w-5xl h-full bg-white shadow-lg z-50 rounded-md",
-          "transform transition-transform duration-300 ease-in-out",
-          isOpen ? "translate-x-0" : "translate-x-full"
-        )}
-      >
-        <ScrollArea className="h-full">
-          <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between gap-2 p-4 border-b border-gray-line">
-              <Input
-                value={section.heading}
-                onChange={(e) =>
-                  handleSectionChange(index, "heading", e.target.value)
-                }
-                className="flex-1 font-bold resize-none overflow-hidden whitespace-nowrap min-h-[1.75rem] bg-transparent border-none focus:ring-0 shadow-none md:text-lg"
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                className="text-2xl bg-transparent"
-              >
-                ×
-              </Button>
-            </div>
-            <div className="p-4 space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <QuestionTypeDropdown
-                    value={section.choice}
-                    onChange={(value) =>
-                      handleSectionChange(index, "choice", value)
-                    }
-                    showIcon={true}
-                  />
-                  <SelectFilePopup
-                    onSaveSelectedFiles={handleSaveSelectedFiles}
-                    initialSelectedFiles={
-                      section?.highlightedDocuments?.map((doc) => doc.name) ||
-                      []
-                    }
-                    onSaveSelectedTenderFiles={handleSaveSelectedTenderFiles}
-                    initialTenderSelectedFiles={
-                      section?.highlightedTenderDocuments?.map(
-                        (doc) => doc.name
-                      ) || []
-                    }
-                    bid_id={sharedState.object_id}
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Word count:</span>
-                  <Input
-                    type="number"
-                    value={section.word_count || 0}
-                    min={0}
-                    step={50}
-                    className="w-20 text-center h-9"
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      if (!isNaN(value) && value >= 0) {
-                        handleSectionChange(index, "word_count", value);
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-
-              {section?.highlightedDocuments?.length > 0 && (
-                <div className="space-y-2 min-h-10">
-                  <span className="text-xs font-medium text-gray-500">
-                    Content Library Documents:
-                  </span>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {section.highlightedDocuments.map((doc, idx) => (
-                      <Badge
-                        key={idx}
-                        className={cn(
-                          "flex items-center gap-1 px-2 py-1 border text-sm",
-                          loadingDocuments[doc.name]
-                            ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                            : doc.rawtext
-                              ? "bg-green-50 text-green-700 border-green-200"
-                              : "bg-blue-50 text-blue-700 border-blue-200"
-                        )}
-                      >
-                        <FileIcon className="h-3 w-3" />
-                        <span className="max-w-xs truncate">{doc.name}</span>
-                        {loadingDocuments[doc.name] && (
-                          <span className="ml-1 text-xs">(loading...)</span>
-                        )}
-                        <Button
-                          onClick={() => handleRemoveDocument(doc)}
-                          variant="ghost"
-                          size="icon"
-                          className="ml-1 h-4 w-4 p-0"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {section?.highlightedTenderDocuments?.length > 0 && (
-                <div className="mt-2 mb-1">
-                  <span className="text-xs font-medium text-gray-500">
-                    Tender Documents:
-                  </span>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {section.highlightedTenderDocuments.map((doc, idx) => (
-                      <Badge
-                        key={`tender-${idx}`}
-                        className={cn(
-                          "flex items-center gap-1 px-2 py-1 border text-sm",
-                          loadingDocuments[doc.name]
-                            ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                            : doc.rawtext
-                              ? "bg-purple-50 text-purple-700 border-purple-200"
-                              : "bg-indigo-50 text-indigo-700 border-indigo-200"
-                        )}
-                      >
-                        <FileIcon className="h-3 w-3" />
-                        <span className="max-w-xs truncate">{doc.name}</span>
-                        {loadingDocuments[doc.name] && (
-                          <span className="ml-1 text-xs">(loading...)</span>
-                        )}
-                        <Button
-                          onClick={() => handleRemoveTenderDocument(doc)}
-                          variant="ghost"
-                          size="icon"
-                          className="ml-1 h-4 w-4 p-0"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <span className="font-medium">Question</span>
-                <DebouncedTextArea
-                  value={section.question}
+    <div
+      className={cn(
+        "w-full max-w-5xl h-full bg-white shadow-lg rounded-md border border-gray-line mx-auto"
+      )}
+    >
+      <ScrollArea className="h-full">
+        <div className="flex flex-col h-full">
+          <div className="flex items-center justify-between gap-2 p-4 border-b border-gray-line">
+            <Input
+              value={section.heading}
+              onChange={(e) =>
+                handleSectionChange(index, "heading", e.target.value)
+              }
+              className="flex-1 font-bold resize-none overflow-hidden whitespace-nowrap min-h-[1.75rem] bg-transparent border-none focus:ring-0 shadow-none md:text-lg"
+            />
+          </div>
+          <div className="p-4 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <QuestionTypeDropdown
+                  value={section.choice}
                   onChange={(value) =>
-                    handleSectionChange(index, "question", value)
+                    handleSectionChange(index, "choice", value)
                   }
-                  rows={3}
-                  className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-gray-line rounded-lg !leading-relaxed"
-                  placeholder="Add in the question here"
+                  showIcon={true}
+                />
+                <SelectFilePopup
+                  onSaveSelectedFiles={handleSaveSelectedFiles}
+                  initialSelectedFiles={
+                    section?.highlightedDocuments?.map((doc) => doc.name) || []
+                  }
+                  onSaveSelectedTenderFiles={handleSaveSelectedTenderFiles}
+                  initialTenderSelectedFiles={
+                    section?.highlightedTenderDocuments?.map(
+                      (doc) => doc.name
+                    ) || []
+                  }
+                  bid_id={sharedState.object_id}
                 />
               </div>
-              {section.writingplan && section.writingplan.trim() ? (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium">Writing Plan</span>
-                    {editingWritingPlan && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setEditingWritingPlan(false)}
-                        className="ml-auto"
-                      >
-                        Save
-                      </Button>
-                    )}
-                  </div>
-                  {editingWritingPlan ? (
-                    <DebouncedTextArea
-                      value={section.writingplan}
-                      onChange={(value) =>
-                        handleSectionChange(index, "writingplan", value)
-                      }
-                      className="w-full focus:outline-none focus-visible:ring-0 font-mono"
-                      placeholder="Enter Markdown content here..."
-                      rows={20}
-                    />
-                  ) : (
-                    <div
-                      onClick={() => setEditingWritingPlan(true)}
-                      className="px-2 border border-gray-line rounded-lg cursor-pointer"
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Word count:</span>
+                <Input
+                  type="number"
+                  value={section.word_count || 0}
+                  min={0}
+                  step={50}
+                  className="w-20 text-center h-9"
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    if (!isNaN(value) && value >= 0) {
+                      handleSectionChange(index, "word_count", value);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+
+            {section?.highlightedDocuments?.length > 0 && (
+              <div className="space-y-2 min-h-10">
+                <span className="text-xs font-medium text-gray-500">
+                  Content Library Documents:
+                </span>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {section.highlightedDocuments.map((doc, idx) => (
+                    <Badge
+                      key={idx}
+                      className={cn(
+                        "flex items-center gap-1 px-2 py-1 border text-sm",
+                        loadingDocuments[doc.name]
+                          ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                          : doc.rawtext
+                            ? "bg-green-50 text-green-700 border-green-200"
+                            : "bg-blue-50 text-blue-700 border-blue-200"
+                      )}
                     >
-                      <MarkdownRenderer content={section.writingplan} />
-                    </div>
+                      <FileIcon className="h-3 w-3" />
+                      <span className="max-w-xs truncate">{doc.name}</span>
+                      {loadingDocuments[doc.name] && (
+                        <span className="ml-1 text-xs">(loading...)</span>
+                      )}
+                      <Button
+                        onClick={() => handleRemoveDocument(doc)}
+                        variant="ghost"
+                        size="icon"
+                        className="ml-1 h-4 w-4 p-0"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {section?.highlightedTenderDocuments?.length > 0 && (
+              <div className="mt-2 mb-1">
+                <span className="text-xs font-medium text-gray-500">
+                  Tender Documents:
+                </span>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {section.highlightedTenderDocuments.map((doc, idx) => (
+                    <Badge
+                      key={`tender-${idx}`}
+                      className={cn(
+                        "flex items-center gap-1 px-2 py-1 border text-sm",
+                        loadingDocuments[doc.name]
+                          ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                          : doc.rawtext
+                            ? "bg-purple-50 text-purple-700 border-purple-200"
+                            : "bg-indigo-50 text-indigo-700 border-indigo-200"
+                      )}
+                    >
+                      <FileIcon className="h-3 w-3" />
+                      <span className="max-w-xs truncate">{doc.name}</span>
+                      {loadingDocuments[doc.name] && (
+                        <span className="ml-1 text-xs">(loading...)</span>
+                      )}
+                      <Button
+                        onClick={() => handleRemoveTenderDocument(doc)}
+                        variant="ghost"
+                        size="icon"
+                        className="ml-1 h-4 w-4 p-0"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <span className="font-medium">Question</span>
+              <DebouncedTextArea
+                value={section.question}
+                onChange={(value) =>
+                  handleSectionChange(index, "question", value)
+                }
+                rows={3}
+                className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-gray-line rounded-lg !leading-relaxed"
+                placeholder="Add in the question here"
+              />
+            </div>
+            {section.writingplan && section.writingplan.trim() ? (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium">Writing Plan</span>
+                  {editingWritingPlan && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setEditingWritingPlan(false)}
+                      className="ml-auto"
+                    >
+                      Save
+                    </Button>
                   )}
                 </div>
-              ) : null}
-              {/* <SubheadingCards
+                {editingWritingPlan ? (
+                  <DebouncedTextArea
+                    value={section.writingplan}
+                    onChange={(value) =>
+                      handleSectionChange(index, "writingplan", value)
+                    }
+                    className="w-full focus:outline-none focus-visible:ring-0 font-mono"
+                    placeholder="Enter Markdown content here..."
+                    rows={20}
+                  />
+                ) : (
+                  <div
+                    onClick={() => setEditingWritingPlan(true)}
+                    className="px-2 border border-gray-line rounded-lg cursor-pointer"
+                  >
+                    <MarkdownRenderer content={section.writingplan} />
+                  </div>
+                )}
+              </div>
+            ) : null}
+            {/* <SubheadingCards
                 section={section}
                 index={index}
                 handleSectionChange={handleSectionChange}
                 handleDeleteSubheading={handleDeleteSubheading}
               /> */}
-              <div className="space-y-6">
-                <div className="space-y-2 min-h-10">
-                  <span
-                    className="font-medium flex items-center gap-1 cursor-pointer select-none"
-                    onClick={() => toggleSection("compliance")}
-                  >
-                    <ChevronRight
-                      className={cn(
-                        "w-5 h-5 transition-transform duration-200",
-                        openSections.compliance && "rotate-90"
-                      )}
-                    />
-                    Compliance Requirements
-                  </span>
-                  {openSections.compliance && (
-                    <>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {complianceBullets.map((requirement, idx) => (
-                          <Badge
-                            key={idx}
-                            className="bg-status-success_light text-status-success border border-status-success rounded-xl flex items-center gap-1 min-h-8 text-sm"
+            <div className="space-y-6">
+              <div className="space-y-2 min-h-10">
+                <span
+                  className="font-medium flex items-center gap-1 cursor-pointer select-none"
+                  onClick={() => toggleSection("compliance")}
+                >
+                  <ChevronRight
+                    className={cn(
+                      "w-5 h-5 transition-transform duration-200",
+                      openSections.compliance && "rotate-90"
+                    )}
+                  />
+                  Compliance Requirements
+                </span>
+                {openSections.compliance && (
+                  <>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {complianceBullets.map((requirement, idx) => (
+                        <Badge
+                          key={idx}
+                          className="bg-status-success_light text-status-success border border-status-success rounded-xl flex items-center gap-1 min-h-8 text-sm"
+                        >
+                          {requirement}
+                          <Button
+                            onClick={() => handleRemoveCompliance(requirement)}
+                            variant="ghost"
+                            size="icon"
+                            className="ml-1 h-4 w-4 p-0"
                           >
-                            {requirement}
-                            <Button
-                              onClick={() =>
-                                handleRemoveCompliance(requirement)
-                              }
-                              variant="ghost"
-                              size="icon"
-                              className="ml-1 h-4 w-4 p-0"
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </Badge>
+                      ))}
+                      <div className="flex items-center gap-2 mb-2">
+                        {showComplianceSelect ? (
+                          <>
+                            <Select
+                              value={selectedCompliance}
+                              onValueChange={setSelectedCompliance}
                             >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </Badge>
-                        ))}
-                        <div className="flex items-center gap-2 mb-2">
-                          {showComplianceSelect ? (
-                            <>
-                              <Select
-                                value={selectedCompliance}
-                                onValueChange={setSelectedCompliance}
-                              >
-                                <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
-                                  <SelectValue placeholder="Enter compliance requirement" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {complianceOptions.map((requirement, idx) => (
-                                    <SelectItem
-                                      key={idx}
-                                      value={requirement}
-                                      className="max-w-xl"
-                                    >
-                                      {requirement}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleAddCompliance}
-                                className="flex items-center rounded-lg p-2"
-                              >
-                                <Plus className="h-4 w-4" />
-                              </Button>
-                            </>
-                          ) : (
+                              <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
+                                <SelectValue placeholder="Enter compliance requirement" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {complianceOptions.map((requirement, idx) => (
+                                  <SelectItem
+                                    key={idx}
+                                    value={requirement}
+                                    className="max-w-xl"
+                                  >
+                                    {requirement}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <Button
                               variant="outline"
                               size="sm"
@@ -878,10 +843,20 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
-                          )}
-                        </div>
+                          </>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleAddCompliance}
+                            className="flex items-center rounded-lg p-2"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
-                      {/* <DebouncedTextArea
+                    </div>
+                    {/* <DebouncedTextArea
                         value={section.compliance_requirements}
                         onChange={(value) =>
                           handleSectionChange(
@@ -892,73 +867,63 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         }
                         placeholder="These are the compliance requirements relevant to the section..."
                       /> */}
-                    </>
-                  )}
-                </div>
-                <div className="space-y-2 min-h-10">
-                  <span
-                    className="font-medium flex items-center gap-1 cursor-pointer select-none"
-                    onClick={() => toggleSection("winThemes")}
-                  >
-                    <ChevronRight
-                      className={cn(
-                        "w-5 h-5 transition-transform duration-200",
-                        openSections.winThemes && "rotate-90"
-                      )}
-                    />
-                    Relevant Win Themes
-                  </span>
-                  {openSections.winThemes && (
-                    <>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {winThemeBullets.map((theme, idx) => (
-                          <Badge
-                            key={idx}
-                            className="bg-status-research_light text-status-research border border-status-research rounded-xl flex items-center gap-1 min-h-8 text-sm"
+                  </>
+                )}
+              </div>
+              <div className="space-y-2 min-h-10">
+                <span
+                  className="font-medium flex items-center gap-1 cursor-pointer select-none"
+                  onClick={() => toggleSection("winThemes")}
+                >
+                  <ChevronRight
+                    className={cn(
+                      "w-5 h-5 transition-transform duration-200",
+                      openSections.winThemes && "rotate-90"
+                    )}
+                  />
+                  Relevant Win Themes
+                </span>
+                {openSections.winThemes && (
+                  <>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {winThemeBullets.map((theme, idx) => (
+                        <Badge
+                          key={idx}
+                          className="bg-status-research_light text-status-research border border-status-research rounded-xl flex items-center gap-1 min-h-8 text-sm"
+                        >
+                          {theme}
+                          <Button
+                            onClick={() => handleRemoveWinTheme(theme)}
+                            variant="ghost"
+                            size="icon"
+                            className="ml-1 h-4 w-4 p-0"
                           >
-                            {theme}
-                            <Button
-                              onClick={() => handleRemoveWinTheme(theme)}
-                              variant="ghost"
-                              size="icon"
-                              className="ml-1 h-4 w-4 p-0"
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </Badge>
+                      ))}
+                      <div className="flex items-center gap-2 mb-2">
+                        {showWinThemeSelect ? (
+                          <>
+                            <Select
+                              value={selectedWinTheme}
+                              onValueChange={setSelectedWinTheme}
                             >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </Badge>
-                        ))}
-                        <div className="flex items-center gap-2 mb-2">
-                          {showWinThemeSelect ? (
-                            <>
-                              <Select
-                                value={selectedWinTheme}
-                                onValueChange={setSelectedWinTheme}
-                              >
-                                <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
-                                  <SelectValue placeholder="Select a win theme" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {sharedState.win_themes.map((theme, idx) => (
-                                    <SelectItem
-                                      key={idx}
-                                      value={theme}
-                                      className="max-w-xl"
-                                    >
-                                      {theme}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleAddWinTheme}
-                                className="flex items-center rounded-lg p-2"
-                              >
-                                <Plus className="h-4 w-4" />
-                              </Button>
-                            </>
-                          ) : (
+                              <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
+                                <SelectValue placeholder="Select a win theme" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {sharedState.win_themes.map((theme, idx) => (
+                                  <SelectItem
+                                    key={idx}
+                                    value={theme}
+                                    className="max-w-xl"
+                                  >
+                                    {theme}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <Button
                               variant="outline"
                               size="sm"
@@ -967,10 +932,20 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
-                          )}
-                        </div>
+                          </>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleAddWinTheme}
+                            className="flex items-center rounded-lg p-2"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
-                      {/* <DebouncedTextArea
+                    </div>
+                    {/* <DebouncedTextArea
                         value={section.relevant_evaluation_criteria}
                         onChange={(value) =>
                           handleSectionChange(
@@ -981,75 +956,65 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         }
                         placeholder="These are the win themes relevant to the section..."
                       /> */}
-                    </>
-                  )}
-                </div>
-                <div className="space-y-2 min-h-10">
-                  <span
-                    className="font-medium flex items-center gap-1 cursor-pointer select-none"
-                    onClick={() => toggleSection("painPoints")}
-                  >
-                    <ChevronRight
-                      className={cn(
-                        "w-5 h-5 transition-transform duration-200",
-                        openSections.painPoints && "rotate-90"
-                      )}
-                    />
-                    Relevant Customer Pain Points
-                  </span>
-                  {openSections.painPoints && (
-                    <>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {painPointBullets.map((point, idx) => (
-                          <Badge
-                            key={idx}
-                            className="bg-status-review_light text-status-review border border-status-review rounded-xl flex items-center gap-1 min-h-8 text-sm"
+                  </>
+                )}
+              </div>
+              <div className="space-y-2 min-h-10">
+                <span
+                  className="font-medium flex items-center gap-1 cursor-pointer select-none"
+                  onClick={() => toggleSection("painPoints")}
+                >
+                  <ChevronRight
+                    className={cn(
+                      "w-5 h-5 transition-transform duration-200",
+                      openSections.painPoints && "rotate-90"
+                    )}
+                  />
+                  Relevant Customer Pain Points
+                </span>
+                {openSections.painPoints && (
+                  <>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {painPointBullets.map((point, idx) => (
+                        <Badge
+                          key={idx}
+                          className="bg-status-review_light text-status-review border border-status-review rounded-xl flex items-center gap-1 min-h-8 text-sm"
+                        >
+                          {point}
+                          <Button
+                            onClick={() => handleRemovePainPoint(point)}
+                            variant="ghost"
+                            size="icon"
+                            className="ml-1 h-4 w-4 p-0"
                           >
-                            {point}
-                            <Button
-                              onClick={() => handleRemovePainPoint(point)}
-                              variant="ghost"
-                              size="icon"
-                              className="ml-1 h-4 w-4 p-0"
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </Badge>
+                      ))}
+                      <div className="flex items-center gap-2 mb-2">
+                        {showPainPointSelect ? (
+                          <>
+                            <Select
+                              value={selectedPainPoint}
+                              onValueChange={setSelectedPainPoint}
                             >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </Badge>
-                        ))}
-                        <div className="flex items-center gap-2 mb-2">
-                          {showPainPointSelect ? (
-                            <>
-                              <Select
-                                value={selectedPainPoint}
-                                onValueChange={setSelectedPainPoint}
-                              >
-                                <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
-                                  <SelectValue placeholder="Select a pain point" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {sharedState.customer_pain_points.map(
-                                    (point, idx) => (
-                                      <SelectItem
-                                        key={idx}
-                                        value={point}
-                                        className="max-w-xl"
-                                      >
-                                        {point}
-                                      </SelectItem>
-                                    )
-                                  )}
-                                </SelectContent>
-                              </Select>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleAddPainPoint}
-                                className="flex items-center rounded-lg p-2"
-                              >
-                                <Plus className="h-4 w-4" />
-                              </Button>
-                            </>
-                          ) : (
+                              <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
+                                <SelectValue placeholder="Select a pain point" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {sharedState.customer_pain_points.map(
+                                  (point, idx) => (
+                                    <SelectItem
+                                      key={idx}
+                                      value={point}
+                                      className="max-w-xl"
+                                    >
+                                      {point}
+                                    </SelectItem>
+                                  )
+                                )}
+                              </SelectContent>
+                            </Select>
                             <Button
                               variant="outline"
                               size="sm"
@@ -1058,10 +1023,20 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
-                          )}
-                        </div>
+                          </>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleAddPainPoint}
+                            className="flex items-center rounded-lg p-2"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
-                      {/* <DebouncedTextArea
+                    </div>
+                    {/* <DebouncedTextArea
                         value={section.relevant_derived_insights}
                         onChange={(value) =>
                           handleSectionChange(
@@ -1072,79 +1047,67 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                         }
                         placeholder="These are the customer pain points relevant to the section..."
                       /> */}
-                    </>
-                  )}
-                </div>
-                <div className="space-y-2 min-h-10">
-                  <span
-                    className="font-medium flex items-center gap-1 cursor-pointer select-none"
-                    onClick={() => toggleSection("differentiation")}
-                  >
-                    <ChevronRight
-                      className={cn(
-                        "w-5 h-5 transition-transform duration-200",
-                        openSections.differentiation && "rotate-90"
-                      )}
-                    />
-                    Competitor Differentiation Factors
-                  </span>
-                  {openSections.differentiation && (
-                    <>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {parseBulletPoints(
-                          section?.relevant_differentiation_factors || ""
-                        ).map((factor, idx) => (
-                          <Badge
-                            key={idx}
-                            className="bg-status-planning_light text-status-planning border border-status-planning rounded-xl flex items-center gap-1 min-h-8 text-sm py-2"
+                  </>
+                )}
+              </div>
+              <div className="space-y-2 min-h-10">
+                <span
+                  className="font-medium flex items-center gap-1 cursor-pointer select-none"
+                  onClick={() => toggleSection("differentiation")}
+                >
+                  <ChevronRight
+                    className={cn(
+                      "w-5 h-5 transition-transform duration-200",
+                      openSections.differentiation && "rotate-90"
+                    )}
+                  />
+                  Competitor Differentiation Factors
+                </span>
+                {openSections.differentiation && (
+                  <>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {parseBulletPoints(
+                        section?.relevant_differentiation_factors || ""
+                      ).map((factor, idx) => (
+                        <Badge
+                          key={idx}
+                          className="bg-status-planning_light text-status-planning border border-status-planning rounded-xl flex items-center gap-1 min-h-8 text-sm py-2"
+                        >
+                          {factor}
+                          <Button
+                            onClick={() => handleRemoveDifferentiation(factor)}
+                            variant="ghost"
+                            size="icon"
+                            className="ml-1 h-4 w-4 p-0"
                           >
-                            {factor}
-                            <Button
-                              onClick={() =>
-                                handleRemoveDifferentiation(factor)
-                              }
-                              variant="ghost"
-                              size="icon"
-                              className="ml-1 h-4 w-4 p-0"
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </Badge>
+                      ))}
+                      <div className="flex items-center gap-2 mb-2">
+                        {showDifferentiationSelect ? (
+                          <>
+                            <Select
+                              value={selectedDifferentiation}
+                              onValueChange={setSelectedDifferentiation}
                             >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </Badge>
-                        ))}
-                        <div className="flex items-center gap-2 mb-2">
-                          {showDifferentiationSelect ? (
-                            <>
-                              <Select
-                                value={selectedDifferentiation}
-                                onValueChange={setSelectedDifferentiation}
-                              >
-                                <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
-                                  <SelectValue placeholder="Enter differentiation factor" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {sharedState.differentiating_factors?.map(
-                                    (factor, idx) => (
-                                      <SelectItem
-                                        key={idx}
-                                        value={factor}
-                                        className="max-w-xl"
-                                      >
-                                        {factor}
-                                      </SelectItem>
-                                    )
-                                  ) || []}
-                                </SelectContent>
-                              </Select>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleAddDifferentiation}
-                                className="flex items-center rounded-lg p-2"
-                              >
-                                <Plus className="h-4 w-4" />
-                              </Button>
-                            </>
-                          ) : (
+                              <SelectTrigger className="min-w-64 max-w-xl h-8 bg-white text-sm">
+                                <SelectValue placeholder="Enter differentiation factor" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {sharedState.differentiating_factors?.map(
+                                  (factor, idx) => (
+                                    <SelectItem
+                                      key={idx}
+                                      value={factor}
+                                      className="max-w-xl"
+                                    >
+                                      {factor}
+                                    </SelectItem>
+                                  )
+                                ) || []}
+                              </SelectContent>
+                            </Select>
                             <Button
                               variant="outline"
                               size="sm"
@@ -1153,18 +1116,27 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
-                          )}
-                        </div>
+                          </>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleAddDifferentiation}
+                            className="flex items-center rounded-lg p-2"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
-                    </>
-                  )}
-                </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
-        </ScrollArea>
-      </div>
-    </>
+        </div>
+      </ScrollArea>
+    </div>
   );
 };
 

@@ -92,8 +92,6 @@ const ProposalPlan = ({
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [selectedSections, setSelectedSections] = useState(new Set());
 
-  const [isSidepaneOpen, setIsSidepaneOpen] = useState(false);
-
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [sectionToDelete, setSectionToDelete] = useState<{
     section: Section;
@@ -130,8 +128,6 @@ const ProposalPlan = ({
           // handleRowClick(syntheticEvent, index);
           // Set the selected section directly
           setSelectedSection(index);
-          // Set the sidepane to be open
-          setIsSidepaneOpen(true);
         }
       }, 500); // Short delay to ensure components are rendered
     }
@@ -141,17 +137,17 @@ const ProposalPlan = ({
   useEffect(() => {
     // Check if the activeSectionId matches any section ID, indicating we should jump to that section
     if (activeSectionId && outline && outline.length > 0) {
-      
       // Find the section index by section_id
-      const sectionIndex = outline.findIndex(section => section.section_id === activeSectionId);
-      
+      const sectionIndex = outline.findIndex(
+        (section) => section.section_id === activeSectionId
+      );
+
       if (sectionIndex !== -1) {
         // Scroll to the section
         scrollToSection(String(sectionIndex));
-        
+
         // Open the sidepane for this section
         setSelectedSection(sectionIndex);
-        setIsSidepaneOpen(true);
       }
     }
   }, [activeSectionId, outline]);
@@ -300,7 +296,6 @@ const ProposalPlan = ({
     // Otherwise, open the sidepane
     e.preventDefault();
     setSelectedSection(index);
-    setIsSidepaneOpen(true);
     setApiChoices([]);
   };
 
@@ -1165,84 +1160,15 @@ const ProposalPlan = ({
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-end flex-shrink-0 gap-2">
-                  <Button variant="outline" onClick={handleRegenerateClick}>
-                    <PlusIcon />
-                    New Outline
-                  </Button>
-                  <GenerateProposalModal
-                    bid_id={object_id}
-                    handleTabClick={handleTabClick}
-                  />
-                </div>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[60px] py-3.5 px-4">
-                          <div className="flex justify-end">
-                            <Checkbox
-                              checked={selectedSections.size === outline.length}
-                              onCheckedChange={(checked: boolean) =>
-                                handleSelectAll(checked)
-                              }
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          </div>
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4">
-                          Section
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                          Question Type
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                          Status
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                          <div className="flex items-center justify-center">
-                            <LengthUnitDropdown
-                              value={lengthUnit}
-                              onChange={(value) => setLengthUnit(value)}
-                            />
-                          </div>
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                          Answerer
-                        </TableHead>
-                        <TableHead className="text-sm text-typo-900 font-semibold py-3.5 px-4 text-center">
-                          Reviewer
-                        </TableHead>
-                        <TableHead className="w-[60px] text-right text-sm text-typo-900 font-semibold py-3.5 px-4">
-                          Action
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <DndContext
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
-                      onDragStart={handleDragStart}
-                      modifiers={[restrictToVerticalAxis]}
-                    >
-                      <SortableContext
-                        items={outline.map((section) => section.section_id)}
-                        strategy={verticalListSortingStrategy}
-                      >
-                        <TableBody>
-                          {outline.map((section, index) => (
-                            <SortableTableRow
-                              key={section.section_id}
-                              section={section}
-                              index={index}
-                            />
-                          ))}
-                        </TableBody>
-                      </SortableContext>
-                    </DndContext>
-                  </Table>
-                </div>
+              <div className="flex items-center justify-end flex-shrink-0 gap-2 max-w-5xl mx-auto mb-4">
+                <Button variant="outline" onClick={handleRegenerateClick}>
+                  <PlusIcon />
+                  New Outline
+                </Button>
+                <GenerateProposalModal
+                  bid_id={object_id}
+                  handleTabClick={handleTabClick}
+                />
               </div>
             )}
 
@@ -1261,11 +1187,6 @@ const ProposalPlan = ({
               <ProposalSidepane
                 section={outline[selectedSection]}
                 index={selectedSection}
-                isOpen={isSidepaneOpen}
-                onClose={() => {
-                  setIsSidepaneOpen(false);
-                  setSelectedSection(null);
-                }}
                 isLoading={isLoading}
                 isPreviewLoading={isPreviewLoading}
                 handleEditClick={handleEditClick}

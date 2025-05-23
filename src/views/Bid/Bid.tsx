@@ -115,6 +115,9 @@ const Bid = () => {
   };
 
   const handleSubTabClick = (subTab: string) => {
+    if (subTab !== "bid_extractor") {
+      setActiveTab("/bid-extractor");
+    }
     setActiveSubTab(subTab);
   };
 

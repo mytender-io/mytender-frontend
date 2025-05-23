@@ -55,7 +55,9 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
             key={index}
             className={cn(
               baseSubTabStyles,
-              activeSubTab === tab.stateKey && activeSubTabStyles
+              activeTab === "/bid-extractor" &&
+                activeSubTab === tab.stateKey &&
+                activeSubTabStyles
             )}
             onClick={() => handleSubTabClick(tab.stateKey)}
           >
@@ -93,7 +95,10 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               key={section.section_id}
               className={cn(
                 baseSubTabStyles,
-                activeSectionId === section.section_id && activeSubTabStyles
+                (activeTab === "/proposal-planner" ||
+                  activeTab === "/proposal-preview") &&
+                  activeSectionId === section.section_id &&
+                  activeSubTabStyles
               )}
               onClick={() => handleSectionClick(section.section_id)}
               title={section.heading}
