@@ -56,6 +56,7 @@ interface ProposalPlanProps {
   handleRegenerateClick: () => void;
   handleTabClick: (path: string) => void;
   activeSectionId?: string;
+  handleActiveSectionChange: (sectionId: string) => void;
 }
 
 const ProposalPlan = ({
@@ -64,7 +65,8 @@ const ProposalPlan = ({
   sectionIndex,
   handleRegenerateClick,
   handleTabClick,
-  activeSectionId = ""
+  activeSectionId = "",
+  handleActiveSectionChange
 }: ProposalPlanProps) => {
   const outlineSectionsRef = useRef<Record<string, any>>({});
 
@@ -296,6 +298,8 @@ const ProposalPlan = ({
     // Otherwise, open the sidepane
     e.preventDefault();
     setSelectedSection(index);
+    
+    handleActiveSectionChange(outline[index].section_id);
     setApiChoices([]);
   };
 

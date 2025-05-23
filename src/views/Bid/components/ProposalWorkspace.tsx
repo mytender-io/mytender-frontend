@@ -147,6 +147,7 @@ const ProposalWorkspace = ({
               handleRegenerateClick={handleRegenerateClick}
               handleTabClick={handleTabClick}
               activeSectionId={activeSectionId}
+              handleActiveSectionChange={handleActiveSectionChange}
             />
           </TabsContent>
           <TabsContent
