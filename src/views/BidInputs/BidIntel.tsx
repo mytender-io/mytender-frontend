@@ -241,10 +241,10 @@ const BidIntel = ({
 
   return (
     <div className="flex flex-col gap-4 px-6 py-4">
-      <Button onClick={handleOpenAIModal} className="mx-auto mb-4">
+      {/* <Button onClick={handleOpenAIModal} className="mx-auto mb-4">
         <Sparkles />
         AI Input Editing
-      </Button>
+      </Button> */}
 
       <div className="grid grid-cols-3 gap-6">
         {/* Customer Pain Points Card */}
@@ -340,9 +340,9 @@ const BidIntel = ({
 
       {/* Solution Accordion */}
       <div className="bg-white rounded-lg w-full">
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion type="single" collapsible defaultValue="solution" className="w-full">
           <AccordionItem value="solution" className="border-none">
-            <AccordionTrigger className="px-4 py-3 w-full text-lg text-gray-hint_text">
+            <AccordionTrigger className="px-4 py-3 w-full text-base font-medium text-gray-hint_text">
               Solution
             </AccordionTrigger>
             <AccordionContent className="p-0">
@@ -364,9 +364,9 @@ const BidIntel = ({
 
       {/* Select Case Studies Accordion */}
       <div className="bg-white rounded-lg w-full">
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion type="single" collapsible defaultValue="case-studies" className="w-full">
           <AccordionItem value="case-studies" className="border-none">
-            <AccordionTrigger className="px-4 py-3 w-full text-lg text-gray-hint_text">
+            <AccordionTrigger className="px-4 py-3 w-full text-base font-medium text-gray-hint_text">
               Select Case Studies
             </AccordionTrigger>
             <AccordionContent className="p-4">
@@ -380,9 +380,9 @@ const BidIntel = ({
       <div className="space-y-4">
         {/* Tone of Voice Accordion */}
         <div className="bg-white rounded-lg w-full">
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion type="single" collapsible defaultValue="tone-of-voice" className="w-full">
             <AccordionItem value="tone-of-voice" className="border-none">
-              <AccordionTrigger className="px-4 py-3 w-full text-lg text-gray-hint_text">
+              <AccordionTrigger className="px-4 py-3 w-full text-base font-medium text-gray-hint_text">
                 Tone of Voice
               </AccordionTrigger>
               <AccordionContent className="p-4">

@@ -71,11 +71,11 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     useUserData();
 
   const [openSections, setOpenSections] = React.useState({
-    compliance: false,
-    winThemes: false,
-    painPoints: false,
-    differentiation: false,
-    highlightedDocs: false
+    compliance: true,
+    winThemes: true,
+    painPoints: true,
+    differentiation: true,
+    highlightedDocs: true
   });
 
   const toggleSection = (sectionName: keyof typeof openSections) => {
