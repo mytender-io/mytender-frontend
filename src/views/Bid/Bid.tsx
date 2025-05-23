@@ -103,13 +103,13 @@ const Bid = () => {
       // If switching to the proposal workspace, ensure the correct subtab
       if (path === "/proposal-planner" || path === "/proposal-preview") {
         // Only reset the subtab if we're not already in the proposal workspace
-        const isAlreadyInProposalWorkspace =
-          activeTab === "/proposal-planner" ||
-          activeTab === "/proposal-preview";
+        // const isAlreadyInProposalWorkspace =
+        //   activeTab === "/proposal-planner" ||
+        //   activeTab === "/proposal-preview";
 
-        if (!isAlreadyInProposalWorkspace) {
+        // if (!isAlreadyInProposalWorkspace) {
           setActiveSectionId("");
-        }
+        // }
       }
     }, 300); // 300ms matches our CSS transition time
   };

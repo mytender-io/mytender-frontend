@@ -23,6 +23,10 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { MarkdownRenderer } from "@/components/Markdown";
+import StatusMenu from "@/buttons/StatusMenu";
+import SelectOrganisationUserButton from "@/buttons/SelectOrganisationUserButton";
+import { useUserData } from "@/context/UserDataContext";
+import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 
 interface HighlightedDocument {
   name: string;
@@ -41,7 +45,7 @@ interface ProposalSidepaneProps {
     index: number,
     field: keyof Section,
     value: any
-  ) => void;
+  ) => Promise<boolean> | boolean;
   sendQuestionToChatbot: (
     question: string,
     writingPlan: string,
@@ -63,6 +67,8 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   handleDeleteSubheading
 }) => {
   const { sharedState } = useContext(BidContext);
+  const { organizationUsers, isLoading: isOrganizationUsersLoading } =
+    useUserData();
 
   const [openSections, setOpenSections] = React.useState({
     compliance: false,
@@ -592,12 +598,138 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
 
   const [editingWritingPlan, setEditingWritingPlan] = useState(false);
 
+  // 1. Modified handleAnswererSelect function to include the correct user assignment and priority
+  const handleAnswererSelect = async (user) => {
+    // Extract the username and email from the user object
+    const username = user.username || "";
+    const email = user.email || "";
+
+    // Skip if no email is provided
+    if (!email) {
+      handleSectionChange(index, "answerer", username);
+      return;
+    }
+
+    // Update the section with the new answerer
+    const success = await handleSectionChange(index, "answerer", username);
+
+    if (success) {
+      // After successfully setting the answerer, create a task for them
+      try {
+        const taskData = {
+          name: `Answer section: ${section.heading}`,
+          bid_id: sharedState.object_id,
+          index: index,
+          priority: "medium", // Adding priority parameter
+          target_user: username // Adding explicit target_user parameter
+        };
+
+        // Create the task
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
+          taskData,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`
+            }
+          }
+        );
+
+        if (response.data.success) {
+          // Task created successfully, now send email notification
+          const bidTitle = sharedState.bidInfo || "Untitled Bid";
+          const message = `You have been assigned to answer the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
+          const subject = `New Answer Task: ${section.heading}`;
+
+          // Send the email notification
+          await sendOrganizationEmail({
+            recipient: email,
+            message,
+            subject,
+            token: tokenRef.current,
+            onSuccess: () => {},
+            onError: (error) => {}
+          });
+        } else {
+          console.error("Error creating answer task:", response.data.error);
+          toast.error("Failed to assign task to answerer");
+        }
+      } catch (error) {
+        console.error("Error creating task for answerer:", error);
+        toast.error("Failed to assign task to answerer");
+      }
+    }
+  };
+
+  // 2. Modified handleReviewerSelect function to include the correct user assignment and priority
+  const handleReviewerSelect = async (user) => {
+    // Extract the username and email from the user object
+    const username = user.username || "";
+    const email = user.email || "";
+
+    // Skip if no email is provided
+    if (!email) {
+      handleSectionChange(index, "reviewer", username);
+      return;
+    }
+
+    // Update the section with the new reviewer
+    const success = await handleSectionChange(index, "reviewer", username);
+
+    if (success) {
+      // After successfully setting the reviewer, create a task for them
+      try {
+        const taskData = {
+          name: `Review section: ${section.heading}`,
+          bid_id: sharedState.object_id,
+          index: index,
+          priority: "high", // Adding priority parameter with higher priority for reviews
+          target_user: username // Adding explicit target_user parameter
+        };
+
+        // Create the task
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
+          taskData,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`
+            }
+          }
+        );
+
+        if (response.data.success) {
+          // Task created successfully, now send email notification
+          const bidTitle = sharedState.bidInfo || "Untitled Bid";
+          const message = `You have been assigned to review the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
+          const subject = `New Review Task: ${section.heading}`;
+
+          // Send the email notification
+          await sendOrganizationEmail({
+            recipient: email,
+            message,
+            subject,
+            token: tokenRef.current,
+            onSuccess: () => {},
+            onError: (error) => {}
+          });
+        } else {
+          console.error("Error creating reviewer task:", response.data.error);
+          toast.error("Failed to assign task to reviewer");
+        }
+      } catch (error) {
+        console.error("Error creating task for reviewer:", error);
+        toast.error("Failed to assign task to reviewer");
+      }
+    }
+  };
+
   if (!section) return null;
 
   return (
     <div
       className={cn(
-        "w-full max-w-5xl h-full bg-white shadow-lg rounded-md border border-gray-line mx-auto"
+        "w-full max-w-7xl h-full bg-white shadow-lg rounded-md border border-gray-line mx-auto"
       )}
     >
       <ScrollArea className="h-full">
@@ -612,29 +744,31 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
             />
           </div>
           <div className="p-4 space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <QuestionTypeDropdown
-                  value={section.choice}
-                  onChange={(value) =>
-                    handleSectionChange(index, "choice", value)
-                  }
-                  showIcon={true}
-                />
-                <SelectFilePopup
-                  onSaveSelectedFiles={handleSaveSelectedFiles}
-                  initialSelectedFiles={
-                    section?.highlightedDocuments?.map((doc) => doc.name) || []
-                  }
-                  onSaveSelectedTenderFiles={handleSaveSelectedTenderFiles}
-                  initialTenderSelectedFiles={
-                    section?.highlightedTenderDocuments?.map(
-                      (doc) => doc.name
-                    ) || []
-                  }
-                  bid_id={sharedState.object_id}
-                />
+            <div className="flex items-center justify-end gap-4">
+              {/* Status Field */}
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <StatusMenu
+                    value={section.status}
+                    onChange={(value) => {
+                      handleSectionChange(index, "status", value);
+                    }}
+                  />
+                </div>
               </div>
+
+              {/* Question Type Field */}
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <QuestionTypeDropdown
+                    value={section.choice}
+                    onChange={(value) =>
+                      handleSectionChange(index, "choice", value)
+                    }
+                  />
+                </div>
+              </div>
+
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">Word count:</span>
                 <Input
@@ -649,6 +783,48 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                       handleSectionChange(index, "word_count", value);
                     }
                   }}
+                />
+              </div>
+              {/* Answerer Field */}
+              <div className="flex items-center gap-1">
+                <span className="text-sm font-medium">Assigned:</span>
+                <div className="flex items-center">
+                  <SelectOrganisationUserButton
+                    selectedUser={section.answerer}
+                    onSelectUser={handleAnswererSelect}
+                    organizationUsers={organizationUsers}
+                    isReviewReady={section.review_ready}
+                  />
+                </div>
+              </div>
+
+              {/* Reviewer Field */}
+              <div className="flex items-center gap-1">
+                <span className="text-sm font-medium">Reviewer:</span>
+                <div className="flex items-center">
+                  <SelectOrganisationUserButton
+                    selectedUser={section.reviewer}
+                    onSelectUser={handleReviewerSelect}
+                    organizationUsers={organizationUsers}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <SelectFilePopup
+                  onSaveSelectedFiles={handleSaveSelectedFiles}
+                  initialSelectedFiles={
+                    section?.highlightedDocuments?.map((doc) => doc.name) || []
+                  }
+                  onSaveSelectedTenderFiles={handleSaveSelectedTenderFiles}
+                  initialTenderSelectedFiles={
+                    section?.highlightedTenderDocuments?.map(
+                      (doc) => doc.name
+                    ) || []
+                  }
+                  bid_id={sharedState.object_id}
                 />
               </div>
             </div>
