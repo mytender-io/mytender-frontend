@@ -42,7 +42,7 @@ const Bid = () => {
   });
 
   const [activeSubTab, setActiveSubTab] = useState("tender_summary");
-  const [activeSection, setActiveSection] = useState("");
+  const [activeSectionId, setActiveSectionId] = useState("");
 
   const [showModal, setShowModal] = useState(false);
 
@@ -108,15 +108,18 @@ const Bid = () => {
           activeTab === "/proposal-preview";
 
         if (!isAlreadyInProposalWorkspace) {
-          setActiveSection("");
+          setActiveSectionId("");
         }
       }
     }, 300); // 300ms matches our CSS transition time
   };
 
   const handleSubTabClick = (subTab: string) => {
-    // Regular behavior for tender subtabs
     setActiveSubTab(subTab);
+  };
+
+  const handleActiveSectionChange = (sectionId: string) => {
+    setActiveSectionId(sectionId);
   };
 
   const handleSectionClick = (sectionId: string) => {
@@ -129,11 +132,11 @@ const Bid = () => {
       setActiveTab("/proposal-planner");
       // Short delay to ensure tab switch happens before setting subtab
       setTimeout(() => {
-        setActiveSection(sectionId);
+        setActiveSectionId(sectionId);
       }, 50);
     } else {
       // Set the active section
-      setActiveSection(sectionId);
+      setActiveSectionId(sectionId);
     }
   };
 
@@ -234,7 +237,7 @@ const Bid = () => {
           <BidNavbar
             activeTab={activeTab}
             activeSubTab={activeSubTab}
-            activeSection={activeSection}
+            activeSectionId={activeSectionId}
             handleTabClick={handleTabClick}
             handleSubTabClick={handleSubTabClick}
             handleSectionClick={handleSectionClick}
@@ -258,7 +261,8 @@ const Bid = () => {
               sectionIndex={shouldOpenTask ? sectionIndex : null}
               handleRegenerateClick={handleRegenerateClick}
               handleTabClick={handleTabClick}
-              activeSection={activeSection}
+              activeSectionId={activeSectionId}
+              handleActiveSectionChange={handleActiveSectionChange}
               yPosition={yPosition}
               activeTab={activeTab}
             />

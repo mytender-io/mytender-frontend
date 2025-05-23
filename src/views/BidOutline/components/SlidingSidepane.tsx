@@ -1,19 +1,14 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import DebouncedTextArea from "./DebouncedTextArea";
 // import SubheadingCards from "./SubheadingCards";
-import {
-  BidContext,
-  Contributor,
-  Section
-} from "../../BidWritingStateManagerView";
-import StatusMenu from "@/buttons/StatusMenu";
+import { BidContext, Section } from "../../BidWritingStateManagerView";
 // import ReviewerDropdown from "@/views/BidOutline/components/ReviewerDropdown";
 import QuestionTypeDropdown from "@/views/BidOutline/components/QuestionTypeDropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/utils";
-import { ChevronRight, FileIcon, ChevronLeft, X, Plus } from "lucide-react";
+import { ChevronRight, FileIcon, X, Plus } from "lucide-react";
 import SelectFilePopup from "./SelectFilePopup";
 import { Badge } from "@/components/ui/badge";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
@@ -38,7 +33,6 @@ interface HighlightedDocument {
 
 interface ProposalSidepaneProps {
   section: Section;
-  contributors: Contributor;
   index: number;
   isOpen: boolean;
   onClose: () => void;
@@ -63,19 +57,14 @@ interface ProposalSidepaneProps {
     sectionIndex: number,
     subheadingIndex: number
   ) => void;
-  totalSections: number;
-  onNavigate: (direction: "prev" | "next") => void;
 }
 const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   section,
-  contributors,
   index,
   isOpen,
   onClose,
   handleSectionChange,
-  handleDeleteSubheading,
-  totalSections,
-  onNavigate
+  handleDeleteSubheading
 }) => {
   const { sharedState } = useContext(BidContext);
 
@@ -645,38 +634,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
               </Button>
             </div>
             <div className="p-4 space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onNavigate("prev")}
-                    disabled={index === 0}
-                    className="w-fit px-2 gap-1"
-                  >
-                    <ChevronLeft />
-                    Prev
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onNavigate("next")}
-                    disabled={index === totalSections - 1}
-                    className="w-fit px-2 gap-1"
-                  >
-                    Next
-                    <ChevronRight />
-                  </Button>
-                </div>
-                <StatusMenu
-                  value={section.status}
-                  onChange={(value) =>
-                    handleSectionChange(index, "status", value)
-                  }
-                />
-              </div>
-
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <QuestionTypeDropdown

@@ -55,7 +55,7 @@ interface ProposalPlanProps {
   sectionIndex: string | null;
   handleRegenerateClick: () => void;
   handleTabClick: (path: string) => void;
-  activeSection?: string;
+  activeSectionId?: string;
 }
 
 const ProposalPlan = ({
@@ -64,7 +64,7 @@ const ProposalPlan = ({
   sectionIndex,
   handleRegenerateClick,
   handleTabClick,
-  activeSection = ""
+  activeSectionId = ""
 }: ProposalPlanProps) => {
   const outlineSectionsRef = useRef<Record<string, any>>({});
 
@@ -137,13 +137,13 @@ const ProposalPlan = ({
     }
   }, [taskToOpen, sectionIndex, openTask, outline.length]);
 
-  // Update useEffect to respond to section-specific activeSection values
+  // Update useEffect to respond to section-specific activeSectionId values
   useEffect(() => {
-    // Check if the activeSection matches any section ID, indicating we should jump to that section
-    if (activeSection && outline && outline.length > 0) {
+    // Check if the activeSectionId matches any section ID, indicating we should jump to that section
+    if (activeSectionId && outline && outline.length > 0) {
       
       // Find the section index by section_id
-      const sectionIndex = outline.findIndex(section => section.section_id === activeSection);
+      const sectionIndex = outline.findIndex(section => section.section_id === activeSectionId);
       
       if (sectionIndex !== -1) {
         // Scroll to the section
@@ -154,7 +154,7 @@ const ProposalPlan = ({
         setIsSidepaneOpen(true);
       }
     }
-  }, [activeSection, outline]);
+  }, [activeSectionId, outline]);
 
   // Function to scroll to a specific section
   const scrollToSection = (index: string) => {
@@ -522,20 +522,6 @@ const ProposalPlan = ({
       console.error("Error updating section:", error);
       toast.error("Failed to update section");
       return false;
-    }
-  };
-
-  const handleSectionNavigation = (direction: "prev" | "next") => {
-    console.log("clicked", selectedSection);
-    if (selectedSection === null) return; // Changed condition to check for null specifically
-
-    setApiChoices([]);
-    console.log("change section");
-    const newIndex =
-      direction === "prev" ? selectedSection - 1 : selectedSection + 1;
-
-    if (newIndex >= 0 && newIndex < outline.length) {
-      setSelectedSection(newIndex);
     }
   };
 
@@ -1274,7 +1260,6 @@ const ProposalPlan = ({
             {selectedSection !== null && !isOrganizationUsersLoading && (
               <ProposalSidepane
                 section={outline[selectedSection]}
-                contributors={contributors}
                 index={selectedSection}
                 isOpen={isSidepaneOpen}
                 onClose={() => {
@@ -1290,8 +1275,6 @@ const ProposalPlan = ({
                 selectedChoices={selectedChoices}
                 submitSelections={submitSelections}
                 handleDeleteSubheading={handleDeleteSubheading}
-                totalSections={outline.length}
-                onNavigate={handleSectionNavigation}
               />
             )}
 

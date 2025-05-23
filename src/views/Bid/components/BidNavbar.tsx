@@ -6,7 +6,7 @@ import { tenderTabs } from "@/utils/tenderTabsConfig";
 interface BidNavbarProps {
   activeTab?: string;
   activeSubTab?: string;
-  activeSection?: string;
+  activeSectionId?: string;
   handleTabClick?: (path: string) => void;
   handleSubTabClick?: (subTab: string) => void;
   handleSectionClick?: (sectionId: string) => void;
@@ -15,7 +15,7 @@ interface BidNavbarProps {
 const BidNavbar: React.FC<BidNavbarProps> = ({
   activeTab = "",
   activeSubTab = "tender_summary",
-  activeSection = "",
+  activeSectionId = "",
   handleTabClick = () => {},
   handleSubTabClick = () => {},
   handleSectionClick = () => {}
@@ -93,7 +93,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               key={section.section_id}
               className={cn(
                 baseSubTabStyles,
-                activeSection === section.section_id && activeSubTabStyles
+                activeSectionId === section.section_id && activeSubTabStyles
               )}
               onClick={() => handleSectionClick(section.section_id)}
               title={section.heading}
