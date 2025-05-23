@@ -95,21 +95,25 @@ const Bid = () => {
     toast.error("You only have permission to view this bid.");
   };
 
-  const handleTabClick = (path: string) => {
+  const handleTabClick = (path: string, isParentTab: boolean = false) => {
     // Delay navigation to allow animation to play
     setTimeout(() => {
       setActiveTab(path);
 
+      if (isParentTab) {
+        setActiveSectionId("");
+      }
+
       // If switching to the proposal workspace, ensure the correct subtab
       if (path === "/proposal-planner" || path === "/proposal-preview") {
         // Only reset the subtab if we're not already in the proposal workspace
-        // const isAlreadyInProposalWorkspace =
-        //   activeTab === "/proposal-planner" ||
-        //   activeTab === "/proposal-preview";
+        const isAlreadyInProposalWorkspace =
+          activeTab === "/proposal-planner" ||
+          activeTab === "/proposal-preview";
 
-        // if (!isAlreadyInProposalWorkspace) {
+        if (!isAlreadyInProposalWorkspace) {
           setActiveSectionId("");
-        // }
+        }
       }
     }, 300); // 300ms matches our CSS transition time
   };
@@ -130,7 +134,10 @@ const Bid = () => {
     const isSection =
       outline && outline.some((section) => section.section_id === sectionId);
 
-    if (isSection && activeTab !== "/proposal-planner") {
+    if (
+      isSection &&
+      !(activeTab == "/proposal-planner" || activeTab == "/proposal-preview")
+    ) {
       // If clicking on a section but not on the proposal planner tab, switch to it first
       setActiveTab("/proposal-planner");
       // Short delay to ensure tab switch happens before setting subtab

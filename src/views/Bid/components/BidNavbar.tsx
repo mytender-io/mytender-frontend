@@ -7,7 +7,7 @@ interface BidNavbarProps {
   activeTab?: string;
   activeSubTab?: string;
   activeSectionId?: string;
-  handleTabClick?: (path: string) => void;
+  handleTabClick?: (path: string, isParentTab?: boolean) => void;
   handleSubTabClick?: (subTab: string) => void;
   handleSectionClick?: (sectionId: string) => void;
 }
@@ -83,7 +83,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
             activeTab === "/proposal-preview") &&
             activeNavLinkStyles
         )}
-        onClick={() => handleTabClick("/proposal-planner")}
+        onClick={() => handleTabClick("/proposal-planner", true)}
       >
         Bid Outline
       </span>

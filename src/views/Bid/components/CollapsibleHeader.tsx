@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 interface CollapsibleHeaderProps {
   children: React.ReactNode;
   className?: string;
+  disableCollapse?: boolean;
 }
 
 const CollapsibleHeader: React.FC<CollapsibleHeaderProps> = ({
   children,
-  className
+  className,
+  disableCollapse = false
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -23,20 +25,22 @@ const CollapsibleHeader: React.FC<CollapsibleHeaderProps> = ({
       <div
         className={cn(
           "flex flex-col gap-2 items-center px-4 py-6 transition-all duration-500 overflow-hidden",
-          isCollapsed && "max-h-0 pb-0 pt-3"
+          !disableCollapse && isCollapsed && "max-h-0 pb-0 pt-3"
         )}
       >
         {children}
       </div>
-      <Button
-        onClick={toggleCollapse}
-        variant="outline"
-        size="icon"
-        className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rounded-full shadow-sm h-6 w-6"
-        aria-label={isCollapsed ? "Expand header" : "Collapse header"}
-      >
-        {isCollapsed ? <ChevronDown /> : <ChevronUp />}
-      </Button>
+      {!disableCollapse && (
+        <Button
+          onClick={toggleCollapse}
+          variant="outline"
+          size="icon"
+          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rounded-full shadow-sm h-6 w-6"
+          aria-label={isCollapsed ? "Expand header" : "Collapse header"}
+        >
+          {isCollapsed ? <ChevronDown /> : <ChevronUp />}
+        </Button>
+      )}
     </div>
   );
 };
