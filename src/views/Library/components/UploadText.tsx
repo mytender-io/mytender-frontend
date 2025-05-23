@@ -66,7 +66,7 @@ const UploadText = ({ folder, get_collections, onClose }) => {
 
     try {
       await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/uploadtext/`,
+        `http${HTTP_PREFIX}://${API_URL}/uploadtext`,
         formData,
         {
           headers: {
