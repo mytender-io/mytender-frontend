@@ -5,7 +5,7 @@ import TenderLibrary from "../../components/TenderLibrary";
 import TenderAnalysis from "./components/TenderAnalysis";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import ExpandIcon from "@/components/icons/ExpandIcon";
+import DocsIcon from "@/components/icons/DocsIcon";
 
 const BidPlanner = ({
   activeSubTab,
@@ -20,16 +20,16 @@ const BidPlanner = ({
   const handleOpenLibrary = () => setIsLibraryOpen(true);
 
   return (
-    <div className="flex flex-col gap-4 px-6 py-4">
+    <div className="max-w-6xl mx-auto flex flex-col gap-4 px-6 py-4">
       <Button
         onClick={handleOpenLibrary}
         variant="outline"
-        className="w-full justify-start border-gray-spacer_light"
+        className="w-fit justify-start border-gray-spacer_light ml-auto"
       >
         <div className="flex items-center space-x-3">
-          <ExpandIcon className="text-gray" />
+          <DocsIcon className="text-gray" />
           <span className="text-gray-hint_text font-medium">
-            View Tender Library Documents
+            View Tender Docs
           </span>
         </div>
       </Button>
@@ -42,7 +42,7 @@ const BidPlanner = ({
         </DialogContent>
       </Dialog>
 
-      <div className="max-w-6xl mx-auto w-full flex-1">
+      <div className="flex-1">
         <TenderAnalysis
           activeSubTab={activeSubTab}
           setActiveSubTab={setActiveSubTab}

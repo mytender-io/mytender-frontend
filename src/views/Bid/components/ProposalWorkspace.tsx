@@ -6,6 +6,7 @@ import CollapsibleHeader from "./CollapsibleHeader";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface ProposalWorkspaceProps {
   openTask: (taskId: string | null, sectionIndex: string | null) => void;
@@ -39,6 +40,7 @@ const ProposalWorkspace = ({
     null
   );
   const [activeView, setActiveView] = useState<"plan" | "write">("plan");
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
 
   // Initialize the active view based on the activeTab prop
   useEffect(() => {
@@ -71,18 +73,51 @@ const ProposalWorkspace = ({
     }
   };
 
+  const handleViewChange = (value: string) => {
+    // Set the slide direction based on the tab change
+    if (value === "write" && activeView === "plan") {
+      setSlideDirection("left");
+    } else if (value === "plan" && activeView === "write") {
+      setSlideDirection("right");
+    }
+    
+    setActiveView(value as "plan" | "write");
+    handleTabClick(
+      value === "plan" ? "/proposal-planner" : "/proposal-preview"
+    );
+  };
+
+  // Animation variants
+  const slideVariants = {
+    rightEnter: {
+      x: 300,
+      opacity: 0
+    },
+    leftEnter: {
+      x: -300,
+      opacity: 0
+    },
+    center: {
+      x: 0,
+      opacity: 1
+    },
+    rightExit: {
+      x: 300,
+      opacity: 0
+    },
+    leftExit: {
+      x: -300,
+      opacity: 0
+    }
+  };
+
   return (
     <div className="flex flex-col h-full w-full pb-4">
       {/* Tabs for switching between Plan and Write views */}
       <Tabs
         defaultValue={activeView}
         value={activeView}
-        onValueChange={(value) => {
-          setActiveView(value as "plan" | "write");
-          handleTabClick(
-            value === "plan" ? "/proposal-planner" : "/proposal-preview"
-          );
-        }}
+        onValueChange={handleViewChange}
         className="flex flex-col flex-1 overflow-hidden px-0"
       >
         {/* Collapsible Header */}
@@ -136,25 +171,45 @@ const ProposalWorkspace = ({
           <TabsContent
             value="plan"
             className="mt-0 flex-1 overflow-auto h-full"
+            asChild
           >
-            <ProposalPlan
-              openTask={openTask}
-              taskToOpen={taskToOpen}
-              sectionIndex={sectionIndex}
-              handleRegenerateClick={handleRegenerateClick}
-              handleTabClick={handleTabClick}
-              activeSectionId={activeSectionId}
-              handleActiveSectionChange={handleActiveSectionChange}
-            />
+            <motion.div
+              initial={slideDirection === "right" ? "leftEnter" : "rightEnter"}
+              animate="center"
+              exit={slideDirection === "right" ? "leftExit" : "rightExit"}
+              variants={slideVariants}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="flex-1 overflow-auto h-full"
+            >
+              <ProposalPlan
+                openTask={openTask}
+                taskToOpen={taskToOpen}
+                sectionIndex={sectionIndex}
+                handleRegenerateClick={handleRegenerateClick}
+                handleTabClick={handleTabClick}
+                activeSectionId={activeSectionId}
+                handleActiveSectionChange={handleActiveSectionChange}
+              />
+            </motion.div>
           </TabsContent>
           <TabsContent
             value="write"
             className="mt-0 flex-1 overflow-auto h-full"
+            asChild
           >
-            <ProposalPreview
-              yPosition={yPosition}
-              activeSectionId={activeSectionId}
-            />
+            <motion.div
+              initial={slideDirection === "right" ? "leftEnter" : "rightEnter"}
+              animate="center"
+              exit={slideDirection === "right" ? "leftExit" : "rightExit"}
+              variants={slideVariants}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="flex-1 overflow-auto h-full"
+            >
+              <ProposalPreview
+                yPosition={yPosition}
+                activeSectionId={activeSectionId}
+              />
+            </motion.div>
           </TabsContent>
         </div>
       </Tabs>
