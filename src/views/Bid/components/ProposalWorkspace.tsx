@@ -7,6 +7,7 @@ import { BidContext } from "@/views/BidWritingStateManagerView";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { cn } from "@/utils";
 
 interface ProposalWorkspaceProps {
   openTask: (taskId: string | null, sectionIndex: string | null) => void;
@@ -40,7 +41,9 @@ const ProposalWorkspace = ({
     null
   );
   const [activeView, setActiveView] = useState<"plan" | "write">("plan");
-  const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">(
+    "right"
+  );
 
   // Initialize the active view based on the activeTab prop
   useEffect(() => {
@@ -80,7 +83,7 @@ const ProposalWorkspace = ({
     } else if (value === "plan" && activeView === "write") {
       setSlideDirection("right");
     }
-    
+
     setActiveView(value as "plan" | "write");
     handleTabClick(
       value === "plan" ? "/proposal-planner" : "/proposal-preview"
@@ -120,8 +123,11 @@ const ProposalWorkspace = ({
         onValueChange={handleViewChange}
         className="flex flex-col flex-1 overflow-hidden px-0"
       >
-        {/* Collapsible Header */}
-        <CollapsibleHeader disableCollapse>
+        <div
+          className={cn(
+            "flex flex-col gap-2 items-center px-6 pt-6 pb-2 transition-all duration-500 overflow-hidden"
+          )}
+        >
           <TabsList className="w-full max-w-md mx-auto h-12">
             <TabsTrigger
               value="plan"
@@ -138,36 +144,34 @@ const ProposalWorkspace = ({
             </TabsTrigger>
           </TabsList>
           {activeSectionIndex !== null && (
-            <div className="absolute top-10 left-3 -translate-y-1/2 flex flex-col gap-2 items-center justify-center">
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSectionNavigation("prev")}
-                  disabled={activeSectionIndex === 0}
-                  className="w-fit px-2 gap-1"
-                >
-                  <ChevronLeft />
-                </Button>
-                <span className="text-gray-hint_text">
-                  Question {activeSectionIndex + 1} of {totalSections}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSectionNavigation("next")}
-                  disabled={activeSectionIndex === totalSections - 1}
-                  className="w-fit px-2 gap-1"
-                >
-                  <ChevronRight />
-                </Button>
-              </div>
+            <div className="w-full flex items-center justify-start gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleSectionNavigation("prev")}
+                disabled={activeSectionIndex === 0}
+                className="w-fit px-2 gap-1"
+              >
+                <ChevronLeft />
+              </Button>
+              <span className="text-gray-hint_text">
+                Question {activeSectionIndex + 1} of {totalSections}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleSectionNavigation("next")}
+                disabled={activeSectionIndex === totalSections - 1}
+                className="w-fit px-2 gap-1"
+              >
+                <ChevronRight />
+              </Button>
             </div>
           )}
-        </CollapsibleHeader>
+        </div>
 
         {/* Content area for the selected view */}
-        <div className="flex-1 overflow-hidden flex flex-col px-6 py-4">
+        <div className="flex-1 overflow-hidden flex flex-col px-6 pb-4">
           <TabsContent
             value="plan"
             className="mt-0 flex-1 overflow-auto h-full"

@@ -77,7 +77,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
         >
           <HomeIcon
             className={cn(
-              "min-w-10 min-h-10 stroke-1",
+              "min-w-8 min-h-8 stroke-1",
               isActive("/home") ? "text-orange stroke-2" : "text-gray-hint_text"
             )}
             width={20}
@@ -102,7 +102,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
         >
           <DashboardIcon
             className={cn(
-              "min-w-10 min-h-10",
+              "min-w-8 min-h-8",
               isActive("/bids") || isActive("/bid")
                 ? "text-orange"
                 : "text-gray-hint_text"
@@ -130,7 +130,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
         >
           <ContentLibraryIcon
             className={cn(
-              "min-w-10 min-h-10",
+              "min-w-8 min-h-8",
               isActive("/library") ? "text-orange" : "text-gray-hint_text"
             )}
             strokeWidth={isActive("/library") ? 1.5 : 1}
@@ -156,7 +156,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
         >
           <LibraryChatIcon
             className={cn(
-              "min-w-10 min-h-10",
+              "min-w-8 min-h-8",
               isActive("/chat") ? "text-orange" : "text-gray-hint_text"
             )}
             strokeWidth={isActive("/chat") ? 2 : 1}
@@ -182,7 +182,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
         >
           <UserRound
             className={cn(
-              "min-w-10 min-h-10 stroke-1",
+              "min-w-8 min-h-8 stroke-1",
               isActive("/profile")
                 ? "text-orange stroke-2"
                 : "text-gray-hint_text"

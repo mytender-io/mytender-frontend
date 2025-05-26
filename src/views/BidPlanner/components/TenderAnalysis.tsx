@@ -679,7 +679,7 @@ const TenderAnalysis = ({
           </Button>
 
           {/* We use the `open` prop to control the dialog state */}
-          {object_id && (
+          {/* {object_id && (
             <TenderLibraryChatDialog
               bid_id={object_id}
               open={chatDialogOpen}
@@ -697,7 +697,7 @@ const TenderAnalysis = ({
                 </Button>
               }
             />
-          )}
+          )} */}
         </div>
       </div>
       <div className={cn("h-full border border-gray-line rounded-md mb-4")}>

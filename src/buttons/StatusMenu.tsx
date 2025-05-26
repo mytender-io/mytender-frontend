@@ -13,10 +13,12 @@ type ValidStatus = "Not Started" | "In Progress" | "Completed";
 
 const StatusMenu = ({
   value,
-  onChange
+  onChange,
+  minimize = false
 }: {
   value: Section["status"];
   onChange: (value: Section["status"]) => void;
+  minimize?: boolean;
 }) => {
   const normalizeStatus = (status: string): ValidStatus => {
     const validStatuses: ValidStatus[] = [
@@ -44,6 +46,19 @@ const StatusMenu = ({
     }
   };
 
+  const getCircleColor = (status: ValidStatus): string => {
+    switch (status) {
+      case "Completed":
+        return "bg-status-success border-status-success";
+      case "In Progress":
+        return "bg-status-review border-status-review";
+      case "Not Started":
+        return "bg-status-planning border-status-planning";
+      default:
+        return "bg-status-planning border-status-planning";
+    }
+  };
+
   const getStatusIcon = (status: ValidStatus) => {
     const iconProps = {
       className: "ml-2 h-4 w-4 inline-block align-middle"
@@ -64,16 +79,33 @@ const StatusMenu = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className={cn(
-            "font-semibold text-sm rounded-md py-1 px-3 whitespace-nowrap border-[0.5px]",
-            getStatusStyles(currentStatus)
-          )}
-        >
-          {currentStatus}
-          {getStatusIcon(currentStatus)}
-        </Button>
+        {minimize ? (
+          <Button
+            variant="ghost"
+            className="p-0 h-6 w-6 relative group"
+          >
+            <div
+              className={cn(
+                "h-4 w-4 rounded-full border-[0.5px]",
+                getCircleColor(currentStatus)
+              )}
+            />
+            <div className="absolute left-full ml-2 top-1/2 transform -translate-y-1/2 whitespace-nowrap bg-white px-2 py-1 rounded shadow-md border text-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              {currentStatus}
+            </div>
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            className={cn(
+              "font-semibold text-sm rounded-md py-1 px-3 whitespace-nowrap border-[0.5px]",
+              getStatusStyles(currentStatus)
+            )}
+          >
+            {currentStatus}
+            {getStatusIcon(currentStatus)}
+          </Button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-32">
         <DropdownMenuItem

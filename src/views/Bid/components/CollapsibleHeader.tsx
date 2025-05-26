@@ -21,11 +21,11 @@ const CollapsibleHeader: React.FC<CollapsibleHeaderProps> = ({
   };
 
   return (
-    <div className={cn("relative border-b border-gray-line", className)}>
+    <div className={cn("relative", className)}>
       <div
         className={cn(
-          "flex flex-col gap-2 items-center px-4 py-6 transition-all duration-500 overflow-hidden",
-          !disableCollapse && isCollapsed && "max-h-0 pb-0 pt-3"
+          "flex flex-col gap-2 items-center px-4 pt-6 transition-all duration-500 overflow-hidden",
+          !disableCollapse && isCollapsed && "max-h-0"
         )}
       >
         {children}

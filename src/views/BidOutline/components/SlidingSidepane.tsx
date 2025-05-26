@@ -35,6 +35,14 @@ interface HighlightedDocument {
   rawtext: string;
 }
 
+// Interface for file metadata
+interface FileWithMetadata {
+  filename: string;
+  folder: string;
+  unique_id?: string;
+  rawtext?: string;
+}
+
 interface ProposalSidepaneProps {
   section: Section;
   index: number;
@@ -127,7 +135,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   };
 
   // Update the handleSaveSelectedFiles function
-  const handleSaveSelectedFiles = async (selectedFilesWithMetadata) => {
+  const handleSaveSelectedFiles = async (selectedFilesWithMetadata: FileWithMetadata[]) => {
     console.log("Received files with metadata:", selectedFilesWithMetadata);
 
     if (!selectedFilesWithMetadata || selectedFilesWithMetadata.length === 0) {
@@ -137,7 +145,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
 
     // Convert to HighlightedDocument objects with the correct rawtext
     const documentObjects = await Promise.all(
-      selectedFilesWithMetadata.map(async (file) => {
+      selectedFilesWithMetadata.map(async (file: FileWithMetadata) => {
         // If existing document has rawtext, use it; otherwise, fetch the content
         const rawtext = await getFileContent(file.filename, file.folder);
 
@@ -154,7 +162,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   };
 
   // Update the handleRemoveDocument function
-  const handleRemoveDocument = (document) => {
+  const handleRemoveDocument = (document: HighlightedDocument) => {
     // Filter the document from the section's highlightedDocuments
     const updatedDocs = section.highlightedDocuments.filter(
       (doc) => doc.name !== document.name
@@ -165,7 +173,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   };
 
   // Update the handleSaveSelectedTenderFiles function
-  const handleSaveSelectedTenderFiles = async (selectedFilesWithMetadata) => {
+  const handleSaveSelectedTenderFiles = async (selectedFilesWithMetadata: FileWithMetadata[]) => {
     console.log(
       "Received tender files with metadata:",
       selectedFilesWithMetadata
@@ -178,7 +186,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
 
     // Convert to HighlightedDocument objects with the correct rawtext
     const documentObjects = await Promise.all(
-      selectedFilesWithMetadata.map(async (file) => {
+      selectedFilesWithMetadata.map(async (file: FileWithMetadata) => {
         // If existing document has rawtext, use it; otherwise, fetch the content
         const rawtext = await getFileContent(file.filename, file.folder);
 
@@ -195,7 +203,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   };
 
   // Update the handleRemoveTenderDocument function
-  const handleRemoveTenderDocument = (document) => {
+  const handleRemoveTenderDocument = (document: HighlightedDocument) => {
     // Filter the document from the section's highlightedTenderDocuments
     const updatedDocs = section.highlightedTenderDocuments.filter(
       (doc) => doc.name !== document.name
@@ -599,7 +607,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   const [editingWritingPlan, setEditingWritingPlan] = useState(false);
 
   // 1. Modified handleAnswererSelect function to include the correct user assignment and priority
-  const handleAnswererSelect = async (user) => {
+  const handleAnswererSelect = async (user: { username?: string; email?: string }) => {
     // Extract the username and email from the user object
     const username = user.username || "";
     const email = user.email || "";
@@ -662,7 +670,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   };
 
   // 2. Modified handleReviewerSelect function to include the correct user assignment and priority
-  const handleReviewerSelect = async (user) => {
+  const handleReviewerSelect = async (user: { username?: string; email?: string }) => {
     // Extract the username and email from the user object
     const username = user.username || "";
     const email = user.email || "";
@@ -724,107 +732,102 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     }
   };
 
+  const [headingWidth, setHeadingWidth] = useState<number>(0);
+  const textMeasureRef = useRef<HTMLSpanElement>(null);
+  
+  // Update width based on heading content
+  useEffect(() => {
+    if (section?.heading && textMeasureRef.current) {
+      // Set the text content of the hidden span to match the input value
+      textMeasureRef.current.textContent = section.heading;
+      // Get the width of the text plus some padding
+      const textWidth = textMeasureRef.current.getBoundingClientRect().width;
+      // Add some buffer to prevent text clipping
+      const bufferWidth = 20;
+      const calculatedWidth = Math.max(100, Math.min(600, textWidth + bufferWidth));
+      setHeadingWidth(calculatedWidth);
+    } else {
+      setHeadingWidth(150); // Default width for empty heading
+    }
+  }, [section?.heading]);
+
   if (!section) return null;
 
   return (
     <div
       className={cn(
-        "w-full max-w-7xl h-full bg-white shadow-lg rounded-md border border-gray-line mx-auto"
+        "w-full h-full bg-white shadow-lg rounded-md"
       )}
     >
+      {/* Hidden span to measure text width */}
+      <span 
+        ref={textMeasureRef}
+        className="absolute opacity-0 pointer-events-none font-bold md:text-lg whitespace-nowrap"
+        aria-hidden="true"
+      />
       <ScrollArea className="h-full">
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between gap-2 p-4 border-b border-gray-line">
-            <Input
-              value={section.heading}
-              onChange={(e) =>
-                handleSectionChange(index, "heading", e.target.value)
-              }
-              className="flex-1 font-bold resize-none overflow-hidden whitespace-nowrap min-h-[1.75rem] bg-transparent border-none focus:ring-0 shadow-none md:text-lg"
-            />
-          </div>
-          <div className="p-4 space-y-6">
-            <div className="flex items-center justify-end gap-4">
-              {/* Status Field */}
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <StatusMenu
-                    value={section.status}
-                    onChange={(value) => {
-                      handleSectionChange(index, "status", value);
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Question Type Field */}
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <QuestionTypeDropdown
-                    value={section.choice}
-                    onChange={(value) =>
-                      handleSectionChange(index, "choice", value)
-                    }
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Word count:</span>
-                <Input
-                  type="number"
-                  value={section.word_count || 0}
-                  min={0}
-                  step={50}
-                  className="w-20 text-center h-9"
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    if (!isNaN(value) && value >= 0) {
-                      handleSectionChange(index, "word_count", value);
-                    }
-                  }}
+        <div className="flex flex-col h-full gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center">
+              <Input
+                value={section.heading}
+                onChange={(e) =>
+                  handleSectionChange(index, "heading", e.target.value)
+                }
+                className="font-bold resize-none overflow-hidden whitespace-nowrap min-h-[1.75rem] bg-transparent border-none focus:ring-0 shadow-none md:text-lg"
+                style={{ width: headingWidth ? `${headingWidth}px` : 'auto' }}
+              />
+              <StatusMenu
+                minimize
+                value={section.status}
+                onChange={(value) => {
+                  handleSectionChange(index, "status", value);
+                }}
+              />
+            </div>
+            <div className="flex items-center relative">
+              {/* Assigned User */}
+              <div className="z-10">
+                <SelectOrganisationUserButton
+                  selectedUser={section.answerer}
+                  onSelectUser={handleAnswererSelect}
+                  organizationUsers={organizationUsers}
+                  isReviewReady={section.review_ready}
                 />
               </div>
-              {/* Answerer Field */}
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-medium">Assigned:</span>
-                <div className="flex items-center">
-                  <SelectOrganisationUserButton
-                    selectedUser={section.answerer}
-                    onSelectUser={handleAnswererSelect}
-                    organizationUsers={organizationUsers}
-                    isReviewReady={section.review_ready}
-                  />
-                </div>
-              </div>
-
-              {/* Reviewer Field */}
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-medium">Reviewer:</span>
-                <div className="flex items-center">
-                  <SelectOrganisationUserButton
-                    selectedUser={section.reviewer}
-                    onSelectUser={handleReviewerSelect}
-                    organizationUsers={organizationUsers}
-                  />
-                </div>
+              {/* Reviewer - positioned with negative margin for overlap */}
+              <div className="-ml-6 z-0">
+                <SelectOrganisationUserButton
+                  selectedUser={section.reviewer}
+                  onSelectUser={handleReviewerSelect}
+                  organizationUsers={organizationUsers}
+                />
               </div>
             </div>
-
-            <div className="flex items-center justify-between">
+          </div>
+          <div className="px-4 space-y-6">
+            <div className="flex items-center gap-2">
               <div className="flex items-center gap-2">
                 <SelectFilePopup
                   onSaveSelectedFiles={handleSaveSelectedFiles}
                   initialSelectedFiles={
-                    section?.highlightedDocuments?.map((doc) => doc.name) || []
+                    (section?.highlightedDocuments?.map((doc) => doc.name) || []) as string[]
                   }
                   onSaveSelectedTenderFiles={handleSaveSelectedTenderFiles}
                   initialTenderSelectedFiles={
-                    section?.highlightedTenderDocuments?.map(
+                    (section?.highlightedTenderDocuments?.map(
                       (doc) => doc.name
-                    ) || []
+                    ) || []) as string[]
                   }
                   bid_id={sharedState.object_id}
+                />
+              </div>
+              <div className="flex items-center">
+                <QuestionTypeDropdown
+                  value={section.choice}
+                  onChange={(value) =>
+                    handleSectionChange(index, "choice", value)
+                  }
                 />
               </div>
             </div>
@@ -904,21 +907,39 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
             )}
 
             <div className="space-y-2">
-              <span className="font-medium">Question</span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-semibold text-lg">Question:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Word count:</span>
+                  <Input
+                    type="number"
+                    value={section.word_count || 0}
+                    min={0}
+                    step={50}
+                    className="w-20 text-center h-9"
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (!isNaN(value) && value >= 0) {
+                        handleSectionChange(index, "word_count", value);
+                      }
+                    }}
+                  />
+                </div>
+              </div>
               <DebouncedTextArea
                 value={section.question}
                 onChange={(value) =>
                   handleSectionChange(index, "question", value)
                 }
                 rows={3}
-                className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-gray-line rounded-lg !leading-relaxed"
+                className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-none p-0 rounded-lg !leading-relaxed"
                 placeholder="Add in the question here"
               />
             </div>
             {section.writingplan && section.writingplan.trim() ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium">Writing Plan</span>
+                  <span className="text-lg font-semibold">Writing Plan</span>
                   {editingWritingPlan && (
                     <Button
                       size="sm"
@@ -943,7 +964,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 ) : (
                   <div
                     onClick={() => setEditingWritingPlan(true)}
-                    className="px-2 border border-gray-line rounded-lg cursor-pointer"
+                    className="cursor-pointer"
                   >
                     <MarkdownRenderer content={section.writingplan} />
                   </div>

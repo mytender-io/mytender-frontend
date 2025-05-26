@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -84,7 +84,7 @@ const SelectOrganisationUserButton: React.FC<SelectOrganisationUserButton> = ({
     <div data-org-user-dropdown onClick={handleComponentClick}>
       <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger
-          className="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 focus:outline-none"
+          className="flex items-center justify-center rounded-md focus:outline-none"
           onClick={(e) => e.stopPropagation()} // Explicitly stop propagation on trigger click
         >
           <div className="relative">
@@ -104,24 +104,12 @@ const SelectOrganisationUserButton: React.FC<SelectOrganisationUserButton> = ({
             {/* Review Ready Indicator */}
 
             {isReviewReady && (
-              <div className="absolute bottom-0 right-0 bg-green-600 rounded-full p-0.5 border border-white shadow-sm z-10">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M20 6L9 17l-5-5" />
-                </svg>
+              <div className="absolute bottom-0 right-0 bg-green-600 rounded-full p-0.5 border border-white shadow-sm z-10 flex items-center justify-center">
+                <Check size={12} color="white" strokeWidth={3} />
               </div>
             )}
           </div>
-          <ChevronDown className="h-4 w-4 text-gray-500" />
+          {/* <ChevronDown className="h-4 w-4 text-gray-500" /> */}
         </DropdownMenuTrigger>
 
         <DropdownMenuContent

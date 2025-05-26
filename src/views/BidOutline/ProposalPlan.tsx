@@ -1164,7 +1164,7 @@ const ProposalPlan = ({
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-end flex-shrink-0 gap-2 max-w-7xl mx-auto mb-4">
+              {/* <div className="flex items-center justify-end flex-shrink-0 gap-2 max-w-7xl mx-auto mb-4">
                 <Button variant="outline" onClick={handleRegenerateClick}>
                   <PlusIcon />
                   New Outline
@@ -1173,7 +1173,7 @@ const ProposalPlan = ({
                   bid_id={object_id}
                   handleTabClick={handleTabClick}
                 />
-              </div>
+              </div> */}
               {activeSectionId === "" && (
                 <div className="rounded-md border">
                   <Table>
