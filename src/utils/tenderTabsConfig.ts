@@ -39,7 +39,7 @@ export const tenderTabs: TabData[] = [
     extract_insights_prompt: "extract_section_derive_insights"
   },
   {
-    name: "Differentiation Factors",
+    name: "Differentiators",
     Icon: Star,
     prompt: "generate_differentiation_opportunities",
     stateKey: "differentiation_opportunities",

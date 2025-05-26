@@ -51,7 +51,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
       >
         <div className="flex items-center gap-2">
           <LightbulbIcon className="text-black" />
-          Tender Insights
+          Insights
         </div>
       </span>
 
@@ -81,7 +81,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
       >
         <div className="flex items-center gap-2">
           <CursorIcon className="text-black" />
-          Bid Inputs
+          Response Inputs
         </div>
       </span>
 
@@ -96,7 +96,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
       >
         <div className="flex items-center gap-2">
           <BulletsIcon className="text-black" />
-          Bid Outline
+          Outline
         </div>
       </span>
 
