@@ -340,23 +340,18 @@ const BidIntel = ({
 
       {/* Solution Accordion */}
       <div className="bg-white rounded-lg w-full">
-        <Accordion type="single" collapsible defaultValue="solution" className="w-full">
+        <Accordion
+          type="single"
+          collapsible
+          defaultValue="solution"
+          className="w-full"
+        >
           <AccordionItem value="solution" className="border-none">
             <AccordionTrigger className="px-4 py-3 w-full text-base font-medium text-gray-hint_text">
               Solution
             </AccordionTrigger>
             <AccordionContent className="p-0">
-              <Solution
-                initialData={sharedState.solution || {}}
-                onSave={(solutionData) => {
-                  const updatedState = {
-                    ...sharedState,
-                    solution: solutionData
-                  };
-                  setSharedState(updatedState);
-                }}
-                readOnly={!canUserEdit}
-              />
+              <Solution />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -364,7 +359,12 @@ const BidIntel = ({
 
       {/* Select Case Studies Accordion */}
       <div className="bg-white rounded-lg w-full">
-        <Accordion type="single" collapsible defaultValue="case-studies" className="w-full">
+        <Accordion
+          type="single"
+          collapsible
+          defaultValue="case-studies"
+          className="w-full"
+        >
           <AccordionItem value="case-studies" className="border-none">
             <AccordionTrigger className="px-4 py-3 w-full text-base font-medium text-gray-hint_text">
               Select Case Studies
@@ -380,7 +380,12 @@ const BidIntel = ({
       <div className="space-y-4">
         {/* Tone of Voice Accordion */}
         <div className="bg-white rounded-lg w-full">
-          <Accordion type="single" collapsible defaultValue="tone-of-voice" className="w-full">
+          <Accordion
+            type="single"
+            collapsible
+            defaultValue="tone-of-voice"
+            className="w-full"
+          >
             <AccordionItem value="tone-of-voice" className="border-none">
               <AccordionTrigger className="px-4 py-3 w-full text-base font-medium text-gray-hint_text">
                 Tone of Voice

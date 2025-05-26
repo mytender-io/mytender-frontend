@@ -1,26 +1,69 @@
-import React, { useState } from "react";
+import React, { useContext, useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import { toast } from "react-toastify";
-import { Save } from "lucide-react";
+import { BidContext } from "../BidWritingStateManagerView";
+import axios from "axios";
+import { useAuthUser } from "react-auth-kit";
 
-const Solution = ({ initialData = {}, onSave, readOnly = false }) => {
-  const [solution, setSolution] = useState({
-    product: initialData.product || "",
-    features: initialData.features || "",
-    approach: initialData.approach || ""
-  });
+const Solution = ({}) => {
+  const { sharedState, setSharedState } = useContext(BidContext);
+  const [solution, setSolution] = useState(sharedState.solution || "");
+  const [loading, setLoading] = useState(false);
+  const getAuth = useAuthUser();
+  const auth = useMemo(() => getAuth(), [getAuth]);
+  const tokenRef = useRef(auth?.token || "default");
 
-  const handleChange = (field) => (e) => {
-    setSolution({ ...solution, [field]: e.target.value });
+  const handleChange = (e) => {
+    setSolution(e.target.value);
   };
 
-  const handleSave = () => {
-    if (onSave) {
-      onSave(solution);
-      toast.success("Solution information saved successfully!");
+  const generate_solution = async () => {
+    setLoading(true);
+    try {
+      // Check if bid_id exists in shared state
+      if (!sharedState.object_id) {
+        toast.error("Bid ID not found in state");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("bid_id", sharedState.object_id);
+
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/write_solution`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+
+      // The response now contains documents with name, folder, and rawtext
+      const { solution, message } = response.data;
+
+      if (!solution || solution.length === 0) {
+        toast.info(message || "No failed to write solution");
+        return;
+      }
+
+      setSolution(solution);
+
+      // Update the shared state
+      setSharedState((prev) => ({
+        ...prev,
+        solution: solution
+      }));
+
+      toast.success(message || `Generate solution successfully!`);
+    } catch (error) {
+      console.error("Error writing solution:", error);
+      toast.error("Failed to write solution");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -32,52 +75,19 @@ const Solution = ({ initialData = {}, onSave, readOnly = false }) => {
             What specific product or service are you bidding to provide?
           </label>
           <Textarea
-            value={solution.product}
-            onChange={handleChange("product")}
+            value={solution}
+            onChange={handleChange}
             className="w-full p-2 border rounded-md"
-            rows={3}
-            disabled={readOnly}
+            rows={30}
             placeholder="Describe your product or service offering..."
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            What are some key technical features or capabilities of your
-            solution?
-          </label>
-          <Textarea
-            value={solution.features}
-            onChange={handleChange("features")}
-            className="w-full p-2 border rounded-md"
-            rows={3}
-            disabled={readOnly}
-            placeholder="List key technical features and capabilities..."
-          />
+        <div className="flex gap-2">
+          <Button onClick={generate_solution} disabled={loading}>
+            {loading ? "Generating..." : "Generate Solution"}
+          </Button>
         </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            What makes your approach technically superior to alternatives?
-          </label>
-          <Textarea
-            value={solution.approach}
-            onChange={handleChange("approach")}
-            className="w-full p-2 border rounded-md"
-            rows={3}
-            disabled={readOnly}
-            placeholder="Explain your competitive technical advantages..."
-          />
-        </div>
-
-        {!readOnly && (
-          <div className="flex justify-end">
-            <Button onClick={handleSave} className="flex items-center gap-2">
-              <Save className="h-4 w-4" />
-              Save Solution
-            </Button>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

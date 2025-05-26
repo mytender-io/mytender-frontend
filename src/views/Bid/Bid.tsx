@@ -183,6 +183,9 @@ const Bid = () => {
           ? bidData.competitor_urls
           : [];
 
+        const solutionValue =
+          typeof bidData?.solution === "string" ? bidData.solution : "";
+
         console.log("loading competitor urls");
         console.log(bidData?.competitor_urls);
 
@@ -217,11 +220,7 @@ const Bid = () => {
           differentiating_factors: bidData?.differentiating_factors || [],
           competitor_urls: competitor_urls,
           selectedCaseStudies: bidData?.selectedCaseStudies || [],
-          solution: bidData?.solution || {
-            product: "",
-            features: "",
-            approach: ""
-          },
+          solution: solutionValue,
           tone_of_voice: bidData?.tone_of_voice || "",
           new_bid_completed: bidData?.new_bid_completed || true
         };

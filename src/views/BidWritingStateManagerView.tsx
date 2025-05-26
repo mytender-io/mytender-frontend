@@ -120,7 +120,7 @@ export interface SharedState {
   customer_pain_points: string[];
   differentiating_factors: string[];
   competitor_urls: string[];
-  solution: Solution;
+  solution: string;
   selectedCaseStudies: HighlightedDocument[]; // Array of highlighted document objects
   tone_of_voice: string;
   new_bid_completed: boolean;
@@ -161,12 +161,7 @@ const defaultState: BidContextType = {
     customer_pain_points: [],
     differentiating_factors: [],
     competitor_urls: [],
-    solution: {
-      // Initialize solution with empty values
-      product: "",
-      features: "",
-      approach: ""
-    },
+    solution: "",
     selectedCaseStudies: [], // Initialize with an empty array
     tone_of_voice: "", // Initialize tone_of_voice with empty string
     new_bid_completed: true,
@@ -314,12 +309,9 @@ const BidManagement: React.FC = () => {
       console.log(competitor_urls);
       formData.append("competitor_urls", JSON.stringify(competitor_urls || []));
 
-      formData.append(
-        "solution",
-        JSON.stringify(solution || { product: "", features: "", approach: "" })
-      );
-
+      appendFormData("solution", solution);
       // Add selectedCaseStudies to the form data
+
       formData.append(
         "selectedCaseStudies",
         JSON.stringify(selectedCaseStudies || [])
@@ -417,7 +409,7 @@ const BidManagement: React.FC = () => {
     sharedState.customer_pain_points,
     sharedState.tone_of_voice, // Add tone_of_voice as a dependency
     sharedState.new_bid_completed,
-    JSON.stringify(sharedState.solution),
+    sharedState.solution,
     JSON.stringify(sharedState.selectedCaseStudies),
     JSON.stringify(
       sharedState.outline.map((s) => ({
