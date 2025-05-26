@@ -104,7 +104,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <div
           className={cn(
             "flex h-screen bg-typo-100 pr-2 py-2",
-            sidebarCollapsed ? "pl-20" : "pl-56"
+            sidebarCollapsed ? "pl-20" : "pl-28"
           )}
         >
           <SideBar onCollapseChange={setSidebarCollapsed} />
