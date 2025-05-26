@@ -2,6 +2,9 @@ import React, { useContext, useState } from "react";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 import { cn } from "@/utils";
 import { tenderTabs } from "@/utils/tenderTabsConfig";
+import LightbulbIcon from "@/components/icons/LightbulbIcon";
+import CursorIcon from "@/components/icons/CursorIcon";
+import BulletsIcon from "@/components/icons/BulletsIcon";
 
 interface BidNavbarProps {
   activeTab?: string;
@@ -46,10 +49,13 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
         )}
         onClick={() => handleTabClick("/bid-extractor")}
       >
-        Tender Insights
+        <div className="flex items-center gap-2">
+          <LightbulbIcon className="text-black" />
+          Tender Insights
+        </div>
       </span>
 
-      <div className="flex flex-col ml-2 border-l border-gray-200">
+      <div className="flex flex-col ml-4 border-l border-gray-200">
         {tenderTabs.map((tab, index) => (
           <span
             key={index}
@@ -73,7 +79,10 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
         )}
         onClick={() => handleTabClick("/bid-intel")}
       >
-        Bid Inputs
+        <div className="flex items-center gap-2">
+          <CursorIcon className="text-black" />
+          Bid Inputs
+        </div>
       </span>
 
       <span
@@ -85,11 +94,14 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
         )}
         onClick={() => handleTabClick("/proposal-planner", true)}
       >
-        Bid Outline
+        <div className="flex items-center gap-2">
+          <BulletsIcon className="text-black" />
+          Bid Outline
+        </div>
       </span>
 
       {displayOutline.length > 0 && (
-        <div className="flex flex-col ml-2 border-l border-gray-200">
+        <div className="flex flex-col ml-4 border-l border-gray-200">
           {displayOutline.map((section, index) => (
             <span
               key={section.section_id}
