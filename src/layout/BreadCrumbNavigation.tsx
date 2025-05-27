@@ -1,9 +1,11 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useContext } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import SupportChat from "@/components/SupportChat";
 import ProfilePhoto from "@/layout/ProfilePhoto";
 import { useUserData } from "@/context/UserDataContext";
+import SaveStatus from "@/views/Bid/components/SaveStatus";
+import { BidContext } from "@/views/BidWritingStateManagerView";
 
 const BreadcrumbNavigation = ({
   currentPage,
@@ -17,10 +19,13 @@ const BreadcrumbNavigation = ({
   refreshImage?: boolean;
 }) => {
   const { userProfile, organizationUsers, isLoading } = useUserData();
-
+  const { sharedState, setSharedState } = useContext(BidContext);
+  
+  const shouldShowSaveStatus = parentPages.length > 0 && sharedState?.object_id;
+  
   return (
     <nav className="flex items-center justify-between w-full rounded-lg">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         {parentPages.map((page) => (
           <React.Fragment key={page.path}>
             <Link
@@ -35,8 +40,14 @@ const BreadcrumbNavigation = ({
         {currentPage && (
           <span className="text-gray-black font-semibold">{currentPage}</span>
         )}
+        {shouldShowSaveStatus && (
+          <SaveStatus
+      
+            isLoading={sharedState.isLoading}
+            saveSuccess={sharedState.saveSuccess}
+          />
+        )}
       </div>
-
       <div className="flex items-center gap-4">
         {rightContent}
         <SupportChat />
