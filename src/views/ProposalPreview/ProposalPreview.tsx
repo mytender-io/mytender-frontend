@@ -574,66 +574,6 @@ const ProposalPreview = ({
       }
     }
   };
-
-  const handleDownloadDocument = async () => {
-    if (!sharedState.object_id) {
-      toast.error("No bid ID found");
-      return;
-    }
-    try {
-      toast.info("Preparing document for download...");
-
-      // Create FormData instead of JSON
-      const formData = new FormData();
-      formData.append("bid_id", sharedState.object_id);
-
-      const response = await axios({
-        method: "post",
-        url: `http${HTTP_PREFIX}://${API_URL}/generate_docx`,
-        data: formData,
-        responseType: "blob",
-        headers: {
-          Authorization: `Bearer ${tokenRef.current}`
-          // Don't set Content-Type - axios will set it correctly with boundaries
-        }
-      });
-
-      // Create a blob from the response data
-      const blob = new Blob([response.data], {
-        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      });
-
-      // Create a URL for the blob
-      const url = URL.createObjectURL(blob);
-
-      // Create a temporary link element to trigger the download
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${sharedState.bidInfo || "proposal"}.docx`;
-
-      // Append to the DOM, click and then remove
-      document.body.appendChild(a);
-      a.click();
-
-      // Clean up
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 100);
-
-      toast.success("Document downloaded successfully");
-
-      // Track download with posthog
-      posthog.capture("proposal_document_downloaded", {
-        bidId: sharedState.object_id,
-        format: "docx"
-      });
-    } catch (error) {
-      console.error("Error downloading document:", error);
-      toast.error("Failed to download document");
-    }
-  };
-
   // Add this new effect to handle clicks outside of highlighted text
   useEffect(() => {
     // Handler for clicks outside of highlighted text
@@ -840,12 +780,7 @@ const ProposalPreview = ({
           </div>
         ) : (
           <div className="space-y-2">
-            <div className="flex justify-end pr-8">
-              <Button onClick={handleDownloadDocument}>
-                <Download size={16} />
-                Download
-              </Button>
-            </div>
+
             <div className="flex gap-2 pr-4">
               <div
                 className={cn(

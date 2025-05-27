@@ -1,10 +1,16 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 import { cn } from "@/utils";
 import { tenderTabs } from "@/utils/tenderTabsConfig";
 import LightbulbIcon from "@/components/icons/LightbulbIcon";
 import CursorIcon from "@/components/icons/CursorIcon";
 import BulletsIcon from "@/components/icons/BulletsIcon";
+import DownloadIcon from "@/components/icons/DownloadIcon"; // You'll need to create this icon component
+import { toast } from "react-toastify";
+import axios from "axios";
+import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
+import { useAuthUser } from "react-auth-kit";
+import posthog from "posthog-js";
 
 interface BidNavbarProps {
   activeTab?: string;
@@ -25,6 +31,11 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
 }) => {
   const { sharedState } = useContext(BidContext);
   const { outline } = sharedState;
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const getAuth = useAuthUser();
+  const auth = getAuth();
+  const tokenRef = useRef(auth?.token || "default");
 
   const baseNavLinkStyles =
     "px-4 py-3 cursor-pointer rounded-md bg-transparent text-gray-hint_text font-medium transition-all duration-300 ease-in-out w-full hover:bg-gray-100";
@@ -39,6 +50,69 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
   const displayOutline =
     outline && outline.length > 0 ? outline.slice(0, 20) : [];
   const hasMoreSections = outline && outline.length > 20;
+
+  const handleDownloadDocument = async () => {
+    if (!sharedState.object_id) {
+      toast.error("No bid ID found");
+      return;
+    }
+
+    setIsDownloading(true);
+
+    try {
+      toast.info("Preparing document for download...");
+
+      // Create FormData instead of JSON
+      const formData = new FormData();
+      formData.append("bid_id", sharedState.object_id);
+
+      const response = await axios({
+        method: "post",
+        url: `http${HTTP_PREFIX}://${API_URL}/generate_docx`,
+        data: formData,
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${tokenRef.current}`
+        }
+      });
+
+      // Create a blob from the response data
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      });
+
+      // Create a URL for the blob
+      const url = URL.createObjectURL(blob);
+
+      // Create a temporary link element to trigger the download
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${sharedState.bidInfo || "proposal"}.docx`;
+
+      // Append to the DOM, click and then remove
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+
+      toast.success("Document downloaded successfully");
+
+      // Track download with posthog
+      posthog.capture("proposal_document_downloaded", {
+        bidId: sharedState.object_id,
+        format: "docx"
+      });
+    } catch (error) {
+      console.error("Error downloading document:", error);
+      toast.error("Failed to download document");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-1 relative bg-white rounded-lg p-2 h-full">
@@ -93,7 +167,6 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
             activeNavLinkStyles
         )}
         onClick={() => handleTabClick("/proposal-planner", true)}
-        
       >
         <div className="flex items-center gap-2">
           <BulletsIcon className="text-black" />
@@ -128,6 +201,20 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
           )}
         </div>
       )}
+
+      {/* Download Tab */}
+      <span
+        className={cn(
+          baseNavLinkStyles,
+          isDownloading && "opacity-50 cursor-not-allowed"
+        )}
+        onClick={!isDownloading ? handleDownloadDocument : undefined}
+      >
+        <div className="flex items-center gap-2">
+          <DownloadIcon className={cn("text-black")} />
+          {isDownloading ? "Downloading..." : "Download Bid"}
+        </div>
+      </span>
     </div>
   );
 };
