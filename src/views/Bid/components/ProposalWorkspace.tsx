@@ -132,12 +132,12 @@ const ProposalWorkspace = ({
       >
         <div
           className={cn(
-            "flex flex-col gap-2 items-center px-6 pt-6 pb-2 transition-all duration-500 overflow-hidden "
+            "flex flex-col gap-2 items-center px-6 pt-6 pb-2 transition-all duration-500 overflow-hidden"
           )}
         >
           {activeSectionIndex !== null ? (
-            <div>
-              <TabsList className="w-full max-w-md mx-auto h-12">
+            <div className="w-full">
+              <TabsList className="flex justify-center w-full max-w-md mx-auto h-12">
                 <TabsTrigger
                   value="plan"
                   className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
@@ -177,7 +177,7 @@ const ProposalWorkspace = ({
               </div>
             </div>
           ) : (
-            <div className="flex items-center flex-shrink-0 gap-2 mb-4">
+            <div className="flex items-center justify-end flex-shrink-0 gap-2 mb-4 w-full">
               <Button variant="outline" onClick={handleRegenerateClick}>
                 <PlusIcon />
                 New Outline
