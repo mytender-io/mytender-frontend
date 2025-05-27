@@ -144,7 +144,7 @@ const ProposalWorkspace = ({
             </TabsTrigger>
           </TabsList>
           {activeSectionIndex !== null && (
-            <div className="w-full flex items-center justify-start gap-1">
+            <div className="w-full flex items-center justify-start gap-1 max-w-7xl mx-auto">
               <Button
                 variant="ghost"
                 size="icon"
@@ -183,7 +183,7 @@ const ProposalWorkspace = ({
               exit={slideDirection === "right" ? "leftExit" : "rightExit"}
               variants={slideVariants}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 overflow-auto h-full"
+              className="flex-1 overflow-auto h-full max-w-7xl mx-auto"
             >
               <ProposalPlan
                 openTask={openTask}
