@@ -93,6 +93,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
             activeNavLinkStyles
         )}
         onClick={() => handleTabClick("/proposal-planner", true)}
+        
       >
         <div className="flex items-center gap-2">
           <BulletsIcon className="text-black" />

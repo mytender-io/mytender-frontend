@@ -101,6 +101,7 @@ const Bid = () => {
       setActiveTab(path);
 
       if (isParentTab) {
+        console.log("parent tab")
         setActiveSectionId("");
       }
 

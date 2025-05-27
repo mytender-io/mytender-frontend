@@ -5,9 +5,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CollapsibleHeader from "./CollapsibleHeader";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, PlusIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/utils";
+import GenerateProposalModal from "@/modals/GenerateProposalModal";
 
 interface ProposalWorkspaceProps {
   openTask: (taskId: string | null, sectionIndex: string | null) => void;
@@ -55,6 +56,12 @@ const ProposalWorkspace = ({
   }, [activeTab]);
 
   useEffect(() => {
+    //set active sectionindex to null if there is no active section
+    if (activeSectionId === "") {
+      setActiveSectionIndex(null);
+      return;
+    }
+
     const index = outline.findIndex(
       (section) => section.section_id === activeSectionId
     );
@@ -125,47 +132,60 @@ const ProposalWorkspace = ({
       >
         <div
           className={cn(
-            "flex flex-col gap-2 items-center px-6 pt-6 pb-2 transition-all duration-500 overflow-hidden"
+            "flex flex-col gap-2 items-center px-6 pt-6 pb-2 transition-all duration-500 overflow-hidden "
           )}
         >
-          <TabsList className="w-full max-w-md mx-auto h-12">
-            <TabsTrigger
-              value="plan"
-              className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
-            >
-              Plan
-            </TabsTrigger>
-            <TabsTrigger
-              value="write"
-              className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
-              disabled={!activeSectionId}
-            >
-              Write
-            </TabsTrigger>
-          </TabsList>
-          {activeSectionIndex !== null && (
-            <div className="w-full flex items-center justify-start gap-1 max-w-7xl mx-auto">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleSectionNavigation("prev")}
-                disabled={activeSectionIndex === 0}
-                className="w-fit px-2 gap-1"
-              >
-                <ChevronLeft />
+          {activeSectionIndex !== null ? (
+            <div>
+              <TabsList className="w-full max-w-md mx-auto h-12">
+                <TabsTrigger
+                  value="plan"
+                  className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
+                >
+                  Plan
+                </TabsTrigger>
+                <TabsTrigger
+                  value="write"
+                  className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
+                  disabled={!activeSectionId}
+                >
+                  Write
+                </TabsTrigger>
+              </TabsList>
+              <div className="w-full flex items-center justify-start gap-1 max-w-7xl mx-auto mt-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleSectionNavigation("prev")}
+                  disabled={activeSectionIndex === 0}
+                  className="w-fit px-2 gap-1"
+                >
+                  <ChevronLeft />
+                </Button>
+                <span className="text-gray-hint_text">
+                  Question {activeSectionIndex + 1} of {totalSections}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleSectionNavigation("next")}
+                  disabled={activeSectionIndex === totalSections - 1}
+                  className="w-fit px-2 gap-1"
+                >
+                  <ChevronRight />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center flex-shrink-0 gap-2 mb-4">
+              <Button variant="outline" onClick={handleRegenerateClick}>
+                <PlusIcon />
+                New Outline
               </Button>
-              <span className="text-gray-hint_text">
-                Question {activeSectionIndex + 1} of {totalSections}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleSectionNavigation("next")}
-                disabled={activeSectionIndex === totalSections - 1}
-                className="w-fit px-2 gap-1"
-              >
-                <ChevronRight />
-              </Button>
+              <GenerateProposalModal
+                bid_id={sharedState.object_id}
+                handleTabClick={handleTabClick}
+              />
             </div>
           )}
         </div>
