@@ -865,226 +865,258 @@ const ProposalPreview = ({
                   >
                     {outline.length > 0 ? (
                       // Display sections from the outline
+                      //Step 1: Filter to show only the currently active section
+                      // This reduces the array to contain just one section that matches activeSection
                       outline
                         .filter(
                           (section) => section.section_id === activeSectionId
                         )
-                        .map((section, index) => (
-                          <div
-                            key={section.section_id}
-                            className={cn("border-b border-gray-line relative")}
-                          >
-                            {section.answerer && (
-                              <div className="absolute right-1 top-2">
-                                <ProfilePhoto
-                                  answererId={section.answerer}
-                                  size="sm"
-                                  userProfile={userProfile}
-                                  organizationUsers={organizationUsers}
-                                  isLoading={isLoading}
-                                />
-                              </div>
-                            )}
-
-                            <div className="bg-white p-8 relative">
-                              <h2 className="text-xl font-semibold mb-4 break-words">
-                                {section.heading}
-                              </h2>
-
-                              {/* Display section question if it exists */}
-                              {section.question && (
-                                <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
-                                  <p className="font-medium text-gray-700 mb-1">
-                                    Question:
-                                  </p>
-                                  <p className="text-gray-600">
-                                    {section.question}
-                                  </p>
+                        // Step 2: Map over the filtered results (which will be just one section)
+                        // Note: We use _ as the parameter name because we don't want the filtered index
+                        // The filtered index would always be 0 since we only have one section after filtering
+                        .map((section, _) => {
+                          const originalIndex = outline.findIndex(
+                            (s) => s.section_id === section.section_id
+                          );
+                          // Example: If outline has sections ['a', 'b', 'c', 'd'] and activeSectionId is 'c'
+                          // - After filter: we get just section 'c'
+                          // - In map: index would be 0 (first item in filtered array)
+                          // - But originalIndex will be 2 (actual position of 'c' in full array)
+                          return (
+                            <div
+                              key={section.section_id}
+                              className={cn(
+                                "border-b border-gray-line relative"
+                              )}
+                            >
+                              {section.answerer && (
+                                <div className="absolute right-1 top-2">
+                                  <ProfilePhoto
+                                    answererId={section.answerer}
+                                    size="sm"
+                                    userProfile={userProfile}
+                                    organizationUsers={organizationUsers}
+                                    isLoading={isLoading}
+                                  />
                                 </div>
                               )}
 
-                              <DebouncedContentEditable
-                                content={section.answer || ""}
-                                onChange={(newContent) =>
-                                  handleContentChange(index, newContent)
-                                }
-                                onFocus={() => {
-                                  setActiveEditor(
-                                    editorRefs.current[index],
-                                    index
-                                  );
-                                }}
-                                onClick={() => {
-                                  if (currentSectionIndex !== index) {
+                              <div className="bg-white p-8 relative">
+                                <h2 className="text-xl font-semibold mb-4 break-words">
+                                  {section.heading}
+                                </h2>
+
+                                {/* Display section question if it exists */}
+                                {section.question && (
+                                  <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                                    <p className="font-medium text-gray-700 mb-1">
+                                      Question:
+                                    </p>
+                                    <p className="text-gray-600">
+                                      {section.question}
+                                    </p>
+                                  </div>
+                                )}
+
+                                <DebouncedContentEditable
+                                  key={section.section_id}
+                                  content={section.answer || ""}
+                                  onChange={(newContent) =>
+                                    handleContentChange(
+                                      originalIndex,
+                                      newContent
+                                    )
+                                  }
+                                  onFocus={() => {
                                     setActiveEditor(
-                                      editorRefs.current[index],
-                                      index
+                                      editorRefs.current[originalIndex],
+                                      originalIndex
                                     );
+                                  }}
+                                  onClick={() => {
+                                    if (currentSectionIndex !== originalIndex) {
+                                      setActiveEditor(
+                                        editorRefs.current[originalIndex],
+                                        originalIndex
+                                      );
+                                    }
+                                  }}
+                                  onSelectionChange={(selection) => {
+                                    if (selection) {
+                                      handleTextSelection();
+                                    }
+                                  }}
+                                  onFeedbackClick={(feedbackId) =>
+                                    handleFeedbackClick(
+                                      feedbackId,
+                                      currentSectionIndex,
+                                      outline,
+                                      setActiveFeedback,
+                                      setFeedbackSidepaneOpen
+                                    )
                                   }
-                                }}
-                                onSelectionChange={(selection) => {
-                                  if (selection) {
-                                    handleTextSelection();
-                                  }
-                                }}
-                                onFeedbackClick={(feedbackId) =>
-                                  handleFeedbackClick(
-                                    feedbackId,
-                                    currentSectionIndex,
-                                    outline,
-                                    setActiveFeedback,
-                                    setFeedbackSidepaneOpen
-                                  )
-                                }
-                                disabled={false}
-                                editorRef={(el) => {
-                                  editorRefs.current[index] = el;
-                                  if (currentSectionIndex === index) {
-                                    activeEditorRef.current = el;
-                                  }
-                                }}
-                              />
-
-                              {/* Inline rewrite feedback section */}
-                              {rewritingSectionIndex === index && (
-                                <RewriteInputBar
-                                  section={section}
-                                  sectionIndex={index}
-                                  isActive={rewritingSectionIndex === index}
-                                  objectId={sharedState.object_id}
-                                  tokenRef={tokenRef}
-                                  onCancel={handleRewriteCancel}
-                                  onRewriteSuccess={handleRewriteSuccess}
+                                  disabled={false}
+                                  editorRef={(el) => {
+                                    editorRefs.current[originalIndex] = el;
+                                    if (currentSectionIndex === originalIndex) {
+                                      activeEditorRef.current = el;
+                                    }
+                                  }}
                                 />
-                              )}
 
-                              {/* Section action buttons */}
-                              <div className="flex gap-2 mt-4">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleCopySection(index)}
-                                  className="text-xs text-gray-hint_text"
-                                >
-                                  <CopyIcon /> Copy
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleRewriteClick(index)}
-                                  disabled={
-                                    rewritingSection === section.section_id
-                                  }
-                                  className="text-xs text-gray-hint_text"
-                                >
-                                  <RedoSparkIcon /> Rewrite
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleWordAdjustClick(index)}
-                                  className="text-xs text-gray-hint_text"
-                                >
-                                  <TextIcon size={14} /> Adjust Words
-                                </Button>
-                                <MarkReviewReadyButton
-                                  section={section}
-                                  index={index}
-                                  objectId={sharedState.object_id}
-                                  organizationUsers={organizationUsers}
-                                  tokenRef={tokenRef}
-                                  setSharedState={setSharedState}
-                                />
-                              </div>
+                                {/* Inline rewrite feedback section */}
+                                {rewritingSectionIndex === originalIndex && (
+                                  <RewriteInputBar
+                                    section={section}
+                                    sectionIndex={originalIndex}
+                                    isActive={
+                                      rewritingSectionIndex === originalIndex
+                                    }
+                                    objectId={sharedState.object_id}
+                                    tokenRef={tokenRef}
+                                    onCancel={handleRewriteCancel}
+                                    onRewriteSuccess={handleRewriteSuccess}
+                                  />
+                                )}
 
-                              {/* Word count adjustment input */}
-                              {wordAdjustSectionIndex === index && (
-                                <div className="mt-2 p-3 border border-gray-200 rounded-md bg-gray-50">
-                                  <div className="flex items-center gap-3">
-                                    <div className="flex-1">
-                                      <div className="text-sm mb-1">
-                                        Target word count:
+                                {/* Section action buttons */}
+                                <div className="flex gap-2 mt-4">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleCopySection(originalIndex)
+                                    }
+                                    className="text-xs text-gray-hint_text"
+                                  >
+                                    <CopyIcon /> Copy
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleRewriteClick(originalIndex)
+                                    }
+                                    disabled={
+                                      rewritingSection === section.section_id
+                                    }
+                                    className="text-xs text-gray-hint_text"
+                                  >
+                                    <RedoSparkIcon /> Rewrite
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleWordAdjustClick(originalIndex)
+                                    }
+                                    className="text-xs text-gray-hint_text"
+                                  >
+                                    <TextIcon size={14} /> Adjust Words
+                                  </Button>
+                                  <MarkReviewReadyButton
+                                    section={section}
+                                    index={originalIndex}
+                                    objectId={sharedState.object_id}
+                                    organizationUsers={organizationUsers}
+                                    tokenRef={tokenRef}
+                                    setSharedState={setSharedState}
+                                  />
+                                </div>
+
+                                {/* Word count adjustment input */}
+                                {wordAdjustSectionIndex === originalIndex && (
+                                  <div className="mt-2 p-3 border border-gray-200 rounded-md bg-gray-50">
+                                    <div className="flex items-center gap-3">
+                                      <div className="flex-1">
+                                        <div className="text-sm mb-1">
+                                          Target word count:
+                                        </div>
+                                        <input
+                                          type="number"
+                                          value={targetWordCount}
+                                          onChange={(e) =>
+                                            setTargetWordCount(
+                                              parseInt(e.target.value) || 0
+                                            )
+                                          }
+                                          className="w-full px-3 py-1 border border-gray-300 rounded"
+                                          min="50"
+                                          max="5000"
+                                        />
                                       </div>
-                                      <input
-                                        type="number"
-                                        value={targetWordCount}
-                                        onChange={(e) =>
-                                          setTargetWordCount(
-                                            parseInt(e.target.value) || 0
+                                      <div>
+                                        <div className="text-sm mb-1">
+                                          Current:
+                                        </div>
+                                        <div className="text-sm font-medium">
+                                          {section.word_count} words
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="flex justify-end gap-2 mt-3">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                          setWordAdjustSectionIndex(null)
+                                        }
+                                      >
+                                        Cancel
+                                      </Button>
+                                      <Button
+                                        variant="default"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleAdjustToWordCount(
+                                            originalIndex,
+                                            targetWordCount
                                           )
                                         }
-                                        className="w-full px-3 py-1 border border-gray-300 rounded"
-                                        min="50"
-                                        max="5000"
-                                      />
-                                    </div>
-                                    <div>
-                                      <div className="text-sm mb-1">
-                                        Current:
-                                      </div>
-                                      <div className="text-sm font-medium">
-                                        {section.word_count} words
-                                      </div>
+                                        disabled={
+                                          targetWordCount <= 0 || localLoading
+                                        }
+                                      >
+                                        {localLoading ? (
+                                          <Spinner className="w-4 h-4 mr-2" />
+                                        ) : null}
+                                        Adjust
+                                      </Button>
                                     </div>
                                   </div>
-                                  <div className="flex justify-end gap-2 mt-3">
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() =>
-                                        setWordAdjustSectionIndex(null)
-                                      }
-                                    >
-                                      Cancel
-                                    </Button>
-                                    <Button
-                                      variant="default"
-                                      size="sm"
-                                      onClick={() =>
-                                        handleAdjustToWordCount(
-                                          index,
-                                          targetWordCount
-                                        )
-                                      }
-                                      disabled={
-                                        targetWordCount <= 0 || localLoading
-                                      }
-                                    >
-                                      {localLoading ? (
-                                        <Spinner className="w-4 h-4 mr-2" />
-                                      ) : null}
-                                      Adjust
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
+                                )}
+                              </div>
 
-                            {/* Show a meta info box with section details */}
-                            <div className="bg-gray-50 px-4 py-2 text-xs text-gray-600 flex justify-between border-t border-gray-200">
-                              <div>
-                                <span className="font-medium">Words:</span>{" "}
-                                {calculateWordCount(section.answer || "")}
-                              </div>
-                              {section.reviewer && (
+                              {/* Show a meta info box with section details */}
+                              <div className="bg-gray-50 px-4 py-2 text-xs text-gray-600 flex justify-between border-t border-gray-200">
                                 <div>
-                                  <span className="font-medium">Reviewer:</span>{" "}
-                                  {section.reviewer}
+                                  <span className="font-medium">Words:</span>{" "}
+                                  {calculateWordCount(section.answer || "")}
                                 </div>
-                              )}
-                              {section.answerer && (
+                                {section.reviewer && (
+                                  <div>
+                                    <span className="font-medium">
+                                      Reviewer:
+                                    </span>{" "}
+                                    {section.reviewer}
+                                  </div>
+                                )}
+                                {section.answerer && (
+                                  <div>
+                                    <span className="font-medium">
+                                      Answerer:
+                                    </span>{" "}
+                                    {section.answerer}
+                                  </div>
+                                )}
                                 <div>
-                                  <span className="font-medium">Answerer:</span>{" "}
-                                  {section.answerer}
+                                  <span className="font-medium">Status:</span>{" "}
+                                  {section.status}
                                 </div>
-                              )}
-                              <div>
-                                <span className="font-medium">Status:</span>{" "}
-                                {section.status}
                               </div>
                             </div>
-                          </div>
-                        ))
+                          );
+                        })
                     ) : (
                       <div className="flex justify-center items-center h-full bg-muted p-5 text-center">
                         <p>
