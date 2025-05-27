@@ -183,7 +183,7 @@ const ProposalWorkspace = ({
               exit={slideDirection === "right" ? "leftExit" : "rightExit"}
               variants={slideVariants}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 overflow-auto h-full max-w-7xl mx-auto"
+              className="flex-1 overflow-auto h-full"
             >
               <ProposalPlan
                 openTask={openTask}
