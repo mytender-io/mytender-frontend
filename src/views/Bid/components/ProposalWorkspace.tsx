@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CollapsibleHeader from "./CollapsibleHeader";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, PlusIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, PlusIcon, ArrowLeft, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/utils";
 import GenerateProposalModal from "@/modals/GenerateProposalModal";
@@ -97,6 +97,18 @@ const ProposalWorkspace = ({
     );
   };
 
+  const switchToNextTab = () => {
+    if (activeView === "plan" && activeSectionId) {
+      handleViewChange("write");
+    }
+  };
+
+  const switchToPrevTab = () => {
+    if (activeView === "write") {
+      handleViewChange("plan");
+    }
+  };
+
   // Animation variants
   const slideVariants = {
     rightEnter: {
@@ -122,7 +134,35 @@ const ProposalWorkspace = ({
   };
 
   return (
-    <div className="flex flex-col h-full w-full pb-4">
+    <div className="flex flex-col h-full w-full pb-4 relative">
+      {/* Tab switching arrows */}
+      {activeSectionIndex !== null && (
+        <>
+          {activeView === "write" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={switchToPrevTab}
+              className="absolute left-2 top-1/3 z-10 bg-white/80 hover:bg-white/90 shadow-md h-20 w-8 rounded-r-md [&_svg]:size-6"
+              aria-label="Switch to Plan view"
+            >
+              <ArrowLeft />
+            </Button>
+          )}
+          {activeView === "plan" && activeSectionId && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={switchToNextTab}
+              className="absolute right-2 top-1/3 z-[999] bg-white/80 hover:bg-white/90 shadow-md h-20 w-8 rounded-l-md [&_svg]:size-6"
+              aria-label="Switch to Write view"
+            >
+              <ArrowRight />
+            </Button>
+          )}
+        </>
+      )}
+
       {/* Tabs for switching between Plan and Write views */}
       <Tabs
         defaultValue={activeView}
@@ -183,7 +223,7 @@ const ProposalWorkspace = ({
                 New Outline
               </Button>
               <GenerateProposalModal
-                bid_id={sharedState.object_id}
+                bid_id={sharedState.object_id || ''}
                 handleTabClick={handleTabClick}
               />
             </div>
