@@ -767,7 +767,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
       />
       <ScrollArea className="h-full">
         <div className="flex flex-col h-full gap-2">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 p-1">
             <div className="flex items-center">
               <Input
                 value={section.heading}
