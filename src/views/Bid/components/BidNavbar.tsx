@@ -129,22 +129,24 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
         </div>
       </span>
 
-      <div className="flex flex-col ml-4 border-l border-gray-200">
-        {tenderTabs.map((tab, index) => (
-          <span
-            key={index}
-            className={cn(
-              baseSubTabStyles,
-              activeTab === "/bid-extractor" &&
-                activeSubTab === tab.stateKey &&
-                activeSubTabStyles
-            )}
-            onClick={() => handleSubTabClick(tab.stateKey)}
-          >
-            {tab.name}
-          </span>
-        ))}
-      </div>
+      {activeTab === "/bid-extractor" && (
+        <div className="flex flex-col ml-4 border-l border-gray-200">
+          {tenderTabs.map((tab, index) => (
+            <span
+              key={index}
+              className={cn(
+                baseSubTabStyles,
+                activeTab === "/bid-extractor" &&
+                  activeSubTab === tab.stateKey &&
+                  activeSubTabStyles
+              )}
+              onClick={() => handleSubTabClick(tab.stateKey)}
+            >
+              {tab.name}
+            </span>
+          ))}
+        </div>
+      )}
 
       <span
         className={cn(
