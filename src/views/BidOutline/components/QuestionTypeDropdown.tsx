@@ -25,19 +25,19 @@ const QuestionTypeDropdown = ({
         </div>
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="3b">
+        <SelectItem value="3b" className="my-2">
           <span className="font-medium">General</span>
         </SelectItem>
-        <SelectItem value="3b_case_study">
+        <SelectItem value="3b_case_study" className="my-2">
           <span className="font-medium">Case Study</span>
         </SelectItem>
-        <SelectItem value="3b_commercial">
+        <SelectItem value="3b_commercial" className="my-2">
           <span className="font-medium">Compliance</span>
         </SelectItem>
-        <SelectItem value="3b_personnel">
+        <SelectItem value="3b_personnel" className="my-2">
           <span className="font-medium">Team</span>
         </SelectItem>
-        <SelectItem value="3b_technical">
+        <SelectItem value="3b_technical" className="my-2">
           <span className="font-medium">Technical</span>
         </SelectItem>
       </SelectContent>
