@@ -768,7 +768,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   if (!section) return null;
 
   return (
-    <div className={cn("w-full h-full bg-white rounded-md max-w-7xl mx-auto")}>
+    <div className={cn("w-full h-full bg-white rounded-md max-w-4xl mx-auto")}>
       {/* Hidden span to measure text width */}
       <span
         ref={textMeasureRef}

@@ -200,7 +200,7 @@ const ProposalWorkspace = ({
                     Write
                   </TabsTrigger>
                 </TabsList>
-                <div className="w-full flex items-center justify-start gap-1 max-w-7xl mx-auto mt-2">
+                <div className="w-full flex items-center justify-start gap-1 max-w-4xl mx-auto mt-2">
                   <Button
                     variant="ghost"
                     size="icon"
