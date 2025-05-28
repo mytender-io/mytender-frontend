@@ -1013,7 +1013,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                       {complianceBullets.map((requirement, idx) => (
                         <Badge
                           key={idx}
-                          className="bg-status-success_light text-status-success border border-status-success rounded-xl flex items-center gap-1 min-h-8 text-sm"
+                          className="bg-status-success_light hover:bg-status-success text-status-success hover:text-white border-status-success rounded-xl flex items-center gap-1 min-h-8 text-sm max-w-xl"
                         >
                           {requirement}
                           <Button
@@ -1102,7 +1102,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                       {winThemeBullets.map((theme, idx) => (
                         <Badge
                           key={idx}
-                          className="bg-status-research_light text-status-research border border-status-research rounded-xl flex items-center gap-1 min-h-8 text-sm"
+                          className="bg-status-research_light hover:bg-status-research text-status-research hover:text-white border-status-research rounded-xl flex items-center gap-1 min-h-8 text-sm max-w-xl"
                         >
                           {theme}
                           <Button
@@ -1191,7 +1191,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                       {painPointBullets.map((point, idx) => (
                         <Badge
                           key={idx}
-                          className="bg-status-review_light text-status-review border border-status-review rounded-xl flex items-center gap-1 min-h-8 text-sm"
+                          className="bg-status-review_light hover:bg-status-review text-status-review hover:text-white border-status-review rounded-xl flex items-center gap-1 min-h-8 text-sm max-w-xl"
                         >
                           {point}
                           <Button
@@ -1284,7 +1284,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                       ).map((factor, idx) => (
                         <Badge
                           key={idx}
-                          className="bg-status-planning_light text-status-planning border border-status-planning rounded-xl flex items-center gap-1 min-h-8 text-sm py-2"
+                          className="bg-status-planning_light hover:bg-status-planning text-status-planning hover:text-white border-status-planning rounded-xl flex items-center gap-1 min-h-8 text-sm max-w-xl"
                         >
                           {factor}
                           <Button
