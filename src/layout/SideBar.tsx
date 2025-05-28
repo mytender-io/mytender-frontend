@@ -78,7 +78,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           <HomeIcon
             className={cn(
               "min-w-8 min-h-8 stroke-1",
-              isActive("/home") ? "text-orange stroke-2" : "text-gray-hint_text"
+              isActive("/home") ? "text-orange" : "text-gray-hint_text"
             )}
             width={20}
             height={20}
@@ -88,7 +88,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               className={cn(
                 "text-sm font-medium whitespace-nowrap",
                 isActive("/home")
-                  ? "text-orange font-bold"
+                  ? "text-orange"
                   : "text-gray-hint_text"
               )}
             >
@@ -107,7 +107,6 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
                 ? "text-orange"
                 : "text-gray-hint_text"
             )}
-            strokeWidth={isActive("/bids") || isActive("/bid") ? 2 : 1}
             width={20}
             height={20}
           />
@@ -116,7 +115,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               className={cn(
                 "text-sm font-medium whitespace-nowrap",
                 isActive("/bids") || isActive("/bid")
-                  ? "text-orange font-bold"
+                  ? "text-orange"
                   : "text-gray-hint_text"
               )}
             >
@@ -133,7 +132,6 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               "min-w-8 min-h-8",
               isActive("/library") ? "text-orange" : "text-gray-hint_text"
             )}
-            strokeWidth={isActive("/library") ? 1.5 : 1}
             width={20}
             height={20}
           />
@@ -142,7 +140,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               className={cn(
                 "text-sm font-medium whitespace-nowrap",
                 isActive("/library")
-                  ? "text-orange font-bold"
+                  ? "text-orange"
                   : "text-gray-hint_text"
               )}
             >
@@ -159,7 +157,6 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               "min-w-8 min-h-8",
               isActive("/chat") ? "text-orange" : "text-gray-hint_text"
             )}
-            strokeWidth={isActive("/chat") ? 2 : 1}
             width={20}
             height={20}
           />
@@ -168,7 +165,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               className={cn(
                 "text-sm font-medium whitespace-nowrap",
                 isActive("/chat")
-                  ? "text-orange font-bold"
+                  ? "text-orange"
                   : "text-gray-hint_text"
               )}
             >
@@ -183,9 +180,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
           <UserRound
             className={cn(
               "min-w-8 min-h-8 stroke-1",
-              isActive("/profile")
-                ? "text-orange stroke-2"
-                : "text-gray-hint_text"
+              isActive("/profile") ? "text-orange" : "text-gray-hint_text"
             )}
             width={20}
             height={20}
@@ -195,7 +190,7 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
               className={cn(
                 "text-sm font-medium whitespace-nowrap",
                 isActive("/profile")
-                  ? "text-orange font-bold"
+                  ? "text-orange"
                   : "text-gray-hint_text"
               )}
             >
