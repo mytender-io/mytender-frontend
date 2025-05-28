@@ -143,7 +143,7 @@ const ProposalWorkspace = ({
               variant="ghost"
               size="icon"
               onClick={switchToPrevTab}
-              className="absolute left-2 top-1/3 z-10 bg-white/80 hover:bg-white/90 shadow-md h-20 w-8 rounded-r-md [&_svg]:size-6"
+              className="absolute left-2 top-1/3 z-10 bg-orange-ultra_light hover:bg-orange-lighter shadow-md h-20 w-8 rounded-r-md [&_svg]:size-6"
               aria-label="Switch to Plan view"
             >
               <ArrowLeft />
@@ -154,7 +154,7 @@ const ProposalWorkspace = ({
               variant="ghost"
               size="icon"
               onClick={switchToNextTab}
-              className="absolute right-2 top-1/3 z-[999] bg-white/80 hover:bg-white/90 shadow-md h-20 w-8 rounded-l-md [&_svg]:size-6"
+              className="absolute right-2 top-1/3 z-[999] bg-orange-ultra_light hover:bg-orange-lighter shadow-md h-20 w-8 rounded-l-md [&_svg]:size-6"
               aria-label="Switch to Write view"
             >
               <ArrowRight />
