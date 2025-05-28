@@ -27,6 +27,7 @@ import StatusMenu from "@/buttons/StatusMenu";
 import SelectOrganisationUserButton from "@/buttons/SelectOrganisationUserButton";
 import { useUserData } from "@/context/UserDataContext";
 import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
+import GenerateSectonButton from "@/components/GenerateSectionButton";
 
 interface HighlightedDocument {
   name: string;
@@ -135,7 +136,9 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   };
 
   // Update the handleSaveSelectedFiles function
-  const handleSaveSelectedFiles = async (selectedFilesWithMetadata: FileWithMetadata[]) => {
+  const handleSaveSelectedFiles = async (
+    selectedFilesWithMetadata: FileWithMetadata[]
+  ) => {
     console.log("Received files with metadata:", selectedFilesWithMetadata);
 
     if (!selectedFilesWithMetadata || selectedFilesWithMetadata.length === 0) {
@@ -173,7 +176,9 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   };
 
   // Update the handleSaveSelectedTenderFiles function
-  const handleSaveSelectedTenderFiles = async (selectedFilesWithMetadata: FileWithMetadata[]) => {
+  const handleSaveSelectedTenderFiles = async (
+    selectedFilesWithMetadata: FileWithMetadata[]
+  ) => {
     console.log(
       "Received tender files with metadata:",
       selectedFilesWithMetadata
@@ -607,7 +612,10 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   const [editingWritingPlan, setEditingWritingPlan] = useState(false);
 
   // 1. Modified handleAnswererSelect function to include the correct user assignment and priority
-  const handleAnswererSelect = async (user: { username?: string; email?: string }) => {
+  const handleAnswererSelect = async (user: {
+    username?: string;
+    email?: string;
+  }) => {
     // Extract the username and email from the user object
     const username = user.username || "";
     const email = user.email || "";
@@ -670,7 +678,10 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   };
 
   // 2. Modified handleReviewerSelect function to include the correct user assignment and priority
-  const handleReviewerSelect = async (user: { username?: string; email?: string }) => {
+  const handleReviewerSelect = async (user: {
+    username?: string;
+    email?: string;
+  }) => {
     // Extract the username and email from the user object
     const username = user.username || "";
     const email = user.email || "";
@@ -734,7 +745,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
 
   const [headingWidth, setHeadingWidth] = useState<number>(0);
   const textMeasureRef = useRef<HTMLSpanElement>(null);
-  
+
   // Update width based on heading content
   useEffect(() => {
     if (section?.heading && textMeasureRef.current) {
@@ -744,7 +755,10 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
       const textWidth = textMeasureRef.current.getBoundingClientRect().width;
       // Add some buffer to prevent text clipping
       const bufferWidth = 20;
-      const calculatedWidth = Math.max(100, Math.min(600, textWidth + bufferWidth));
+      const calculatedWidth = Math.max(
+        100,
+        Math.min(600, textWidth + bufferWidth)
+      );
       setHeadingWidth(calculatedWidth);
     } else {
       setHeadingWidth(150); // Default width for empty heading
@@ -754,13 +768,9 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   if (!section) return null;
 
   return (
-    <div
-      className={cn(
-        "w-full h-full bg-white rounded-md max-w-7xl mx-auto"
-      )}
-    >
+    <div className={cn("w-full h-full bg-white rounded-md max-w-7xl mx-auto")}>
       {/* Hidden span to measure text width */}
-      <span 
+      <span
         ref={textMeasureRef}
         className="absolute opacity-0 pointer-events-none font-bold md:text-lg whitespace-nowrap"
         aria-hidden="true"
@@ -775,7 +785,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   handleSectionChange(index, "heading", e.target.value)
                 }
                 className="font-bold resize-none overflow-hidden whitespace-nowrap min-h-[1.75rem] bg-transparent border-none focus:ring-0 shadow-none md:text-lg"
-                style={{ width: headingWidth ? `${headingWidth}px` : 'auto' }}
+                style={{ width: headingWidth ? `${headingWidth}px` : "auto" }}
               />
               <StatusMenu
                 minimize
@@ -806,30 +816,34 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
             </div>
           </div>
           <div className="px-4 space-y-6">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <SelectFilePopup
-                  onSaveSelectedFiles={handleSaveSelectedFiles}
-                  initialSelectedFiles={
-                    (section?.highlightedDocuments?.map((doc) => doc.name) || []) as string[]
-                  }
-                  onSaveSelectedTenderFiles={handleSaveSelectedTenderFiles}
-                  initialTenderSelectedFiles={
-                    (section?.highlightedTenderDocuments?.map(
-                      (doc) => doc.name
-                    ) || []) as string[]
-                  }
-                  bid_id={sharedState.object_id}
-                />
+                <div className="flex items-center gap-2">
+                  <SelectFilePopup
+                    onSaveSelectedFiles={handleSaveSelectedFiles}
+                    initialSelectedFiles={
+                      (section?.highlightedDocuments?.map((doc) => doc.name) ||
+                        []) as string[]
+                    }
+                    onSaveSelectedTenderFiles={handleSaveSelectedTenderFiles}
+                    initialTenderSelectedFiles={
+                      (section?.highlightedTenderDocuments?.map(
+                        (doc) => doc.name
+                      ) || []) as string[]
+                    }
+                    bid_id={sharedState.object_id}
+                  />
+                </div>
+                <div className="flex items-center">
+                  <QuestionTypeDropdown
+                    value={section.choice}
+                    onChange={(value) =>
+                      handleSectionChange(index, "choice", value)
+                    }
+                  />
+                </div>
               </div>
-              <div className="flex items-center">
-                <QuestionTypeDropdown
-                  value={section.choice}
-                  onChange={(value) =>
-                    handleSectionChange(index, "choice", value)
-                  }
-                />
-              </div>
+              <GenerateSectonButton section={section} />
             </div>
 
             {section?.highlightedDocuments?.length > 0 && (
