@@ -32,7 +32,9 @@ export default {
           review_light: "#F8E6F8",
           review: "#9D629D",
           pending_light: "#F5F5F5",
-          pending: "#6C757D"
+          pending: "#6C757D",
+          informing_light: "#F5F2D9",
+          informing: "#DACB5C"
         },
         gray: {
           DEFAULT: "#8B888D",

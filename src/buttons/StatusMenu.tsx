@@ -38,7 +38,7 @@ const StatusMenu = ({
       case "Completed":
         return "bg-status-success_light text-status-success hover:text-status-success hover:bg-status-success_light/90 border-status-success";
       case "In Progress":
-        return "bg-status-review_light text-status-review hover:text-status-review hover:bg-status-review_light/90 border-status-review";
+        return "bg-status-informing_light text-status-informing hover:text-status-informing hover:bg-status-informing_light/90 border-status-informing";
       case "Not Started":
         return "bg-status-planning_light text-status-planning hover:text-status-planning hover:bg-status-planning_light/90 border-status-planning";
       default:
@@ -51,7 +51,7 @@ const StatusMenu = ({
       case "Completed":
         return "bg-status-success border-status-success";
       case "In Progress":
-        return "bg-status-review border-status-review";
+        return "bg-status-informing border-status-informing";
       case "Not Started":
         return "bg-status-planning border-status-planning";
       default:
@@ -107,33 +107,42 @@ const StatusMenu = ({
           </Button>
         )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-32">
+      <DropdownMenuContent className="w-36">
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation();
             onChange("Not Started");
           }}
-          className={cn("hover:bg-gray-100")}
+          className={cn("hover:bg-gray-100 my-2")}
         >
-          Not Started
+          <div className="flex items-center space-x-3">
+            <div className="h-4 w-4 rounded-full bg-status-planning" />
+            <span>Not Started</span>
+          </div>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation();
             onChange("In Progress");
           }}
-          className={cn("hover:bg-gray-100")}
+          className={cn("hover:bg-gray-100 my-2")}
         >
-          In Progress
+          <div className="flex items-center space-x-3">
+            <div className="h-4 w-4 rounded-full bg-status-informing" />
+            <span>In Progress</span>
+          </div>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation();
             onChange("Completed");
           }}
-          className={cn("hover:bg-gray-100")}
+          className={cn("hover:bg-gray-100 my-2")}
         >
-          Completed
+          <div className="flex items-center space-x-3">
+            <div className="h-4 w-4 rounded-full bg-status-success" />
+            <span>Completed</span>
+          </div>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
