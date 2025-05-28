@@ -795,9 +795,10 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 }}
               />
             </div>
-            <div className="flex items-center relative">
+            <div className="flex items-center gap-2">
               {/* Assigned User */}
-              <div className="z-10">
+              <div className="flex items-center gap-1">
+                <span className="text-sm"> Answerer:</span>
                 <SelectOrganisationUserButton
                   selectedUser={section.answerer}
                   onSelectUser={handleAnswererSelect}
@@ -806,7 +807,8 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 />
               </div>
               {/* Reviewer - positioned with negative margin for overlap */}
-              <div className="-ml-6 z-0">
+              <div className="flex items-center gap-1">
+                <span className="text-sm"> Reviewer:</span>
                 <SelectOrganisationUserButton
                   selectedUser={section.reviewer}
                   onSelectUser={handleReviewerSelect}
@@ -1024,7 +1026,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                           </Button>
                         </Badge>
                       ))}
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2">
                         {showComplianceSelect ? (
                           <>
                             <Select
@@ -1113,7 +1115,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                           </Button>
                         </Badge>
                       ))}
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2">
                         {showWinThemeSelect ? (
                           <>
                             <Select
@@ -1202,7 +1204,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                           </Button>
                         </Badge>
                       ))}
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2">
                         {showPainPointSelect ? (
                           <>
                             <Select
@@ -1295,7 +1297,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                           </Button>
                         </Badge>
                       ))}
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2">
                         {showDifferentiationSelect ? (
                           <>
                             <Select
