@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight, PlusIcon, ArrowLeft, ArrowRight } from "luci
 import { motion } from "framer-motion";
 import { cn } from "@/utils";
 import GenerateProposalModal from "@/modals/GenerateProposalModal";
+import { GenerationProvider } from "@/context/GeneratingSectionContext";
 
 interface ProposalWorkspaceProps {
   openTask: (taskId: string | null, sectionIndex: string | null) => void;
@@ -163,122 +164,124 @@ const ProposalWorkspace = ({
         </>
       )}
 
-      {/* Tabs for switching between Plan and Write views */}
-      <Tabs
-        defaultValue={activeView}
-        value={activeView}
-        onValueChange={handleViewChange}
-        className="flex flex-col flex-1 overflow-hidden px-0"
-      >
-        <div
-          className={cn(
-            "flex flex-col gap-2 items-center px-6 pt-6 pb-2 transition-all duration-500 overflow-hidden"
-          )}
+        {/* Tabs for switching between Plan and Write views */}
+        <Tabs
+          defaultValue={activeView}
+          value={activeView}
+          onValueChange={handleViewChange}
+          className="flex flex-col flex-1 overflow-hidden px-0"
         >
-          {activeSectionIndex !== null ? (
-            <div className="w-full">
-              <TabsList className="flex justify-center w-full max-w-md mx-auto h-12">
-                <TabsTrigger
-                  value="plan"
-                  className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
-                >
-                  Plan
-                </TabsTrigger>
-                <TabsTrigger
-                  value="write"
-                  className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
-                  disabled={!activeSectionId}
-                >
-                  Write
-                </TabsTrigger>
-              </TabsList>
-              <div className="w-full flex items-center justify-start gap-1 max-w-7xl mx-auto mt-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSectionNavigation("prev")}
-                  disabled={activeSectionIndex === 0}
-                  className="w-fit px-2 gap-1"
-                >
-                  <ChevronLeft />
-                </Button>
-                <span className="text-gray-hint_text">
-                  Question {activeSectionIndex + 1} of {totalSections}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSectionNavigation("next")}
-                  disabled={activeSectionIndex === totalSections - 1}
-                  className="w-fit px-2 gap-1"
-                >
-                  <ChevronRight />
-                </Button>
+          <div
+            className={cn(
+              "flex flex-col gap-2 items-center px-6 pt-6 pb-2 transition-all duration-500 overflow-hidden"
+            )}
+          >
+            {activeSectionIndex !== null ? (
+              <div className="w-full">
+                <TabsList className="flex justify-center w-full max-w-md mx-auto h-12">
+                  <TabsTrigger
+                    value="plan"
+                    className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
+                  >
+                    Plan
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="write"
+                    className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
+                    disabled={!activeSectionId}
+                  >
+                    Write
+                  </TabsTrigger>
+                </TabsList>
+                <div className="w-full flex items-center justify-start gap-1 max-w-7xl mx-auto mt-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleSectionNavigation("prev")}
+                    disabled={activeSectionIndex === 0}
+                    className="w-fit px-2 gap-1"
+                  >
+                    <ChevronLeft />
+                  </Button>
+                  <span className="text-gray-hint_text">
+                    Question {activeSectionIndex + 1} of {totalSections}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleSectionNavigation("next")}
+                    disabled={activeSectionIndex === totalSections - 1}
+                    className="w-fit px-2 gap-1"
+                  >
+                    <ChevronRight />
+                  </Button>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-end flex-shrink-0 gap-2 mb-4 w-full">
-              <Button variant="outline" onClick={handleRegenerateClick}>
-                <PlusIcon />
-                New Outline
-              </Button>
-              <GenerateProposalModal
-                bid_id={sharedState.object_id || ''}
-                handleTabClick={handleTabClick}
-              />
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="flex items-center justify-end flex-shrink-0 gap-2 mb-4 w-full">
+                <Button variant="outline" onClick={handleRegenerateClick}>
+                  <PlusIcon />
+                  New Outline
+                </Button>
+                <GenerateProposalModal
+                  bid_id={sharedState.object_id || ''}
+                  handleTabClick={handleTabClick}
+                />
+              </div>
+            )}
+          </div>
 
-        {/* Content area for the selected view */}
-        <div className="flex-1 overflow-hidden flex flex-col px-6 pb-4">
-          <TabsContent
-            value="plan"
-            className="mt-0 flex-1 overflow-auto h-full"
-            asChild
-          >
-            <motion.div
-              initial={slideDirection === "right" ? "leftEnter" : "rightEnter"}
-              animate="center"
-              exit={slideDirection === "right" ? "leftExit" : "rightExit"}
-              variants={slideVariants}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 overflow-auto h-full"
+          {/* Content area for the selected view */}
+          <div className="flex-1 overflow-hidden flex flex-col px-6 pb-4">
+            <TabsContent
+              value="plan"
+              className="mt-0 flex-1 overflow-auto h-full"
+              asChild
             >
-              <ProposalPlan
-                openTask={openTask}
-                taskToOpen={taskToOpen}
-                sectionIndex={sectionIndex}
-                handleRegenerateClick={handleRegenerateClick}
-                handleTabClick={handleTabClick}
-                activeSectionId={activeSectionId}
-                handleActiveSectionChange={handleActiveSectionChange}
-              />
-            </motion.div>
-          </TabsContent>
-          <TabsContent
-            value="write"
-            className="mt-0 flex-1 overflow-auto h-full"
-            asChild
-          >
-            <motion.div
-              initial={slideDirection === "right" ? "leftEnter" : "rightEnter"}
-              animate="center"
-              exit={slideDirection === "right" ? "leftExit" : "rightExit"}
-              variants={slideVariants}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 overflow-auto h-full"
+              <motion.div
+                initial={slideDirection === "right" ? "leftEnter" : "rightEnter"}
+                animate="center"
+                exit={slideDirection === "right" ? "leftExit" : "rightExit"}
+                variants={slideVariants}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="flex-1 overflow-auto h-full"
+              >
+                <ProposalPlan
+                  openTask={openTask}
+                  taskToOpen={taskToOpen}
+                  sectionIndex={sectionIndex}
+                  handleRegenerateClick={handleRegenerateClick}
+                  handleTabClick={handleTabClick}
+                  activeSectionId={activeSectionId}
+                  handleActiveSectionChange={handleActiveSectionChange}
+                />
+              </motion.div>
+            </TabsContent>
+            <TabsContent
+              value="write"
+              className="mt-0 flex-1 overflow-auto h-full"
+              asChild
             >
-              <ProposalPreview
-                yPosition={yPosition}
-                activeSectionId={activeSectionId}
-              />
-            </motion.div>
-          </TabsContent>
-        </div>
-      </Tabs>
-    </div>
+              <motion.div
+                initial={slideDirection === "right" ? "leftEnter" : "rightEnter"}
+                animate="center"
+                exit={slideDirection === "right" ? "leftExit" : "rightExit"}
+                variants={slideVariants}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="flex-1 overflow-auto h-full"
+              >
+                <ProposalPreview
+                  yPosition={yPosition}
+                  activeSectionId={activeSectionId}
+                />
+              </motion.div>
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
+    </GenerationProvider>
   );
 };
 
 export default ProposalWorkspace;
+

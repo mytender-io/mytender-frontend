@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useRef, useState } from "react";
+import React, { useContext, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Section, BidContext } from "@/views/BidWritingStateManagerView";
 import { ArrowRight, Loader2 } from "lucide-react";
@@ -6,6 +6,7 @@ import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import { useAuthUser } from "react-auth-kit";
 import { toast } from "react-toastify";
+import { useGeneration } from "@/context/GeneratingSectionContext";
 
 interface GenerateSectonButtonProps {
   section: Section;
@@ -18,7 +19,22 @@ const GenerateSectonButton: React.FC<GenerateSectonButtonProps> = ({
   const auth = useMemo(() => getAuth(), [getAuth]);
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState, setSharedState } = useContext(BidContext);
-  const [isLoading, setIsLoading] = useState(false);
+  const { isGenerating, generatingSectionId, setGenerating } = useGeneration();
+
+  // Check if this specific section is generating
+  const isThisSectionGenerating =
+    isGenerating && generatingSectionId === section.section_id;
+
+  const handleClick = () => {
+    // If any section is generating (including this one), show simple toast
+    if (isGenerating) {
+      toast.warning("Please wait until the section you clicked has finished generating");
+      return;
+    }
+
+    // Otherwise proceed with generation
+    onGenerate();
+  };
 
   const onGenerate = async () => {
     if (!sharedState.object_id) {
@@ -30,7 +46,7 @@ const GenerateSectonButton: React.FC<GenerateSectonButtonProps> = ({
       return;
     }
     try {
-      setIsLoading(true);
+      setGenerating(true, section.section_id);
       toast.info("Generating section content...");
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_section_answer`,
@@ -45,28 +61,22 @@ const GenerateSectonButton: React.FC<GenerateSectonButtonProps> = ({
           }
         }
       );
-
       console.log("API Response:", response.data);
-
       if (response.data) {
         toast.success("Section generated successfully!");
-
         setSharedState((prevState) => {
           const updatedOutline = [...(prevState.outline || [])];
           const sectionIndex = updatedOutline.findIndex(
             (s) => s.section_id === section.section_id
           );
-
           console.log("SECTION INDEX");
           console.log(sectionIndex);
-
           if (sectionIndex !== -1) {
             updatedOutline[sectionIndex] = {
               ...updatedOutline[sectionIndex],
               answer: response.data // This should now correctly assign the answer text
             };
           }
-
           return {
             ...prevState,
             outline: updatedOutline
@@ -77,18 +87,14 @@ const GenerateSectonButton: React.FC<GenerateSectonButtonProps> = ({
       console.error("Full error:", err.response?.data);
       toast.error("Failed to generate section");
     } finally {
-      setIsLoading(false);
+      setGenerating(false);
     }
   };
 
   return (
     <div className="flex items-center">
-      <Button
-        onClick={onGenerate}
-        disabled={isLoading}
-        className="flex items-center gap-2"
-      >
-        {isLoading ? (
+      <Button onClick={handleClick} className="flex items-center gap-2">
+        {isThisSectionGenerating ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
             Generating...

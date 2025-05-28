@@ -178,6 +178,8 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
         error: err.message || "Failed to generate outline"
       });
 
+      console.error(err);
+
       if (err.response?.status === 404) {
         toast.warning("No documents found in the tender library.");
       } else {
