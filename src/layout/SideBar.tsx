@@ -63,141 +63,133 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
 
   return (
     <div
-      className={`fixed top-0 left-0 h-screen bg-transparent transition-all duration-300 z-[1] ${
-        isCollapsed ? "w-20" : "w-28"
-      }`}
+      className={`fixed top-0 left-0 h-screen bg-transparent transition-all duration-300 z-[1] w-24`}
     >
-      <div className="flex flex-col h-full p-2">
-        <div className={cn("flex items-center p-4")}>
+      <div className="flex flex-col h-full p-2 gap-4">
+        <div className="flex items-center p-2">
           <img src={Logo} alt="mytender.io logo" className="w-full h-full" />
         </div>
-        <Link
-          to="/home"
-          className="flex flex-col items-center justify-center hover:bg-typo-200 bg-transparent rounded-md p-4 gap-2"
-        >
-          <HomeIcon
-            className={cn(
-              "min-w-8 min-h-8 stroke-1",
-              isActive("/home") ? "text-orange" : "text-gray-hint_text"
-            )}
-            width={20}
-            height={20}
-          />
-          {!isCollapsed && (
-            <span
+        <div className="flex flex-col gap-4">
+          <Link
+            to="/home"
+            className="flex flex-col items-center justify-center bg-transparent group"
+          >
+            <HomeIcon
               className={cn(
-                "text-sm font-medium whitespace-nowrap",
-                isActive("/home")
-                  ? "text-orange"
-                  : "text-gray-hint_text"
+                "min-w-12 min-h-12 stroke-1 group-hover:bg-typo-200 rounded-md p-2",
+                isActive("/home") ? "text-orange" : "text-gray-hint_text"
               )}
-            >
-              Home
-            </span>
-          )}
-        </Link>
-        <Link
-          to="/bids"
-          className="flex flex-col items-center justify-center hover:bg-typo-200 bg-transparent rounded-md p-4 gap-2"
-        >
-          <DashboardIcon
-            className={cn(
-              "min-w-8 min-h-8",
-              isActive("/bids") || isActive("/bid")
-                ? "text-orange"
-                : "text-gray-hint_text"
+              width={20}
+              height={20}
+            />
+            {!isCollapsed && (
+              <span
+                className={cn(
+                  "text-sm font-medium whitespace-nowrap",
+                  isActive("/home") ? "text-orange" : "text-gray-hint_text"
+                )}
+              >
+                Home
+              </span>
             )}
-            width={20}
-            height={20}
-          />
-          {!isCollapsed && (
-            <span
+          </Link>
+          <Link
+            to="/bids"
+            className="flex flex-col items-center justify-center bg-transparent group"
+          >
+            <DashboardIcon
               className={cn(
-                "text-sm font-medium whitespace-nowrap",
+                "min-w-12 min-h-12 group-hover:bg-typo-200 rounded-md p-2",
                 isActive("/bids") || isActive("/bid")
                   ? "text-orange"
                   : "text-gray-hint_text"
               )}
-            >
-              Dashboard
-            </span>
-          )}
-        </Link>
-        <Link
-          to="/library"
-          className="flex flex-col items-center justify-center hover:bg-typo-200 bg-transparent rounded-md p-4 gap-2"
-        >
-          <ContentLibraryIcon
-            className={cn(
-              "min-w-8 min-h-8",
-              isActive("/library") ? "text-orange" : "text-gray-hint_text"
+              width={20}
+              height={20}
+            />
+            {!isCollapsed && (
+              <span
+                className={cn(
+                  "text-sm font-medium whitespace-nowrap",
+                  isActive("/bids") || isActive("/bid")
+                    ? "text-orange"
+                    : "text-gray-hint_text"
+                )}
+              >
+                Dashboard
+              </span>
             )}
-            width={20}
-            height={20}
-          />
-          {!isCollapsed && (
-            <span
+          </Link>
+          <Link
+            to="/library"
+            className="flex flex-col items-center justify-center bg-transparent group"
+          >
+            <ContentLibraryIcon
               className={cn(
-                "text-sm font-medium whitespace-nowrap",
-                isActive("/library")
-                  ? "text-orange"
-                  : "text-gray-hint_text"
+                "min-w-12 min-h-12 group-hover:bg-typo-200 rounded-md p-2",
+                isActive("/library") ? "text-orange" : "text-gray-hint_text"
               )}
-            >
-              Library
-            </span>
-          )}
-        </Link>
-        <Link
-          to="/chat"
-          className="flex flex-col items-center justify-center hover:bg-typo-200 bg-transparent rounded-md p-4 gap-2"
-        >
-          <LibraryChatIcon
-            className={cn(
-              "min-w-8 min-h-8",
-              isActive("/chat") ? "text-orange" : "text-gray-hint_text"
+              width={20}
+              height={20}
+            />
+            {!isCollapsed && (
+              <span
+                className={cn(
+                  "text-sm font-medium whitespace-nowrap",
+                  isActive("/library") ? "text-orange" : "text-gray-hint_text"
+                )}
+              >
+                Library
+              </span>
             )}
-            width={20}
-            height={20}
-          />
-          {!isCollapsed && (
-            <span
+          </Link>
+          <Link
+            to="/chat"
+            className="flex flex-col items-center justify-center bg-transparent group"
+          >
+            <LibraryChatIcon
               className={cn(
-                "text-sm font-medium whitespace-nowrap",
-                isActive("/chat")
-                  ? "text-orange"
-                  : "text-gray-hint_text"
+                "min-w-12 min-h-12 group-hover:bg-typo-200 rounded-md p-2",
+                isActive("/chat") ? "text-orange" : "text-gray-hint_text"
               )}
-            >
-              Chat
-            </span>
-          )}
-        </Link>
-        <Link
-          to="/profile"
-          className="flex flex-col items-center justify-center hover:bg-typo-200 bg-transparent rounded-md p-4 gap-2"
-        >
-          <UserRound
-            className={cn(
-              "min-w-8 min-h-8 stroke-1",
-              isActive("/profile") ? "text-orange" : "text-gray-hint_text"
+              width={20}
+              height={20}
+            />
+            {!isCollapsed && (
+              <span
+                className={cn(
+                  "text-sm font-medium whitespace-nowrap",
+                  isActive("/chat") ? "text-orange" : "text-gray-hint_text"
+                )}
+              >
+                Chat
+              </span>
             )}
-            width={20}
-            height={20}
-          />
-          {!isCollapsed && (
-            <span
+          </Link>
+          <Link
+            to="/profile"
+            className="flex flex-col items-center justify-center bg-transparent group"
+          >
+            <UserRound
               className={cn(
-                "text-sm font-medium whitespace-nowrap",
-                isActive("/profile")
-                  ? "text-orange"
-                  : "text-gray-hint_text"
+                "min-w-12 min-h-12 stroke-1 group-hover:bg-typo-200 rounded-md p-2",
+                isActive("/profile") ? "text-orange" : "text-gray-hint_text"
               )}
-            >
-              Account
-            </span>
-          )}
-        </Link>
+              width={20}
+              height={20}
+            />
+            {!isCollapsed && (
+              <span
+                className={cn(
+                  "text-sm font-medium whitespace-nowrap",
+                  isActive("/profile") ? "text-orange" : "text-gray-hint_text"
+                )}
+              >
+                Account
+              </span>
+            )}
+          </Link>
+        </div>
       </div>
     </div>
   );

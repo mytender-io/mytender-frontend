@@ -798,7 +798,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
             <div className="flex items-center gap-2">
               {/* Assigned User */}
               <div className="flex items-center gap-1">
-                <span className="text-sm"> Answerer:</span>
+                <span className="text-sm font-medium"> Answerer:</span>
                 <SelectOrganisationUserButton
                   selectedUser={section.answerer}
                   onSelectUser={handleAnswererSelect}
@@ -808,7 +808,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
               </div>
               {/* Reviewer - positioned with negative margin for overlap */}
               <div className="flex items-center gap-1">
-                <span className="text-sm"> Reviewer:</span>
+                <span className="text-sm font-medium"> Reviewer:</span>
                 <SelectOrganisationUserButton
                   selectedUser={section.reviewer}
                   onSelectUser={handleReviewerSelect}
