@@ -38,7 +38,7 @@ const StatusMenu = ({
       case "Completed":
         return "bg-status-success_light text-status-success hover:text-status-success hover:bg-status-success_light/90 border-status-success";
       case "In Progress":
-        return "bg-status-informing_light text-status-informing hover:text-status-informing hover:bg-status-informing_light/90 border-status-informing";
+        return "bg-status-research_light text-status-research hover:text-status-research hover:bg-status-research_light/90 border-status-research";
       case "Not Started":
         return "bg-status-planning_light text-status-planning hover:text-status-planning hover:bg-status-planning_light/90 border-status-planning";
       default:
@@ -51,7 +51,7 @@ const StatusMenu = ({
       case "Completed":
         return "bg-status-success border-status-success";
       case "In Progress":
-        return "bg-status-informing border-status-informing";
+        return "bg-status-research border-status-research";
       case "Not Started":
         return "bg-status-planning border-status-planning";
       default:
@@ -128,7 +128,7 @@ const StatusMenu = ({
           className={cn("hover:bg-gray-100 my-2")}
         >
           <div className="flex items-center space-x-3">
-            <div className="h-4 w-4 rounded-full bg-status-informing" />
+            <div className="h-4 w-4 rounded-full bg-status-research" />
             <span>In Progress</span>
           </div>
         </DropdownMenuItem>
