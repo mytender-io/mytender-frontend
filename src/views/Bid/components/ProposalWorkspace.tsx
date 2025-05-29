@@ -22,7 +22,11 @@ interface ProposalWorkspaceProps {
   taskToOpen: string | null;
   sectionIndex: string | null;
   handleRegenerateClick: () => void;
- handleTabClick: (path: string, isParentTab?: boolean, sectionId?: string) => void;
+  handleTabClick: (
+    path: string,
+    isParentTab?: boolean,
+    sectionId?: string
+  ) => void;
   activeSectionId: string;
   yPosition: number;
   activeTab?: string;
@@ -170,7 +174,31 @@ const ProposalWorkspace = ({
             )}
           </>
         )}
-
+        {activeSectionIndex !== null && (
+          <div className="absolute top-1 left-1 flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleSectionNavigation("prev")}
+              disabled={activeSectionIndex === 0}
+              className="w-fit px-2 gap-1"
+            >
+              <ChevronLeft />
+            </Button>
+            <span className="text-sm text-gray-hint_text">
+              Question {activeSectionIndex + 1} of {totalSections}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleSectionNavigation("next")}
+              disabled={activeSectionIndex === totalSections - 1}
+              className="w-fit px-2 gap-1"
+            >
+              <ChevronRight />
+            </Button>
+          </div>
+        )}
         {/* Tabs for switching between Plan and Write views */}
         <Tabs
           defaultValue={activeView}
@@ -200,29 +228,6 @@ const ProposalWorkspace = ({
                     Write
                   </TabsTrigger>
                 </TabsList>
-                <div className="w-full flex items-center justify-start gap-1 max-w-4xl mx-auto mt-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleSectionNavigation("prev")}
-                    disabled={activeSectionIndex === 0}
-                    className="w-fit px-2 gap-1"
-                  >
-                    <ChevronLeft />
-                  </Button>
-                  <span className="text-gray-hint_text">
-                    Question {activeSectionIndex + 1} of {totalSections}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleSectionNavigation("next")}
-                    disabled={activeSectionIndex === totalSections - 1}
-                    className="w-fit px-2 gap-1"
-                  >
-                    <ChevronRight />
-                  </Button>
-                </div>
               </div>
             ) : (
               <div className="flex items-center justify-end flex-shrink-0 gap-2 mb-4 w-full">

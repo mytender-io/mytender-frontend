@@ -144,7 +144,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
         <Button
           variant="ghost"
           onClick={toggleCollapse}
-          className="absolute top-1 right-2 transition-all p-1 h-auto"
+          className="absolute top-1 right-2 transition-all p-2 h-auto"
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {isCollapsed ? (
