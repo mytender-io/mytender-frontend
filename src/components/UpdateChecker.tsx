@@ -11,6 +11,9 @@ export const UpdateChecker = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const [lastChecked, setLastChecked] = useState<number>(Date.now());
+  const [lastValidatedHash, setLastValidatedHash] = useState<string | null>(
+    localStorage.getItem('lastValidatedHash')
+  );
 
   // Add this effect to test toast functionality
   useEffect(() => {
@@ -20,6 +23,56 @@ export const UpdateChecker = () => {
   useEffect(() => {
     const checkForUpdates = async () => {
       console.log("UpdateChecker: Starting version check...");
+      
+      // Check if service worker is present
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        console.log("UpdateChecker: Service worker detected, checking for updates...");
+        
+        // First, check if the service worker itself has updates
+        const registration = await navigator.serviceWorker.ready;
+        await registration.update();
+        
+        // If there's a waiting service worker, we have an update
+        if (registration.waiting) {
+          console.log("UpdateChecker: Service worker update available");
+          
+          const toastId = toast.info(
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <span>A new version is available!</span>
+              <button
+                onClick={() => {
+                  console.log("UpdateChecker: Update button clicked, activating new service worker...");
+                  toast.dismiss(toastId);
+                  
+                  // Tell the waiting service worker to activate
+                  registration.waiting!.postMessage({ type: 'SKIP_WAITING' });
+                  
+                  // Listen for the controlling service worker to change
+                  navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    window.location.reload();
+                  });
+                }}
+                style={{
+                  marginLeft: "10px",
+                  padding: "4px 8px",
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer"
+                }}
+              >
+                Update Now
+              </button>
+            </div>,
+            {
+              toastId: "update-notification"
+            }
+          );
+          return; // Don't check HTML hashes if service worker update is pending
+        }
+      }
+      
       try {
         // Don't check if we checked in the last minute (prevents double checks)
         if (Date.now() - lastChecked < 60000) {
@@ -51,13 +104,25 @@ export const UpdateChecker = () => {
 
         const currentHash = currentScript.src.match(/index\.(.+?)\.js/)?.[1];
         console.log("UpdateChecker: Current hash:", currentHash);
+        
+        // Clear validated hash if we're on a new version
+        if (currentHash && lastValidatedHash) {
+          const [oldHash] = lastValidatedHash.split('-');
+          if (oldHash !== currentHash) {
+            console.log("UpdateChecker: Clearing validated hash, we're on a new version");
+            localStorage.removeItem('lastValidatedHash');
+            setLastValidatedHash(null);
+          }
+        }
 
         console.log("UpdateChecker: Fetching index.html...");
         const response = await fetch(`/index.html?t=${Date.now()}`, {
           headers: {
-            "Cache-Control": "no-cache",
-            Pragma: "no-cache"
-          }
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0"
+          },
+          cache: "no-store" // Force bypassing the cache
         });
 
         if (!response.ok) {
@@ -90,6 +155,13 @@ export const UpdateChecker = () => {
         }
 
         if (currentHash && newHash && currentHash !== newHash) {
+          // Check if we've already validated this hash combination
+          const hashKey = `${currentHash}-${newHash}`;
+          if (lastValidatedHash === hashKey) {
+            console.log("UpdateChecker: Hash mismatch already validated, skipping notification");
+            return;
+          }
+          
           console.log("UpdateChecker: Update available", {
             currentHash,
             newHash,
@@ -107,6 +179,12 @@ export const UpdateChecker = () => {
                     "UpdateChecker: Update button clicked, reloading..."
                   );
                   toast.dismiss(toastId);
+                  
+                  // Store the hash combination as validated
+                  const hashKey = `${currentHash}-${newHash}`;
+                  localStorage.setItem('lastValidatedHash', hashKey);
+                  setLastValidatedHash(hashKey);
+                  
                   window.location.reload();
                 }}
                 style={{
@@ -168,7 +246,7 @@ export const UpdateChecker = () => {
       console.log("UpdateChecker: Cleaning up interval");
       clearInterval(intervalId);
     };
-  }, [auth?.token, lastChecked]);
+  }, [auth?.token, lastChecked, lastValidatedHash]);
 
   return null;
 };
