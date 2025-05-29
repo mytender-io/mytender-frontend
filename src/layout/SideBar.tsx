@@ -65,8 +65,8 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
     <div
       className={`fixed top-0 left-0 h-screen bg-transparent transition-all duration-300 z-[1] w-24`}
     >
-      <div className="flex flex-col h-full p-2 gap-4">
-        <div className="flex items-center p-2">
+      <div className="flex flex-col h-full p-2 gap-2">
+        <div className="flex items-center p-4">
           <img src={Logo} alt="mytender.io logo" className="w-full h-full" />
         </div>
         <div className="flex flex-col gap-4">

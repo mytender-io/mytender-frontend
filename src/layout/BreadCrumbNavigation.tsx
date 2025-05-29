@@ -20,9 +20,9 @@ const BreadcrumbNavigation = ({
 }) => {
   const { userProfile, organizationUsers, isLoading } = useUserData();
   const { sharedState, setSharedState } = useContext(BidContext);
-  
+
   const shouldShowSaveStatus = parentPages.length > 0 && sharedState?.object_id;
-  
+
   return (
     <nav className="flex items-center justify-between w-full rounded-lg">
       <div className="flex items-center gap-3">
@@ -42,7 +42,6 @@ const BreadcrumbNavigation = ({
         )}
         {shouldShowSaveStatus && (
           <SaveStatus
-      
             isLoading={sharedState.isLoading}
             saveSuccess={sharedState.saveSuccess}
           />
