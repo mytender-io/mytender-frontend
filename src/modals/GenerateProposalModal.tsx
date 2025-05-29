@@ -136,6 +136,8 @@ const GenerateProposalModal = ({
     });
 
     try {
+      // Reset state at the beginning of a new generation
+      resetState();
       setIsGeneratingProposal(true);
       setProgress(0);
       setMessage(loadingMessages[0]);
@@ -191,14 +193,17 @@ const GenerateProposalModal = ({
 
   const handleNext = async () => {
     if (proposalState.currentStep === 1) {
-      generateProposal();
+      // Only start generation if not already generating
+      if (!proposalState.isGeneratingProposal) {
+        generateProposal();
+      }
     }
   };
 
   const handleModalClose = () => {
     setShow(false);
-    // Reset the proposal generation state when modal closes
-    resetState();
+    // Don't reset state when modal closes - only reset when generation is complete
+    // or when starting a new generation
   };
 
   const renderStepContent = () => {
@@ -269,9 +274,10 @@ const GenerateProposalModal = ({
               // Get the first section ID from the outline
               const firstSectionId = sharedState.outline?.[0]?.section_id;
               if (firstSectionId) {
-                // Pass both the tab path and the section ID
+                // Pass the tab path, isParentTab flag, and the section ID
                 handleTabClick("/proposal-preview", false, firstSectionId);
               }
+              resetState();
             }}
           >
             Preview Your Masterpiece
