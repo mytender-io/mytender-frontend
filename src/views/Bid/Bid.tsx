@@ -12,6 +12,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/utils";
 import { ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProposalGenerationProvider } from "@/context/ProposalGenerationContext";
 
 const Bid = () => {
   const { sharedState, setSharedState } = useContext(BidContext);
@@ -95,16 +96,19 @@ const Bid = () => {
     toast.error("You only have permission to view this bid.");
   };
 
-  const handleTabClick = (path: string, isParentTab: boolean = false) => {
+  const handleTabClick = (
+    path: string,
+    isParentTab: boolean = false,
+    sectionId?: string
+  ) => {
     // Delay navigation to allow animation to play
     setTimeout(() => {
       setActiveTab(path);
-
       if (isParentTab) {
+        console.log("parent tab");
         console.log("parent tab");
         setActiveSectionId("");
       }
-
       // If switching to the proposal workspace, ensure the correct subtab
       if (path === "/proposal-planner" || path === "/proposal-preview") {
         // Only reset the subtab if we're not already in the proposal workspace
@@ -113,7 +117,15 @@ const Bid = () => {
           activeTab === "/proposal-preview";
 
         if (!isAlreadyInProposalWorkspace) {
-          setActiveSectionId("");
+          // If a specific sectionId is provided, use it; otherwise reset to empty
+          if (sectionId) {
+            setActiveSectionId(sectionId);
+          } else {
+            setActiveSectionId("");
+          }
+        } else if (sectionId) {
+          // If we're already in the proposal workspace but a sectionId is provided, use it
+          setActiveSectionId(sectionId);
         }
       }
     }, 300); // 300ms matches our CSS transition time

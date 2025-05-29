@@ -47,14 +47,12 @@ import SelectOrganisationUserButton from "@/buttons/SelectOrganisationUserButton
 import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 import LengthUnitDropdown from "./components/LengthUnitDropdown";
 import { useUserData } from "@/context/UserDataContext";
-import PlusIcon from "@/components/icons/PlusIcon";
-import GenerateProposalModal from "@/modals/GenerateProposalModal";
 interface ProposalPlanProps {
   openTask: (taskId: string | null, sectionIndex: string) => void;
   taskToOpen: string | null;
   sectionIndex: string | null;
   handleRegenerateClick: () => void;
-  handleTabClick: (path: string) => void;
+ handleTabClick: (path: string, isParentTab?: boolean, sectionId?: string) => void;
   activeSectionId?: string;
   handleActiveSectionChange: (sectionId: string) => void;
 }

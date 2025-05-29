@@ -2,14 +2,10 @@ import React, { useState, useEffect, useRef, useContext } from "react";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
-import { useNavigate } from "react-router-dom";
-import {
-  faCheckCircle,
-  faRocket,
-  faSpinner
-} from "@fortawesome/free-solid-svg-icons";
+import { faCheckCircle, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BidContext } from "../views/BidWritingStateManagerView";
+import { useProposalGeneration } from "@/context/ProposalGenerationContext";
 import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
@@ -26,7 +22,11 @@ import posthog from "posthog-js";
 
 interface GenerateProposalModalProps {
   bid_id: string;
-  handleTabClick: (path: string) => void;
+  handleTabClick: (
+    path: string,
+    isParentTab?: boolean,
+    sectionId?: string
+  ) => void;
 }
 
 const GenerateProposalModal = ({
@@ -36,19 +36,22 @@ const GenerateProposalModal = ({
   const getAuth = useAuthUser();
   const auth = getAuth();
   const { sharedState, setSharedState } = useContext(BidContext);
-  const [currentStep, setCurrentStep] = useState(1);
+  const {
+    state: proposalState,
+    setIsGeneratingProposal,
+    setProgress,
+    setMessage,
+    setCurrentStep,
+    resetState
+  } = useProposalGeneration();
+
   const tokenRef = useRef(auth?.token || "default");
   const [show, setShow] = useState(false);
-  const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [windowDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight
   });
-
-  const [loadingMessage, setLoadingMessage] = useState(
-    "Analysing the outline..."
-  );
 
   const loadingMessages = [
     "Analysing the outline...",
@@ -66,7 +69,6 @@ const GenerateProposalModal = ({
     "Finalizing the proposal..."
   ];
 
-  const [progress, setProgress] = useState(0);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
 
   interface ProgressProps {
@@ -90,7 +92,7 @@ const GenerateProposalModal = ({
 
   const startProgressBar = () => {
     const duration = 180000; // 3:00 minutes in ms
-    const interval = 1000; // Update every 100ms
+    const interval = 1000; // Update every 1000ms
     const steps = duration / interval;
     const increment = 98 / steps;
 
@@ -103,7 +105,7 @@ const GenerateProposalModal = ({
     const messageRotationInterval = setInterval(() => {
       if (messageIndex < loadingMessages.length - 1) {
         messageIndex++;
-        setLoadingMessage(loadingMessages[messageIndex]);
+        setMessage(loadingMessages[messageIndex]);
       }
     }, messageInterval);
 
@@ -115,9 +117,9 @@ const GenerateProposalModal = ({
           clearInterval(progressInterval.current);
           clearInterval(messageRotationInterval);
         }
-        if (!isGeneratingProposal) {
+        if (!proposalState.isGeneratingProposal) {
           setProgress(100);
-          setLoadingMessage(loadingMessages[loadingMessages.length - 1]);
+          setMessage(loadingMessages[loadingMessages.length - 1]);
         } else {
           setProgress(98);
         }
@@ -135,6 +137,8 @@ const GenerateProposalModal = ({
 
     try {
       setIsGeneratingProposal(true);
+      setProgress(0);
+      setMessage(loadingMessages[0]);
       startProgressBar();
       console.log(sharedState.selectedFolders);
 
@@ -155,6 +159,7 @@ const GenerateProposalModal = ({
           }
         }
       );
+
       // Update shared state with outline data
       setSharedState((prevState) => ({
         ...prevState,
@@ -185,13 +190,19 @@ const GenerateProposalModal = ({
   };
 
   const handleNext = async () => {
-    if (currentStep === 1) {
+    if (proposalState.currentStep === 1) {
       generateProposal();
     }
   };
 
+  const handleModalClose = () => {
+    setShow(false);
+    // Reset the proposal generation state when modal closes
+    resetState();
+  };
+
   const renderStepContent = () => {
-    if (currentStep === 1) {
+    if (proposalState.currentStep === 1) {
       return (
         <div className="px-2 py-4">
           <div className="px-3">
@@ -214,18 +225,18 @@ const GenerateProposalModal = ({
               alt="Wordpane Preview"
               className="w-full max-h-[350px] object-cover object-top rounded-lg shadow-md"
             />
-            {isGeneratingProposal && (
+            {proposalState.isGeneratingProposal && (
               <div className="mt-4">
                 <LinearProgressWithLabel
-                  value={progress}
-                  message={loadingMessage}
+                  value={proposalState.progress}
+                  message={proposalState.message}
                 />
               </div>
             )}
           </div>
         </div>
       );
-    } else if (currentStep === 2) {
+    } else if (proposalState.currentStep === 2) {
       return (
         <div className="px-4 py-5 text-center bg-gradient-to-br from-white to-gray-50 rounded-xl relative overflow-hidden">
           {showConfetti && (
@@ -254,8 +265,13 @@ const GenerateProposalModal = ({
           <Button
             className="animate-[slideUp_0.5s_ease-out]"
             onClick={() => {
-              setShow(false);
-              handleTabClick("/proposal-preview");
+              handleModalClose();
+              // Get the first section ID from the outline
+              const firstSectionId = sharedState.outline?.[0]?.section_id;
+              if (firstSectionId) {
+                // Pass both the tab path and the section ID
+                handleTabClick("/proposal-preview", false, firstSectionId);
+              }
             }}
           >
             Preview Your Masterpiece
@@ -266,12 +282,12 @@ const GenerateProposalModal = ({
   };
 
   useEffect(() => {
-    if (currentStep === 2) {
+    if (proposalState.currentStep === 2) {
       setShowConfetti(true);
       const timer = setTimeout(() => setShowConfetti(false), 5000); // Stop confetti after 5 seconds
       return () => clearTimeout(timer);
     }
-  }, [currentStep]);
+  }, [proposalState.currentStep]);
 
   return (
     <>
@@ -280,17 +296,20 @@ const GenerateProposalModal = ({
         Generate Proposal
       </Button>
 
-      <Dialog open={show} onOpenChange={setShow}>
+      <Dialog open={show} onOpenChange={handleModalClose}>
         <DialogContent className="max-w-5xl">
-          {currentStep === 1 ? (
+          {proposalState.currentStep === 1 ? (
             <>
               <DialogHeader>
                 <DialogTitle>Generate Proposal</DialogTitle>
               </DialogHeader>
               {renderStepContent()}
               <div className="flex justify-end">
-                <Button onClick={handleNext} disabled={isGeneratingProposal}>
-                  {isGeneratingProposal ? (
+                <Button
+                  onClick={handleNext}
+                  disabled={proposalState.isGeneratingProposal}
+                >
+                  {proposalState.isGeneratingProposal ? (
                     <>
                       <FontAwesomeIcon
                         icon={faSpinner as IconProp}

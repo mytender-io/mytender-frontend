@@ -22,7 +22,7 @@ interface ProposalWorkspaceProps {
   taskToOpen: string | null;
   sectionIndex: string | null;
   handleRegenerateClick: () => void;
-  handleTabClick: (path: string) => void;
+ handleTabClick: (path: string, isParentTab?: boolean, sectionId?: string) => void;
   activeSectionId: string;
   yPosition: number;
   activeTab?: string;
