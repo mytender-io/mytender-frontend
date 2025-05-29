@@ -744,7 +744,7 @@ const TenderAnalysis = ({
                     )}
                   /> */}
                   <span className={cn("font-medium")}>{tab.name}</span>
-                  {/* {tabContent[index as keyof typeof tabContent] && (
+                  {tabContent[index as keyof typeof tabContent] && (
                     <Button
                       ref={regenerateBtnRef}
                       onClick={(e) => handleRegenerateClick(index, e)}
@@ -762,7 +762,7 @@ const TenderAnalysis = ({
                     >
                       <RefreshCw size={14} />
                     </Button>
-                  )} */}
+                  )}
                 </TabsTrigger>
               );
             })}
