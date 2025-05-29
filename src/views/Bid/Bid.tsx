@@ -13,6 +13,7 @@ import { cn } from "@/utils";
 import { ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProposalGenerationProvider } from "@/context/ProposalGenerationContext";
+import { GeneratingOutlineProvider } from "@/context/GeneratingOutlineContext";
 
 const Bid = () => {
   const { sharedState, setSharedState } = useContext(BidContext);
@@ -243,70 +244,72 @@ const Bid = () => {
 
   return (
     <ProposalGenerationProvider>
-      <div className="flex flex-col h-full">
-        <div
-          className={cn(
-            "flex items-center justify-between w-full border-b border-typo-200 pl-6 py-2 min-h-14",
-            "pr-6"
-          )}
-        >
-          <BreadcrumbNavigation
-            currentPage={initialBidName}
-            parentPages={parentPages}
-          />
-        </div>
-        <div className="flex flex-1 overflow-y-auto relative">
-          <BidNavbar
-            activeTab={activeTab}
-            activeSubTab={activeSubTab}
-            activeSectionId={activeSectionId}
-            handleTabClick={handleTabClick}
-            handleSubTabClick={handleSubTabClick}
-            handleSectionClick={handleSectionClick}
-            handleRegenerateClick={handleRegenerateClick}
-          />
-          <div className="h-full flex-1 overflow-y-auto" ref={contentRef}>
-            {activeTab === "/bid-extractor" && (
-              <BidPlanner
-                activeSubTab={activeSubTab}
-                setActiveSubTab={setActiveSubTab}
-              />
+      <GeneratingOutlineProvider>
+        <div className="flex flex-col h-full">
+          <div
+            className={cn(
+              "flex items-center justify-between w-full border-b border-typo-200 pl-6 py-2 min-h-14",
+              "pr-6"
             )}
-            {activeTab === "/bid-intel" && (
-              <BidIntel showViewOnlyMessage={showViewOnlyMessage} />
-            )}
-            {(activeTab === "/proposal-planner" ||
-              activeTab === "/proposal-preview") && (
-              <ProposalWorkspace
-                openTask={openTask}
-                taskToOpen={shouldOpenTask ? taskId : null}
-                sectionIndex={shouldOpenTask ? sectionIndex : null}
-                handleRegenerateClick={handleRegenerateClick}
-                handleTabClick={handleTabClick}
-                activeSectionId={activeSectionId}
-                handleActiveSectionChange={handleActiveSectionChange}
-                yPosition={yPosition}
-                activeTab={activeTab}
-              />
-            )}
-            <OutlineInstructionsModal
-              show={showModal}
-              onHide={() => setShowModal(false)}
-              bid_id={object_id}
+          >
+            <BreadcrumbNavigation
+              currentPage={initialBidName}
+              parentPages={parentPages}
             />
           </div>
-          {yPosition > 200 && (
-            <Button
-              variant="ghost"
-              onClick={scrollToTop}
-              className="fixed bottom-8 right-8 bg-primary rounded-full p-3 text-white shadow-lg hover:bg-primary-dark hover:text-white transition-all duration-300 z-50 w-9"
-              aria-label="Scroll to top"
-            >
-              <ArrowUp size={24} />
-            </Button>
-          )}
+          <div className="flex flex-1 overflow-y-auto relative">
+            <BidNavbar
+              activeTab={activeTab}
+              activeSubTab={activeSubTab}
+              activeSectionId={activeSectionId}
+              handleTabClick={handleTabClick}
+              handleSubTabClick={handleSubTabClick}
+              handleSectionClick={handleSectionClick}
+              handleRegenerateClick={handleRegenerateClick}
+            />
+            <div className="h-full flex-1 overflow-y-auto" ref={contentRef}>
+              {activeTab === "/bid-extractor" && (
+                <BidPlanner
+                  activeSubTab={activeSubTab}
+                  setActiveSubTab={setActiveSubTab}
+                />
+              )}
+              {activeTab === "/bid-intel" && (
+                <BidIntel showViewOnlyMessage={showViewOnlyMessage} />
+              )}
+              {(activeTab === "/proposal-planner" ||
+                activeTab === "/proposal-preview") && (
+                <ProposalWorkspace
+                  openTask={openTask}
+                  taskToOpen={shouldOpenTask ? taskId : null}
+                  sectionIndex={shouldOpenTask ? sectionIndex : null}
+                  handleRegenerateClick={handleRegenerateClick}
+                  handleTabClick={handleTabClick}
+                  activeSectionId={activeSectionId}
+                  handleActiveSectionChange={handleActiveSectionChange}
+                  yPosition={yPosition}
+                  activeTab={activeTab}
+                />
+              )}
+              <OutlineInstructionsModal
+                show={showModal}
+                onHide={() => setShowModal(false)}
+                bid_id={object_id}
+              />
+            </div>
+            {yPosition > 200 && (
+              <Button
+                variant="ghost"
+                onClick={scrollToTop}
+                className="fixed bottom-8 right-8 bg-primary rounded-full p-3 text-white shadow-lg hover:bg-primary-dark hover:text-white transition-all duration-300 z-50 w-9"
+                aria-label="Scroll to top"
+              >
+                <ArrowUp size={24} />
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      </GeneratingOutlineProvider>
     </ProposalGenerationProvider>
   );
 };

@@ -19,23 +19,28 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "react-toastify";
 import posthog from "posthog-js";
+import { useGeneratingOutline } from "@/context/GeneratingOutlineContext";
 
 const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState, setSharedState } = useContext(BidContext);
-  const [currentStep, setCurrentStep] = useState(1);
 
-  const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
+  const {
+    state: { currentStep = 1, isGeneratingOutline, progress, loadingMessage },
+    setCurrentStep,
+    setIsGeneratingOutline,
+    setProgress,
+    setLoadingMessage,
+    resetState
+  } = useGeneratingOutline();
+
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectedFolders, setSelectedFolders] = useState(
     sharedState.selectedFolders || []
   );
-  const [progress, setProgress] = useState(0);
-  const [loadingMessage, setLoadingMessage] = useState(
-    "Analysing tender documents..."
-  );
+
   const progressInterval = useRef(null);
 
   const loadingMessages = [
@@ -105,11 +110,8 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
   };
 
   const resetModalState = () => {
-    setCurrentStep(1);
-    setIsGeneratingOutline(false);
     setSelectedFiles([]);
-    setProgress(0);
-    setLoadingMessage("Analysing tender documents...");
+    resetState(); // This resets the generation state from context
     if (progressInterval.current) {
       clearInterval(progressInterval.current);
     }
@@ -143,10 +145,15 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
         {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`
-          }
+          },
+          timeout: 500000 // longer timeout
         }
       );
+
+      console.log(response.data);
       setCurrentStep(4);
+      setProgress(100);
+      setLoadingMessage("Outline generated successfully!");
 
       posthog.capture("generating_outline_succeeded", {
         bid_id,
@@ -154,8 +161,6 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
         selected_folders: sharedState.selectedFolders,
         selected_files: selectedFiles
       });
-
-      console.log(response.data.outline);
 
       setSharedState((prevState) => ({
         ...prevState,
@@ -180,13 +185,30 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
 
       console.error(err);
 
-      if (err.response?.status === 404) {
+      // Clear the progress intervals
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+      }
+
+      if (err.code === "ECONNABORTED" || err.message.includes("timeout")) {
+        toast.error(
+          "Request timed out. The outline generation is taking longer than expected."
+        );
+      } else if (err.response?.status === 404) {
         toast.warning("No documents found in the tender library.");
       } else {
         toast.error("Failed to generate outline");
       }
+
+      // Reset generation state but keep the user on step 3
+      setIsGeneratingOutline(false);
+      setProgress(0);
+      setLoadingMessage("Analysing tender documents...");
     } finally {
       setIsGeneratingOutline(false);
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+      }
     }
   };
 
@@ -240,7 +262,6 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
   };
 
   const onCancel = () => {
-    resetModalState();
     onHide();
   };
 
