@@ -300,7 +300,7 @@ const Home = () => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full">
       <div className="flex items-center justify-between w-full border-b border-typo-200 px-6 py-2 min-h-14 bg-white">
         <BreadcrumbNavigation currentPage="Home" parentPages={parentPages} />
       </div>
@@ -308,7 +308,7 @@ const Home = () => {
       <div className="flex flex-col py-6 px-8 space-y-6 flex-1 overflow-y-auto">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold text-gray-900">Bid Center</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Bid Centre</h1>
             <p className="text-gray-hint_text">
               Access all the key analytics of your bidding
             </p>

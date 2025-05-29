@@ -101,7 +101,7 @@ const Bid = () => {
       setActiveTab(path);
 
       if (isParentTab) {
-        console.log("parent tab")
+        console.log("parent tab");
         setActiveSectionId("");
       }
 
@@ -243,16 +243,14 @@ const Bid = () => {
         />
       </div>
       <div className="flex flex-1 overflow-y-auto relative">
-        <div className="w-60 min-w-60 h-full border-r border-gray-line">
-          <BidNavbar
-            activeTab={activeTab}
-            activeSubTab={activeSubTab}
-            activeSectionId={activeSectionId}
-            handleTabClick={handleTabClick}
-            handleSubTabClick={handleSubTabClick}
-            handleSectionClick={handleSectionClick}
-          />
-        </div>
+        <BidNavbar
+          activeTab={activeTab}
+          activeSubTab={activeSubTab}
+          activeSectionId={activeSectionId}
+          handleTabClick={handleTabClick}
+          handleSubTabClick={handleSubTabClick}
+          handleSectionClick={handleSectionClick}
+        />
         <div className="h-full flex-1 overflow-y-auto" ref={contentRef}>
           {activeTab === "/bid-extractor" && (
             <BidPlanner
