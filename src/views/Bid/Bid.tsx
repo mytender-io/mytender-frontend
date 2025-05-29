@@ -250,6 +250,7 @@ const Bid = () => {
           handleTabClick={handleTabClick}
           handleSubTabClick={handleSubTabClick}
           handleSectionClick={handleSectionClick}
+          handleRegenerateClick={handleRegenerateClick}
         />
         <div className="h-full flex-1 overflow-y-auto" ref={contentRef}>
           {activeTab === "/bid-extractor" && (

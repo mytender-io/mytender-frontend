@@ -8,6 +8,7 @@ import BulletsIcon from "@/components/icons/BulletsIcon";
 import DownloadIcon from "@/components/icons/DownloadIcon";
 import SidebarCollapseIcon from "@/components/icons/SidebarCollapseIcon";
 import SidebarExpandIcon from "@/components/icons/SidebarExpandIcon";
+import PlusIcon from "@/components/icons/PlusIcon";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
@@ -22,6 +23,7 @@ interface BidNavbarProps {
   handleSubTabClick?: (subTab: string) => void;
   handleSectionClick?: (sectionId: string) => void;
   onCollapseChange?: (isCollapsed: boolean) => void;
+  handleRegenerateClick: () => void;
 }
 
 const BidNavbar: React.FC<BidNavbarProps> = ({
@@ -31,7 +33,8 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
   handleTabClick = () => {},
   handleSubTabClick = () => {},
   handleSectionClick = () => {},
-  onCollapseChange = () => {}
+  onCollapseChange = () => {},
+  handleRegenerateClick
 }) => {
   const { sharedState } = useContext(BidContext);
   const { outline } = sharedState;
@@ -266,34 +269,43 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               </div>
             </span>
 
-            {displayOutline.length > 0 && (
-              <div className="flex flex-col ml-4 border-l border-gray-200">
-                {displayOutline.map((section, index) => (
-                  <span
-                    key={section.section_id}
-                    className={cn(
-                      baseSubTabStyles,
-                      (activeTab === "/proposal-planner" ||
-                        activeTab === "/proposal-preview") &&
-                        activeSectionId === section.section_id &&
-                        activeSubTabStyles
-                    )}
-                    onClick={() => handleSectionClick(section.section_id)}
-                    title={section.heading}
-                  >
-                    {section.heading.length > 25
-                      ? section.heading.substring(0, 25) + "..."
-                      : section.heading}
-                  </span>
-                ))}
-                {hasMoreSections && (
-                  <div className="text-xs text-gray-500 italic pl-4 pt-1">
-                    + {outline.length - 20} more sections
-                  </div>
-                )}
-              </div>
-            )}
-
+            <div className="flex flex-col gap-2">
+              {displayOutline.length > 0 && (
+                <div className="flex flex-col ml-4 border-l border-gray-200">
+                  {displayOutline.map((section, index) => (
+                    <span
+                      key={section.section_id}
+                      className={cn(
+                        baseSubTabStyles,
+                        (activeTab === "/proposal-planner" ||
+                          activeTab === "/proposal-preview") &&
+                          activeSectionId === section.section_id &&
+                          activeSubTabStyles
+                      )}
+                      onClick={() => handleSectionClick(section.section_id)}
+                      title={section.heading}
+                    >
+                      {section.heading.length > 25
+                        ? section.heading.substring(0, 25) + "..."
+                        : section.heading}
+                    </span>
+                  ))}
+                  {hasMoreSections && (
+                    <div className="text-xs text-gray-500 italic pl-4 pt-1">
+                      + {outline.length - 20} more sections
+                    </div>
+                  )}
+                </div>
+              )}
+              <Button
+                variant="ghost"
+                className="text-xs justify-start text-gray border-none hover:bg-transparent"
+                onClick={handleRegenerateClick}
+              >
+                <PlusIcon  />
+                Add Section
+              </Button>
+            </div>
             {/* Download Tab */}
             <span
               className={cn(
