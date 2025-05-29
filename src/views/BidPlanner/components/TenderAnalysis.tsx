@@ -663,7 +663,7 @@ const TenderAnalysis = ({
 
   return (
     <div>
-      <div className="bg-gray-100 border border-gray-line rounded-md p-2 mb-4">
+      {/* <div className="bg-gray-100 border border-gray-line rounded-md p-2 mb-4">
         <div className="flex w-full items-center gap-2">
           <Button
             onClick={() => setChatDialogOpen(true)}
@@ -678,8 +678,7 @@ const TenderAnalysis = ({
             </div>
           </Button>
 
-          {/* We use the `open` prop to control the dialog state */}
-          {/* {object_id && (
+          {object_id && (
             <TenderLibraryChatDialog
               bid_id={object_id}
               open={chatDialogOpen}
@@ -697,9 +696,9 @@ const TenderAnalysis = ({
                 </Button>
               }
             />
-          )} */}
+          )}
         </div>
-      </div>
+      </div> */}
       <div className={cn("h-full border border-gray-line rounded-md mb-4")}>
         <Tabs
           value={currentTabIndex.toString()}

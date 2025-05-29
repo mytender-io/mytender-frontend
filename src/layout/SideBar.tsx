@@ -74,14 +74,16 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             to="/home"
             className="flex flex-col items-center justify-center bg-transparent group"
           >
-            <HomeIcon
-              className={cn(
-                "min-w-12 min-h-12 stroke-1 group-hover:bg-typo-200 rounded-md p-2",
-                isActive("/home") ? "text-orange" : "text-gray-hint_text"
-              )}
-              width={20}
-              height={20}
-            />
+            <div className="group-hover:bg-typo-200 rounded-md p-2">
+              <HomeIcon
+                className={cn(
+                  "stroke-1",
+                  isActive("/home") ? "text-orange" : "text-gray-hint_text"
+                )}
+                width={32}
+                height={32}
+              />
+            </div>
             {!isCollapsed && (
               <span
                 className={cn(
@@ -97,16 +99,17 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             to="/bids"
             className="flex flex-col items-center justify-center bg-transparent group"
           >
-            <DashboardIcon
-              className={cn(
-                "min-w-12 min-h-12 group-hover:bg-typo-200 rounded-md p-2",
-                isActive("/bids") || isActive("/bid")
-                  ? "text-orange"
-                  : "text-gray-hint_text"
-              )}
-              width={20}
-              height={20}
-            />
+            <div className="group-hover:bg-typo-200 rounded-md p-2">
+              <DashboardIcon
+                className={cn(
+                  isActive("/bids") || isActive("/bid")
+                    ? "text-orange"
+                    : "text-gray-hint_text"
+                )}
+                width={32}
+                height={32}
+              />
+            </div>
             {!isCollapsed && (
               <span
                 className={cn(
@@ -124,14 +127,15 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             to="/library"
             className="flex flex-col items-center justify-center bg-transparent group"
           >
-            <ContentLibraryIcon
-              className={cn(
-                "min-w-12 min-h-12 group-hover:bg-typo-200 rounded-md p-2",
-                isActive("/library") ? "text-orange" : "text-gray-hint_text"
-              )}
-              width={20}
-              height={20}
-            />
+            <div className="group-hover:bg-typo-200 rounded-md p-2">
+              <ContentLibraryIcon
+                className={cn(
+                  isActive("/library") ? "text-orange" : "text-gray-hint_text"
+                )}
+                width={32}
+                height={32}
+              />
+            </div>
             {!isCollapsed && (
               <span
                 className={cn(
@@ -147,14 +151,15 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             to="/chat"
             className="flex flex-col items-center justify-center bg-transparent group"
           >
-            <LibraryChatIcon
-              className={cn(
-                "min-w-12 min-h-12 group-hover:bg-typo-200 rounded-md p-2",
-                isActive("/chat") ? "text-orange" : "text-gray-hint_text"
-              )}
-              width={20}
-              height={20}
-            />
+            <div className="group-hover:bg-typo-200 rounded-md p-2">
+              <LibraryChatIcon
+                className={cn(
+                  isActive("/chat") ? "text-orange" : "text-gray-hint_text"
+                )}
+                width={32}
+                height={32}
+              />
+            </div>
             {!isCollapsed && (
               <span
                 className={cn(
@@ -170,14 +175,16 @@ const SideBar = ({ onCollapseChange }: SideBarProps) => {
             to="/profile"
             className="flex flex-col items-center justify-center bg-transparent group"
           >
-            <UserRound
-              className={cn(
-                "min-w-12 min-h-12 stroke-1 group-hover:bg-typo-200 rounded-md p-2",
-                isActive("/profile") ? "text-orange" : "text-gray-hint_text"
-              )}
-              width={20}
-              height={20}
-            />
+            <div className="group-hover:bg-typo-200 rounded-md p-2">
+              <UserRound
+                className={cn(
+                  "stroke-1",
+                  isActive("/profile") ? "text-orange" : "text-gray-hint_text"
+                )}
+                width={32}
+                height={32}
+              />
+            </div>
             {!isCollapsed && (
               <span
                 className={cn(
