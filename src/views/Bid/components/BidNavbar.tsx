@@ -44,6 +44,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
   const { outline } = sharedState;
   const [isDownloading, setIsDownloading] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showAllSections, setShowAllSections] = useState(false);
 
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -66,8 +67,12 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
 
   // Limit to max 20 sections to avoid overwhelming the UI
   const displayOutline =
-    outline && outline.length > 0 ? outline.slice(0, 20) : [];
-  const hasMoreSections = outline && outline.length > 20;
+    outline && outline.length > 0
+      ? showAllSections
+        ? outline
+        : outline.slice(0, 20)
+      : [];
+  const hasMoreSections = !showAllSections && outline && outline.length > 20;
 
   const handleOpenLibrary = () => {
     // You'll need to pass this function down from the parent component
@@ -198,14 +203,14 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
     >
       <div
         className={cn(
-          "flex flex-col gap-1 relative bg-white rounded-lg p-2 h-full transition-all duration-300 ease-in-out pt-8"
+          "flex flex-col gap-1 relative bg-white rounded-lg p-2 h-full transition-all duration-300 ease-in-out pt-12"
         )}
       >
         {/* Collapse/Expand Button */}
         <Button
           variant="ghost"
           onClick={toggleCollapse}
-          className="absolute top-1 right-2 transition-all p-2 h-auto"
+          className="absolute top-1 right-2 transition-all px-2"
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {isCollapsed ? (
@@ -359,8 +364,19 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
                     </span>
                   ))}
                   {hasMoreSections && (
-                    <div className="text-xs text-gray-500 italic pl-4 pt-1">
+                    <div
+                      className="text-xs text-gray-500 italic pl-4 pt-1 cursor-pointer hover:text-orange-500"
+                      onClick={() => setShowAllSections(true)}
+                    >
                       + {outline.length - 20} more sections
+                    </div>
+                  )}
+                  {showAllSections && (
+                    <div
+                      className="text-xs text-gray-500 italic pl-4 pt-1 cursor-pointer hover:text-orange-500"
+                      onClick={() => setShowAllSections(false)}
+                    >
+                      Show fewer sections
                     </div>
                   )}
                 </div>
