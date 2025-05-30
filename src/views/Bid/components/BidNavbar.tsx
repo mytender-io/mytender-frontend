@@ -192,7 +192,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
   return (
     <div
       className={cn(
-        "w-60 min-w-60 h-full border-r border-gray-line transition-all duration-300 ease-in-out",
+        "w-60 min-w-60 h-full border-r border-gray-line transition-all duration-300 ease-in-out max-h-[calc(100vh-66px)] overflow-y-auto",
         isCollapsed ? "min-w-20 w-20" : ""
       )}
     >
