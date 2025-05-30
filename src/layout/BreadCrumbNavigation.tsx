@@ -70,19 +70,17 @@ const BreadcrumbNavigation = ({
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-56 p-2" align="end">
-              <div className="flex flex-col gap-1">
-                <Link
-                  to="/logout"
-                  className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 transition-colors text-black hover:text-black/70"
-                >
-                  <LogoutIcon
-                    className="text-gray-hint_text"
-                    width={16}
-                    height={16}
-                  />
-                  <span className="text-sm font-medium">Logout</span>
-                </Link>
-              </div>
+              <Link
+                to="/logout"
+                className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 transition-colors text-black hover:text-black/70"
+              >
+                <LogoutIcon
+                  className="text-gray-hint_text"
+                  width={16}
+                  height={16}
+                />
+                <span className="text-sm font-medium">Logout</span>
+              </Link>
             </PopoverContent>
           </Popover>
         </div>
