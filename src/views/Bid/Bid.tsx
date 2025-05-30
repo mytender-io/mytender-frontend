@@ -14,6 +14,8 @@ import { ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProposalGenerationProvider } from "@/context/ProposalGenerationContext";
 import { GeneratingOutlineProvider } from "@/context/GeneratingOutlineContext";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import TenderLibrary from "@/components/TenderLibrary";
 
 const Bid = () => {
   const { sharedState, setSharedState } = useContext(BidContext);
@@ -34,6 +36,8 @@ const Bid = () => {
   const shouldOpenTask = queryParams.get("openTask") === "true";
   const taskId = queryParams.get("taskId");
   const sectionIndex = queryParams.get("sectionIndex");
+
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useState(() => {
     // If we're being asked to open a task, default to proposal planner tab
@@ -95,6 +99,10 @@ const Bid = () => {
 
   const showViewOnlyMessage = () => {
     toast.error("You only have permission to view this bid.");
+  };
+
+  const handleOpenLibrary = () => {
+    setIsLibraryOpen(true);
   };
 
   const handleTabClick = (
@@ -266,6 +274,7 @@ const Bid = () => {
               handleSubTabClick={handleSubTabClick}
               handleSectionClick={handleSectionClick}
               handleRegenerateClick={handleRegenerateClick}
+              onLibraryOpen={handleOpenLibrary} // Add this line
             />
             <div className="h-full flex-1 overflow-y-auto" ref={contentRef}>
               {activeTab === "/bid-extractor" && (
@@ -309,6 +318,13 @@ const Bid = () => {
             )}
           </div>
         </div>
+        {/* Library Modal */}
+        <Dialog open={isLibraryOpen} onOpenChange={setIsLibraryOpen}>
+          <DialogContent className="max-w-7xl p-2">
+            <DialogTitle className="p-4">Tender Upload</DialogTitle>
+            <TenderLibrary key={object_id} object_id={object_id} />
+          </DialogContent>
+        </Dialog>
       </GeneratingOutlineProvider>
     </ProposalGenerationProvider>
   );

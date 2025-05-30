@@ -15,6 +15,7 @@ import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import { useAuthUser } from "react-auth-kit";
 import posthog from "posthog-js";
 import { Button } from "@/components/ui/button";
+import DocsIcon from "@/components/icons/DocsIcon";
 interface BidNavbarProps {
   activeTab?: string;
   activeSubTab?: string;
@@ -24,6 +25,7 @@ interface BidNavbarProps {
   handleSectionClick?: (sectionId: string) => void;
   onCollapseChange?: (isCollapsed: boolean) => void;
   handleRegenerateClick: () => void;
+  onLibraryOpen?: () => void; // Add this line
 }
 
 const BidNavbar: React.FC<BidNavbarProps> = ({
@@ -34,7 +36,8 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
   handleSubTabClick = () => {},
   handleSectionClick = () => {},
   onCollapseChange = () => {},
-  handleRegenerateClick
+  handleRegenerateClick,
+  onLibraryOpen = () => {} // Add this line
 }) => {
   const { sharedState, setSharedState } = useContext(BidContext);
   const { outline } = sharedState;
@@ -64,6 +67,12 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
   const displayOutline =
     outline && outline.length > 0 ? outline.slice(0, 20) : [];
   const hasMoreSections = outline && outline.length > 20;
+
+  const handleOpenLibrary = () => {
+    // You'll need to pass this function down from the parent component
+    // or use a callback prop
+    onLibraryOpen?.();
+  };
 
   const handleAddSection = async (targetIndex: number) => {
     const insertIndex = targetIndex + 1;
@@ -260,6 +269,13 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
         ) : (
           // Expanded view with full navigation
           <>
+            <span className={cn(baseNavLinkStyles)} onClick={handleOpenLibrary}>
+              <div className="flex items-center gap-2">
+                <DocsIcon />
+                View Tender Docs
+              </div>
+            </span>
+
             <span
               className={cn(
                 baseNavLinkStyles,
