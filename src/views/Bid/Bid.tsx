@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { ProposalGenerationProvider } from "@/context/ProposalGenerationContext";
 import { GeneratingOutlineProvider } from "@/context/GeneratingOutlineContext";
 import TenderLibrary from "@/components/TenderLibrary";
+import FullProposal from "../ProposalPreview/FullProposal";
 
 const Bid = () => {
   const { sharedState, setSharedState } = useContext(BidContext);
@@ -294,6 +295,10 @@ const Bid = () => {
                   activeTab={activeTab}
                 />
               )}
+               {(activeTab === "/full-proposal") && (
+                 <FullProposal   handleTabClick={handleTabClick}/>
+              )}
+               
               <OutlineInstructionsModal
                 show={showModal}
                 onHide={() => setShowModal(false)}

@@ -15,7 +15,7 @@ import { useAuthUser } from "react-auth-kit";
 import posthog from "posthog-js";
 import { Button } from "@/components/ui/button";
 import DocsIcon from "@/components/icons/DocsIcon";
-import WordpaneIcon from "@/components/icons/WordpaneIcon";
+import DocIcon from "@/components/icons/DocIcon";
 interface BidNavbarProps {
   activeTab?: string;
   activeSubTab?: string;
@@ -38,7 +38,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
 }) => {
   const { sharedState, setSharedState } = useContext(BidContext);
   const { outline } = sharedState;
-  const [isDownloading, setIsDownloading] = useState(false);
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showAllSections, setShowAllSections] = useState(false);
 
@@ -121,69 +121,6 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
     }
   };
 
-  const handleDownloadDocument = async () => {
-    if (!sharedState.object_id) {
-      toast.error("No bid ID found");
-      return;
-    }
-
-    setIsDownloading(true);
-
-    try {
-      toast.info("Preparing document for download...");
-
-      // Create FormData instead of JSON
-      const formData = new FormData();
-      formData.append("bid_id", sharedState.object_id);
-
-      const response = await axios({
-        method: "post",
-        url: `http${HTTP_PREFIX}://${API_URL}/generate_docx`,
-        data: formData,
-        responseType: "blob",
-        headers: {
-          Authorization: `Bearer ${tokenRef.current}`
-        }
-      });
-
-      // Create a blob from the response data
-      const blob = new Blob([response.data], {
-        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      });
-
-      // Create a URL for the blob
-      const url = URL.createObjectURL(blob);
-
-      // Create a temporary link element to trigger the download
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${sharedState.bidInfo || "proposal"}.docx`;
-
-      // Append to the DOM, click and then remove
-      document.body.appendChild(a);
-      a.click();
-
-      // Clean up
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 100);
-
-      toast.success("Document downloaded successfully");
-
-      // Track download with posthog
-      posthog.capture("proposal_document_downloaded", {
-        bidId: sharedState.object_id,
-        format: "docx"
-      });
-    } catch (error) {
-      console.error("Error downloading document:", error);
-      toast.error("Failed to download document");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
   return (
     <div
       className={cn(
@@ -260,18 +197,6 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               onClick={() => handleTabClick("/proposal-planner", true)}
             >
               <BulletsIcon className="w-5 h-5" />
-            </div>
-
-            <div
-              className={cn(
-                "p-2 rounded-md cursor-pointer mt-auto",
-                isDownloading
-                  ? "opacity-50 cursor-not-allowed"
-                  : "text-gray-hint_text hover:bg-gray-100"
-              )}
-              onClick={!isDownloading ? handleDownloadDocument : undefined}
-            >
-              <WordpaneIcon className="w-5 h-5" />
             </div>
           </div>
         ) : (
@@ -398,18 +323,20 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
                 Add Section
               </Button>
             </div>
-            <span
+
+             <span
               className={cn(
                 baseNavLinkStyles,
-                isDownloading && "opacity-50 cursor-not-allowed"
+                activeTab === "/full-proposal" && activeNavLinkStyles
               )}
-              onClick={!isDownloading ? handleDownloadDocument : undefined}
+              onClick={() => handleTabClick( "/full-proposal")}
             >
               <div className="flex items-center gap-2">
-                <WordpaneIcon className="w-5 h-5" />
-                {isDownloading ? "Downloading..." : "Download Proposal"}
+                <DocIcon className="w-5 h-5" />
+                Full Proposal
               </div>
             </span>
+
           </>
         )}
       </div>
