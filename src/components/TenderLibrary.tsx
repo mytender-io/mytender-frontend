@@ -356,7 +356,7 @@ const TenderLibrary = ({ object_id }) => {
                           icon={faFileAlt}
                           className="text-muted-foreground"
                         />
-                        <span>{doc.filename || doc}</span>
+                        <span className="break-all">{doc.filename || doc}</span>
                       </div>
                     </TableCell>
                     <TableCell className="py-2 px-4">
