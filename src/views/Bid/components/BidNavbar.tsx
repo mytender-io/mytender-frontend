@@ -5,7 +5,6 @@ import { tenderTabs } from "@/utils/tenderTabsConfig";
 import LightbulbIcon from "@/components/icons/LightbulbIcon";
 import CursorIcon from "@/components/icons/CursorIcon";
 import BulletsIcon from "@/components/icons/BulletsIcon";
-import DownloadIcon from "@/components/icons/DownloadIcon";
 import SidebarCollapseIcon from "@/components/icons/SidebarCollapseIcon";
 import SidebarExpandIcon from "@/components/icons/SidebarExpandIcon";
 import PlusIcon from "@/components/icons/PlusIcon";
@@ -37,7 +36,6 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
   handleSubTabClick = () => {},
   handleSectionClick = () => {},
   onCollapseChange = () => {},
-  handleRegenerateClick,
   onLibraryOpen = () => {} // Add this line
 }) => {
   const { sharedState, setSharedState } = useContext(BidContext);
@@ -58,7 +56,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
 
   const baseNavLinkStyles =
     "px-4 py-3 cursor-pointer rounded-md bg-transparent text-gray-hint_text font-medium transition-all duration-300 ease-in-out w-full hover:bg-gray-100";
-  const activeNavLinkStyles = "bg-orange-active font-bold shadow-sm";
+  const activeNavLinkStyles = "bg-orange-active text-orange-600";
 
   const baseSubTabStyles =
     "pl-4 py-2 cursor-pointer text-sm text-gray-600 hover:text-gray-900 transition-all duration-200 -ml-0.5";
@@ -226,6 +224,16 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
             <div
               className={cn(
                 "p-2 rounded-md cursor-pointer",
+                "text-gray-hint_text hover:bg-gray-100"
+              )}
+              onClick={handleOpenLibrary}
+            >
+              <DocsIcon className="w-5 h-5" />
+            </div>
+
+            <div
+              className={cn(
+                "p-2 rounded-md cursor-pointer",
                 activeTab === "/bid-extractor"
                   ? "bg-orange-active text-orange-600"
                   : "text-gray-hint_text hover:bg-gray-100"
@@ -269,7 +277,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               )}
               onClick={!isDownloading ? handleDownloadDocument : undefined}
             >
-              <DownloadIcon className="w-5 h-5" />
+              <WordpaneIcon className="w-5 h-5" />
             </div>
           </div>
         ) : (
@@ -277,7 +285,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
           <>
             <span className={cn(baseNavLinkStyles)} onClick={handleOpenLibrary}>
               <div className="flex items-center gap-2">
-                <DocsIcon />
+                <DocsIcon className="w-5 h-5" />
                 View Tender Docs
               </div>
             </span>
@@ -290,7 +298,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               onClick={() => handleTabClick("/bid-extractor")}
             >
               <div className="flex items-center gap-2">
-                <LightbulbIcon className="text-black" />
+                <LightbulbIcon className="w-5 h-5" />
                 Insights
               </div>
             </span>
@@ -322,7 +330,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               onClick={() => handleTabClick("/bid-intel")}
             >
               <div className="flex items-center gap-2">
-                <CursorIcon className="text-black" />
+                <CursorIcon className="w-5 h-5" />
                 Response Inputs
               </div>
             </span>
@@ -337,7 +345,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               onClick={() => handleTabClick("/proposal-planner", true)}
             >
               <div className="flex items-center gap-2">
-                <BulletsIcon className="text-black" />
+                <BulletsIcon className="w-5 h-5" />
                 Outline
               </div>
             </span>
@@ -398,7 +406,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               onClick={!isDownloading ? handleDownloadDocument : undefined}
             >
               <div className="flex items-center gap-2">
-                <WordpaneIcon width={16} height={16} />
+                <WordpaneIcon className="w-5 h-5" />
                 {isDownloading ? "Downloading..." : "Download Proposal"}
               </div>
             </span>
