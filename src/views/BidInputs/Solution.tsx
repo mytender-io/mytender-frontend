@@ -1,5 +1,5 @@
 import React, { useContext, useMemo, useRef, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
@@ -8,7 +8,7 @@ import { BidContext } from "../BidWritingStateManagerView";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 
-const Solution = ({}) => {
+const Solution = () => {
   const { sharedState, setSharedState } = useContext(BidContext);
   const [solution, setSolution] = useState(sharedState.solution || "");
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ const Solution = ({}) => {
   const auth = useMemo(() => getAuth(), [getAuth]);
   const tokenRef = useRef(auth?.token || "default");
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setSolution(e.target.value);
   };
 
@@ -69,25 +69,22 @@ const Solution = ({}) => {
 
   return (
     <Card className="w-full bg-white border-none shadow-none">
-      <CardContent className="p-6 space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            What specific product or service are you bidding to provide?
-          </label>
-          <Textarea
-            value={solution}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md"
-            rows={30}
-            placeholder="Describe your product or service offering..."
-          />
-        </div>
-
-        <div className="flex gap-2">
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between w-full">
+          <span className="text-base font-medium text-gray-hint_text">
+            Solution Design
+          </span>
           <Button onClick={generate_solution} disabled={loading}>
             {loading ? "Generating..." : "Generate Solution"}
           </Button>
         </div>
+        <Textarea
+          value={solution}
+          onChange={handleChange}
+          className="w-full p-2 border rounded-md"
+          rows={30}
+          placeholder="Describe your product or service offering..."
+        />
       </CardContent>
     </Card>
   );
