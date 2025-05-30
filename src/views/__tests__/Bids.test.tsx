@@ -8,7 +8,7 @@ describe("Bids Component", () => {
       const axiosInstance = await getAuthenticatedAxios();
 
       const bidsResponse = await axiosInstance.post(
-        `https://dev.mytender.io:7861/get_bids_list/`,
+        `https://backend.mytender.io:7861/get_bids_list/`,
         {}
       );
 

@@ -6,7 +6,7 @@ const authenticatedAxios = await getAuthenticatedAxios();
 describe("Library Component", () => {
   it("fetches collections from API", async () => {
     const collectionsResponse = await authenticatedAxios.post(
-      `https://dev.mytender.io:7861/get_collections`,
+      `https://backend.mytender.io:7861/get_collections`,
       {},
       {
         headers: {
@@ -30,7 +30,7 @@ describe("Library Component", () => {
 
   it("fetches folder contents from API", async () => {
     const folderContentsResponse = await authenticatedAxios.post(
-      `https://dev.mytender.io:7861/get_folder_filenames`,
+      `https://backend.mytender.io:7861/get_folder_filenames`,
       { collection_name: "default" },
       {
         headers: {
@@ -64,7 +64,7 @@ describe("Library Component", () => {
 
   //     // Create folder
   //     const createResponse = await authenticatedAxios.post(
-  //       `https://dev.mytender.io:7861/create_upload_folder`,
+  //       `https://backend.mytender.io:7861/create_upload_folder`,
   //       formData,
   //       {
   //         headers: {
@@ -80,7 +80,7 @@ describe("Library Component", () => {
   //     deleteFormData.append("profile_name", testFolderName);
 
   //     const deleteResponse = await authenticatedAxios.post(
-  //       `https://dev.mytender.io:7861/delete_template/`,
+  //       `https://backend.mytender.io:7861/delete_template/`,
   //       deleteFormData,
   //       {
   //         headers: {
