@@ -52,7 +52,11 @@ interface ProposalPlanProps {
   taskToOpen: string | null;
   sectionIndex: string | null;
   handleRegenerateClick: () => void;
- handleTabClick: (path: string, isParentTab?: boolean, sectionId?: string) => void;
+  handleTabClick: (
+    path: string,
+    isParentTab?: boolean,
+    sectionId?: string
+  ) => void;
   activeSectionId?: string;
   handleActiveSectionChange: (sectionId: string) => void;
 }
@@ -1162,7 +1166,6 @@ const ProposalPlan = ({
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-            
               {activeSectionId === "" && (
                 <div className="rounded-md border">
                   <Table>

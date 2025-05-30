@@ -36,7 +36,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
   onCollapseChange = () => {},
   handleRegenerateClick
 }) => {
-  const { sharedState } = useContext(BidContext);
+  const { sharedState, setSharedState } = useContext(BidContext);
   const { outline } = sharedState;
   const [isDownloading, setIsDownloading] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -64,6 +64,57 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
   const displayOutline =
     outline && outline.length > 0 ? outline.slice(0, 20) : [];
   const hasMoreSections = outline && outline.length > 20;
+
+  const handleAddSection = async (targetIndex: number) => {
+    const insertIndex = targetIndex + 1;
+
+    // Return early if no object_id or no valid index to insert at
+    if (!sharedState.object_id || insertIndex === null) return;
+
+    const newSection = {
+      heading: "New Section",
+      word_count: 250,
+      reviewer: "",
+      answerer: "",
+      status: "Not Started" as const,
+      subsections: 0,
+      question: "",
+      answer: "",
+      weighting: "",
+      page_limit: "",
+      subheadings: [],
+      choice: "3b",
+      writingplan: ""
+    };
+
+    try {
+      const uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+        /[xy]/g,
+        (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        }
+      );
+
+      const updatedOutline = [...sharedState.outline];
+      updatedOutline.splice(insertIndex, 0, {
+        ...newSection,
+        section_id: uuid
+      });
+
+      setSharedState((prevState) => ({
+        ...prevState,
+        outline: updatedOutline
+      }));
+
+      // Show success toast
+      toast.success("New section added");
+    } catch (err) {
+      console.error("Error adding section:", err);
+      toast.error("Failed to add section");
+    }
+  };
 
   const handleDownloadDocument = async () => {
     if (!sharedState.object_id) {
@@ -300,13 +351,12 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               <Button
                 variant="ghost"
                 className="text-xs justify-start text-gray border-none hover:bg-transparent"
-                onClick={handleRegenerateClick}
+                onClick={() => handleAddSection(displayOutline.length - 1)}
               >
-                <PlusIcon  />
+                <PlusIcon />
                 Add Section
               </Button>
             </div>
-            {/* Download Tab */}
             <span
               className={cn(
                 baseNavLinkStyles,
@@ -316,7 +366,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
             >
               <div className="flex items-center gap-2">
                 <DownloadIcon className={cn("text-black")} />
-                {isDownloading ? "Downloading..." : "Download Bid"}
+                {isDownloading ? "Downloading..." : "Download Proposal"}
               </div>
             </span>
           </>
