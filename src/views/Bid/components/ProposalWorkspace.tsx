@@ -213,13 +213,13 @@ const ProposalWorkspace = ({
                 <TabsList className="flex justify-center w-fit mx-auto h-12 bg-transparent">
                   <TabsTrigger
                     value="plan"
-                    className="flex-1 h-full data-[state=active]:shadow-none data-[state=active]:text-orange px-6 w-fit text-base"
+                    className="flex-1 h-full data-[state=active]:shadow-none data-[state=active]:font-bold data-[state=active]:text-orange px-6 w-fit text-lg"
                   >
                     Plan
                   </TabsTrigger>
                   <TabsTrigger
                     value="write"
-                    className="flex-1 h-full data-[state=active]:shadow-none data-[state=active]:text-orange px-6 w-fit text-base"
+                    className="flex-1 h-full data-[state=active]:shadow-none data-[state=active]:font-bold data-[state=active]:text-orange px-6 w-fit text-lg"
                     disabled={!activeSectionId}
                   >
                     Write
