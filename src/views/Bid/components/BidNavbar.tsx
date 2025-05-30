@@ -25,7 +25,6 @@ interface BidNavbarProps {
   handleSectionClick?: (sectionId: string) => void;
   onCollapseChange?: (isCollapsed: boolean) => void;
   handleRegenerateClick: () => void;
-  onLibraryOpen?: () => void; // Add this line
 }
 
 const BidNavbar: React.FC<BidNavbarProps> = ({
@@ -35,8 +34,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
   handleTabClick = () => {},
   handleSubTabClick = () => {},
   handleSectionClick = () => {},
-  onCollapseChange = () => {},
-  onLibraryOpen = () => {} // Add this line
+  onCollapseChange = () => {}
 }) => {
   const { sharedState, setSharedState } = useContext(BidContext);
   const { outline } = sharedState;
@@ -71,12 +69,6 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
         : outline.slice(0, 20)
       : [];
   const hasMoreSections = !showAllSections && outline && outline.length > 20;
-
-  const handleOpenLibrary = () => {
-    // You'll need to pass this function down from the parent component
-    // or use a callback prop
-    onLibraryOpen?.();
-  };
 
   const handleAddSection = async (targetIndex: number) => {
     const insertIndex = targetIndex + 1;
@@ -224,9 +216,11 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
             <div
               className={cn(
                 "p-2 rounded-md cursor-pointer",
-                "text-gray-hint_text hover:bg-gray-100"
+                activeTab === "/tender-documents"
+                  ? "bg-orange-active text-orange-600"
+                  : "text-gray-hint_text hover:bg-gray-100"
               )}
-              onClick={handleOpenLibrary}
+              onClick={() => handleTabClick("/tender-documents")}
             >
               <DocsIcon className="w-5 h-5" />
             </div>
@@ -283,10 +277,16 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
         ) : (
           // Expanded view with full navigation
           <>
-            <span className={cn(baseNavLinkStyles)} onClick={handleOpenLibrary}>
+            <span
+              className={cn(
+                baseNavLinkStyles,
+                activeTab === "/tender-documents" && activeNavLinkStyles
+              )}
+              onClick={() => handleTabClick("/tender-documents")}
+            >
               <div className="flex items-center gap-2">
                 <DocsIcon className="w-5 h-5" />
-                View Tender Docs
+                Tender Documents
               </div>
             </span>
 
