@@ -296,7 +296,6 @@ const Bid = () => {
                   handleTabClick={handleTabClick}
                   activeSectionId={activeSectionId}
                   handleActiveSectionChange={handleActiveSectionChange}
-                  yPosition={yPosition}
                   activeTab={activeTab}
                 />
               )}

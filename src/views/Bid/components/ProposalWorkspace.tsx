@@ -28,7 +28,6 @@ interface ProposalWorkspaceProps {
     sectionId?: string
   ) => void;
   activeSectionId: string;
-  yPosition: number;
   activeTab?: string;
   handleActiveSectionChange: (sectionId: string) => void;
 }
@@ -41,7 +40,6 @@ const ProposalWorkspace = ({
   handleTabClick,
   activeSectionId,
   handleActiveSectionChange,
-  yPosition,
   activeTab
 }: ProposalWorkspaceProps) => {
   const { sharedState } = useContext(BidContext);
@@ -244,7 +242,7 @@ const ProposalWorkspace = ({
           </div>
 
           {/* Content area for the selected view */}
-          <div className="flex-1 overflow-hidden flex flex-col px-6 pb-4">
+          <div className="flex-1 flex flex-col px-6 overflow-y-auto">
             <TabsContent
               value="plan"
               className="mt-0 flex-1 overflow-auto h-full"
@@ -286,10 +284,7 @@ const ProposalWorkspace = ({
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 className="flex-1 overflow-auto h-full"
               >
-                <ProposalPreview
-                  yPosition={yPosition}
-                  activeSectionId={activeSectionId}
-                />
+                <ProposalPreview activeSectionId={activeSectionId} />
               </motion.div>
             </TabsContent>
           </div>

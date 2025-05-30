@@ -44,13 +44,7 @@ import {
   handleFeedbackResolved
 } from "./feedbackFunctions";
 
-const ProposalPreview = ({
-  yPosition,
-  activeSectionId
-}: {
-  yPosition: number;
-  activeSectionId: string;
-}) => {
+const ProposalPreview = ({ activeSectionId }: { activeSectionId: string }) => {
   const editorRefs = useRef<(HTMLDivElement | null)[]>([]);
   const activeEditorRef = useRef<HTMLDivElement | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null);
@@ -780,7 +774,6 @@ const ProposalPreview = ({
           </div>
         ) : (
           <div className="space-y-2">
-
             <div className="flex gap-2 pr-4">
               <div
                 className={cn(
@@ -788,7 +781,7 @@ const ProposalPreview = ({
                 )}
               >
                 <div className="rounded-md bg-white w-full max-w-4xl flex-1">
-                  <div className="border border-gray-line bg-gray-50 px-4 py-2 rounded-t-md flex items-center justify-center gap-2 sticky -top-4 z-[49]">
+                  <div className="border border-gray-line bg-gray-50 px-4 py-2 flex items-center justify-center gap-2 sticky top-0 z-[49]">
                     <ProposalToolbar
                       activeEditorRef={activeEditorRef}
                       execCommand={execCommand}
@@ -1304,10 +1297,10 @@ const ProposalPreview = ({
               {(sidepaneOpen || feedbackSidepaneOpen) && (
                 <div
                   className={cn(
-                    "proposal-preview-sidepane w-[450px] overflow-y-auto z-50 sticky -top-4 right-0"
+                    "proposal-preview-sidepane w-[450px] overflow-y-auto z-50 sticky top-0 right-0"
                   )}
                   style={{
-                    maxHeight: `calc(100vh - ${241 - (yPosition > 180 ? 176 : yPosition)}px)`
+                    maxHeight: `calc(100vh - 136px)`
                   }}
                 >
                   {feedbackSidepaneOpen ? (
