@@ -2,7 +2,6 @@ import { useState, useEffect, useContext } from "react";
 import ProposalPlan from "@/views/BidOutline/ProposalPlan";
 import ProposalPreview from "@/views/ProposalPreview/ProposalPreview";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import CollapsibleHeader from "./CollapsibleHeader";
 import { BidContext } from "@/views/BidWritingStateManagerView";
 import { Button } from "@/components/ui/button";
 import {
@@ -144,7 +143,7 @@ const ProposalWorkspace = ({
 
   return (
     <GenerationProvider>
-      <div className="flex flex-col h-full w-full pb-4 relative">
+      <div className="flex flex-col h-full w-full relative">
         {/* Tab switching arrows */}
         {activeSectionIndex !== null && (
           <>
@@ -211,16 +210,16 @@ const ProposalWorkspace = ({
           >
             {activeSectionIndex !== null ? (
               <div className="w-full">
-                <TabsList className="flex justify-center w-full max-w-md mx-auto h-12">
+                <TabsList className="flex justify-center w-fit mx-auto h-12 bg-transparent">
                   <TabsTrigger
                     value="plan"
-                    className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
+                    className="flex-1 h-full data-[state=active]:shadow-none data-[state=active]:text-orange px-6 w-fit text-base"
                   >
                     Plan
                   </TabsTrigger>
                   <TabsTrigger
                     value="write"
-                    className="flex-1 h-full data-[state=active]:bg-orange-ultra_light data-[state=active]:text-orange"
+                    className="flex-1 h-full data-[state=active]:shadow-none data-[state=active]:text-orange px-6 w-fit text-base"
                     disabled={!activeSectionId}
                   >
                     Write
@@ -256,7 +255,7 @@ const ProposalWorkspace = ({
                 exit={slideDirection === "right" ? "leftExit" : "rightExit"}
                 variants={slideVariants}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="flex-1 overflow-auto h-full"
+                className="flex-1 overflow-auto h-full pb-4"
               >
                 <ProposalPlan
                   openTask={openTask}
