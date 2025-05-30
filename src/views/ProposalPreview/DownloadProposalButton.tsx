@@ -94,7 +94,7 @@ const DownloadProposalButton: React.FC = () => {
         ) : (
           <>
             <Download className="h-4 w-4" />
-            Download Proposal
+            Download Proposal as Word Document
           </>
         )}
       </Button>

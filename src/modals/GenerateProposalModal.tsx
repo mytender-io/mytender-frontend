@@ -299,7 +299,7 @@ const GenerateProposalModal = ({
     <>
       <Button variant="default" onClick={() => setShow(true)}>
         <FastIcon />
-        Generate Proposal
+        Generate Full Proposal
       </Button>
 
       <Dialog open={show} onOpenChange={handleModalClose}>
@@ -307,7 +307,7 @@ const GenerateProposalModal = ({
           {proposalState.currentStep === 1 ? (
             <>
               <DialogHeader>
-                <DialogTitle>Generate Proposal</DialogTitle>
+                <DialogTitle>Generate Full Proposal</DialogTitle>
               </DialogHeader>
               {renderStepContent()}
               <div className="flex justify-end">
@@ -325,7 +325,7 @@ const GenerateProposalModal = ({
                       Processing...
                     </>
                   ) : (
-                    "Generate Proposal"
+                    "Generate Full Proposal"
                   )}
                 </Button>
               </div>
