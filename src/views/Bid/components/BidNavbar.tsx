@@ -16,6 +16,7 @@ import { useAuthUser } from "react-auth-kit";
 import posthog from "posthog-js";
 import { Button } from "@/components/ui/button";
 import DocsIcon from "@/components/icons/DocsIcon";
+import WordpaneIcon from "@/components/icons/WordpaneIcon";
 interface BidNavbarProps {
   activeTab?: string;
   activeSubTab?: string;
@@ -381,7 +382,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               onClick={!isDownloading ? handleDownloadDocument : undefined}
             >
               <div className="flex items-center gap-2">
-                <DownloadIcon className={cn("text-black")} />
+                <WordpaneIcon width={16} height={16} />
                 {isDownloading ? "Downloading..." : "Download Proposal"}
               </div>
             </span>
