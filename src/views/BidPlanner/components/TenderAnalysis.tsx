@@ -31,7 +31,12 @@ import TenderLibraryChatDialog from "@/views/BidPlanner/components/TenderLibrary
 import InterrogateTenderDialog from "./InterrogateTender";
 import AddCompetitors from "./AddCompetitors";
 import { useGeneratingTenderInsightContext } from "@/context/GeneratingTenderInsightContext";
-import { TabData, tenderTabs, getTabIndexByStateKey } from "../../../utils/tenderTabsConfig";
+import {
+  TabData,
+  tenderTabs,
+  getTabIndexByStateKey
+} from "../../../utils/tenderTabsConfig";
+import DownloadTabButton from "./DownloadTabButton";
 
 interface TenderInsightData {
   requirements?: string;
@@ -774,6 +779,15 @@ const TenderAnalysis = ({
                 value={index.toString()}
                 className="h-full pt-0 mt-0"
               >
+                <div className="flex justify-end mb-4 px-8 pt-4">
+                  <DownloadTabButton
+                    object_id={object_id}
+                    currentTabIndex={currentTabIndex}
+                    tabContent={tabContent}
+                    auth={auth}
+                    className="ml-auto"
+                  />
+                </div>
                 <div className={cn("relative px-8 py-4 h-full")}>
                   {tab.stateKey === "differentiation_opportunities" &&
                     object_id && (
