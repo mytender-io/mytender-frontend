@@ -17,9 +17,9 @@ jobs:
       - name: Set API URL based on branch
         run: |
           if [ "${{ github.ref }}" == "refs/heads/dev" ] || [ "${{ github.ref }}" == "refs/heads/experimental" ]; then
-            echo "VITE_REACT_APP_API_URL=dev.mytender.io:7861" >> $GITHUB_ENV
+            echo "VITE_REACT_APP_API_URL=backend.mytender.io:7861" >> $GITHUB_ENV
           else
-            echo "VITE_REACT_APP_API_URL=app.mytender.io:7860" >> $GITHUB_ENV
+            echo "VITE_REACT_APP_API_URL=backend.mytender.io:7860" >> $GITHUB_ENV
           fi
       - name: Install Dependencies
         run: npm install
@@ -37,9 +37,9 @@ jobs:
       - name: Set API URL based on branch
         run: |
           if [ "${{ github.ref }}" == "refs/heads/dev" ] || [ "${{ github.ref }}" == "refs/heads/experimental" ]; then
-            echo "VITE_REACT_APP_API_URL=dev.mytender.io:7861" >> $GITHUB_ENV
+            echo "VITE_REACT_APP_API_URL=backend.mytender.io:7861" >> $GITHUB_ENV
           else
-            echo "VITE_REACT_APP_API_URL=app.mytender.io:7860" >> $GITHUB_ENV
+            echo "VITE_REACT_APP_API_URL=backend.mytender.io:7860" >> $GITHUB_ENV
           fi
       - name: Clean Install Dependencies
         run: |
@@ -65,7 +65,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOYMENT_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 44.208.84.199 >> ~/.ssh/known_hosts
-          scp -i ~/.ssh/id_rsa -r ./dist/* ec2-user@44.208.84.199:$TARGET_DIR
+          ssh-keyscan backend.mytender.io >> ~/.ssh/known_hosts
+          scp -i ~/.ssh/id_rsa -r ./dist/* ec2-user@backend.mytender.io:$TARGET_DIR
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOYMENT_KEY }}

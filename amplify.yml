@@ -1,0 +1,56 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        # Install dependencies
+        - npm ci --cache .npm --prefer-offline
+        
+        # Set API URL based on branch
+        - |
+          if [ "$AWS_BRANCH" = "dev" ]; then
+            echo "Setting dev API URL"
+            export VITE_REACT_APP_API_URL=backend.mytender.io:7861
+          elif [ "$AWS_BRANCH" = "main" ]; then
+            echo "Setting production API URL"
+            export VITE_REACT_APP_API_URL=backend.mytender.io:7860
+          fi
+        
+        # Export the environment variable for the build phase
+        - echo "VITE_REACT_APP_API_URL=$VITE_REACT_APP_API_URL" >> .env
+        
+    build:
+      commands:
+        # Run tests first - build will fail if tests fail
+        - echo "Running tests..."
+        - npm test
+        
+        # Build based on branch
+        - |
+          if [ "$AWS_BRANCH" = "dev" ]; then
+            echo "Building for dev environment"
+            npm run build:dev
+          elif [ "$AWS_BRANCH" = "main" ]; then
+            echo "Building for production environment"
+            npm run build:prod
+          else
+            echo "Unknown branch $AWS_BRANCH, using dev build"
+            npm run build:dev
+          fi
+          
+  artifacts:
+    baseDirectory: dist
+    files:
+      - "**/*"
+      
+  cache:
+    paths:
+      - .npm/**/*
+      - node_modules/**/*
+      
+  # Optional: Add environment variables if needed
+  # You can also set these in the Amplify Console
+  environment:
+    variables:
+      # Add any other environment variables you need here
+      NODE_VERSION: "20" 
