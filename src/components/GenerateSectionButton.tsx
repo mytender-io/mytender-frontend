@@ -7,22 +7,13 @@ import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import { useAuthUser } from "react-auth-kit";
 import { toast } from "react-toastify";
 import { useGeneration } from "@/context/GeneratingSectionContext";
-import GenerateProposalModal from "@/modals/GenerateProposalModal";
 
 interface GenerateSectonButtonProps {
   section: Section;
-  handleTabClick?: (
-    path: string,
-    isParentTab?: boolean,
-    sectionId?: string
-  ) => void;
-  bid_id: string;
 }
 
 const GenerateSectonButton: React.FC<GenerateSectonButtonProps> = ({
-  section,
-  handleTabClick,
-  bid_id
+  section
 }) => {
   const getAuth = useAuthUser();
   const auth = useMemo(() => getAuth(), [getAuth]);
@@ -92,9 +83,8 @@ const GenerateSectonButton: React.FC<GenerateSectonButtonProps> = ({
           };
         });
       }
-    } catch (err: unknown) {
-      const error = err as Error;
-      console.error("Full error:", error);
+    } catch (err: any) {
+      console.error("Full error:", err.response?.data);
       toast.error("Failed to generate section");
     } finally {
       setGenerating(false);
@@ -102,10 +92,7 @@ const GenerateSectonButton: React.FC<GenerateSectonButtonProps> = ({
   };
 
   return (
-    <div className="flex items-center gap-2">
-      {handleTabClick && (
-        <GenerateProposalModal bid_id={bid_id} handleTabClick={handleTabClick} />
-      )}
+    <div className="flex items-center">
       <Button onClick={handleClick} className="flex items-center gap-2">
         {isThisSectionGenerating ? (
           <>
@@ -115,7 +102,7 @@ const GenerateSectonButton: React.FC<GenerateSectonButtonProps> = ({
         ) : (
           <>
             <ArrowRight className="h-4 w-4" />
-            Generate This Section only
+            Generate Section
           </>
         )}
       </Button>
