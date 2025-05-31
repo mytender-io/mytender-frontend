@@ -21,7 +21,13 @@ import { toast } from "react-toastify";
 import posthog from "posthog-js";
 import { useGeneratingOutline } from "@/context/GeneratingOutlineContext";
 
-const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
+interface OutlineInstructionsModalProps {
+  show: boolean;
+  onHide: () => void;
+  bid_id: string;
+}
+
+const OutlineInstructionsModal = ({ show, onHide, bid_id }: OutlineInstructionsModalProps) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -36,22 +42,67 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
     resetState
   } = useGeneratingOutline();
 
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [selectedFolders, setSelectedFolders] = useState(
     sharedState.selectedFolders || []
   );
 
-  const progressInterval = useRef(null);
+  const progressInterval = useRef<NodeJS.Timeout | null>(null);
 
   const loadingMessages = [
     "Looking at the tender docs...",
+    "Scanning tender requirements and specifications...",
+    "Identifying key evaluation criteria...",
     "Searching for questions...",
+    "Analyzing submission requirements...",
+    "Extracting mandatory compliance items...",
+    "Reviewing technical specifications...",
+    "Mapping response requirements...",
     "Extracting information...",
+    "Identifying section dependencies...",
+    "Analyzing scoring weightings...",
+    "Cross-referencing tender appendices...",
+    "Generating tender summary...",
+    "Summarizing key tender requirements...",
+    "Identifying evaluation criteria weightings...",
+    "Analyzing customer pain points...",
+    "Understanding buyer's objectives...",
+    "Extracting customer challenges...",
+    "Identifying decision-making factors...",
+    "Discovering win themes...",
+    "Analyzing competitive landscape...",
+    "Finding differentiation opportunities...",
+    "Identifying unique value propositions...",
+    "Mapping customer needs to solutions...",
+    "Analyzing historical win patterns...",
+    "Extracting compliance requirements...",
+    "Building evaluation criteria matrix...",
+    "Identifying critical success factors...",
+    "Analyzing stakeholder priorities...",
+    "Extracting budget constraints...",
+    "Understanding project timelines...",
+    "Identifying risk factors...",
+    "Analyzing technical requirements depth...",
     "Planning outline...",
+    "Structuring response sections...",
+    "Organizing compliance matrix...",
+    "Aligning with evaluation criteria...",
+    "Building section hierarchy...",
+    "Analyzing word limits and page counts...",
+    "Incorporating win themes...",
+    "Optimizing section flow...",
+    "Integrating customer pain points...",
+    "Positioning differentiators...",
+    "Finalizing outline structure...",
     "Generating outline... Please wait a little bit longer..."
   ];
 
-  function ProgressWithLabel({ value, message }) {
+  interface ProgressWithLabelProps {
+    value: number;
+    message: string;
+  }
+
+  function ProgressWithLabel({ value, message }: ProgressWithLabelProps) {
     return (
       <div className="flex flex-col items-center">
         <div className="w-full">
@@ -66,7 +117,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
   }
 
   const startProgressBar = () => {
-    const duration = 80000; // 1 minute in ms
+    const duration = 300000; // 5 minutes in ms
     const interval = 100;
     const steps = duration / interval;
     const increment = 98 / steps;
@@ -77,12 +128,12 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
     const messageRotationInterval = setInterval(() => {
       messageIndex = (messageIndex + 1) % loadingMessages.length;
       setLoadingMessage(loadingMessages[messageIndex]);
-    }, 1000);
+    }, 6500); // Adjusted to rotate through all messages during 5 minutes
 
     progressInterval.current = setInterval(() => {
       currentProgress += increment;
       if (currentProgress >= 98) {
-        clearInterval(progressInterval.current);
+        clearInterval(progressInterval.current!);
         clearInterval(messageRotationInterval);
         if (!isGeneratingOutline) {
           setProgress(100);
@@ -96,7 +147,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
     }, interval);
   };
 
-  const handleFileSelection = (files) => {
+  const handleFileSelection = (files: string[]) => {
     console.log("Files selected in SelectTenderLibraryFile component:", files);
     setSelectedFiles(files);
   };
@@ -146,7 +197,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`
           },
-          timeout: 500000 // longer timeout
+          timeout: 2000000 // longer timeout
         }
       );
 
@@ -180,7 +231,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
         bid_id,
         selected_folders: sharedState.selectedFolders,
         selected_files: selectedFiles,
-        error: err.message || "Failed to generate outline"
+        error: err instanceof Error ? err.message : "Failed to generate outline"
       });
 
       console.error(err);
@@ -190,11 +241,17 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }) => {
         clearInterval(progressInterval.current);
       }
 
-      if (err.code === "ECONNABORTED" || err.message.includes("timeout")) {
+      const isTimeoutError = err instanceof Error && 
+        ('code' in err && err.code === "ECONNABORTED" || err.message?.includes("timeout"));
+      
+      const isNotFoundError = err instanceof Error && 
+        'response' in err && (err as { response?: { status?: number } }).response?.status === 404;
+
+      if (isTimeoutError) {
         toast.error(
           "Request timed out. The outline generation is taking longer than expected."
         );
-      } else if (err.response?.status === 404) {
+      } else if (isNotFoundError) {
         toast.warning("No documents found in the tender library.");
       } else {
         toast.error("Failed to generate outline");
