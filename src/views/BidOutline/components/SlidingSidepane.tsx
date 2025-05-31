@@ -68,12 +68,18 @@ interface ProposalSidepaneProps {
     sectionIndex: number,
     subheadingIndex: number
   ) => void;
+  handleTabClick?: (
+    path: string,
+    isParentTab?: boolean,
+    sectionId?: string
+  ) => void;
 }
 const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   section,
   index,
   handleSectionChange,
-  handleDeleteSubheading
+  handleDeleteSubheading,
+  handleTabClick
 }) => {
   const { sharedState } = useContext(BidContext);
   const { organizationUsers, isLoading: isOrganizationUsersLoading } =
@@ -845,7 +851,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   />
                 </div>
               </div>
-              <GenerateSectonButton section={section} />
+              <GenerateSectonButton section={section} handleTabClick={handleTabClick} bid_id={sharedState.object_id} />
             </div>
 
             {section?.highlightedDocuments?.length > 0 && (

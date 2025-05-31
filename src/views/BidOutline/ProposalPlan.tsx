@@ -1264,6 +1264,7 @@ const ProposalPlan = ({
                 selectedChoices={selectedChoices}
                 submitSelections={submitSelections}
                 handleDeleteSubheading={handleDeleteSubheading}
+                handleTabClick={handleTabClick}
               />
             )}
 
