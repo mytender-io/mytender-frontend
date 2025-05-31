@@ -66,7 +66,30 @@ const GenerateProposalModal = ({
     "Ensuring compliance with tender requirements from compliance inputs...",
     "Adding the final improvements...",
     "Almost there! Just applying the finishing touches...",
-    "Finalizing the proposal..."
+    "Finalizing the proposal...",
+    "Evaluating technical requirements...",
+    "Crafting compelling value propositions...",
+    "Integrating customer success stories...",
+    "Optimizing pricing strategy...",
+    "Reviewing competitive differentiators...",
+    "Strengthening executive summary...",
+    "Aligning with evaluation criteria...",
+    "Incorporating industry best practices...",
+    "Enhancing risk mitigation strategies...",
+    "Refining project timeline details...",
+    "Verifying technical specifications...",
+    "Strengthening partnership benefits...",
+    "Highlighting innovation opportunities...",
+    "Ensuring consistency across sections...",
+    "Applying customer-centric language...",
+    "Fine-tuning deliverables description...",
+    "Reinforcing ROI messaging...",
+    "Validating compliance checklist...",
+    "Optimizing readability and flow...",
+    "Incorporating feedback from similar wins...",
+    "Double-checking all requirements...",
+    "Preparing final document structure...",
+    "One last review for perfection..."
   ];
 
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
@@ -91,7 +114,7 @@ const GenerateProposalModal = ({
   };
 
   const startProgressBar = () => {
-    const duration = 180000; // 3:00 minutes in ms
+    const duration = 360000; // 6:00 minutes in ms
     const interval = 1000; // Update every 1000ms
     const steps = duration / interval;
     const increment = 98 / steps;
@@ -181,7 +204,7 @@ const GenerateProposalModal = ({
       posthog.capture("generating_proposal_failed", {
         bid_id,
         selected_folders: sharedState.selectedFolders,
-        error: err.message || "Failed to generate proposal"
+        error: err instanceof Error ? err.message : "Failed to generate proposal"
       });
     } finally {
       if (progressInterval.current) {
