@@ -441,6 +441,10 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       // Close the modal and reset form regardless of success/failure
       setShowConfirmClose(false);
       resetForm();
+      // Reset shared state to initial values
+      setSharedState({
+        ...initialModalState
+      });
       onHide();
     }
   };
@@ -633,7 +637,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
 
                 {currentStep === "documents" && (
                   <UploadPDF
-                    bid_id={sharedState.object_id}
+                    bid_id={sharedState.object_id || ""}
                     apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
                     onUploadComplete={(uploadedFiles) => {
                       setDocuments([...documents, ...uploadedFiles]);

@@ -16,7 +16,8 @@ import FileIcon from "@/components/icons/FileIcon";
 import { toast } from "react-toastify";
 interface UploadResult {
   error?: Error;
-  data?: any;
+  data?: unknown;
+  fileName?: string;
 }
 
 interface UploadPDFProps {
@@ -30,10 +31,6 @@ interface UploadPDFProps {
   uploadedDocuments?: File[];
   isUploadingDocuments?: boolean;
   setUploadingDocuments?: (isUploadingDocuments: boolean) => void;
-}
-
-interface UploadProgress {
-  [key: string]: number;
 }
 
 const UploadPDF: React.FC<UploadPDFProps> = ({
@@ -56,7 +53,9 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress>({});
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
+    {}
+  );
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
 
   const getFileMode = (fileType: string) => {
@@ -72,7 +71,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         return null;
     }
   };
-  const handleDrag = (e) => {
+  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     // Only handle drag events if not currently uploading
@@ -85,7 +84,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -99,7 +98,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }
   };
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Only handle file selection if not currently uploading
     if (!isUploadingDocuments && e.target.files && e.target.files.length > 0) {
       handleFiles(Array.from(e.target.files));
@@ -127,8 +126,8 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
   };
 
   const handleFiles = (newFiles: File[]) => {
-    const validFiles = [];
-    const invalidFiles = [];
+    const validFiles: File[] = [];
+    const invalidFiles: File[] = [];
 
     for (const file of newFiles) {
       if (isAllowedFileType(file)) {
@@ -177,8 +176,14 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       formData.append("profile_name", encodeURIComponent(folder));
     }
 
-    if (bid_id) {
+    // Check if the API endpoint requires bid_id
+    const requiresBidId = apiUrl.includes("uploadfile_tenderlibrary");
+
+    if (bid_id && bid_id.trim() !== "") {
       formData.append("bid_id", bid_id);
+    } else if (requiresBidId) {
+      // If endpoint requires bid_id but it's not provided, throw an error
+      throw new Error("Missing required parameter: bid_id");
     }
 
     const fileSizeInMB = file.size / (1024 * 1024);
@@ -255,7 +260,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       setSelectedFiles(uploadedDocuments);
       setUploadedFiles(uploadedDocuments.map((file) => file.name));
       setUploadProgress(
-        uploadedDocuments.reduce((acc, file) => {
+        uploadedDocuments.reduce<Record<string, number>>((acc, file) => {
           acc[file.name] = 100;
           return acc;
         }, {})
@@ -266,6 +271,13 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
   const handleUpload = async (filesToUpload = selectedFiles) => {
     if (filesToUpload.length === 0) {
       toast.error("No files selected");
+      return;
+    }
+
+    // Check if the API endpoint requires bid_id
+    const requiresBidId = apiUrl.includes("uploadfile_tenderlibrary");
+    if (requiresBidId && (!bid_id || bid_id.trim() === "")) {
+      toast.error("Cannot upload: Missing tender ID");
       return;
     }
 
@@ -292,7 +304,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       // Track successfully uploaded files
       const successfulFileNames = results
         .filter((result) => !result.error)
-        .map((result) => result.fileName);
+        .map((result) => result.fileName as string);
 
       setUploadedFiles((prev) => [...prev, ...successfulFileNames]);
 
@@ -364,7 +376,6 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
                 <Progress
                   value={hasError ? 100 : progress}
                   className={hasError ? "bg-red-200" : ""}
-                  indicatorClassName={hasError ? "bg-red-500" : ""}
                 />
               </div>
               <span
@@ -413,7 +424,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        onClick={() => !isUploadingDocuments && fileInputRef.current.click()}
+        onClick={() => !isUploadingDocuments && fileInputRef.current?.click()}
       >
         <div className="relative flex flex-col items-center">
           <input
