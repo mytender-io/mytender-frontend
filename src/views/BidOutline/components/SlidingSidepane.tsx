@@ -611,138 +611,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
 
   const [editingWritingPlan, setEditingWritingPlan] = useState(false);
 
-  // 1. Modified handleAnswererSelect function to include the correct user assignment and priority
-  const handleAnswererSelect = async (user: {
-    username?: string;
-    email?: string;
-  }) => {
-    // Extract the username and email from the user object
-    const username = user.username || "";
-    const email = user.email || "";
-
-    // Skip if no email is provided
-    if (!email) {
-      handleSectionChange(index, "answerer", username);
-      return;
-    }
-
-    // Update the section with the new answerer
-    const success = await handleSectionChange(index, "answerer", username);
-
-    if (success) {
-      // After successfully setting the answerer, create a task for them
-      try {
-        const taskData = {
-          name: `Answer section: ${section.heading}`,
-          bid_id: sharedState.object_id,
-          index: index,
-          priority: "medium", // Adding priority parameter
-          target_user: username // Adding explicit target_user parameter
-        };
-
-        // Create the task
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
-          taskData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`
-            }
-          }
-        );
-
-        if (response.data.success) {
-          // Task created successfully, now send email notification
-          const bidTitle = sharedState.bidInfo || "Untitled Bid";
-          const message = `You have been assigned to answer the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
-          const subject = `New Answer Task: ${section.heading}`;
-
-          // Send the email notification
-          await sendOrganizationEmail({
-            recipient: email,
-            message,
-            subject,
-            token: tokenRef.current,
-            onSuccess: () => {},
-            onError: (error) => {}
-          });
-        } else {
-          console.error("Error creating answer task:", response.data.error);
-          toast.error("Failed to assign task to answerer");
-        }
-      } catch (error) {
-        console.error("Error creating task for answerer:", error);
-        toast.error("Failed to assign task to answerer");
-      }
-    }
-  };
-
-  // 2. Modified handleReviewerSelect function to include the correct user assignment and priority
-  const handleReviewerSelect = async (user: {
-    username?: string;
-    email?: string;
-  }) => {
-    // Extract the username and email from the user object
-    const username = user.username || "";
-    const email = user.email || "";
-
-    // Skip if no email is provided
-    if (!email) {
-      handleSectionChange(index, "reviewer", username);
-      return;
-    }
-
-    // Update the section with the new reviewer
-    const success = await handleSectionChange(index, "reviewer", username);
-
-    if (success) {
-      // After successfully setting the reviewer, create a task for them
-      try {
-        const taskData = {
-          name: `Review section: ${section.heading}`,
-          bid_id: sharedState.object_id,
-          index: index,
-          priority: "high", // Adding priority parameter with higher priority for reviews
-          target_user: username // Adding explicit target_user parameter
-        };
-
-        // Create the task
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
-          taskData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`
-            }
-          }
-        );
-
-        if (response.data.success) {
-          // Task created successfully, now send email notification
-          const bidTitle = sharedState.bidInfo || "Untitled Bid";
-          const message = `You have been assigned to review the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
-          const subject = `New Review Task: ${section.heading}`;
-
-          // Send the email notification
-          await sendOrganizationEmail({
-            recipient: email,
-            message,
-            subject,
-            token: tokenRef.current,
-            onSuccess: () => {},
-            onError: (error) => {}
-          });
-        } else {
-          console.error("Error creating reviewer task:", response.data.error);
-          toast.error("Failed to assign task to reviewer");
-        }
-      } catch (error) {
-        console.error("Error creating task for reviewer:", error);
-        toast.error("Failed to assign task to reviewer");
-      }
-    }
-  };
-
   const [headingWidth, setHeadingWidth] = useState<number>(0);
   const textMeasureRef = useRef<HTMLSpanElement>(null);
 
@@ -795,28 +663,14 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 }}
               />
             </div>
-            <div className="flex items-center gap-2">
-              {/* Assigned User */}
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-medium"> Answerer:</span>
-                <SelectOrganisationUserButton
-                  selectedUser={section.answerer}
-                  onSelectUser={handleAnswererSelect}
-                  organizationUsers={organizationUsers}
-                  isReviewReady={section.review_ready}
-                />
-              </div>
-              {/* Reviewer - positioned with negative margin for overlap */}
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-medium"> Reviewer:</span>
-                <SelectOrganisationUserButton
-                  selectedUser={section.reviewer}
-                  onSelectUser={handleReviewerSelect}
-                  organizationUsers={organizationUsers}
-                />
-              </div>
-            </div>
           </div>
+          <DebouncedTextArea
+            value={section.question}
+            onChange={(value) => handleSectionChange(index, "question", value)}
+            rows={3}
+            className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-none p-0 rounded-lg !leading-relaxed"
+            placeholder="Add in the question here"
+          />
           <div className="px-4 space-y-6">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -845,7 +699,25 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                   />
                 </div>
               </div>
-              <GenerateSectonButton section={section} />
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Word count:</span>
+                  <Input
+                    type="number"
+                    value={section.word_count || 0}
+                    min={0}
+                    step={50}
+                    className="w-20 text-center h-9"
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (!isNaN(value) && value >= 0) {
+                        handleSectionChange(index, "word_count", value);
+                      }
+                    }}
+                  />
+                </div>
+                <GenerateSectonButton section={section} />
+              </div>
             </div>
 
             {section?.highlightedDocuments?.length > 0 && (

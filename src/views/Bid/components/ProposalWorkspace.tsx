@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import ProposalPlan from "@/views/BidOutline/ProposalPlan";
 import ProposalPreview from "@/views/ProposalPreview/ProposalPreview";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -15,6 +15,13 @@ import { motion } from "framer-motion";
 import { cn } from "@/utils";
 import GenerateProposalModal from "@/modals/GenerateProposalModal";
 import { GenerationProvider } from "@/context/GeneratingSectionContext";
+import SelectOrganisationUserButton from "@/buttons/SelectOrganisationUserButton";
+import { useUserData } from "@/context/UserDataContext";
+import { useAuthUser } from "react-auth-kit";
+import axios from "axios";
+import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
+import { toast } from "react-toastify";
+import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 
 interface ProposalWorkspaceProps {
   openTask: (taskId: string | null, sectionIndex: string | null) => void;
@@ -41,8 +48,10 @@ const ProposalWorkspace = ({
   handleActiveSectionChange,
   activeTab
 }: ProposalWorkspaceProps) => {
-  const { sharedState } = useContext(BidContext);
+  const { sharedState, setSharedState } = useContext(BidContext);
   const { outline } = sharedState;
+  const { organizationUsers, isLoading: isOrganizationUsersLoading } =
+    useUserData();
 
   const totalSections = outline.length;
 
@@ -53,6 +62,10 @@ const ProposalWorkspace = ({
   const [slideDirection, setSlideDirection] = useState<"left" | "right">(
     "right"
   );
+
+  const getAuth = useAuthUser();
+  const auth = getAuth();
+  const tokenRef = useRef(auth?.token || "default");
 
   // Initialize the active view based on the activeTab prop
   useEffect(() => {
@@ -78,6 +91,192 @@ const ProposalWorkspace = ({
       handleActiveSectionChange(outline[index].section_id);
     }
   }, [activeSectionId, outline]);
+
+  const handleSectionChange = async (
+    index: number,
+    field: string,
+    value: any
+  ) => {
+    try {
+      // Create new outline by properly spreading nested objects
+      const newOutline = [...sharedState.outline];
+
+      // If changing a field other than status and current status is "Not Started", update status to "In Progress"
+      if (field !== "status" && newOutline[index].status === "Not Started") {
+        newOutline[index] = {
+          ...newOutline[index],
+          [field]: value,
+          status: "In Progress"
+        };
+      } else {
+        newOutline[index] = {
+          ...newOutline[index],
+          [field]: value
+        };
+      }
+
+      // Update state using callback to ensure we have latest state
+      setSharedState((prevState) => ({
+        ...prevState,
+        outline: newOutline
+      }));
+
+      // Wait for state to update
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      return true; // Indicate successful update
+    } catch (error) {
+      console.error("Error updating section:", error);
+      toast.error("Failed to update section");
+      return false;
+    }
+  };
+
+  // 1. Modified handleAnswererSelect function to include the correct user assignment and priority
+  const handleAnswererSelect = async (user: {
+    username?: string;
+    email?: string;
+  }) => {
+    if (!activeSectionIndex) return;
+
+    // Extract the username and email from the user object
+    const username = user.username || "";
+    const email = user.email || "";
+    const section = outline[activeSectionIndex];
+
+    // Skip if no email is provided
+    if (!email) {
+      handleSectionChange(activeSectionIndex, "answerer", username);
+      return;
+    }
+
+    // Update the section with the new answerer
+    const success = await handleSectionChange(
+      activeSectionIndex,
+      "answerer",
+      username
+    );
+
+    if (success) {
+      // After successfully setting the answerer, create a task for them
+      try {
+        const taskData = {
+          name: `Answer section: ${section.heading}`,
+          bid_id: sharedState.object_id,
+          index: activeSectionIndex,
+          priority: "medium", // Adding priority parameter
+          target_user: username // Adding explicit target_user parameter
+        };
+
+        // Create the task
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
+          taskData,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`
+            }
+          }
+        );
+
+        if (response.data.success) {
+          // Task created successfully, now send email notification
+          const bidTitle = sharedState.bidInfo || "Untitled Bid";
+          const message = `You have been assigned to answer the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
+          const subject = `New Answer Task: ${section.heading}`;
+
+          // Send the email notification
+          await sendOrganizationEmail({
+            recipient: email,
+            message,
+            subject,
+            token: tokenRef.current,
+            onSuccess: () => {},
+            onError: (error) => {}
+          });
+        } else {
+          console.error("Error creating answer task:", response.data.error);
+          toast.error("Failed to assign task to answerer");
+        }
+      } catch (error) {
+        console.error("Error creating task for answerer:", error);
+        toast.error("Failed to assign task to answerer");
+      }
+    }
+  };
+
+  // 2. Modified handleReviewerSelect function to include the correct user assignment and priority
+  const handleReviewerSelect = async (user: {
+    username?: string;
+    email?: string;
+  }) => {
+    if (!activeSectionIndex) return;
+
+    // Extract the username and email from the user object
+    const username = user.username || "";
+    const email = user.email || "";
+    const section = outline[activeSectionIndex];
+
+    // Skip if no email is provided
+    if (!email) {
+      handleSectionChange(activeSectionIndex, "reviewer", username);
+      return;
+    }
+
+    // Update the section with the new reviewer
+    const success = await handleSectionChange(
+      activeSectionIndex,
+      "reviewer",
+      username
+    );
+
+    if (success) {
+      // After successfully setting the reviewer, create a task for them
+      try {
+        const taskData = {
+          name: `Review section: ${section.heading}`,
+          bid_id: sharedState.object_id,
+          index: activeSectionIndex,
+          priority: "high", // Adding priority parameter with higher priority for reviews
+          target_user: username // Adding explicit target_user parameter
+        };
+
+        // Create the task
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/set_user_task`,
+          taskData,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`
+            }
+          }
+        );
+
+        if (response.data.success) {
+          // Task created successfully, now send email notification
+          const bidTitle = sharedState.bidInfo || "Untitled Bid";
+          const message = `You have been assigned to review the section "${section.heading}" in bid "${bidTitle}". You can access this task from your dashboard.`;
+          const subject = `New Review Task: ${section.heading}`;
+
+          // Send the email notification
+          await sendOrganizationEmail({
+            recipient: email,
+            message,
+            subject,
+            token: tokenRef.current,
+            onSuccess: () => {},
+            onError: (error) => {}
+          });
+        } else {
+          console.error("Error creating reviewer task:", response.data.error);
+          toast.error("Failed to assign task to reviewer");
+        }
+      } catch (error) {
+        console.error("Error creating task for reviewer:", error);
+        toast.error("Failed to assign task to reviewer");
+      }
+    }
+  };
 
   const handleSectionNavigation = (direction: "prev" | "next") => {
     if (activeSectionIndex === null) return;
@@ -141,6 +340,10 @@ const ProposalWorkspace = ({
     }
   };
 
+  // Get the current active section
+  const activeSection =
+    activeSectionIndex !== null ? outline[activeSectionIndex] : null;
+
   return (
     <GenerationProvider>
       <div className="flex flex-col h-full w-full relative">
@@ -196,6 +399,32 @@ const ProposalWorkspace = ({
             </Button>
           </div>
         )}
+
+        {/* User assignment controls moved to top right */}
+        {activeSectionIndex !== null && activeSection && (
+          <div className="absolute top-1 right-1 flex items-center gap-2 z-10">
+            {/* Assigned User */}
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-medium">Answerer:</span>
+              <SelectOrganisationUserButton
+                selectedUser={activeSection.answerer}
+                onSelectUser={handleAnswererSelect}
+                organizationUsers={organizationUsers}
+                isReviewReady={activeSection.review_ready}
+              />
+            </div>
+            {/* Reviewer */}
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-medium">Reviewer:</span>
+              <SelectOrganisationUserButton
+                selectedUser={activeSection.reviewer}
+                onSelectUser={handleReviewerSelect}
+                organizationUsers={organizationUsers}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Tabs for switching between Plan and Write views */}
         <Tabs
           defaultValue={activeView}
