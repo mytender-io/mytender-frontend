@@ -228,24 +228,22 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               </div>
             </span>
 
-            {activeTab === "/bid-extractor" && (
-              <div className="flex flex-col ml-4 border-l border-gray-200">
-                {tenderTabs.map((tab, index) => (
-                  <span
-                    key={index}
-                    className={cn(
-                      baseSubTabStyles,
-                      activeTab === "/bid-extractor" &&
-                        activeSubTab === tab.stateKey &&
-                        activeSubTabStyles
-                    )}
-                    onClick={() => handleSubTabClick(tab.stateKey)}
-                  >
-                    {tab.name}
-                  </span>
-                ))}
-              </div>
-            )}
+            <div className="flex flex-col ml-4 border-l border-gray-200">
+              {tenderTabs.map((tab, index) => (
+                <span
+                  key={index}
+                  className={cn(
+                    baseSubTabStyles,
+                    activeTab === "/bid-extractor" &&
+                      activeSubTab === tab.stateKey &&
+                      activeSubTabStyles
+                  )}
+                  onClick={() => handleSubTabClick(tab.stateKey)}
+                >
+                  {tab.name}
+                </span>
+              ))}
+            </div>
 
             <span
               className={cn(
@@ -324,19 +322,18 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
               </Button>
             </div>
 
-             <span
+            <span
               className={cn(
                 baseNavLinkStyles,
                 activeTab === "/full-proposal" && activeNavLinkStyles
               )}
-              onClick={() => handleTabClick( "/full-proposal")}
+              onClick={() => handleTabClick("/full-proposal")}
             >
               <div className="flex items-center gap-2">
                 <DocIcon className="w-5 h-5" />
                 Full Proposal
               </div>
             </span>
-
           </>
         )}
       </div>
