@@ -149,7 +149,10 @@ const SelectCaseStudy = ({}) => {
       const { documents, message } = response.data;
 
       if (!documents || documents.length === 0) {
-        toast.info(message || "No relevant case studies found");
+        toast.info(
+          message ||
+            "No relevant case studies found, upload some to the Case Studies folder in the Library"
+        );
         return;
       }
 
