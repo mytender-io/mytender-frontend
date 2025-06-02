@@ -265,7 +265,7 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
     try {
       // Make API call to expand text using copilot endpoint
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/copilot`,
+        `http${HTTP_PREFIX}://${API_URL}/copilot/expanded_or_summarise`,
         {
           input_text: selectedText,
           extra_instructions: "",
@@ -354,7 +354,7 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
     try {
       // Make API call to get summary using copilot endpoint
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/copilot`,
+        `http${HTTP_PREFIX}://${API_URL}/copilot/expanded_or_summarise`,
         {
           input_text: selectedText,
           extra_instructions: "",

@@ -502,9 +502,15 @@ const ProposalPreviewSidepane = ({
 
     try {
       const copilot_mode = "4" + question.toLowerCase().replace(/\s+/g, "_");
+      let url;
+      if (copilot_mode.includes("expand") || copilot_mode.includes("summarise")) {
+        url = `http${HTTP_PREFIX}://${API_URL}/copilot/expanded_or_summarise`;
+      } else {
+        url = `http${HTTP_PREFIX}://${API_URL}/copilot`;
+      }
 
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/copilot`,
+       url,
         {
           input_text: promptTarget,
           extra_instructions: "",

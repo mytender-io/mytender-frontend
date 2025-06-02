@@ -122,11 +122,16 @@ const QAGenerator = () => {
     setCopilotLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
     console.log(selectedBidId);
-
+    let url;
+    if (copilot_mode.includes("expand") || copilot_mode.includes("summarise")) {
+      url = `http${HTTP_PREFIX}://${API_URL}/copilot/expanded_or_summarise`;
+    } else {
+      url = `http${HTTP_PREFIX}://${API_URL}/copilot`;
+    }
     try {
       const requests = [
         axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/copilot`,
+          url,
           {
             input_text: copilotInput,
             extra_instructions: instructions,
