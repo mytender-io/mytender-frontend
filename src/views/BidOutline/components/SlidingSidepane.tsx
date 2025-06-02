@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import DebouncedTextArea from "./DebouncedTextArea";
 // import SubheadingCards from "./SubheadingCards";
 import { BidContext, Section } from "../../BidWritingStateManagerView";
-// import ReviewerDropdown from "@/views/BidOutline/components/ReviewerDropdown";
 import QuestionTypeDropdown from "@/views/BidOutline/components/QuestionTypeDropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,12 +21,18 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { MarkdownRenderer } from "@/components/Markdown";
 import StatusMenu from "@/buttons/StatusMenu";
-import SelectOrganisationUserButton from "@/buttons/SelectOrganisationUserButton";
 import { useUserData } from "@/context/UserDataContext";
-import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
 import GenerateSectonButton from "@/components/GenerateSectionButton";
+import {
+  MDXEditor,
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
+  thematicBreakPlugin,
+  markdownShortcutPlugin
+} from "@mdxeditor/editor";
+import "@mdxeditor/editor/style.css";
 
 interface HighlightedDocument {
   name: string;
@@ -609,8 +614,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
     );
   };
 
-  const [editingWritingPlan, setEditingWritingPlan] = useState(false);
-
   const [headingWidth, setHeadingWidth] = useState<number>(0);
   const textMeasureRef = useRef<HTMLSpanElement>(null);
 
@@ -828,35 +831,21 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-lg font-semibold">Writing Plan</span>
-                  {editingWritingPlan && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setEditingWritingPlan(false)}
-                      className="ml-auto"
-                    >
-                      Save
-                    </Button>
-                  )}
                 </div>
-                {editingWritingPlan ? (
-                  <DebouncedTextArea
-                    value={section.writingplan}
-                    onChange={(value) =>
-                      handleSectionChange(index, "writingplan", value)
-                    }
-                    className="w-full focus:outline-none focus-visible:ring-0 font-mono"
-                    placeholder="Enter Markdown content here..."
-                    rows={20}
-                  />
-                ) : (
-                  <div
-                    onClick={() => setEditingWritingPlan(true)}
-                    className="cursor-pointer"
-                  >
-                    <MarkdownRenderer content={section.writingplan} />
-                  </div>
-                )}
+                <MDXEditor
+                  markdown={section.writingplan || ""}
+                  onChange={(value) =>
+                    handleSectionChange(index, "writingplan", value)
+                  }
+                  className="border rounded-md"
+                  plugins={[
+                    headingsPlugin(),
+                    listsPlugin(),
+                    quotePlugin(),
+                    thematicBreakPlugin(),
+                    markdownShortcutPlugin()
+                  ]}
+                />
               </div>
             ) : null}
             {/* <SubheadingCards
