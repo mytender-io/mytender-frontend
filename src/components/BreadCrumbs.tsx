@@ -24,12 +24,9 @@ const BreadCrumbs = ({
     );
   }
 
-  // Parse the folder path and filter out the "case_studies_collection" part
-  const allParts = activeFolder.split("FORWARDSLASH");
-  
-  // Remove "case_studies_collection" from the breadcrumb path
-  const parts = allParts.filter(part => part !== "case_studies_collection");
-  
+  // Parse the folder path
+  const parts = activeFolder.split("FORWARDSLASH");
+ 
   return (
     <div className="flex items-center gap-2">
       <span
@@ -38,13 +35,11 @@ const BreadCrumbs = ({
       >
         {rootFolderName}
       </span>
-      
+     
       {parts.map((part: string, index: number) => {
-        // Calculate the actual path for this breadcrumb piece
-        // We need to reconstruct the proper path with case_studies_collection included
-        const pathIndex = allParts.indexOf(part);
-        const actualPath = allParts.slice(0, pathIndex + 1).join("FORWARDSLASH");
-        
+        // Calculate the path for this breadcrumb piece
+        const currentPath = parts.slice(0, index + 1).join("FORWARDSLASH");
+       
         return (
           <React.Fragment key={index}>
             <span className="mx-2 text-gray-400">&gt;</span>
@@ -56,8 +51,7 @@ const BreadCrumbs = ({
               }`}
               onClick={() => {
                 if (index < parts.length - 1) {
-                  // Use the actual path when setting active folder
-                  setActiveFolder(actualPath);
+                  setActiveFolder(currentPath);
                 }
               }}
             >

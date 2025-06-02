@@ -52,44 +52,20 @@ const SelectFile: React.FC<SelectFileProps> = ({
   const itemsPerPage = 10;
 
   const getTopLevelFolders = () => {
-    // For case studies, we don't exclude FORWARDSLASH if apiEndpoint is get_case_studies
-    const isCaseStudies = apiEndpoint === "get_case_studies";
+    // Original behavior for regular collections
+    const folders = availableCollections.filter(
+      (collection: string) =>
+        !collection.includes("FORWARDSLASH") &&
+        !collection.startsWith("TenderLibrary_") &&
+        collection !== "default"
+    );
 
-    if (isCaseStudies) {
-      // For case studies endpoint, only include direct children of case_studies_collection
-      const caseStudyFolders = availableCollections
-        .filter((collection: string) => {
-          const parts = collection.split("FORWARDSLASH");
-          return (
-            parts.length === 2 &&
-            collection.startsWith("case_studies_collection")
-          );
-        })
-        .map((collection: string) => {
-          const parts = collection.split("FORWARDSLASH");
-          // Return full path for navigation
-          return collection;
-        });
-
-      return caseStudyFolders.sort((a: string, b: string) =>
-        a.localeCompare(b)
-      );
-    } else {
-      // Original behavior for regular collections
-      const folders = availableCollections.filter(
-        (collection: string) =>
-          !collection.includes("FORWARDSLASH") &&
-          !collection.startsWith("TenderLibrary_") &&
-          collection !== "default"
-      );
-
-      // Sort the folders to put "default" first
-      return folders.sort((a: string, b: string) => {
-        if (a === "default") return -1;
-        if (b === "default") return 1;
-        return a.localeCompare(b);
-      });
-    }
+    // Sort the folders to put "default" first
+    return folders.sort((a: string, b: string) => {
+      if (a === "default") return -1;
+      if (b === "default") return 1;
+      return a.localeCompare(b);
+    });
   };
 
   const fetchFolderStructure = async () => {
@@ -100,19 +76,11 @@ const SelectFile: React.FC<SelectFileProps> = ({
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
 
-      // Handle different response structures based on the endpoint
-      if (apiEndpoint === "get_case_studies") {
-        setAvailableCollections(response.data.case_studies || []);
-      } else {
-        setAvailableCollections(response.data.collections || []);
-      }
+      setAvailableCollections(response.data.collections || []);
 
       // Build the folder structure regardless of the endpoint
       const structure = {};
-      const collections =
-        apiEndpoint === "get_case_studies"
-          ? response.data.case_studies || []
-          : response.data.collections || [];
+      const collections = response.data.collections || [];
 
       collections.forEach((collectionName) => {
         const parts = collectionName.split("FORWARDSLASH");
@@ -317,13 +285,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
     if (typeof name !== "string") return "";
     return name.replace(/_/g, " ");
   };
-
-  // For case studies, extract just the folder name from the path
   const getDisplayName = (path) => {
-    if (apiEndpoint === "get_case_studies" && path.includes("FORWARDSLASH")) {
-      const parts = path.split("FORWARDSLASH");
-      return formatDisplayName(parts[parts.length - 1]);
-    }
     return path === "default" ? rootFolderName : formatDisplayName(path);
   };
 
@@ -411,11 +373,7 @@ const SelectFile: React.FC<SelectFileProps> = ({
             <BreadCrumbs
               activeFolder={activeFolder}
               setActiveFolder={setActiveFolder}
-              rootFolderName={
-                apiEndpoint === "get_case_studies"
-                  ? "Case Studies"
-                  : rootFolderName
-              }
+              rootFolderName={rootFolderName}
             />
             {activeFolder && (
               <Button
