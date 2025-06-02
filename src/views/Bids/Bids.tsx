@@ -515,6 +515,11 @@ const Bids = () => {
     fetchBids();
   };
 
+   const handleFail = () => {
+    handleModalClose();
+    fetchBids();
+  };
+
   const parentPages = [] as Array<{ name: string; path: string }>;
 
   // Check if this is the user's first visit
@@ -762,6 +767,7 @@ const Bids = () => {
           show={showModal}
           onHide={handleModalClose}
           onSuccess={handleSuccess}
+          onFail={handleFail}
           existingBids={bids}
           fetchBids={fetchBids}
           isGeneratingOutline={isGeneratingOutline}

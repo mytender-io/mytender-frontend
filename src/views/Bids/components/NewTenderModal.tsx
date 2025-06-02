@@ -29,6 +29,7 @@ interface NewTenderModalProps {
   show: boolean;
   onHide: () => void;
   onSuccess: () => void;
+  onFail: () => void;
   existingBids: Array<{ bid_title: string }>;
   fetchBids: () => void;
   isGeneratingOutline: boolean;
@@ -43,6 +44,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   show,
   onHide,
   onSuccess,
+  onFail,
   existingBids,
   fetchBids,
   isGeneratingOutline,
@@ -351,7 +353,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
 
       // Reset shared state to initial values while preserving user info
       setSharedState({
-        ...initialModalState,
+        ...initialModalState
       });
     }
   }, [show]);
@@ -374,6 +376,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     } else {
       toast.error("Failed to generate outline");
     }
+    onFail();
   };
 
   const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -675,15 +678,14 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
                   onClick={handleNextStep}
                   disabled={isBidCreating}
                 >
-                {isBidCreating ? (
+                  {isBidCreating ? (
                     <>
                       <Spinner className="mr-2 h-4 w-4" color="text-white" />
                       Creating Bid...
                     </>
                   ) : (
                     "Next Step →"
-                  )} 
-                
+                  )}
                 </Button>
               ) : currentStep === "questions" ? (
                 <Button type="submit" disabled={isGeneratingOutline}>
