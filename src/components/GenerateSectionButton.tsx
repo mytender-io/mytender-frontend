@@ -25,10 +25,15 @@ const GenerateSectonButton: React.FC<GenerateSectonButtonProps> = ({
   const isThisSectionGenerating =
     isGenerating && generatingSectionId === section.section_id;
 
+  // Check if this section already has content generated
+  const isAlreadyGenerated = Boolean(section.answer && section.answer.trim());
+
   const handleClick = () => {
     // If any section is generating (including this one), show simple toast
     if (isGenerating) {
-      toast.warning("Please wait until the section you clicked has finished generating");
+      toast.warning(
+        "Please wait until the section you clicked has finished generating"
+      );
       return;
     }
 
@@ -102,7 +107,7 @@ const GenerateSectonButton: React.FC<GenerateSectonButtonProps> = ({
         ) : (
           <>
             <ArrowRight className="h-4 w-4" />
-            Generate Section
+            {isAlreadyGenerated ? "Re-generate Section" : "Generate Section"}
           </>
         )}
       </Button>
