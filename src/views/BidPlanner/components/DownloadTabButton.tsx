@@ -48,7 +48,6 @@ const DownloadTabButton: React.FC<DownloadTabButtonProps> = ({
       formData.append("bid_id", object_id);
       formData.append("tab_name", currentTab.name);
       formData.append("content", currentContent);
-      formData.append("content_type", currentTab.stateKey);
 
       const response = await axios({
         method: "post",
