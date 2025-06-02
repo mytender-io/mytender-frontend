@@ -309,7 +309,7 @@ const TenderLibrary = ({ object_id }) => {
     }
 
     return (
-      <div className="h-[500px] overflow-auto">
+      <div className="overflow-y-auto h-full max-w-5xl mx-auto">
         {/* Fixed height container with scroll */}
         <div className="space-y-6 px-4">
           {/* Added padding to prevent content touching edges */}
@@ -398,11 +398,7 @@ const TenderLibrary = ({ object_id }) => {
     );
   };
 
-  return (
-    <div className="w-full">
-      <div id="tender-library">{renderLibraryView()}</div>
-    </div>
-  );
+  return <div className="w-full h-full py-4">{renderLibraryView()}</div>;
 };
 
 export default TenderLibrary;
