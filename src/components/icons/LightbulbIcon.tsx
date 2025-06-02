@@ -4,7 +4,7 @@ import IconProps from ".";
 const LightbulbIcon: React.FC<IconProps> = ({
   className,
   width = 16,
-  height = 16,
+  height = 16
 }) => {
   return (
     <svg
@@ -15,7 +15,7 @@ const LightbulbIcon: React.FC<IconProps> = ({
       fill="none"
       className={className}
     >
-      <g clip-path="url(#clip0_5672_3341)">
+      <g clipPath="url(#clip0_5672_3341)">
         <path
           d="M8.96703 15.3457H7.05078"
           stroke="currentColor"

@@ -15,7 +15,7 @@ const CheckIcon: React.FC<IconProps> = ({
       fill="none"
       className={className}
     >
-      <g clip-path="url(#clip0_4991_2311)">
+      <g clipPath="url(#clip0_4991_2311)">
         <path
           d="M9.59121 0.408691L3.0041 9.59072L0.40918 6.9958"
           stroke="currentColor"
