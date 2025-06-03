@@ -18,35 +18,35 @@ const ParagraphIcon: React.FC<IconProps> = ({
       <path
         d="M0.654297 14.7056H11.513"
         stroke="currentColor"
-        strokeWidth="0.67"
+        strokeWidth="1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M0.654297 1.93066H15.3455"
         stroke="currentColor"
-        strokeWidth="0.67"
+        strokeWidth="1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M0.654297 5.12451H15.3455"
         stroke="currentColor"
-        strokeWidth="0.67"
+        strokeWidth="1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M0.654297 8.31787H15.3455"
         stroke="currentColor"
-        strokeWidth="0.67"
+        strokeWidth="1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M0.654297 11.5117H15.3455"
         stroke="currentColor"
-        strokeWidth="0.67"
+        strokeWidth="1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

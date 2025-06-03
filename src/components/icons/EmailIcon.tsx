@@ -18,14 +18,14 @@ const EmailIcon: React.FC<IconProps> = ({
       <path
         d="M0.654297 2.86035H15.3455V13.0804H0.654297V2.86035Z"
         stroke="currentColor"
-        strokeWidth="0.67"
+        strokeWidth="1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M14.9696 3.23242L8.00016 8.92879L1.03076 3.23242"
         stroke="currentColor"
-        strokeWidth="0.67"
+        strokeWidth="1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

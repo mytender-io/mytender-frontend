@@ -69,7 +69,7 @@ const LoadingSpinner = ({ width = 51, height = 52 }: LoadingSpinnerProps) => {
           key={idx}
           d={paths[idx]}
           stroke="#FF8019"
-          strokeWidth="0.67"
+          strokeWidth="1"
           strokeLinecap="round"
           strokeLinejoin="round"
         />

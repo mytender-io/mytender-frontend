@@ -18,7 +18,7 @@ const ItalicIcon: React.FC<IconProps> = ({
       <path
         d="M4.71484 1.43018H11.2848M11.2848 14.5702H4.71484M7.99984 1.43018L7.99983 14.5702"
         stroke="currentColor"
-        strokeWidth="0.67"
+        strokeWidth="1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
