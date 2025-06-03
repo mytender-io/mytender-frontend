@@ -27,7 +27,11 @@ interface OutlineInstructionsModalProps {
   bid_id: string;
 }
 
-const OutlineInstructionsModal = ({ show, onHide, bid_id }: OutlineInstructionsModalProps) => {
+const OutlineInstructionsModal = ({
+  show,
+  onHide,
+  bid_id
+}: OutlineInstructionsModalProps) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -158,6 +162,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }: OutlineInstructionsM
       ...prevState,
       selectedFolders: folders
     }));
+    console.log(folders);
   };
 
   const resetModalState = () => {
@@ -182,7 +187,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }: OutlineInstructionsM
 
     const datasets = Array.isArray(sharedState.selectedFolders)
       ? sharedState.selectedFolders
-      : ["default"];
+      : [];
 
     try {
       const response = await axios.post(
@@ -241,11 +246,15 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id }: OutlineInstructionsM
         clearInterval(progressInterval.current);
       }
 
-      const isTimeoutError = err instanceof Error && 
-        ('code' in err && err.code === "ECONNABORTED" || err.message?.includes("timeout"));
-      
-      const isNotFoundError = err instanceof Error && 
-        'response' in err && (err as { response?: { status?: number } }).response?.status === 404;
+      const isTimeoutError =
+        err instanceof Error &&
+        (("code" in err && err.code === "ECONNABORTED") ||
+          err.message?.includes("timeout"));
+
+      const isNotFoundError =
+        err instanceof Error &&
+        "response" in err &&
+        (err as { response?: { status?: number } }).response?.status === 404;
 
       if (isTimeoutError) {
         toast.error(

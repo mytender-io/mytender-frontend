@@ -295,10 +295,10 @@ const Bid = () => {
                   activeTab={activeTab}
                 />
               )}
-               {(activeTab === "/full-proposal") && (
-                 <FullProposal   handleTabClick={handleTabClick}/>
+              {activeTab === "/full-proposal" && (
+                <FullProposal handleTabClick={handleTabClick} />
               )}
-               
+
               <OutlineInstructionsModal
                 show={showModal}
                 onHide={() => setShowModal(false)}

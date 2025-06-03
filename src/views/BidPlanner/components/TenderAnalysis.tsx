@@ -37,6 +37,8 @@ import {
   getTabIndexByStateKey
 } from "../../../utils/tenderTabsConfig";
 import DownloadTabButton from "./DownloadTabButton";
+import DownloadIcon from "@/components/icons/DownloadIcon";
+import DownloadAllInsightsButton from "./DownloadAllInsightsButton";
 
 interface TenderInsightData {
   requirements?: string;
@@ -668,18 +670,19 @@ const TenderAnalysis = ({
 
   return (
     <div>
-      {/* <div className="bg-gray-100 border border-gray-line rounded-md p-2 mb-4">
+      <div className="mb-4">
         <div className="flex w-full items-center gap-2">
-          <Button
-            onClick={() => setChatDialogOpen(true)}
-            variant="outline"
-            className="w-full justify-start border-gray-spacer_light hover:bg-background hover:text-current"
-          >
+          <DownloadAllInsightsButton
+            object_id={object_id}
+            currentTabIndex={currentTabIndex}
+            tabContent={tabContent}
+            auth={auth}
+          />
+
+          <Button onClick={() => setChatDialogOpen(true)} variant="outline">
             <div className="flex items-center space-x-3">
-              <FileSearch className="h-5 w-5 text-gray" />
-              <span className="text-gray-hint_text font-medium">
-                Ask questions about the tender...
-              </span>
+              <FileSearch className="h-5 w-5" />
+              <span>Tender Chat</span>
             </div>
           </Button>
 
@@ -690,20 +693,8 @@ const TenderAnalysis = ({
               onOpenChange={setChatDialogOpen}
             />
           )}
-
-          {object_id && (
-            <InterrogateTenderDialog
-              bid_id={object_id}
-              triggerComponent={
-                <Button>
-                  <Search className="h-5 w-5 text-white" />
-                  Query Docs
-                </Button>
-              }
-            />
-          )}
         </div>
-      </div> */}
+      </div>
       <div className={cn("h-full border border-gray-line rounded-md mb-4")}>
         <Tabs
           value={currentTabIndex.toString()}
@@ -779,15 +770,6 @@ const TenderAnalysis = ({
                 value={index.toString()}
                 className="h-full pt-0 mt-0"
               >
-                <div className="flex justify-end mb-4 px-8 pt-4">
-                  <DownloadTabButton
-                    object_id={object_id}
-                    currentTabIndex={currentTabIndex}
-                    tabContent={tabContent}
-                    auth={auth}
-                    className="ml-auto"
-                  />
-                </div>
                 <div className={cn("relative px-8 py-4 h-full")}>
                   {tab.stateKey === "differentiation_opportunities" &&
                     object_id && (
