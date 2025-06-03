@@ -31,7 +31,9 @@ const SelectFolder: React.FC<SelectFolderProps> = ({
   const [totalPages, setTotalPages] = useState(0);
   const [activeFolder, setActiveFolder] = useState(null);
   const [selectedFolders, setSelectedFolders] = useState(() => {
-    const initialSelection = new Set([...initialSelectedFolders, "default"]);
+    const initialSelection = new Set(
+      initialSelectedFolders.filter((folder) => folder !== "default")
+    );
     return Array.from(initialSelection);
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -47,17 +49,12 @@ const SelectFolder: React.FC<SelectFolderProps> = ({
     const folders = availableCollections.filter(
       (collection: string) =>
         !collection.includes("FORWARDSLASH") &&
-        !collection.startsWith("TenderLibrary_")
+        !collection.startsWith("TenderLibrary_") &&
+        collection !== "default"
     );
 
-    // Sort the folders to put "default" first
-    return folders.sort((a: string, b: string) => {
-      if (a === "default") return -1;
-      if (b === "default") return 1;
-      return a.localeCompare(b);
-    });
+    return folders.sort((a: string, b: string) => a.localeCompare(b));
   };
-
   const fetchFolderStructure = async () => {
     try {
       const response = await axios.post(
@@ -194,36 +191,6 @@ const SelectFolder: React.FC<SelectFolderProps> = ({
     return name.replace(/_/g, " ");
   };
 
-  const renderFolderStructure = () => {
-    const topLevelFolders = getTopLevelFolders();
-    const foldersToRender = topLevelFolders;
-
-    return foldersToRender.map((folderName) => {
-      const displayName =
-        folderName === "default"
-          ? "Whole Content Library"
-          : formatDisplayName(folderName);
-      return (
-        <TableRow key={folderName}>
-          <TableCell className="flex items-center gap-4">
-            <Checkbox
-              checked={selectedFolders.includes(folderName)}
-              onCheckedChange={() => handleFolderSelect(folderName)}
-            >
-              <div
-                className="flex items-center gap-2"
-                onClick={() => handleFolderClick(folderName)}
-              >
-                {/* <FolderIcon className="h-4 w-4" /> */}
-                <span className="text-sm">{displayName}</span>
-              </div>
-            </Checkbox>
-          </TableCell>
-        </TableRow>
-      );
-    });
-  };
-
   const renderFolderContents = (folderPath) => {
     const contents = folderContents[folderPath] || [];
     //console.log("Raw contents:", contents);
@@ -337,9 +304,7 @@ const SelectFolder: React.FC<SelectFolderProps> = ({
                             >
                               <FolderIcon className="h-4 w-4" />
                               <span className="text-sm">
-                                {folder === "default"
-                                  ? "Whole Content Library"
-                                  : formatDisplayName(folder)}
+                                {formatDisplayName(folder)}
                               </span>
                             </div>
                           </TableCell>

@@ -103,7 +103,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
     isLoading: false,
     saveSuccess: null,
     object_id: null,
-    selectedFolders: ["default"],
+    selectedFolders: [],
     outline: [],
     win_themes: [],
     customer_pain_points: [],
@@ -164,6 +164,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
       ...prevState,
       selectedFolders: folders
     }));
+    console.log(folders);
   };
 
   const isDocumentsStepValid = () => {
