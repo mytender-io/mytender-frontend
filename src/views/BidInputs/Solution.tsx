@@ -1,12 +1,20 @@
 import React, { useContext, useMemo, useRef, useState } from "react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import { toast } from "react-toastify";
 import { BidContext } from "../BidWritingStateManagerView";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
+import {
+  MDXEditor,
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
+  thematicBreakPlugin,
+  markdownShortcutPlugin
+} from "@mdxeditor/editor";
+import "@mdxeditor/editor/style.css";
 
 const Solution = () => {
   const { sharedState, setSharedState } = useContext(BidContext);
@@ -16,8 +24,8 @@ const Solution = () => {
   const auth = useMemo(() => getAuth(), [getAuth]);
   const tokenRef = useRef(auth?.token || "default");
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setSolution(e.target.value);
+  const handleChange = (value: string) => {
+    setSolution(value);
   };
 
   const generate_solution = async () => {
@@ -71,19 +79,24 @@ const Solution = () => {
     <Card className="w-full bg-white border-none shadow-none">
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between w-full">
-          <span className="text-base font-medium text-gray-hint_text">
+          <span className="text-lg font-bold text-gray-hint_text">
             Solution Design
           </span>
           <Button onClick={generate_solution} disabled={loading}>
             {loading ? "Generating..." : "Generate Solution"}
           </Button>
         </div>
-        <Textarea
-          value={solution}
+        <MDXEditor
+          markdown={solution}
           onChange={handleChange}
-          className="w-full p-2 border rounded-md"
-          rows={30}
-          placeholder="Describe your product or service offering..."
+          className="border rounded-md min-h-[500px]"
+          plugins={[
+            headingsPlugin(),
+            listsPlugin(),
+            quotePlugin(),
+            thematicBreakPlugin(),
+            markdownShortcutPlugin()
+          ]}
         />
       </CardContent>
     </Card>
