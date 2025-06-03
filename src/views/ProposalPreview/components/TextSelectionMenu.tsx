@@ -39,6 +39,8 @@ interface TextSelectionMenuProps {
   tokenRef: RefObject<string>;
   /** Current bid's object ID used for API calls */
   objectId: string | null;
+  /** Current bid's question used for API calls */
+  question: string | null;
 }
 
 /**
@@ -46,6 +48,7 @@ interface TextSelectionMenuProps {
  * Provides options to comment on, find evidence for, expand, or summarize the selected text.
  */
 const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
+  question,
   selectionMenuPosition,
   selectedRange,
   setSelectedRange,
@@ -157,12 +160,15 @@ const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({
     setIsLoadingEvidence(true);
 
     try {
-      const formData = new FormData();
-      formData.append("selected_text", selectedText);
+      const requestBody = {
+        selected_text: selectedText,
+        bid_id: objectId,
+        question: question 
+      };
 
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/get_evidence_from_company_lib`,
-        formData,
+        requestBody,
         {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`
