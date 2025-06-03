@@ -21,6 +21,7 @@ import {
 import SelectCaseStudy from "./SelectCaseStudy";
 import { useUserData } from "@/context/UserDataContext";
 import AIChatDialog from "./AIChatDialog";
+import Solution from "./Solution";
 
 const BidIntel = ({
   showViewOnlyMessage
@@ -242,9 +243,9 @@ const BidIntel = ({
         AI Input Editing
       </Button> */}
       {/* Solution Accordion */}
-      {/* <div className="w-full bg-white rounded-lg">
+      <div className="w-full bg-white rounded-lg">
         <Solution />
-      </div> */}
+      </div>
 
       <div className="w-full flex flex-col gap-6">
         {/* Customer Pain Points Card */}
