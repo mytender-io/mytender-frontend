@@ -1056,6 +1056,7 @@ const ProposalPreview = ({ activeSectionId }: { activeSectionId: string }) => {
                     {/* Selection Menu */}
                     {showSelectionMenu && (
                       <TextSelectionMenu
+                        question={outline[currentSectionIndex].question}
                         selectionMenuPosition={selectionMenuPosition}
                         selectedRange={selectedRange}
                         setSelectedRange={setSelectedRange}
