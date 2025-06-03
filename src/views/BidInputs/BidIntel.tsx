@@ -23,16 +23,11 @@ import { useUserData } from "@/context/UserDataContext";
 import AIChatDialog from "./AIChatDialog";
 import Solution from "./Solution";
 
-const BidIntel = ({
-  showViewOnlyMessage
-}: {
-  showViewOnlyMessage: () => void;
-}) => {
+const BidIntel = () => {
   const getAuth = useAuthUser();
   const auth = useMemo(() => getAuth(), [getAuth]);
 
   const { sharedState, setSharedState } = useContext(BidContext);
-  const { contributors } = sharedState;
 
   // State for inline editing
   const [editingState, setEditingState] = useState({
@@ -51,27 +46,13 @@ const BidIntel = ({
     factors: sharedState.differentiating_factors || []
   };
 
-  const currentUserPermission = contributors[auth?.email] || "viewer";
-
-  const canUserEdit =
-    currentUserPermission === "admin" || currentUserPermission === "editor";
-
   const { userProfile, organizationUsers, isLoading } = useUserData();
 
   const handleEditStart = (text: string, type: string, index: number) => {
-    if (!canUserEdit) {
-      showViewOnlyMessage();
-      return;
-    }
     setEditingState({ type, index, text });
   };
 
   const handleDelete = (type: string, index: number) => {
-    if (!canUserEdit) {
-      showViewOnlyMessage();
-      return;
-    }
-
     const updatedState = { ...sharedState };
 
     switch (type) {
