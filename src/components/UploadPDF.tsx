@@ -67,6 +67,8 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
       case "application/vnd.ms-excel":
         return "excel";
+      case "application/msword":
+        return "word";
       default:
         return null;
     }
@@ -102,6 +104,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     // Only handle file selection if not currently uploading
     if (!isUploadingDocuments && e.target.files && e.target.files.length > 0) {
       handleFiles(Array.from(e.target.files));
+
     }
   };
 
@@ -111,11 +114,11 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-      "application/vnd.ms-excel" // .xls
+      "application/vnd.ms-excel", // .xls
+      "application/msword" // .doc
     ];
-
     // Check file extensions
-    const allowedExtensions = [".pdf", ".docx", ".xlsx", ".xls"];
+    const allowedExtensions = [".pdf", ".docx", ".xlsx", ".xls", ".doc"];
     const fileName = file.name.toLowerCase();
     const fileExtension = fileName.substring(fileName.lastIndexOf("."));
 
@@ -136,7 +139,6 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         invalidFiles.push(file);
       }
     }
-
     setSelectedFiles((prevFiles) => [...prevFiles, ...validFiles]);
 
     if (validFiles.length > 0) {
@@ -148,7 +150,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
 
     if (invalidFiles.length > 0) {
       toast.error(
-        "Some files were not added. Only PDF (.pdf), Word (.docx), and Excel (.xlsx, .xls) files are allowed."
+        "Some files were not added. Only PDF (.pdf), Word (.docx, .doc), and Excel (.xlsx, .xls) files are allowed."
       );
       posthog.capture("pdf_upload_invalid_file_types", {
         fileCount: invalidFiles.length,
@@ -162,12 +164,10 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       fileName: file.name,
       fileType: file.type
     });
-
     const mode = getFileMode(file.type);
     if (!mode) {
       throw new Error("Unsupported file type");
     }
-
     const formData = new FormData();
     formData.append("file", file);
     formData.append("mode", mode);
@@ -178,21 +178,18 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
 
     // Check if the API endpoint requires bid_id
     const requiresBidId = apiUrl.includes("uploadfile_tenderlibrary");
-
     if (bid_id && bid_id.trim() !== "") {
       formData.append("bid_id", bid_id);
     } else if (requiresBidId) {
       // If endpoint requires bid_id but it's not provided, throw an error
       throw new Error("Missing required parameter: bid_id");
     }
-
     const fileSizeInMB = file.size / (1024 * 1024);
     const durationPerMB = 30000;
     const duration = Math.max(
       10000,
       Math.min(300000, Math.round(fileSizeInMB * durationPerMB))
     );
-
     const startTime = Date.now();
     const progressInterval = setInterval(() => {
       const elapsed = Date.now() - startTime;
@@ -205,7 +202,6 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         [file.name]: artificialProgress
       }));
     }, 1000);
-
     try {
       const response = await axios.post(apiUrl, formData, {
         headers: {
@@ -213,7 +209,6 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
           Authorization: `Bearer ${tokenRef.current}`
         }
       });
-
       clearInterval(progressInterval);
       setUploadProgress((prev) => ({
         ...prev,
@@ -252,6 +247,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         handleUpload(newFiles);
       }
     }
+
   }, [selectedFiles]);
 
   useEffect(() => {
@@ -430,7 +426,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
           <input
             ref={fileInputRef}
             type="file"
-            accept=".pdf,.docx,.xls,.xlsx"
+            accept=".pdf,.docx,.xls,.xlsx,.doc"
             onChange={handleFileSelect}
             className="hidden"
             multiple
