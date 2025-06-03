@@ -3,7 +3,6 @@ import withAuth from "../../routes/withAuth";
 import BidNavbar from "@/views/Bid/components/BidNavbar";
 import { BidContext } from "../BidWritingStateManagerView";
 import BreadcrumbNavigation from "@/layout/BreadCrumbNavigation";
-import { toast } from "react-toastify";
 import BidPlanner from "../BidPlanner/BidPlanner";
 import BidIntel from "../BidInputs/BidIntel";
 import ProposalWorkspace from "./components/ProposalWorkspace";
@@ -94,10 +93,6 @@ const Bid = () => {
       };
     }
   }, []);
-
-  const showViewOnlyMessage = () => {
-    toast.error("You only have permission to view this bid.");
-  };
 
   const handleTabClick = (
     path: string,
@@ -279,9 +274,7 @@ const Bid = () => {
                   setActiveSubTab={setActiveSubTab}
                 />
               )}
-              {activeTab === "/bid-intel" && (
-                <BidIntel showViewOnlyMessage={showViewOnlyMessage} />
-              )}
+              {activeTab === "/bid-intel" && <BidIntel />}
               {(activeTab === "/proposal-planner" ||
                 activeTab === "/proposal-preview") && (
                 <ProposalWorkspace
@@ -295,10 +288,10 @@ const Bid = () => {
                   activeTab={activeTab}
                 />
               )}
-               {(activeTab === "/full-proposal") && (
-                 <FullProposal   handleTabClick={handleTabClick}/>
+              {activeTab === "/full-proposal" && (
+                <FullProposal handleTabClick={handleTabClick} />
               )}
-               
+
               <OutlineInstructionsModal
                 show={showModal}
                 onHide={() => setShowModal(false)}
