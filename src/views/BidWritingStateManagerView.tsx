@@ -155,7 +155,7 @@ const defaultState: BidContextType = {
     isLoading: false,
     saveSuccess: null,
     object_id: null,
-    selectedFolders: ["default"],
+    selectedFolders: [],
     outline: [],
     win_themes: [],
     customer_pain_points: [],
@@ -290,10 +290,7 @@ const BidManagement: React.FC = () => {
       formData.append("new_bid_completed", new_bid_completed);
 
       formData.append("contributors", JSON.stringify(contributors || []));
-      formData.append(
-        "selectedFolders",
-        JSON.stringify(selectedFolders || ["default"])
-      );
+      formData.append("selectedFolders", JSON.stringify(selectedFolders || []));
       formData.append("outline", JSON.stringify(outline || []));
       formData.append("win_themes", JSON.stringify(win_themes || []));
       formData.append(
