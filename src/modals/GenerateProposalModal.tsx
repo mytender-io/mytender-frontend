@@ -181,7 +181,8 @@ const GenerateProposalModal = ({
         {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`
-          }
+          },
+          timeout: 600000 // 10 minutes in milliseconds
         }
       );
 
@@ -204,7 +205,8 @@ const GenerateProposalModal = ({
       posthog.capture("generating_proposal_failed", {
         bid_id,
         selected_folders: sharedState.selectedFolders,
-        error: err instanceof Error ? err.message : "Failed to generate proposal"
+        error:
+          err instanceof Error ? err.message : "Failed to generate proposal"
       });
     } finally {
       if (progressInterval.current) {
