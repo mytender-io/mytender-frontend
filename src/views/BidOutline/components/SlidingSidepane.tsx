@@ -22,7 +22,6 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import StatusMenu from "@/buttons/StatusMenu";
-import { useUserData } from "@/context/UserDataContext";
 import GenerateSectonButton from "@/components/GenerateSectionButton";
 import {
   MDXEditor,
@@ -81,8 +80,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
   handleDeleteSubheading
 }) => {
   const { sharedState } = useContext(BidContext);
-  const { organizationUsers, isLoading: isOrganizationUsersLoading } =
-    useUserData();
 
   const [openSections, setOpenSections] = React.useState({
     compliance: true,
@@ -796,37 +793,6 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 </div>
               </div>
             )}
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-semibold text-lg">Question:</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Word count:</span>
-                  <Input
-                    type="number"
-                    value={section.word_count || 0}
-                    min={0}
-                    step={50}
-                    className="w-20 text-center h-9"
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      if (!isNaN(value) && value >= 0) {
-                        handleSectionChange(index, "word_count", value);
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-              <DebouncedTextArea
-                value={section.question}
-                onChange={(value) =>
-                  handleSectionChange(index, "question", value)
-                }
-                rows={3}
-                className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-none p-0 rounded-lg !leading-relaxed"
-                placeholder="Add in the question here"
-              />
-            </div>
             {section.writingplan && section.writingplan.trim() ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
