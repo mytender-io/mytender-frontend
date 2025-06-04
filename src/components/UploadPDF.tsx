@@ -283,33 +283,34 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
 
     setUploadingDocuments?.(true);
 
+    const results: UploadResult[] = [];
+    let successCount = 0;
+    let failCount = 0;
+
     try {
-      const uploadPromises = filesToUpload.map((file) => uploadFile(file));
-      const results: UploadResult[] = await Promise.all(
-        uploadPromises.map((p) =>
-          p
-            .then((data) => ({ data, fileName: data.fileName }))
-            .catch((error) => ({
-              error: error as Error,
-              fileName: error.fileName || "Unknown file",
-              message:
-                error.response?.data?.detail || error.message || "Unknown error"
-            }))
-        )
-      );
+      // Upload files one by one sequentially
+      for (let i = 0; i < filesToUpload.length; i++) {
+        const file = filesToUpload[i];
 
-      const successCount = results.filter((result) => !result.error).length;
-      const failCount = results.filter((result) => result.error).length;
+        try {
+          const result = await uploadFile(file);
+          results.push({ data: result.data, fileName: result.fileName });
+          successCount++;
 
-      // Track successfully uploaded files
-      const successfulFileNames = results
-        .filter((result) => !result.error)
-        .map((result) => result.fileName as string);
-
-      setUploadedFiles((prev) => [...prev, ...successfulFileNames]);
+          // Track successfully uploaded file
+          setUploadedFiles((prev) => [...prev, file.name]);
+        } catch (error) {
+          results.push({
+            error: error as Error,
+            fileName: file.name,
+            message:
+              error.response?.data?.detail || error.message || "Unknown error"
+          });
+          failCount++;
+        }
+      }
 
       if (successCount > 0) {
-        // toast.success(`Successfully uploaded ${successCount} file(s)`);
         posthog.capture("pdf_upload_batch_completed", {
           successCount,
           failCount,
@@ -326,9 +327,6 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
           onUploadComplete(successfulFiles);
         }
       }
-
-      // We don't need a generic error message here because specific errors are shown per file
-      // in the uploadFile function with their specific messages from the backend
     } catch (error) {
       console.error("Error in batch upload:", error);
       toast.error("Error uploading files");
@@ -342,6 +340,7 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       }
     }
   };
+
   const renderSelectedFiles = () => {
     if (selectedFiles.length === 0) return null;
 
