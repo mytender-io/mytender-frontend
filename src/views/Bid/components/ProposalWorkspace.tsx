@@ -89,8 +89,18 @@ const ProposalWorkspace = ({
     if (index !== -1) {
       setActiveSectionIndex(index);
       handleActiveSectionChange(outline[index].section_id);
+
+      // Check if the section has content and set view to "write" if it does
+      const currentSection = outline[index];
+      if (
+        currentSection &&
+        currentSection.answer &&
+        currentSection.answer.trim() !== ""
+      ) {
+        setActiveView("write");
+      }
     }
-  }, [activeSectionId, outline]);
+  }, [activeSectionId, outline, handleActiveSectionChange]);
 
   const handleSectionChange = async (
     index: number,
