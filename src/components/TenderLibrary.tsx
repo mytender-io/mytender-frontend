@@ -258,7 +258,7 @@ const TenderLibrary = ({ object_id }) => {
   const renderFileContent = () => {
     if (isLoading) {
       return (
-        <div className="flex h-[500px] items-center justify-center">
+        <div className="flex h-[calc(100vh-115px)] items-center justify-center">
           <Spinner />
         </div>
       );
@@ -269,7 +269,7 @@ const TenderLibrary = ({ object_id }) => {
     if (fileExtension === "pdf") {
       if (hasPDFError) {
         return (
-          <div className="relative h-[500px] border border-gray-300 rounded">
+          <div className="relative h-[calc(100vh-115px)] border border-gray-300 rounded">
             <PDFErrorView />
           </div>
         );
@@ -277,12 +277,12 @@ const TenderLibrary = ({ object_id }) => {
       return (
         <iframe
           src={fileContent}
-          className="h-[500px] w-full rounded border border-border"
+          className="h-[calc(100vh-115px)] w-full rounded border border-border"
         />
       );
     } else if (["doc", "docx"].includes(fileExtension)) {
       return (
-        <pre className="h-[500px] w-full overflow-x-hidden whitespace-pre-wrap break-words rounded border border-border p-5 text-sm">
+        <pre className="h-[calc(100vh-115px)] w-full overflow-x-hidden whitespace-pre-wrap break-words rounded border border-border p-5 text-sm">
           {fileContent}
         </pre>
       );
@@ -294,7 +294,7 @@ const TenderLibrary = ({ object_id }) => {
   const renderLibraryView = () => {
     if (selectedFile) {
       return (
-        <div className="px-4">
+        <div className="px-4 h-full">
           <div className="mb-4 flex items-center gap-2">
             <ArrowLeft
               className="cursor-pointer"
