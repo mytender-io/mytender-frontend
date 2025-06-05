@@ -4,7 +4,7 @@ import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 import { faCheckCircle, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { BidContext } from "../views/BidWritingStateManagerView";
+import { BidContext, Section } from "../views/BidWritingStateManagerView";
 import { useProposalGeneration } from "@/context/ProposalGenerationContext";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -186,11 +186,30 @@ const GenerateProposalModal = ({
         }
       );
 
-      // Update shared state with outline data
-      setSharedState((prevState) => ({
-        ...prevState,
-        outline: response.data?.updated_outline || []
-      }));
+      // Update shared state with outline data and set all sections to "In Progress"
+      setSharedState((prevState) => {
+        // Get the updated outline from the response
+        let updatedOutline = response.data?.updated_outline || [];
+        
+        // If no updated outline was returned, use the current outline and update status
+        if (!updatedOutline.length && prevState.outline && prevState.outline.length) {
+          updatedOutline = prevState.outline.map((section: Section) => ({
+            ...section,
+            status: "In Progress"
+          }));
+        } else if (updatedOutline.length) {
+          // If we have an updated outline, ensure all sections have "In Progress" status
+          updatedOutline = updatedOutline.map((section: Section) => ({
+            ...section,
+            status: "In Progress"
+          }));
+        }
+        
+        return {
+          ...prevState,
+          outline: updatedOutline
+        };
+      });
 
       setProgress(100);
       setCurrentStep(2); // Move to success step

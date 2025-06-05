@@ -79,7 +79,8 @@ const GenerateSectonButton: React.FC<GenerateSectonButtonProps> = ({
           if (sectionIndex !== -1) {
             updatedOutline[sectionIndex] = {
               ...updatedOutline[sectionIndex],
-              answer: response.data // This should now correctly assign the answer text
+              answer: response.data,
+              status: "In Progress"
             };
           }
           return {
