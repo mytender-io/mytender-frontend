@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import DebouncedTextArea from "./DebouncedTextArea";
 // import SubheadingCards from "./SubheadingCards";
 import { BidContext, Section } from "../../BidWritingStateManagerView";
 import QuestionTypeDropdown from "@/views/BidOutline/components/QuestionTypeDropdown";
@@ -21,7 +20,6 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import StatusMenu from "@/buttons/StatusMenu";
 import GenerateSectonButton from "@/components/GenerateSectionButton";
 import {
   MDXEditor,
@@ -637,40 +635,8 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
 
   return (
     <div className={cn("w-full h-full bg-white rounded-md max-w-4xl mx-auto")}>
-      {/* Hidden span to measure text width */}
-      <span
-        ref={textMeasureRef}
-        className="absolute opacity-0 pointer-events-none font-bold md:text-lg whitespace-nowrap"
-        aria-hidden="true"
-      />
       <ScrollArea className="h-full">
         <div className="flex flex-col h-full gap-2">
-          <div className="flex items-center justify-between gap-2 p-1">
-            <div className="flex items-center">
-              <Input
-                value={section.heading}
-                onChange={(e) =>
-                  handleSectionChange(index, "heading", e.target.value)
-                }
-                className="font-bold resize-none overflow-hidden whitespace-nowrap min-h-[1.75rem] bg-transparent border-none focus:ring-0 shadow-none md:text-lg"
-                style={{ width: headingWidth ? `${headingWidth}px` : "auto" }}
-              />
-              <StatusMenu
-                minimize
-                value={section.status}
-                onChange={(value) => {
-                  handleSectionChange(index, "status", value);
-                }}
-              />
-            </div>
-          </div>
-          <DebouncedTextArea
-            value={section.question}
-            onChange={(value) => handleSectionChange(index, "question", value)}
-            rows={3}
-            className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-none p-0 rounded-lg !leading-relaxed"
-            placeholder="Add in the question here"
-          />
           <div className="px-4 space-y-6">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">

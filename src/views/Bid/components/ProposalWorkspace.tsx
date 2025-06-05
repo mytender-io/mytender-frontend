@@ -22,6 +22,9 @@ import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "@/helper/Constants";
 import { toast } from "react-toastify";
 import sendOrganizationEmail from "@/helper/sendOrganisationEmail";
+import { Input } from "@/components/ui/input";
+import DebouncedTextArea from "@/views/BidOutline/components/DebouncedTextArea";
+import StatusMenu from "@/buttons/StatusMenu";
 
 interface ProposalWorkspaceProps {
   openTask: (taskId: string | null, sectionIndex: string | null) => void;
@@ -50,8 +53,7 @@ const ProposalWorkspace = ({
 }: ProposalWorkspaceProps) => {
   const { sharedState, setSharedState } = useContext(BidContext);
   const { outline } = sharedState;
-  const { organizationUsers, isLoading: isOrganizationUsersLoading } =
-    useUserData();
+  const { organizationUsers } = useUserData();
 
   const totalSections = outline.length;
 
@@ -62,6 +64,10 @@ const ProposalWorkspace = ({
   const [slideDirection, setSlideDirection] = useState<"left" | "right">(
     "right"
   );
+
+  // Add new state for heading width
+  const [headingWidth, setHeadingWidth] = useState<number>(0);
+  const textMeasureRef = useRef<HTMLSpanElement>(null);
 
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -91,6 +97,27 @@ const ProposalWorkspace = ({
       handleActiveSectionChange(outline[index].section_id);
     }
   }, [activeSectionId, outline]);
+
+  // Update width based on heading content
+  useEffect(() => {
+    const activeSection =
+      activeSectionIndex !== null ? outline[activeSectionIndex] : null;
+    if (activeSection?.heading && textMeasureRef.current) {
+      // Set the text content of the hidden span to match the input value
+      textMeasureRef.current.textContent = activeSection.heading;
+      // Get the width of the text plus some padding
+      const textWidth = textMeasureRef.current.getBoundingClientRect().width;
+      // Add some buffer to prevent text clipping
+      const bufferWidth = 20;
+      const calculatedWidth = Math.max(
+        100,
+        Math.min(600, textWidth + bufferWidth)
+      );
+      setHeadingWidth(calculatedWidth);
+    } else {
+      setHeadingWidth(150); // Default width for empty heading
+    }
+  }, [outline, activeSectionIndex]);
 
   const handleSectionChange = async (
     index: number,
@@ -347,6 +374,13 @@ const ProposalWorkspace = ({
   return (
     <GenerationProvider>
       <div className="flex flex-col h-full w-full relative">
+        {/* Hidden span to measure text width */}
+        <span
+          ref={textMeasureRef}
+          className="absolute opacity-0 pointer-events-none font-bold md:text-lg whitespace-nowrap"
+          aria-hidden="true"
+        />
+
         {/* Tab switching arrows */}
         {activeSectionIndex !== null && (
           <>
@@ -381,7 +415,6 @@ const ProposalWorkspace = ({
               size="icon"
               onClick={() => handleSectionNavigation("prev")}
               disabled={activeSectionIndex === 0}
-              className="w-fit px-2 gap-1"
             >
               <ChevronLeft />
             </Button>
@@ -393,7 +426,6 @@ const ProposalWorkspace = ({
               size="icon"
               onClick={() => handleSectionNavigation("next")}
               disabled={activeSectionIndex === totalSections - 1}
-              className="w-fit px-2 gap-1"
             >
               <ChevronRight />
             </Button>
@@ -464,6 +496,50 @@ const ProposalWorkspace = ({
                 <GenerateProposalModal
                   bid_id={sharedState.object_id || ""}
                   handleTabClick={handleTabClick}
+                />
+              </div>
+            )}
+
+            {/* Add heading and question section */}
+            {activeSection && activeSectionIndex !== null && (
+              <div className="flex flex-col w-full gap-2 mt-2 max-w-4xl mx-auto px-4">
+                <div className="flex items-center justify-between gap-2 p-1">
+                  <div className="flex items-center">
+                    <Input
+                      value={activeSection.heading}
+                      onChange={(e) =>
+                        handleSectionChange(
+                          activeSectionIndex,
+                          "heading",
+                          e.target.value
+                        )
+                      }
+                      className="font-bold resize-none overflow-hidden whitespace-nowrap min-h-[1.75rem] bg-transparent border-none focus:ring-0 shadow-none md:text-lg px-0 focus-visible:ring-0"
+                      style={{
+                        width: headingWidth ? `${headingWidth}px` : "auto"
+                      }}
+                    />
+                    <StatusMenu
+                      minimize
+                      value={activeSection.status}
+                      onChange={(value) => {
+                        handleSectionChange(
+                          activeSectionIndex,
+                          "status",
+                          value
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+                <DebouncedTextArea
+                  value={activeSection.question}
+                  onChange={(value) =>
+                    handleSectionChange(activeSectionIndex, "question", value)
+                  }
+                  rows={3}
+                  className="w-full focus:outline-none focus-visible:ring-0 overflow-y-auto font-medium md:text-base shadow-none border-none p-0 rounded-lg !leading-relaxed min-h-0"
+                  placeholder="Add in the question here"
                 />
               </div>
             )}
