@@ -257,7 +257,7 @@ const BidStatusMenu = ({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 p-0 text-gray-hint_text [&_svg]:size-3"
+                        className="h-8 w-8 p-0 text-gray-hint_text [&_svg]:size-4"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <ElipsisMenuIcon />
@@ -286,7 +286,7 @@ const BidStatusMenu = ({
             })}
             <Button
               variant="ghost"
-              className="w-full [&_svg]:size-3 font-semibold text-gray-hint_text"
+              className="w-full [&_svg]:size-4 font-semibold text-gray-hint_text"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();

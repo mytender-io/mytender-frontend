@@ -141,24 +141,23 @@ const Bid = () => {
   };
 
   const handleSectionClick = (sectionId: string) => {
-    // Make sure we're on the proposal planner tab if clicking on a section ID
-    const isSection =
-      outline && outline.some((section) => section.section_id === sectionId);
+    const index = outline.findIndex(
+      (section) => section.section_id === sectionId
+    );
 
-    if (
-      isSection &&
-      !(activeTab == "/proposal-planner" || activeTab == "/proposal-preview")
-    ) {
-      // If clicking on a section but not on the proposal planner tab, switch to it first
-      setActiveTab("/proposal-planner");
-      // Short delay to ensure tab switch happens before setting subtab
-      setTimeout(() => {
-        setActiveSectionId(sectionId);
-      }, 50);
-    } else {
-      // Set the active section
-      setActiveSectionId(sectionId);
+    if (index !== -1) {
+      const currentSection = outline[index];
+      if (
+        currentSection &&
+        currentSection.answer &&
+        currentSection.answer.trim() !== ""
+      ) {
+        setActiveTab("/proposal-preview");
+      } else {
+        setActiveTab("/proposal-planner");
+      }
     }
+    setActiveSectionId(sectionId);
   };
 
   const handleRegenerateClick = () => {
