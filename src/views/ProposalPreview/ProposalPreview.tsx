@@ -829,23 +829,7 @@ const ProposalPreview = ({ activeSectionId }: { activeSectionId: string }) => {
                                 </div>
                               )}
 
-                              <div className="bg-white p-8 relative">
-                                <h2 className="text-xl font-semibold mb-4 break-words">
-                                  {section.heading}
-                                </h2>
-
-                                {/* Display section question if it exists */}
-                                {section.question && (
-                                  <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
-                                    <p className="font-medium text-gray-700 mb-1">
-                                      Question:
-                                    </p>
-                                    <p className="text-gray-600">
-                                      {section.question}
-                                    </p>
-                                  </div>
-                                )}
-
+                              <div className="bg-white px-8 py-4 relative">
                                 <DebouncedContentEditable
                                   key={section.section_id}
                                   content={section.answer || ""}
