@@ -31,8 +31,7 @@ const Solution = () => {
   };
 
   useEffect(() => {
-    // Update the editor content when solution state changes
-    if (editorRef.current) {
+    if (editorRef.current && editorRef.current.getMarkdown() !== solution) {
       editorRef.current.setMarkdown(solution);
     }
   }, [solution]);
