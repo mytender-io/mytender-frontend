@@ -136,6 +136,7 @@ const BidNavbar: React.FC<BidNavbarProps> = ({
         {/* Collapse/Expand Button */}
         <Button
           variant="ghost"
+          size="icon"
           onClick={toggleCollapse}
           className="absolute top-1 right-2 transition-all px-2"
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}

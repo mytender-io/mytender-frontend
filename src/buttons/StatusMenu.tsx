@@ -80,13 +80,10 @@ const StatusMenu = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {minimize ? (
-          <Button
-            variant="ghost"
-            className="p-0 h-6 w-6 relative group"
-          >
+          <Button variant="ghost" size="icon" className="relative group">
             <div
               className={cn(
-                "h-4 w-4 rounded-full border-[0.5px]",
+                "min-w-4 min-h-4 h-4 w-4 rounded-full border-[0.5px]",
                 getCircleColor(currentStatus)
               )}
             />
