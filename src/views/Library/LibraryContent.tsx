@@ -4,7 +4,6 @@ import axios from "axios";
 import withAuth from "../../routes/withAuth.tsx";
 import { useAuthUser } from "react-auth-kit";
 import { Button } from "@/components/ui/button";
-import UploadPDF from "@/components/UploadPDF.tsx";
 import handleGAEvent from "@/utils/handleGAEvent.tsx";
 import { UploadButtonWithDropdown } from "./components/UploadButtonWithDropdown.tsx";
 import FileContentModal from "./components/FileContentModal.tsx";
@@ -21,12 +20,6 @@ import {
   HelpCircle,
   FileArchive
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import {
@@ -35,14 +28,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import UploadText from "./components/UploadText.tsx";
 import BreadCrumbs from "@/components/BreadCrumbs.tsx";
-import { DeleteConfirmationDialog } from "@/modals/DeleteConfirmationModal.tsx";
 import { toast } from "react-toastify";
 import PDFViewer from "@/modals/PDFViewer.tsx";
-import UploadZip from "@/components/UploadZip.tsx";
 import posthog from "posthog-js";
 import NewFolderModal from "./components/NewFolderModal.tsx";
+import UploadPDFModal from "./components/UploadPDFModal.tsx";
+import UploadZipModal from "./components/UploadZipModal.tsx";
+import UploadTextModal from "./components/UploadTextModal.tsx";
+import DeleteFolderModal from "./components/DeleteFolderModal.tsx";
+import DeleteFileModal from "./components/DeleteFileModal.tsx";
 
 const LibraryContent = () => {
   const getAuth = useAuthUser();
@@ -355,103 +350,13 @@ const LibraryContent = () => {
     }, 1500);
   };
 
-  const UploadPDFModal = ({
-    show,
-    onHide,
-    folder,
-    get_collections,
-    onClose
-  }) => (
-    <Dialog open={show} onOpenChange={onHide}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Upload Files</DialogTitle>
-        </DialogHeader>
-        <div className="py-4">
-          <UploadPDF
-            folder={folder}
-            get_collections={get_collections}
-            onClose={onClose}
-            apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile/`}
-            descriptionText="Upload previous bids here for the AI to use as context in the Q&A Generator. This might take a while for large documents because we need to convert the documents into a format the AI can understand so sit tight!"
-          />
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-
-  const UploadZipModal = ({
-    show,
-    onHide,
-    folder,
-    get_collections,
-    onClose
-  }) => (
-    <Dialog open={show} onOpenChange={onHide}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Upload Zip Folder</DialogTitle>
-        </DialogHeader>
-        <div className="py-4">
-          <UploadZip
-            folder={folder}
-            get_collections={get_collections}
-            onClose={onClose}
-            descriptionText="Upload ZIP files containing multiple documents. The system will extract and process all files in the ZIP. This might take a while for large archives as we need to convert the documents into a format the AI can understand."
-          />
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-
-  const UploadTextModal = ({ show, onHide, folder, get_collections }) => (
-    <Dialog open={show} onOpenChange={onHide}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Text Uploader</DialogTitle>
-        </DialogHeader>
-        <div className="py-4">
-          <UploadText
-            folder={folder}
-            get_collections={get_collections}
-            onClose={() => {
-              onHide();
-              setUpdateTrigger((prev) => prev + 1);
-              if (folder) {
-                fetchFolderContents(folder);
-              }
-            }}
-          />
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-
-  const DeleteFolderModal = ({ show, onHide, onDelete, folderTitle }) => {
-    const displayFolderName = folderTitle
-      .replace(/FORWARDSLASH/g, "/")
-      .replace(/_/g, " ");
-
-    return (
-      <DeleteConfirmationDialog
-        isOpen={show}
-        onClose={onHide}
-        onConfirm={() => onDelete(folderTitle)}
-        title="Delete Folder"
-        message={`Are you sure you want to delete the folder "${displayFolderName}"?`}
-      />
-    );
+  const handleOnCloseText = () => {
+    setShowTextModal(false);
+    setUpdateTrigger((prev) => prev + 1);
+    if (uploadFolder) {
+      fetchFolderContents(uploadFolder);
+    }
   };
-
-  const DeleteFileModal = ({ show, onHide, onDelete, fileName }) => (
-    <DeleteConfirmationDialog
-      isOpen={show}
-      onClose={onHide}
-      onConfirm={() => onDelete()}
-      title="Delete File"
-      message={`Are you sure you want to delete the file "${fileName}"?`}
-    />
-  );
 
   const saveFileContent = async (
     id: string,
@@ -1203,7 +1108,7 @@ const LibraryContent = () => {
             <DeleteFolderModal
               show={showDeleteFolderModal}
               onHide={() => setShowDeleteFolderModal(false)}
-              onDelete={() => handleDelete(folderToDelete)}
+              onDelete={(folderTitle) => handleDelete(folderTitle)}
               folderTitle={folderToDelete}
             />
 
@@ -1216,7 +1121,9 @@ const LibraryContent = () => {
 
             <UploadPDFModal
               show={showPDFModal}
-              onHide={() => setShowPDFModal(false)}
+              onHide={(open) => {
+                if (!open) setShowPDFModal(false);
+              }}
               folder={uploadFolder}
               get_collections={fetchFolderStructure}
               onClose={handleOnClose}
@@ -1224,7 +1131,9 @@ const LibraryContent = () => {
 
             <UploadZipModal
               show={showZipModal}
-              onHide={() => setShowZipModal(false)}
+              onHide={(open) => {
+                if (!open) setShowZipModal(false);
+              }}
               folder={uploadFolder}
               get_collections={fetchFolderStructure}
               onClose={handleOnCloseZip}
@@ -1232,9 +1141,13 @@ const LibraryContent = () => {
 
             <UploadTextModal
               show={showTextModal}
-              onHide={() => setShowTextModal(false)}
+              onHide={(open) => {
+                if (!open) setShowTextModal(false);
+              }}
               folder={uploadFolder}
               get_collections={fetchFolderStructure}
+              fetchFolderContents={fetchFolderContents}
+              setUpdateTrigger={setUpdateTrigger}
             />
 
             <NewFolderModal
@@ -1246,44 +1159,6 @@ const LibraryContent = () => {
               }
               parentFolder={newFolderParent}
             />
-
-            {/* {contextMenu && contextMenuTarget && (
-            <LibraryContextMenu
-              anchorPosition={{ x: contextMenu.mouseX, y: contextMenu.mouseY }}
-              isOpen={Boolean(contextMenu)}
-              onClose={handleContextMenuClose}
-              onDelete={() => {
-                if (contextMenuTarget.isFolder) {
-                  setFolderToDelete(contextMenuTarget.path);
-                  setShowDeleteFolderModal(true);
-                } else {
-                  setFileToDelete({
-                    unique_id: contextMenuTarget.id,
-                    filename:
-                      folderContents[activeFolder]?.find(
-                        (item) => item.unique_id === contextMenuTarget.id
-                      )?.filename || ""
-                  });
-                  setShowDeleteFileModal(true);
-                }
-                handleContextMenuClose();
-              }}
-              isFolder={contextMenuTarget.isFolder}
-              folderPath={contextMenuTarget.path}
-              onUploadPDF={(event) => {
-                handleShowPDFModal(event, contextMenuTarget.path);
-                handleContextMenuClose();
-              }}
-              onUploadText={(event) => {
-                handleShowTextModal(event, contextMenuTarget.path);
-                handleContextMenuClose();
-              }}
-              onNewSubfolder={() => {
-                handleNewFolderClick(contextMenuTarget.path);
-                handleContextMenuClose();
-              }}
-            />
-          )} */}
 
             {showPdfViewerModal && (
               <PDFViewer
