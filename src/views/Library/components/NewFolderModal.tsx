@@ -13,7 +13,7 @@ import { memo, useState } from "react";
 interface NewFolderModalProps {
   show: boolean;
   onHide: () => void;
-  onCreateFolder: (folderName: string, parentFolder?: null) => Promise<void>;
+  onCreateFolder: (folderName: string, parentFolder?: string | null) => Promise<void>;
   title: string;
   parentFolder: string | null;
 }
@@ -48,7 +48,7 @@ const NewFolderModal = memo(
       return "";
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newName = e.target.value;
       setLocalNewFolderName(newName);
       setError(validateFolderName(newName));
@@ -65,8 +65,17 @@ const NewFolderModal = memo(
       }
     };
 
+    const handleOpenChange = (open: boolean) => {
+      if (!open) {
+        onHide();
+        // Reset state when dialog is closed
+        setLocalNewFolderName("");
+        setError("");
+      }
+    };
+
     return (
-      <Dialog open={show} onOpenChange={onHide}>
+      <Dialog open={show} onOpenChange={handleOpenChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{title || "Create New Folder"}</DialogTitle>
