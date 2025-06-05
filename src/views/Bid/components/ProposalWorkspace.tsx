@@ -437,7 +437,7 @@ const ProposalWorkspace = ({
           <div
             className={cn(
               "absolute top-1 flex items-center gap-2 z-10",
-              activeView === "write" ? "right-14" : "right-1"
+              activeView === "plan" ? "right-1" : "right-14"
             )}
           >
             {/* Assigned User */}
