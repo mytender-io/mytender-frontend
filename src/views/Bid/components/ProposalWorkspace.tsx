@@ -434,7 +434,12 @@ const ProposalWorkspace = ({
 
         {/* User assignment controls moved to top right */}
         {activeSectionIndex !== null && activeSection && (
-          <div className="absolute top-1 right-1 flex items-center gap-2 z-10">
+          <div
+            className={cn(
+              "absolute top-1 flex items-center gap-2 z-10",
+              activeView === "write" ? "right-14" : "right-1"
+            )}
+          >
             {/* Assigned User */}
             <div className="flex items-center gap-1">
               <span className="text-sm font-medium">Answerer:</span>
