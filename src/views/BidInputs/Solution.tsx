@@ -1,5 +1,5 @@
-import React, { useContext, useMemo, useRef, useState } from "react";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants.tsx";
 import { toast } from "react-toastify";
@@ -8,6 +8,7 @@ import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 import {
   MDXEditor,
+  MDXEditorMethods,
   headingsPlugin,
   listsPlugin,
   quotePlugin,
@@ -23,10 +24,18 @@ const Solution = () => {
   const getAuth = useAuthUser();
   const auth = useMemo(() => getAuth(), [getAuth]);
   const tokenRef = useRef(auth?.token || "default");
+  const editorRef = useRef<MDXEditorMethods>(null);
 
   const handleChange = (value: string) => {
     setSolution(value);
   };
+
+  useEffect(() => {
+    // Update the editor content when solution state changes
+    if (editorRef.current) {
+      editorRef.current.setMarkdown(solution);
+    }
+  }, [solution]);
 
   const generate_solution = async () => {
     setLoading(true);
@@ -87,6 +96,7 @@ const Solution = () => {
           </Button>
         </div>
         <MDXEditor
+          ref={editorRef}
           markdown={solution}
           onChange={handleChange}
           className="border rounded-md min-h-[500px]"
