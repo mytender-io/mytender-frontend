@@ -80,6 +80,14 @@ const LibraryContent = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // Define system folders that should be highlighted
+  const systemFolders = ["Case_Studies", "Previous_Bids", "Solution_Design"];
+
+  // Function to check if a folder is a system folder
+  const isSystemFolder = (folderName) => {
+    return systemFolders.includes(folderName);
+  };
+
   const getTopLevelFolders = () => {
     const folders = availableCollections.filter(
       (collection) =>
@@ -87,10 +95,17 @@ const LibraryContent = () => {
         !collection.startsWith("TenderLibrary_")
     );
 
-    // Sort the folders to put "default" first
+    // Sort the folders to put system folders first, then "default", then other folders
     return folders.sort((a, b) => {
+      // System folders come first
+      if (isSystemFolder(a) && !isSystemFolder(b)) return -1;
+      if (!isSystemFolder(a) && isSystemFolder(b)) return 1;
+
+      // Then "default" folder
       if (a === "default") return -1;
       if (b === "default") return 1;
+
+      // Then alphabetical order for remaining folders
       return a.localeCompare(b);
     });
   };
@@ -649,9 +664,18 @@ const LibraryContent = () => {
           className="cursor-pointer"
         >
           <TableCell className="px-4 group">
-            <div className="flex items-center group-hover:text-orange">
-              <FolderIcon className="h-4 w-4 mr-2.5" />
+            <div
+              className={`flex items-center ${isSystemFolder(folderName) ? "text-blue-600 font-medium" : "group-hover:text-orange"}`}
+            >
+              <FolderIcon
+                className={`h-4 w-4 mr-2.5 ${isSystemFolder(folderName) ? "text-blue-600" : ""}`}
+              />
               {displayName}
+              {isSystemFolder(folderName) && (
+                <span className="ml-2 text-xs px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded-full">
+                  System
+                </span>
+              )}
             </div>
           </TableCell>
           <TableCell className="w-[100px] text-right px-4">
@@ -796,13 +820,22 @@ const LibraryContent = () => {
                 : viewFile(filename, folderPath, unique_id)
             }
           >
-            <div className="flex items-center">
+            <div
+              className={`flex items-center ${isSystemFolder(filename) ? "text-blue-600 font-medium" : ""}`}
+            >
               {isFolder ? (
-                <FolderIcon className="h-4 w-4 mr-2.5" />
+                <FolderIcon
+                  className={`h-4 w-4 mr-2.5 ${isSystemFolder(filename) ? "text-blue-600" : ""}`}
+                />
               ) : (
                 <FileIcon className="h-4 w-4 mr-2.5" />
               )}
               {displayName}
+              {isFolder && isSystemFolder(filename) && (
+                <span className="ml-2 text-xs px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded-full">
+                  System
+                </span>
+              )}
             </div>
           </TableCell>
           <TableCell className="w-[100px] text-right px-4">
