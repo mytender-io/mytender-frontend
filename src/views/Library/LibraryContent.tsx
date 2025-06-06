@@ -84,7 +84,7 @@ const LibraryContent = () => {
   const systemFolders = ["Case_Studies", "Previous_Bids", "Solution_Design"];
 
   // Function to check if a folder is a system folder
-  const isSystemFolder = (folderName) => {
+  const isSystemFolder = (folderName: string): boolean => {
     return systemFolders.includes(folderName);
   };
 
@@ -530,6 +530,12 @@ const LibraryContent = () => {
 
   const deleteFolder = useCallback(
     async (folderTitle, parentFolder = null) => {
+      // Prevent deletion of system folders
+      if (isSystemFolder(folderTitle)) {
+        toast.error("System folders cannot be deleted");
+        return;
+      }
+
       const formData = new FormData();
       formData.append("profile_name", folderTitle);
 
@@ -654,24 +660,23 @@ const LibraryContent = () => {
 
     return foldersToRender.map((folderName) => {
       const displayName = formatDisplayName(folderName);
+      const isSystem = isSystemFolder(folderName);
+
       return (
         <TableRow
           key={folderName}
           onClick={() => handleFolderClick(folderName)}
-          // onContextMenu={(e) =>
-          //   handleContextMenu(e, true, folderName, folderName)
-          // }
           className="cursor-pointer"
         >
           <TableCell className="px-4 group">
             <div
-              className={`flex items-center ${isSystemFolder(folderName) ? "text-blue-600 font-medium" : "group-hover:text-orange"}`}
+              className={`flex items-center ${isSystem ? "text-blue-600 font-medium" : "group-hover:text-orange"}`}
             >
               <FolderIcon
-                className={`h-4 w-4 mr-2.5 ${isSystemFolder(folderName) ? "text-blue-600" : ""}`}
+                className={`h-4 w-4 mr-2.5 ${isSystem ? "text-blue-600" : ""}`}
               />
               {displayName}
-              {isSystemFolder(folderName) && (
+              {isSystem && (
                 <span className="ml-2 text-xs px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded-full">
                   System
                 </span>
@@ -686,6 +691,7 @@ const LibraryContent = () => {
               setShowDeleteFolderModal={setShowDeleteFolderModal}
               setFolderToDelete={setFolderToDelete}
               handleNewFolderClick={handleNewFolderClick}
+              disableDelete={isSystem}
             />
           </TableCell>
         </TableRow>
@@ -803,15 +809,10 @@ const LibraryContent = () => {
         ? `${folderPath}FORWARDSLASH${filename}`
         : folderPath;
       const displayName = formatDisplayName(filename);
+      const isSystem = isFolder && isSystemFolder(filename);
 
       return (
-        <TableRow
-          key={`${folderPath}-${index}`}
-          className="cursor-pointer"
-          // onContextMenu={(e) =>
-          //   handleContextMenu(e, isFolder, unique_id, fullPath)
-          // }
-        >
+        <TableRow key={`${folderPath}-${index}`} className="cursor-pointer">
           <TableCell
             className="px-4"
             onClick={() =>
@@ -821,17 +822,17 @@ const LibraryContent = () => {
             }
           >
             <div
-              className={`flex items-center ${isSystemFolder(filename) ? "text-blue-600 font-medium" : ""}`}
+              className={`flex items-center ${isSystem ? "text-blue-600 font-medium" : ""}`}
             >
               {isFolder ? (
                 <FolderIcon
-                  className={`h-4 w-4 mr-2.5 ${isSystemFolder(filename) ? "text-blue-600" : ""}`}
+                  className={`h-4 w-4 mr-2.5 ${isSystem ? "text-blue-600" : ""}`}
                 />
               ) : (
                 <FileIcon className="h-4 w-4 mr-2.5" />
               )}
               {displayName}
-              {isFolder && isSystemFolder(filename) && (
+              {isSystem && (
                 <span className="ml-2 text-xs px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded-full">
                   System
                 </span>
@@ -847,6 +848,7 @@ const LibraryContent = () => {
                 setShowDeleteFolderModal={setShowDeleteFolderModal}
                 setFolderToDelete={setFolderToDelete}
                 handleNewFolderClick={handleNewFolderClick}
+                disableDelete={isSystem}
               />
             ) : (
               <EllipsisMenu
