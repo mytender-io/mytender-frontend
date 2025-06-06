@@ -14,7 +14,8 @@ const UploadButtonWithDropdown = ({
   handleShowTextModal,
   setShowDeleteFolderModal,
   setFolderToDelete,
-  handleNewFolderClick
+  handleNewFolderClick,
+  disableDelete = false
 }) => {
   const handlePDFClick = (event) => {
     event.stopPropagation();
@@ -60,10 +61,12 @@ const UploadButtonWithDropdown = ({
           <i className="fas fa-folder mr-2" />
           New Subfolder
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleDeleteClick}>
-          <RecyclebinIcon className="text-typo-900" />
-          Delete Folder
-        </DropdownMenuItem>
+        {!disableDelete && (
+          <DropdownMenuItem onClick={handleDeleteClick}>
+            <RecyclebinIcon className="text-typo-900" />
+            Delete Folder
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
