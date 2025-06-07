@@ -14,11 +14,29 @@ import { Progress } from "@/components/ui/progress";
 import UploadIcon from "@/components/icons/UploadIcon";
 import FileIcon from "@/components/icons/FileIcon";
 import { toast } from "react-toastify";
+
 interface UploadResult {
   error?: Error;
   data?: unknown;
   fileName?: string;
+  message?: string;
 }
+
+interface FileUploadTask {
+  file: File;
+  retryCount: number;
+  maxRetries: number;
+  timeoutMs: number;
+}
+
+interface AxiosResponse {
+  data: unknown;
+  status: number;
+  statusText: string;
+  headers: unknown;
+}
+
+
 
 interface UploadPDFProps {
   folder?: string;
@@ -157,10 +175,11 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }
   };
 
-  const uploadFile = async (file: File): Promise<UploadResult> => {
+  const uploadFile = async (file: File, retryCount = 0): Promise<UploadResult> => {
     posthog.capture("pdf_upload_started", {
       fileName: file.name,
-      fileType: file.type
+      fileType: file.type,
+      retryCount
     });
 
     const mode = getFileMode(file.type);
@@ -207,12 +226,22 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }, 1000);
 
     try {
-      const response = await axios.post(apiUrl, formData, {
+      // Create a timeout promise that rejects after 2 minutes
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error(`Upload timeout after 2 minutes for file: ${file.name}`));
+        }, 120000); // 2 minutes
+      });
+
+      const uploadPromise = axios.post(apiUrl, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${tokenRef.current}`
-        }
+        },
+        timeout: 120000 // 2 minutes axios timeout
       });
+
+      const response = await Promise.race([uploadPromise, timeoutPromise]) as AxiosResponse;
 
       clearInterval(progressInterval);
       setUploadProgress((prev) => ({
@@ -221,14 +250,18 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
       }));
 
       return { data: response.data, fileName: file.name };
-    } catch (error) {
+    } catch (error: unknown) {
       clearInterval(progressInterval);
       console.error("Error uploading file:", error);
 
       // Extract the error message from the response if available
       let errorMessage = "Error uploading file";
-      if (error.response && error.response.data && error.response.data.detail) {
-        errorMessage = error.response.data.detail;
+      if (error && typeof error === 'object' && 'response' in error && 
+          error.response && typeof error.response === 'object' && 'data' in error.response &&
+          error.response.data && typeof error.response.data === 'object' && 'detail' in error.response.data) {
+        errorMessage = String(error.response.data.detail);
+      } else if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
+        errorMessage = error.message;
       }
 
       // Set upload progress to indicate failure
@@ -237,12 +270,49 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
         [file.name]: -1 // Use a negative value to indicate error
       }));
 
-      // Show error toast with the specific message from backend
-      toast.error(errorMessage);
-
-      throw error;
+      throw new Error(errorMessage);
     }
   };
+
+  const uploadFileWithRetry = async (task: FileUploadTask): Promise<UploadResult> => {
+    const { file, retryCount, maxRetries } = task;
+    
+    try {
+      return await uploadFile(file, retryCount);
+    } catch (error: unknown) {
+      if (retryCount < maxRetries) {
+        console.log(`Retrying upload for ${file.name}, attempt ${retryCount + 1}/${maxRetries}`);
+        
+        // Wait before retrying (exponential backoff)
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 10000);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        
+        // Update progress to show retry
+        setUploadProgress((prev) => ({
+          ...prev,
+          [file.name]: 0
+        }));
+        
+        return uploadFileWithRetry({
+          ...task,
+          retryCount: retryCount + 1
+        });
+      } else {
+        // Max retries reached, show error toast
+        const errorMessage = (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') 
+          ? error.message 
+          : "Error uploading file";
+        toast.error(`Failed to upload ${file.name}: ${errorMessage}`);
+        
+        return {
+          error: error instanceof Error ? error : new Error(String(error)),
+          fileName: file.name,
+          message: errorMessage
+        };
+      }
+    }
+  };
+
   useEffect(() => {
     if (selectedFiles.length > 0) {
       const newFiles = selectedFiles.filter(
@@ -288,25 +358,48 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     let failCount = 0;
 
     try {
-      // Upload files one by one sequentially
-      for (let i = 0; i < filesToUpload.length; i++) {
-        const file = filesToUpload[i];
+      // Create upload tasks with retry configuration
+      const uploadTasks: FileUploadTask[] = filesToUpload.map(file => ({
+        file,
+        retryCount: 0,
+        maxRetries: 2, // Retry up to 2 times (3 total attempts)
+        timeoutMs: 120000 // 2 minutes
+      }));
 
-        try {
-          const result = await uploadFile(file);
-          results.push({ data: result.data, fileName: result.fileName });
-          successCount++;
-
-          // Track successfully uploaded file
-          setUploadedFiles((prev) => [...prev, file.name]);
-        } catch (error) {
-          results.push({
-            error: error as Error,
-            fileName: file.name,
-            message:
-              error.response?.data?.detail || error.message || "Unknown error"
-          });
-          failCount++;
+      // Process files in batches of 5
+      const batchSize = 5;
+      for (let i = 0; i < uploadTasks.length; i += batchSize) {
+        const batch = uploadTasks.slice(i, i + batchSize);
+        
+        // Upload batch simultaneously
+        const batchPromises = batch.map(task => uploadFileWithRetry(task));
+        const batchResults = await Promise.allSettled(batchPromises);
+        
+        // Process batch results
+        for (let j = 0; j < batchResults.length; j++) {
+          const result = batchResults[j];
+          const task = batch[j];
+          
+          if (result.status === 'fulfilled') {
+            const uploadResult = result.value;
+            results.push(uploadResult);
+            
+            if (!uploadResult.error) {
+              successCount++;
+              // Track successfully uploaded file
+              setUploadedFiles((prev) => [...prev, task.file.name]);
+            } else {
+              failCount++;
+            }
+          } else {
+            // Promise was rejected
+            results.push({
+              error: new Error(result.reason?.message || "Unknown error"),
+              fileName: task.file.name,
+              message: result.reason?.message || "Unknown error"
+            });
+            failCount++;
+          }
         }
       }
 
@@ -317,6 +410,8 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
           totalFiles: filesToUpload.length
         });
 
+        toast.success(`Successfully uploaded ${successCount} file(s)${failCount > 0 ? ` (${failCount} failed)` : ''}`);
+
         // Call onUploadComplete with successfully uploaded files
         if (onUploadComplete) {
           const successfulFiles = filesToUpload.filter((file) =>
@@ -326,10 +421,15 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
           );
           onUploadComplete(successfulFiles);
         }
+      } else if (failCount > 0) {
+        toast.error(`Failed to upload ${failCount} file(s)`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error in batch upload:", error);
-      toast.error("Error uploading files");
+      const errorMessage = (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') 
+        ? error.message 
+        : "Unknown error";
+      toast.error("Error uploading files: " + errorMessage);
     } finally {
       setUploadingDocuments?.(false);
       if (get_collections) {
