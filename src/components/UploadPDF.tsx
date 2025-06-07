@@ -187,10 +187,10 @@ const UploadPDF: React.FC<UploadPDFProps> = ({
     }
 
     const fileSizeInMB = file.size / (1024 * 1024);
-    const durationPerMB = 30000;
+    const durationPerMB = 100000; // 3x slower than original 30000
     const duration = Math.max(
       10000,
-      Math.min(300000, Math.round(fileSizeInMB * durationPerMB))
+      Math.min(900000, Math.round(fileSizeInMB * durationPerMB)) // Also increased max duration
     );
 
     const startTime = Date.now();

@@ -118,7 +118,7 @@ const NewTenderModal: React.FC<NewTenderModalProps> = ({
   ];
 
   const startProgressBar = () => {
-    const duration = 68000; // 1 minute in ms
+    const duration = 340000; // 5.67 minutes in ms (5x slower)
     const interval = 100;
     const steps = duration / interval;
     const increment = 98 / steps;
